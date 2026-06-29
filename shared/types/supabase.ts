@@ -102,10 +102,16 @@ export type Database = {
           approved_at: string | null
           approved_by: string | null
           created_at: string
+          id_document_content_type: string | null
+          id_document_path: string | null
+          id_document_size_bytes: number | null
+          id_document_uploaded_at: string | null
           profile_id: string
           rejected_at: string | null
           rejected_by: string | null
           rejection_reason: string | null
+          student_id_number: string | null
+          submitted_at: string | null
           updated_at: string
         }
         Insert: {
@@ -113,10 +119,16 @@ export type Database = {
           approved_at?: string | null
           approved_by?: string | null
           created_at?: string
+          id_document_content_type?: string | null
+          id_document_path?: string | null
+          id_document_size_bytes?: number | null
+          id_document_uploaded_at?: string | null
           profile_id: string
           rejected_at?: string | null
           rejected_by?: string | null
           rejection_reason?: string | null
+          student_id_number?: string | null
+          submitted_at?: string | null
           updated_at?: string
         }
         Update: {
@@ -124,10 +136,16 @@ export type Database = {
           approved_at?: string | null
           approved_by?: string | null
           created_at?: string
+          id_document_content_type?: string | null
+          id_document_path?: string | null
+          id_document_size_bytes?: number | null
+          id_document_uploaded_at?: string | null
           profile_id?: string
           rejected_at?: string | null
           rejected_by?: string | null
           rejection_reason?: string | null
+          student_id_number?: string | null
+          submitted_at?: string | null
           updated_at?: string
         }
         Relationships: [

@@ -5,10 +5,18 @@ export type AdminDepartment = Database["public"]["Enums"]["admin_department"];
 export type ApprovalStatus = Database["public"]["Enums"]["approval_status"];
 
 export type BaseProfile = Database["public"]["Tables"]["profiles"]["Row"];
+export type StudentProfile = Database["public"]["Tables"]["student_profiles"]["Row"];
 
 export type Profile = BaseProfile & {
   admin_department: AdminDepartment | null;
   approval_status: ApprovalStatus;
+  student_id_number?: string | null;
+  id_document_path?: string | null;
+  id_document_content_type?: string | null;
+  id_document_size_bytes?: number | null;
+  id_document_uploaded_at?: string | null;
+  submitted_at?: string | null;
+  rejection_reason?: string | null;
 };
 
 export type Permission =
