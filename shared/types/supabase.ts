@@ -75,6 +75,10 @@ export type Database = {
           email: string
           full_name: string
           id: string
+          profile_photo_content_type: string | null
+          profile_photo_path: string | null
+          profile_photo_size_bytes: number | null
+          profile_photo_uploaded_at: string | null
           role: Database["public"]["Enums"]["app_role"]
           updated_at: string
         }
@@ -83,6 +87,10 @@ export type Database = {
           email: string
           full_name: string
           id: string
+          profile_photo_content_type?: string | null
+          profile_photo_path?: string | null
+          profile_photo_size_bytes?: number | null
+          profile_photo_uploaded_at?: string | null
           role: Database["public"]["Enums"]["app_role"]
           updated_at?: string
         }
@@ -91,6 +99,10 @@ export type Database = {
           email?: string
           full_name?: string
           id?: string
+          profile_photo_content_type?: string | null
+          profile_photo_path?: string | null
+          profile_photo_size_bytes?: number | null
+          profile_photo_uploaded_at?: string | null
           role?: Database["public"]["Enums"]["app_role"]
           updated_at?: string
         }
