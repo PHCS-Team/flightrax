@@ -2,42 +2,31 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import type { FormEvent, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { useState } from "react";
 import { motion, type Variants } from "motion/react";
 import {
   ActivityIcon,
   BellIcon,
   CalendarClockIcon,
-  ChevronDownIcon,
   GaugeIcon,
-  LogOutIcon,
   MenuIcon,
   PlaneIcon,
   RadarIcon,
-  SettingsIcon,
   UserCheckIcon,
   UsersIcon,
   XIcon,
 } from "lucide-react";
 
-import { logoutAction } from "@/modules/auth/actions/logout";
-import { Avatar, AvatarFallback } from "@/shared/components/ui/avatar";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/shared/components/ui/avatar";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/shared/components/ui/dropdown-menu";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/shared/components/ui/sheet";
 import { FlightRaxBackground } from "@/shared/components/layout/flightrax-background";
+import { getAvatarFallback } from "@/shared/lib/avatar-fallback";
 import type { Profile } from "@/shared/lib/rbac/types";
 import { cn } from "@/shared/lib/utils";
 
@@ -68,95 +57,6 @@ const sidebarCopyVariants = {
     transition: copyTransition,
   },
 } satisfies Variants;
-
-function handleLogoutSubmit(event: FormEvent<HTMLFormElement>) {
-  if (!window.confirm("Log out of FlightRax?")) {
-    event.preventDefault();
-  }
-}
-
-function getAvatarFallback(profile: Profile | null) {
-  const source =
-    profile?.full_name?.trim() || profile?.email?.trim() || "FlightRax";
-  const parts = source.split(/[\s@._-]+/).filter(Boolean);
-  const initials = parts
-    .slice(0, 2)
-    .map((part) => part.at(0)?.toUpperCase() ?? "")
-    .join("");
-
-  return initials || "FR";
-}
-
-function AccountAvatar({
-  profile,
-  size = "sm",
-}: {
-  profile: Profile | null;
-  size?: "sm" | "lg";
-}) {
-  return (
-    <Avatar size={size}>
-      <AvatarFallback className="bg-primary-foreground/15 text-primary-foreground">
-        {getAvatarFallback(profile)}
-      </AvatarFallback>
-    </Avatar>
-  );
-}
-
-function AccountContent({ profile }: { profile: Profile | null }) {
-  return (
-    <div className="space-y-3">
-      <div className="rounded-2xl border border-primary-foreground/15 bg-primary-foreground/10 p-3">
-        <div className="flex items-start gap-3">
-          <AccountAvatar profile={profile} size="lg" />
-          <div className="min-w-0 flex-1">
-            {profile?.full_name && (
-              <p className="truncate text-sm font-semibold text-primary-foreground">
-                {profile.full_name}
-              </p>
-            )}
-            <p className="truncate text-sm text-primary-foreground/75">
-              {profile?.email ?? "Profile unavailable"}
-            </p>
-            {profile?.student_id_number && (
-              <p className="mt-1 text-xs uppercase tracking-[0.18em] text-primary-foreground/60">
-                ID {profile.student_id_number}
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <div className="grid gap-2">
-        <Button
-          className="h-auto justify-start rounded-2xl border-primary-foreground/15 bg-primary-foreground/10 py-3 text-primary-foreground opacity-60"
-          disabled
-          type="button"
-          variant="outline"
-        >
-          <SettingsIcon className="size-4" />
-          <span className="flex flex-col items-start leading-none">
-            <span>Account settings</span>
-            <span className="mt-1 text-xs font-normal text-primary-foreground/65">
-              Coming soon
-            </span>
-          </span>
-        </Button>
-
-        <form action={logoutAction} onSubmit={handleLogoutSubmit}>
-          <Button
-            className="w-full justify-start rounded-2xl border border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground hover:bg-destructive/25 hover:text-primary-foreground"
-            type="submit"
-            variant="destructive"
-          >
-            <LogOutIcon className="size-4" />
-            Logout
-          </Button>
-        </form>
-      </div>
-    </div>
-  );
-}
 
 function NetworkStatusCard() {
   return (
@@ -327,61 +227,40 @@ export function DashboardShell({
                 />
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2.5 sm:gap-2">
                 <Button
                   aria-label="Notifications"
                   size="icon"
-                  variant="outline"
-                  className="relative rounded-2xl border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground"
+                  variant="ghost"
+                  className="relative rounded-full text-primary-foreground/85 hover:bg-primary-foreground/10 hover:text-primary-foreground"
                 >
-                  <BellIcon className="size-4" />
-                  <span className="absolute right-2 top-2 size-2 rounded-full bg-warning" />
+                  <BellIcon className="size-6 sm:size-5 " />
+                  <span className="absolute right-1 top-1 sm:right-1.5 sm:top-1.5 size-2 sm:size-1.5 rounded-full bg-warning" />
                 </Button>
 
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="hidden rounded-2xl border-primary-foreground/20 bg-primary-foreground/10 pl-1.5 text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground sm:flex"
-                    >
-                      <AccountAvatar profile={profile} />
-                      <span className="text-sm font-medium">Account</span>
-                      <ChevronDownIcon className="size-4 text-primary-foreground/70" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    align="end"
-                    className="w-80 rounded-2xl border-primary-foreground/15 bg-primary p-2 text-primary-foreground shadow-xl"
-                  >
-                    <AccountContent profile={profile} />
-                  </DropdownMenuContent>
-                </DropdownMenu>
-
-                <Sheet>
-                  <SheetTrigger asChild>
-                    <Button
-                      aria-label="Open account menu"
-                      className="rounded-2xl border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground sm:hidden"
-                      size="icon"
-                      variant="outline"
-                    >
-                      <AccountAvatar profile={profile} />
-                    </Button>
-                  </SheetTrigger>
-                  <SheetContent
-                    className="border-primary-foreground/15 bg-primary p-0 text-primary-foreground sm:hidden"
-                    side="right"
-                  >
-                    <SheetHeader className="border-b border-primary-foreground/15 p-4 pr-12">
-                      <SheetTitle className="text-primary-foreground">
-                        Account
-                      </SheetTitle>
-                    </SheetHeader>
-                    <div className="p-4">
-                      <AccountContent profile={profile} />
-                    </div>
-                  </SheetContent>
-                </Sheet>
+                <Button
+                  asChild
+                  aria-label="Open account page"
+                  className="rounded-full p-0 text-primary-foreground hover:bg-primary-foreground/10"
+                  size="icon"
+                  variant="ghost"
+                >
+                  <Link href="/account">
+                    <Avatar className="border-2 border-primary-foreground/85">
+                      {profile?.profile_photo_url && (
+                        <AvatarImage
+                          alt={`${profile.full_name} profile photo`}
+                          src={profile.profile_photo_url}
+                        />
+                      )}
+                      <AvatarFallback className="bg-linear-to-b from-primary to-tertiary text-primary-foreground">
+                        {getAvatarFallback(
+                          profile?.full_name?.trim() || profile?.email,
+                        )}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Link>
+                </Button>
               </div>
             </div>
           </header>

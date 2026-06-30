@@ -10,6 +10,7 @@ export type StudentProfile = Database["public"]["Tables"]["student_profiles"]["R
 export type Profile = BaseProfile & {
   admin_department: AdminDepartment | null;
   approval_status: ApprovalStatus;
+  profile_photo_url?: string | null;
   student_id_number?: string | null;
   id_document_path?: string | null;
   id_document_content_type?: string | null;
