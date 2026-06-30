@@ -1,4 +1,9 @@
-import type { AdminDepartment, ApprovalStatus, Permission, ProfileRole } from "@/shared/lib/rbac/types";
+import type {
+  AdminDepartment,
+  ApprovalStatus,
+  Permission,
+  ProfileRole,
+} from "@/shared/lib/rbac/types";
 
 export const ROLE = {
   STUDENT: "student",
@@ -32,30 +37,53 @@ export const APPROVAL_STATUS = {
 export const APPROVAL_STATUSES: ApprovalStatus[] = Object.values(APPROVAL_STATUS);
 
 const ROLE_PERMISSIONS = {
-  [ROLE.STUDENT]: ["dashboard.view"],
-  [ROLE.INSTRUCTOR]: [
+  [ROLE.STUDENT]: [
+    "account.view",
     "dashboard.view",
-    "flights.view",
-    "scheduling.view",
-    "monitoring.view",
-    "students.approve",
+    "flight_documents.view",
+    "instructors.view",
+    "schedule.view",
+  ],
+  [ROLE.INSTRUCTOR]: [
+    "account.view",
+    "dashboard.view",
+    "flight_documents.view",
+    "instructors.view",
+    "schedule.view",
+    "students.review",
   ],
   [ROLE.ADMIN]: [
-    "dashboard.view",
-    "flights.view",
-    "scheduling.view",
-    "monitoring.view",
-    "aircraft.view",
-    "crew.view",
-    "students.approve",
+    "account.view",
+    "aircrafts.view",
+    "notams.view",
+    "schedule.view",
+    "instructors.view",
   ],
   [ROLE.SUPERADMIN]: ["system.manage"],
 } satisfies Record<ProfileRole, Permission[]>;
 
 const ADMIN_DEPARTMENT_PERMISSIONS = {
-  [ADMIN_DEPARTMENT.FLIGHT_OPERATIONS_PERSONNEL]: ["admin.flight_operations_personnel", "flights.view", "scheduling.view"],
-  [ADMIN_DEPARTMENT.AIR_TRAFFIC_CONTROLLER]: ["admin.air_traffic_controller", "aircraft.view", "monitoring.view"],
-  [ADMIN_DEPARTMENT.SAFETY_PERSONNEL]: ["admin.safety_personnel", "crew.view", "monitoring.view"],
+  [ADMIN_DEPARTMENT.FLIGHT_OPERATIONS_PERSONNEL]: [
+    "admin.flight_operations_personnel",
+    "aircrafts.view",
+    "notams.view",
+    "schedule.view",
+    "instructors.view",
+  ],
+  [ADMIN_DEPARTMENT.AIR_TRAFFIC_CONTROLLER]: [
+    "admin.air_traffic_controller",
+    "aircrafts.view",
+    "notams.view",
+    "schedule.view",
+    "instructors.view",
+  ],
+  [ADMIN_DEPARTMENT.SAFETY_PERSONNEL]: [
+    "admin.safety_personnel",
+    "aircrafts.view",
+    "notams.view",
+    "schedule.view",
+    "instructors.view",
+  ],
 } satisfies Record<AdminDepartment, Permission[]>;
 
 export function getRolePermissions(role: ProfileRole, department?: AdminDepartment | null) {

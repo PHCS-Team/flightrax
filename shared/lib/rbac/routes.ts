@@ -1,13 +1,15 @@
-import { APPROVAL_STATUS, hasPermission } from "@/shared/lib/rbac/config";
+import { APPROVAL_STATUS, ROLE, hasPermission } from "@/shared/lib/rbac/config";
 import type { Permission, Profile, ProfileRole } from "@/shared/lib/rbac/types";
 
 const PROTECTED_ROUTES: Array<{ prefix: string; permission: Permission }> = [
+  { prefix: "/account", permission: "account.view" },
   { prefix: "/dashboard", permission: "dashboard.view" },
-  { prefix: "/flights", permission: "flights.view" },
-  { prefix: "/scheduling", permission: "scheduling.view" },
-  { prefix: "/monitoring", permission: "monitoring.view" },
-  { prefix: "/aircraft", permission: "aircraft.view" },
-  { prefix: "/crew", permission: "crew.view" },
+  { prefix: "/flight-documents", permission: "flight_documents.view" },
+  { prefix: "/instructors", permission: "instructors.view" },
+  { prefix: "/schedule", permission: "schedule.view" },
+  { prefix: "/aircrafts", permission: "aircrafts.view" },
+  { prefix: "/notams", permission: "notams.view" },
+  { prefix: "/student-review", permission: "students.review" },
 ];
 
 export function getAuthRedirectForRole(role: ProfileRole) {
@@ -17,6 +19,10 @@ export function getAuthRedirectForRole(role: ProfileRole) {
 export function getDefaultRedirectForProfile(profile: Profile) {
   if (profile.approval_status !== APPROVAL_STATUS.APPROVED) {
     return "/pending-approval";
+  }
+
+  if (profile.role === ROLE.ADMIN) {
+    return "/aircrafts";
   }
 
   return "/dashboard";

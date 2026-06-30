@@ -1,7 +1,11 @@
-import { APPROVAL_STATUS, ROLE } from "@/shared/lib/rbac/config";
+import { APPROVAL_STATUS } from "@/shared/lib/rbac/config";
 import { PROFILE_PHOTO_BUCKET } from "@/modules/auth/utils/profile-photo";
+import {
+  normalizeProfile,
+  type ProfileWithRoleProfiles,
+} from "@/shared/lib/rbac/profile";
 import { createClient } from "@/shared/lib/supabase/server";
-import type { AdminDepartment, ApprovalStatus, Profile, ProfileRole } from "@/shared/lib/rbac/types";
+import type { Profile } from "@/shared/lib/rbac/types";
 import type { Database } from "@/shared/types/supabase";
 
 type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
@@ -16,37 +20,9 @@ type StudentProfileApproval = Pick<
   | "student_id_number"
   | "submitted_at"
 >;
-type AdminProfileDepartment = Pick<
-  Database["public"]["Tables"]["admin_profiles"]["Row"],
-  "department"
->;
-
-type ProfileWithRoleProfiles = ProfileRow & {
-  student_profiles: StudentProfileApproval | null;
-  admin_profiles: AdminProfileDepartment | null;
-};
-
 type PendingStudentWithProfile = StudentProfileApproval & {
   profiles: ProfileRow | null;
 };
-
-function getEffectiveApprovalStatus(
-  role: ProfileRole,
-  studentApprovalStatus: ApprovalStatus | null,
-): ApprovalStatus {
-  if (role === ROLE.STUDENT) {
-    return studentApprovalStatus ?? APPROVAL_STATUS.PENDING;
-  }
-
-  return APPROVAL_STATUS.APPROVED;
-}
-
-function getAdminDepartment(
-  role: ProfileRole,
-  adminDepartment: AdminDepartment | null,
-): AdminDepartment | null {
-  return role === ROLE.ADMIN ? adminDepartment : null;
-}
 
 async function getSignedProfilePhotoUrl(path: string | null) {
   if (!path) {
@@ -66,31 +42,10 @@ async function getSignedProfilePhotoUrl(path: string | null) {
 }
 
 async function toProfile(row: ProfileWithRoleProfiles): Promise<Profile> {
-  return {
-    id: row.id,
-    email: row.email,
-    full_name: row.full_name,
-    profile_photo_path: row.profile_photo_path,
-    profile_photo_content_type: row.profile_photo_content_type,
-    profile_photo_size_bytes: row.profile_photo_size_bytes,
-    profile_photo_uploaded_at: row.profile_photo_uploaded_at,
-    profile_photo_url: await getSignedProfilePhotoUrl(row.profile_photo_path),
-    role: row.role,
-    created_at: row.created_at,
-    updated_at: row.updated_at,
-    admin_department: getAdminDepartment(row.role, row.admin_profiles?.department ?? null),
-    approval_status: getEffectiveApprovalStatus(
-      row.role,
-      row.student_profiles?.approval_status ?? null,
-    ),
-    student_id_number: row.student_profiles?.student_id_number ?? null,
-    id_document_path: row.student_profiles?.id_document_path ?? null,
-    id_document_content_type: row.student_profiles?.id_document_content_type ?? null,
-    id_document_size_bytes: row.student_profiles?.id_document_size_bytes ?? null,
-    id_document_uploaded_at: row.student_profiles?.id_document_uploaded_at ?? null,
-    submitted_at: row.student_profiles?.submitted_at ?? null,
-    rejection_reason: row.student_profiles?.rejection_reason ?? null,
-  };
+  return normalizeProfile(row, {
+    includeStudentDocuments: true,
+    profilePhotoUrl: await getSignedProfilePhotoUrl(row.profile_photo_path),
+  });
 }
 
 function toPendingStudentProfile(row: PendingStudentWithProfile): Profile | null {

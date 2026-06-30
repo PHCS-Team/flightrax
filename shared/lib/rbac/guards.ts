@@ -10,5 +10,5 @@ export function canApproveStudent(actor: Profile | null, target: Profile | null)
     return false;
   }
 
-  return isApproved(actor) && hasPermission(actor.role, "students.approve", actor.admin_department);
+  return isApproved(actor) && hasPermission(actor.role, "students.review", actor.admin_department);
 }

@@ -6,15 +6,9 @@ import type { ReactNode } from "react";
 import { useState } from "react";
 import { motion, type Variants } from "motion/react";
 import {
-  ActivityIcon,
   BellIcon,
-  CalendarClockIcon,
-  GaugeIcon,
   MenuIcon,
   PlaneIcon,
-  RadarIcon,
-  UserCheckIcon,
-  UsersIcon,
   XIcon,
 } from "lucide-react";
 
@@ -26,19 +20,10 @@ import {
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import { FlightRaxBackground } from "@/shared/components/layout/flightrax-background";
+import { getDashboardNavigation } from "@/shared/components/layout/navigation";
 import { getAvatarFallback } from "@/shared/lib/avatar-fallback";
 import type { Profile } from "@/shared/lib/rbac/types";
 import { cn } from "@/shared/lib/utils";
-
-const navigationItems = [
-  { href: "/dashboard", label: "Dashboard", icon: GaugeIcon },
-  { href: "/flights", label: "Flights", icon: PlaneIcon },
-  { href: "/scheduling", label: "Scheduling", icon: CalendarClockIcon },
-  { href: "/monitoring", label: "Monitoring", icon: RadarIcon },
-  { href: "/aircraft", label: "Aircraft", icon: ActivityIcon },
-  { href: "/crew", label: "Crew", icon: UsersIcon },
-  { href: "/student-review", label: "Student review", icon: UserCheckIcon },
-];
 
 const copyTransition = {
   duration: 0.12,
@@ -82,6 +67,7 @@ export function DashboardShell({
 }) {
   const [desktopCollapsed, setDesktopCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const navigationItems = getDashboardNavigation(profile);
 
   return (
     <FlightRaxBackground className="min-h-screen">
