@@ -21,7 +21,3 @@ export function getSupabaseAdminConfig() {
 
   return { supabaseUrl, supabaseServiceRoleKey };
 }
-
-export function isPublicStudentReviewEnabled() {
-  return process.env.ENABLE_PUBLIC_STUDENT_REVIEW === "true" || process.env.NODE_ENV !== "production";
-}

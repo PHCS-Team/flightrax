@@ -2,22 +2,17 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { useState } from "react";
 import { motion, type Variants } from "motion/react";
-import {
-  BellIcon,
-  MenuIcon,
-  PlaneIcon,
-  XIcon,
-} from "lucide-react";
+import { BellIcon, MenuIcon, PlaneIcon, XIcon } from "lucide-react";
 
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
 } from "@/shared/components/ui/avatar";
-import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import { FlightRaxBackground } from "@/shared/components/layout/flightrax-background";
 import { getDashboardNavigation } from "@/shared/components/layout/navigation";
@@ -46,13 +41,13 @@ const sidebarCopyVariants = {
 function NetworkStatusCard() {
   return (
     <div className="rounded-2xl border border-primary-foreground/15 bg-primary-foreground/10 p-3 text-primary-foreground">
-      <div className="flex items-center justify-between text-sm">
-        <span className="font-medium">Network status</span>
-        <Badge variant="secondary">Static</Badge>
+      <div className="text-xs font-medium uppercase tracking-wide opacity-75">
+        Flight Student Tip
       </div>
-      <p className="mt-2 text-sm leading-6 text-primary-foreground/75">
-        Supabase wiring is scaffolded; these panels are temporary static
-        surfaces until live data is connected.
+      <p className="mt-1.5 text-sm leading-6">
+        <strong className="text-white">Aviate, Navigate, Communicate:</strong>{" "}
+        Fly the airplane first. Never drop the controls to manage the radio or
+        navigation.
       </p>
     </div>
   );
@@ -65,12 +60,13 @@ export function DashboardShell({
   children: ReactNode;
   profile: Profile | null;
 }) {
+  const pathname = usePathname();
   const [desktopCollapsed, setDesktopCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const navigationItems = getDashboardNavigation(profile);
 
   return (
-    <FlightRaxBackground className="min-h-screen">
+    <FlightRaxBackground>
       {mobileOpen && (
         <button
           aria-label="Close sidebar overlay"
@@ -80,11 +76,13 @@ export function DashboardShell({
         />
       )}
 
-      <div className="mx-auto flex min-h-screen w-full max-w-7xl gap-6 px-4 pb-4 lg:px-6 lg:py-4">
+      <div className="mx-auto flex min-h-dvh w-full max-w-7xl gap-6 px-0 pb-0 sm:px-6 sm:py-4">
         <aside
           className={cn(
-            "fixed inset-y-0 left-0 z-40 flex w-72 flex-col border-r border-primary-foreground/15 bg-primary p-4 text-primary-foreground shadow-xl transition-transform duration-200 lg:sticky lg:top-4 lg:z-auto lg:h-[calc(100vh-2rem)] lg:rounded-3xl lg:border lg:bg-primary/95 lg:backdrop-blur lg:transition-[width,padding] lg:duration-200 lg:ease-out lg:translate-x-0 lg:shadow-sm",
-            mobileOpen ? "translate-x-0" : "-translate-x-[calc(100%+2rem)]",
+            "fixed inset-y-0 left-0 z-40 flex w-72 flex-col border-r border-primary-foreground/15 bg-primary p-4 text-primary-foreground shadow-xl transition-transform duration-200 ease-out lg:sticky lg:top-4 lg:z-auto lg:h-[calc(100vh-2rem)] lg:rounded-3xl lg:border lg:bg-primary/95 lg:backdrop-blur lg:transition-[width,padding] lg:duration-200 lg:ease-out lg:translate-x-0 lg:shadow-sm",
+            mobileOpen
+              ? "translate-x-0 pointer-events-auto"
+              : "-translate-x-full pointer-events-none lg:pointer-events-auto",
             desktopCollapsed && "lg:w-20 lg:px-3",
           )}
         >
@@ -145,6 +143,9 @@ export function DashboardShell({
             <nav className="grid gap-1">
               {navigationItems.map((item) => {
                 const Icon = item.icon;
+                const active =
+                  pathname === item.href ||
+                  pathname.startsWith(`${item.href}/`);
 
                 return (
                   <Button
@@ -154,10 +155,16 @@ export function DashboardShell({
                     variant="ghost"
                     className={cn(
                       "justify-start gap-3 rounded-2xl text-primary-foreground/80 hover:bg-primary-foreground/10 hover:text-primary-foreground aria-expanded:bg-primary-foreground/10 aria-expanded:text-primary-foreground",
+                      active &&
+                        "bg-primary-foreground/15 text-primary-foreground shadow-sm ring-1 ring-primary-foreground/15",
                       desktopCollapsed && "lg:justify-center lg:gap-0 lg:px-0",
                     )}
                   >
-                    <Link href={item.href} onClick={() => setMobileOpen(false)}>
+                    <Link
+                      aria-current={active ? "page" : undefined}
+                      href={item.href}
+                      onClick={() => setMobileOpen(false)}
+                    >
                       <Icon className="size-4 shrink-0" />
                       <span className="lg:hidden">{item.label}</span>
                       <motion.span
@@ -184,8 +191,8 @@ export function DashboardShell({
           </div>
         </aside>
 
-        <div className="min-w-0 flex-1 space-y-6">
-          <header className="sticky top-0 z-20 -mx-4 border-b border-primary-foreground/15 bg-primary p-4 text-primary-foreground shadow-sm lg:top-4 lg:mx-0 lg:rounded-3xl lg:border lg:bg-primary/90 lg:backdrop-blur">
+        <div className="min-w-0 flex-1 space-y-0 sm:space-y-6">
+          <header className="sticky top-0 z-20 border-b border-primary-foreground/15 bg-primary p-4 text-primary-foreground shadow-sm lg:top-4 lg:rounded-3xl lg:border lg:bg-primary/90 lg:backdrop-blur">
             <div className="flex items-center justify-between gap-3">
               <div className="flex min-w-0 items-center gap-3">
                 <button
@@ -251,7 +258,7 @@ export function DashboardShell({
             </div>
           </header>
 
-          <main className="min-w-0 pb-8">{children}</main>
+          <main className="min-w-0 lg:pb-8">{children}</main>
         </div>
       </div>
     </FlightRaxBackground>

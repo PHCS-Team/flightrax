@@ -1,28 +1,52 @@
-import { ActivityIcon, ClockIcon, PlaneIcon, ShieldCheckIcon } from "lucide-react";
+import {
+  ActivityIcon,
+  ClockIcon,
+  PlaneIcon,
+  ShieldCheckIcon,
+} from "lucide-react";
 
-import { Badge } from "@/shared/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/shared/components/ui/card";
+import { PageHeader } from "@/shared/components/layout/page-header";
 
 const metrics = [
-  { label: "Active flights", value: "42", note: "Across 7 sectors", icon: PlaneIcon },
-  { label: "On-time rate", value: "94%", note: "Static target", icon: ClockIcon },
-  { label: "Ops alerts", value: "3", note: "Awaiting realtime", icon: ActivityIcon },
-  { label: "Crew ready", value: "128", note: "Roster placeholder", icon: ShieldCheckIcon },
+  {
+    label: "Active flights",
+    value: "42",
+    note: "Across 7 sectors",
+    icon: PlaneIcon,
+  },
+  {
+    label: "On-time rate",
+    value: "94%",
+    note: "Static target",
+    icon: ClockIcon,
+  },
+  {
+    label: "Ops alerts",
+    value: "3",
+    note: "Awaiting realtime",
+    icon: ActivityIcon,
+  },
+  {
+    label: "Crew ready",
+    value: "128",
+    note: "Roster placeholder",
+    icon: ShieldCheckIcon,
+  },
 ];
 
 export function DashboardPage() {
   return (
-    <section className="space-y-6 py-2">
-      <div className="rounded-3xl border bg-card p-6 shadow-sm">
-        <Badge variant="secondary">Operations overview</Badge>
-        <h1 className="mt-4 text-4xl font-semibold tracking-tight">
-          Today&apos;s network posture
-        </h1>
-        <p className="mt-3 max-w-3xl text-muted-foreground">
-          Static command-center cards for the first FlightRax scaffold. These
-          surfaces are ready for TanStack Query data once Supabase tables exist.
-        </p>
-      </div>
+    <section>
+      <PageHeader
+        breadcrumbs={[{ href: "/dashboard", label: "Dashboard" }]}
+        title="Flight Status"
+      />
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {metrics.map((metric) => {
@@ -38,7 +62,9 @@ export function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-semibold">{metric.value}</div>
-                <p className="mt-2 text-sm text-muted-foreground">{metric.note}</p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {metric.note}
+                </p>
               </CardContent>
             </Card>
           );

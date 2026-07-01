@@ -3,40 +3,60 @@
 import { revalidatePath } from "next/cache";
 
 import { actionClient } from "@/shared/lib/safe-action";
-import { APPROVAL_STATUS } from "@/shared/lib/rbac/config";
-import { isPublicStudentReviewEnabled } from "@/shared/lib/supabase/config";
+import { APPROVAL_STATUS, hasPermission } from "@/shared/lib/rbac/config";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
+import { isApproved } from "@/shared/lib/rbac/guards";
+import { getCurrentProfile } from "@/modules/auth/queries/profile";
 import { approveStudentSchema, rejectStudentSchema } from "@/modules/auth/schemas/auth-schema";
 
 const STUDENT_REVIEW_PATH = "/student-review";
 
-function assertPublicReviewEnabled() {
-  if (!isPublicStudentReviewEnabled()) {
-    throw new Error("Public student review is disabled.");
+async function getAuthorizedReviewer() {
+  const profile = await getCurrentProfile();
+
+  if (!profile || !isApproved(profile)) {
+    return null;
   }
+
+  if (!hasPermission(profile.role, "students.review", profile.admin_department)) {
+    return null;
+  }
+
+  return profile;
 }
 
 export const approveStudentForReviewAction = actionClient
   .inputSchema(approveStudentSchema)
   .action(async ({ parsedInput }) => {
-    assertPublicReviewEnabled();
+    const reviewer = await getAuthorizedReviewer();
+
+    if (!reviewer) {
+      return { ok: false, message: "You do not have permission to review students." };
+    }
 
     const supabase = createAdminClient();
     const now = new Date().toISOString();
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("student_profiles")
       .update({
         approval_status: APPROVAL_STATUS.APPROVED,
         approved_at: now,
-        approved_by: null,
+        approved_by: reviewer.id,
         rejected_at: null,
         rejected_by: null,
         rejection_reason: null,
       })
-      .eq("profile_id", parsedInput.studentId);
+      .eq("profile_id", parsedInput.studentId)
+      .eq("approval_status", APPROVAL_STATUS.PENDING)
+      .select("profile_id")
+      .maybeSingle();
 
     if (error) {
       return { ok: false, message: error.message };
+    }
+
+    if (!data) {
+      return { ok: false, message: "This student request has already been reviewed." };
     }
 
     revalidatePath(STUDENT_REVIEW_PATH);
@@ -47,24 +67,35 @@ export const approveStudentForReviewAction = actionClient
 export const rejectStudentForReviewAction = actionClient
   .inputSchema(rejectStudentSchema)
   .action(async ({ parsedInput }) => {
-    assertPublicReviewEnabled();
+    const reviewer = await getAuthorizedReviewer();
+
+    if (!reviewer) {
+      return { ok: false, message: "You do not have permission to review students." };
+    }
 
     const supabase = createAdminClient();
     const now = new Date().toISOString();
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("student_profiles")
       .update({
         approval_status: APPROVAL_STATUS.REJECTED,
         approved_at: null,
         approved_by: null,
         rejected_at: now,
-        rejected_by: null,
+        rejected_by: reviewer.id,
         rejection_reason: parsedInput.rejectionReason,
       })
-      .eq("profile_id", parsedInput.studentId);
+      .eq("profile_id", parsedInput.studentId)
+      .eq("approval_status", APPROVAL_STATUS.PENDING)
+      .select("profile_id")
+      .maybeSingle();
 
     if (error) {
       return { ok: false, message: error.message };
+    }
+
+    if (!data) {
+      return { ok: false, message: "This student request has already been reviewed." };
     }
 
     revalidatePath(STUDENT_REVIEW_PATH);

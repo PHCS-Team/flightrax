@@ -50,6 +50,7 @@ const ROLE_PERMISSIONS = {
     "flight_documents.view",
     "instructors.view",
     "schedule.view",
+    "students.view",
     "students.review",
   ],
   [ROLE.ADMIN]: [

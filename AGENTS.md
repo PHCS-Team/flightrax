@@ -125,6 +125,7 @@ export default function Page() {
 - Only put something in `shared/` if it is genuinely used by **two or more** modules.
 - `shared/components/ui/` is **exclusively** for shadcn/ui generated components. Never add custom components here.
 - `shared/components/layout/` is for structural shell components (Sidebar, Header, Nav).
+- Dashboard content surfaces should use solid square primary-themed surfaces on mobile and rounded glass surfaces on desktop; prefer the reusable `GlassSurface` component in `shared/components/layout/`.
 - `shared/lib/supabase/` is the **only** place Supabase clients are instantiated. Do not create Supabase clients anywhere else.
 
 ---

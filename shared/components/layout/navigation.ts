@@ -3,6 +3,7 @@ import {
   CalendarClockIcon,
   FileTextIcon,
   GaugeIcon,
+  GraduationCapIcon,
   PlaneIcon,
   UserCheckIcon,
   UsersIcon,
@@ -17,6 +18,7 @@ export type DashboardNavigationItemId =
   | "flightDocuments"
   | "instructors"
   | "schedule"
+  | "students"
   | "studentReview"
   | "aircrafts"
   | "notams";
@@ -53,6 +55,12 @@ const DASHBOARD_NAVIGATION_ITEMS = {
     id: "schedule",
     label: "Schedule",
   },
+  students: {
+    href: "/students",
+    icon: GraduationCapIcon,
+    id: "students",
+    label: "Students",
+  },
   studentReview: {
     href: "/student-review",
     icon: UserCheckIcon,
@@ -82,6 +90,7 @@ const STUDENT_NAVIGATION_ITEM_IDS = [
 
 const INSTRUCTOR_NAVIGATION_ITEM_IDS = [
   ...STUDENT_NAVIGATION_ITEM_IDS,
+  "students",
   "studentReview",
 ] as const satisfies readonly DashboardNavigationItemId[];
 

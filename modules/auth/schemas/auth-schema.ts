@@ -14,6 +14,11 @@ const baseRegisterSchema = z.object({
     .min(2)
     .regex(/^[^,]+,\s*[^,]+$/, "Use the format Lastname, First M."),
 });
+const licenseFieldsSchema = z.object({
+  licenseType: z.string().trim().min(1, "Enter the license type."),
+  licenseNumber: z.string().trim().min(1, "Enter the license number."),
+  rating: z.string().trim().min(1, "Enter the rating."),
+});
 const studentIdDocumentSchema = z.custom<File>(
   (value) => typeof File !== "undefined" && value instanceof File,
   "Upload an image of the student ID.",
@@ -29,6 +34,9 @@ export const registerSchema = baseRegisterSchema
   .extend({
     role: roleSchema,
     adminDepartment: adminDepartmentSchema.optional(),
+    licenseType: z.string().trim().optional(),
+    licenseNumber: z.string().trim().optional(),
+    rating: z.string().trim().optional(),
   })
   .superRefine((value, context) => {
     if (value.role === ROLE.ADMIN && !value.adminDepartment) {
@@ -46,9 +54,44 @@ export const registerSchema = baseRegisterSchema
         message: "Only admins can choose a department.",
       });
     }
+
+    if (value.role === ROLE.INSTRUCTOR) {
+      if (!value.licenseType) {
+        context.addIssue({
+          code: "custom",
+          path: ["licenseType"],
+          message: "Enter the license type.",
+        });
+      }
+
+      if (!value.licenseNumber) {
+        context.addIssue({
+          code: "custom",
+          path: ["licenseNumber"],
+          message: "Enter the license number.",
+        });
+      }
+
+      if (!value.rating) {
+        context.addIssue({
+          code: "custom",
+          path: ["rating"],
+          message: "Enter the rating.",
+        });
+      }
+    }
+
+    if (value.role !== ROLE.INSTRUCTOR && (value.licenseType || value.licenseNumber || value.rating)) {
+      context.addIssue({
+        code: "custom",
+        path: ["licenseType"],
+        message: "Only students and instructors can submit license details.",
+      });
+    }
   });
 
 export const studentRegisterSchema = baseRegisterSchema
+  .merge(licenseFieldsSchema)
   .extend({
     studentIdNumber: z.string().trim().min(1, "Enter the student ID number."),
     studentIdDocument: studentIdDocumentSchema,

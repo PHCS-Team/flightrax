@@ -21,6 +21,9 @@ export function StudentRegisterForm() {
       email: "",
       password: "",
       fullName: "",
+      licenseType: "",
+      licenseNumber: "",
+      rating: "",
       studentIdNumber: "",
     },
   });
@@ -63,6 +66,26 @@ export function StudentRegisterForm() {
         {form.formState.errors.studentIdNumber && (
           <p className="text-sm text-destructive">{form.formState.errors.studentIdNumber.message}</p>
         )}
+      </div>
+      <div className="grid gap-3 sm:grid-cols-3">
+        <div className="space-y-2">
+          <Input placeholder="License type" {...form.register("licenseType")} />
+          {form.formState.errors.licenseType && (
+            <p className="text-sm text-destructive">{form.formState.errors.licenseType.message}</p>
+          )}
+        </div>
+        <div className="space-y-2">
+          <Input placeholder="License number" {...form.register("licenseNumber")} />
+          {form.formState.errors.licenseNumber && (
+            <p className="text-sm text-destructive">{form.formState.errors.licenseNumber.message}</p>
+          )}
+        </div>
+        <div className="space-y-2">
+          <Input placeholder="Rating" {...form.register("rating")} />
+          {form.formState.errors.rating && (
+            <p className="text-sm text-destructive">{form.formState.errors.rating.message}</p>
+          )}
+        </div>
       </div>
       <div className="space-y-2">
         <Input

@@ -1,4 +1,4 @@
-import { isPublicStudentReviewEnabled } from "@/shared/lib/supabase/config";
+import { APPROVAL_STATUS } from "@/shared/lib/rbac/config";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 import type { ApprovalStatus } from "@/shared/lib/rbac/types";
 import type { Database } from "@/shared/types/supabase";
@@ -57,15 +57,12 @@ async function getSignedDocumentUrl(path: string | null) {
 }
 
 export async function getStudentReviewItems() {
-  if (!isPublicStudentReviewEnabled()) {
-    return [] satisfies StudentReviewItem[];
-  }
-
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("student_profiles")
     .select("approval_status, id_document_content_type, id_document_path, id_document_size_bytes, id_document_uploaded_at, profile_id, rejected_at, rejection_reason, student_id_number, submitted_at, profiles!student_profiles_profile_id_fkey(email, full_name, created_at)")
     .not("submitted_at", "is", null)
+    .eq("approval_status", APPROVAL_STATUS.PENDING)
     .order("submitted_at", { ascending: false });
 
   if (error) {

@@ -9,6 +9,7 @@ const PROTECTED_ROUTES: Array<{ prefix: string; permission: Permission }> = [
   { prefix: "/schedule", permission: "schedule.view" },
   { prefix: "/aircrafts", permission: "aircrafts.view" },
   { prefix: "/notams", permission: "notams.view" },
+  { prefix: "/students", permission: "students.view" },
   { prefix: "/student-review", permission: "students.review" },
 ];
 
