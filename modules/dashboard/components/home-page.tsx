@@ -1,22 +1,15 @@
-import Image from "next/image";
 import Link from "next/link";
 
 import { Button } from "@/shared/components/ui/button";
 import { FlightRaxBackground } from "@/shared/components/layout/flightrax-background";
+import { SuperadminSecretTrigger } from "@/modules/dashboard/components/superadmin-secret-trigger";
 
 export function HomePage() {
   return (
     <FlightRaxBackground className="min-h-dvh px-0 py-0 sm:px-6 sm:py-8">
       <main className="mx-auto grid min-h-dvh w-full max-w-7xl items-center gap-14 px-6 py-12 text-primary-foreground md:px-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(20rem,0.55fr)] lg:gap-16 lg:py-24">
         <section className="mx-auto flex max-w-4xl flex-col items-center text-center lg:mx-0 lg:items-start lg:text-left">
-          <Image
-            alt="FlightraX"
-            className="h-20 w-auto object-contain sm:h-14"
-            height={72}
-            priority
-            src="/logo/flightrax-white.png"
-            width={244}
-          />
+          <SuperadminSecretTrigger />
 
           <p className="mt-3 sm:mt-10 mb-64 sm:mb-0 text-sm font-semibold uppercase tracking-[0.3em] text-primary-foreground/70 sm:block lg:mt-12">
             Flight Operations & Training Management

@@ -10,6 +10,7 @@ import {
   uploadProfilePhotoAction,
 } from "@/modules/auth/actions/upload-profile-photo";
 import { PROFILE_PHOTO_TYPES } from "@/modules/auth/utils/profile-photo";
+import { ConfirmationDialog } from "@/shared/components/layout/confirmation-dialog";
 import { DialogSectionHeader } from "@/shared/components/layout/dialog-section-header";
 import {
   Avatar,
@@ -30,6 +31,8 @@ type ProfilePhotoUploaderProps = {
   fullName: string;
 };
 
+const PARENT_CLOSE_RELEASE_MS = 100;
+
 export function ProfilePhotoUploader({
   currentPhotoUrl,
   fallback,
@@ -37,8 +40,10 @@ export function ProfilePhotoUploader({
 }: ProfilePhotoUploaderProps) {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
+  const removeConfirmationActiveRef = useRef(false);
   const previewObjectUrlRef = useRef<string | null>(null);
   const [open, setOpen] = useState(false);
+  const [removeConfirmationOpen, setRemoveConfirmationOpen] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const upload = useAction(uploadProfilePhotoAction, {
@@ -61,6 +66,7 @@ export function ProfilePhotoUploader({
 
       if (data?.ok) {
         updateSelectedFile(null);
+        handleRemoveConfirmationOpenChange(false);
         setOpen(false);
         router.refresh();
       }
@@ -95,51 +101,85 @@ export function ProfilePhotoUploader({
 
   const displayUrl = previewUrl ?? currentPhotoUrl;
 
+  function handleRemoveConfirmationOpenChange(nextOpen: boolean) {
+    setRemoveConfirmationOpen(nextOpen);
+
+    if (nextOpen) {
+      removeConfirmationActiveRef.current = true;
+      return;
+    }
+
+    window.setTimeout(() => {
+      removeConfirmationActiveRef.current = false;
+    }, PARENT_CLOSE_RELEASE_MS);
+  }
+
+  function handleDialogOpenChange(nextOpen: boolean) {
+    if (!nextOpen && removeConfirmationActiveRef.current) {
+      return;
+    }
+
+    setOpen(nextOpen);
+  }
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <button
-          aria-label="View or change profile photo"
-          className="group relative size-28 shrink-0 cursor-pointer overflow-hidden rounded-full border border-border bg-muted shadow-sm ring-4 ring-background transition hover:scale-[1.02] hover:border-tertiary/60 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 sm:size-32 md:size-44"
-          type="button"
-        >
-          <Avatar className="size-full">
-            {currentPhotoUrl && (
-              <AvatarImage
-                alt={`${fullName} profile photo`}
-                className="size-full rounded-full object-cover"
-                src={currentPhotoUrl}
-              />
-            )}
-            <AvatarFallback className="size-full rounded-full bg-linear-to-b from-primary to-tertiary text-primary-foreground text-4xl font-medium leading-none tracking-tight sm:text-5xl md:text-7xl">
-              {fallback}
-            </AvatarFallback>
-          </Avatar>
-          <span className="absolute inset-0 flex items-center justify-center bg-primary/55 text-primary-foreground opacity-0 backdrop-blur-[2px] transition group-hover:opacity-100 group-focus-visible:opacity-100">
-            <span className="flex size-12 items-center justify-center rounded-full bg-tertiary text-tertiary-foreground shadow-lg md:size-14">
-              <CameraIcon className="size-5 md:size-6" />
+    <>
+      <Dialog open={open} onOpenChange={handleDialogOpenChange}>
+        <DialogTrigger asChild>
+          <button
+            aria-label="View or change profile photo"
+            className="group relative size-28 shrink-0 cursor-pointer overflow-hidden rounded-full border border-border bg-muted shadow-sm ring-4 ring-background transition hover:scale-[1.02] hover:border-tertiary/60 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 sm:size-32 md:size-44"
+            type="button"
+          >
+            <Avatar className="size-full">
+              {currentPhotoUrl && (
+                <AvatarImage
+                  alt={`${fullName} profile photo`}
+                  className="size-full rounded-full object-cover"
+                  src={currentPhotoUrl}
+                />
+              )}
+              <AvatarFallback className="size-full rounded-full bg-linear-to-b from-primary to-tertiary text-primary-foreground text-4xl font-medium leading-none tracking-tight sm:text-5xl md:text-7xl">
+                {fallback}
+              </AvatarFallback>
+            </Avatar>
+            <span className="absolute inset-0 flex items-center justify-center bg-primary/55 text-primary-foreground opacity-0 backdrop-blur-[2px] transition group-hover:opacity-100 group-focus-visible:opacity-100">
+              <span className="flex size-12 items-center justify-center rounded-full bg-tertiary text-tertiary-foreground shadow-lg md:size-14">
+                <CameraIcon className="size-5 md:size-6" />
+              </span>
             </span>
-          </span>
-        </button>
-      </DialogTrigger>
+          </button>
+        </DialogTrigger>
 
-      <DialogContent className="max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-[calc(100vw-1rem)] overflow-y-auto p-4 sm:max-w-lg sm:p-6">
-        <DialogSectionHeader
-          description="Choose a clear profile photo so your account is easy to identify."
-          icon={CameraIcon}
-          title="Profile picture"
-        />
-
-        <form
-          className="grid min-w-0 gap-5"
-          onSubmit={(event) => {
-            event.preventDefault();
-
-            if (file) {
-              upload.execute({ profilePhoto: file });
+        <DialogContent
+          className="max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-[calc(100vw-1rem)] overflow-y-auto p-4 sm:max-w-lg sm:p-6"
+          onEscapeKeyDown={(event) => {
+            if (removeConfirmationActiveRef.current) {
+              event.preventDefault();
+            }
+          }}
+          onInteractOutside={(event) => {
+            if (removeConfirmationActiveRef.current) {
+              event.preventDefault();
             }
           }}
         >
+          <DialogSectionHeader
+            description="Choose a clear profile photo so your account is easy to identify."
+            icon={CameraIcon}
+            title="Profile picture"
+          />
+
+          <form
+            className="grid min-w-0 gap-5"
+            onSubmit={(event) => {
+              event.preventDefault();
+
+              if (file) {
+                upload.execute({ profilePhoto: file });
+              }
+            }}
+          >
           <div className="flex justify-center">
             <div className="relative size-28 max-w-full overflow-hidden rounded-full border border-border bg-muted shadow-sm ring-4 ring-muted/50 sm:size-44">
               {displayUrl ? (
@@ -204,7 +244,7 @@ export function ProfilePhotoUploader({
                 <Button
                   className="h-auto w-fit justify-self-start p-0 text-xs font-semibold text-destructive hover:bg-transparent hover:text-destructive/80 disabled:cursor-default"
                   disabled={upload.isExecuting || remove.isExecuting}
-                  onClick={() => remove.execute()}
+                  onClick={() => handleRemoveConfirmationOpenChange(true)}
                   type="button"
                   variant="ghost"
                 >
@@ -228,7 +268,20 @@ export function ProfilePhotoUploader({
             {upload.isExecuting ? "Saving..." : "Save photo"}
           </Button>
         </form>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+      <ConfirmationDialog
+        cancelLabel="Keep photo"
+        confirmLabel="Remove photo"
+        confirmingLabel="Removing..."
+        description="This removes the current profile photo from your account. You can upload a new one anytime."
+        icon={Trash2Icon}
+        isConfirming={remove.isExecuting}
+        onConfirm={() => remove.execute()}
+        onOpenChange={handleRemoveConfirmationOpenChange}
+        open={removeConfirmationOpen}
+        title="Remove profile photo?"
+      />
+    </>
   );
 }
