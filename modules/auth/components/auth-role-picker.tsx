@@ -1,46 +1,69 @@
 import Link from "next/link";
-import { ArrowRightIcon } from "lucide-react";
 
-import { Badge } from "@/shared/components/ui/badge";
-import { Button } from "@/shared/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { PUBLIC_AUTH_ROLES } from "@/shared/lib/rbac/config";
 import { AuthShell } from "@/modules/auth/components/auth-shell";
-import { AUTH_ROLE_CONFIG } from "@/modules/auth/utils/auth-role-config";
+import {
+  AUTH_MODE_CONFIG,
+  AUTH_ROLE_CONFIG,
+  type AuthMode,
+} from "@/modules/auth/utils/auth-role-config";
 
+export function AuthRolePicker({ mode }: { mode: AuthMode }) {
+  const modeConfig = AUTH_MODE_CONFIG[mode];
 
-export function AuthRolePicker({ mode }: { mode: "login" | "register" }) {
   return (
     <AuthShell
-      eyebrow={mode === "login" ? "Choose access" : "Choose registration"}
-      title={mode === "login" ? "Sign in through your FlightRax role." : "Start with the right registration lane."}
-      description="Each role has its own auth path so approvals, departments, and permissions stay explicit."
+      eyebrow={modeConfig.eyebrow}
+      title={modeConfig.title}
+      description={modeConfig.description}
+      surface="bare"
     >
-      <div className="space-y-4">
-        {PUBLIC_AUTH_ROLES.map((role) => {
-          const config = AUTH_ROLE_CONFIG[role];
+      <nav
+        aria-label={`${modeConfig.submitLabel} role`}
+        className="relative mx-auto w-full max-w-lg py-4"
+      >
+        <div
+          aria-hidden="true"
+          className="absolute left-12 right-12 top-20 h-1 rounded-full bg-primary-foreground/25 sm:left-16 sm:right-16"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute left-12 right-12 top-20 h-px translate-y-1 rounded-full bg-primary-foreground/60 sm:left-16 sm:right-16"
+        />
+        <div className="grid grid-cols-3 gap-2 sm:gap-5">
+          {PUBLIC_AUTH_ROLES.map((role) => {
+            const config = AUTH_ROLE_CONFIG[role];
+            const Icon = config.icon;
 
-          return (
-            <Card key={role} className="shadow-none">
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between gap-3">
-                  <CardTitle className="text-base">{config.label}</CardTitle>
-                  <Badge variant="secondary">{role}</Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-sm leading-6 text-muted-foreground">{config.helper}</p>
-                <Button asChild className="w-full" variant="outline">
-                  <Link href={`/${mode}/${role}`}>
-                    Continue
-                    <ArrowRightIcon className="size-4" />
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
+            return (
+              <Link
+                aria-label={`${modeConfig.submitLabel} as ${config.label}`}
+                className="group relative z-10 flex min-h-36 flex-col items-center justify-start gap-3 px-1 py-2 text-center text-primary-foreground outline-none sm:min-h-40"
+                href={`/${mode}/${role}`}
+                key={role}
+              >
+                <span className="relative flex size-24 items-center justify-center rounded-full bg-primary-foreground text-primary shadow-lg shadow-primary/20 ring-4 ring-primary-foreground/20 transition duration-200 group-hover:-translate-y-1 group-hover:bg-primary-foreground/95 group-hover:ring-primary-foreground/35 group-focus-visible:ring-primary-foreground/60 group-active:translate-y-0 sm:size-28">
+                  <span className="absolute inset-3 rounded-full border border-primary/15" />
+                  <Icon className="relative size-9 sm:size-10" />
+                </span>
+                <span className="text-sm font-semibold tracking-tight text-primary-foreground transition group-hover:text-primary-foreground/85 sm:text-base">
+                  {config.label}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
+      <p className="sr-only">{modeConfig.submitLabel}</p>
+      <p className="mt-2 text-center text-sm text-primary-foreground/70">
+        {modeConfig.switchPrompt}{" "}
+        <Link
+          className="font-semibold text-primary-foreground underline-offset-4 transition hover:text-primary-foreground/80 hover:underline"
+          href={`/${modeConfig.switchMode}`}
+        >
+          {modeConfig.switchLabel}
+        </Link>
+      </p>
     </AuthShell>
   );
 }

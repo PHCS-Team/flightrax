@@ -1,6 +1,6 @@
-# FlightRax — AI Agent Rules
+# FlightraX — AI Agent Rules
 
-You are working on **FlightRax**, a Next.js 16 (App Router) + Supabase project. These rules are mandatory. Follow them in every task, every file, every response.
+You are working on **FlightraX**, a Next.js 16 (App Router) + Supabase project. These rules are mandatory. Follow them in every task, every file, every response.
 
 ---
 
@@ -126,6 +126,7 @@ export default function Page() {
 - `shared/components/ui/` is **exclusively** for shadcn/ui generated components. Never add custom components here.
 - `shared/components/layout/` is for structural shell components (Sidebar, Header, Nav).
 - Dashboard content surfaces should use solid square primary-themed surfaces on mobile and rounded glass surfaces on desktop; prefer the reusable `GlassSurface` component in `shared/components/layout/`.
+- Every clickable control must communicate clickability with `cursor-pointer`; disabled interactive controls must use `disabled:cursor-default` or an equivalent disabled cursor style.
 - `shared/lib/supabase/` is the **only** place Supabase clients are instantiated. Do not create Supabase clients anywhere else.
 
 ---

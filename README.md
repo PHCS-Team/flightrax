@@ -1,4 +1,4 @@
-# FlightRax
+# FlightraX
 
 Web-based Flight Operations &amp; Training Management System for WCC. Features automated flight scheduling, digital permission routing, public flight tracking monitors, and role-based approvals for students and flight instructors.
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).

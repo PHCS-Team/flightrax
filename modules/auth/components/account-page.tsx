@@ -1,12 +1,17 @@
 import { redirect } from "next/navigation";
 import { format } from "date-fns";
-import { GraduationCapIcon, IdCardIcon, PlaneIcon } from "lucide-react";
-
 import { logoutAction } from "@/modules/auth/actions/logout";
+import { AccountLicenseSection } from "@/modules/auth/components/account-license-section";
 import { ProfilePhotoUploader } from "@/modules/auth/components/profile-photo-uploader";
 import { getCurrentProfile } from "@/modules/auth/queries/profile";
-import { GlassSurface } from "@/shared/components/layout/glass-surface";
+import {
+  getLicenseTypeLabel,
+  getRatingLabel,
+  hasMissingLicenseDetails,
+} from "@/shared/lib/aviation/license-options";
+import { PageHeader } from "@/shared/components/layout/page-header";
 import { Button } from "@/shared/components/ui/button";
+import { ROLE } from "@/shared/lib/rbac/config";
 import {
   Tabs,
   TabsContent,
@@ -57,7 +62,7 @@ function parseDisplayName(fullName: string) {
   if (!lastName || !givenNames) {
     return {
       lastName: fullName,
-      givenNames: "FlightRax profile",
+      givenNames: "FlightraX profile",
     };
   }
 
@@ -67,19 +72,22 @@ function parseDisplayName(fullName: string) {
 function getProfileDetails(profile: Profile) {
   return [
     {
+      icon: "licenseType" as const,
       label: "License type",
-      value: profile.license_type ?? "Pending submission",
-      icon: GraduationCapIcon,
+      value:
+        getLicenseTypeLabel(profile.license_type) ??
+        profile.license_type ??
+        "Pending submission",
     },
     {
+      icon: "licenseNumber" as const,
       label: "License number",
       value: profile.license_number ?? "Pending submission",
-      icon: IdCardIcon,
     },
     {
+      icon: "rating" as const,
       label: "Rating",
-      value: profile.rating ?? "Pending submission",
-      icon: PlaneIcon,
+      value: getRatingLabel(profile.rating) ?? profile.rating ?? "Pending submission",
     },
   ];
 }
@@ -93,25 +101,32 @@ export async function AccountPage() {
 
   const displayName = parseDisplayName(profile.full_name);
   const profileDetails = getProfileDetails(profile);
+  const canSetLicenseDetails =
+    (profile.role === ROLE.STUDENT || profile.role === ROLE.INSTRUCTOR) &&
+    hasMissingLicenseDetails(profile);
 
   return (
-    <section className="space-y-2 sm:space-y-0">
-      <div className="flex items-center justify-between gap-4 border-b border-primary-foreground/15 sm:border-none p-4">
-        <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
-          My Account
-        </h1>
-        <form action={logoutAction}>
-          <Button
-            className="rounded-sm sm:rounded-2xl"
-            type="submit"
-            variant="outline"
-          >
-            Logout
-          </Button>
-        </form>
-      </div>
+    <section>
+      <PageHeader
+        action={
+          <form action={logoutAction}>
+            <Button
+              className="rounded-lg sm:rounded-2xl"
+              type="submit"
+              variant="outline"
+            >
+              Logout
+            </Button>
+          </form>
+        }
+        breadcrumbs={[
+          { href: "/dashboard", label: "Dashboard" },
+          { href: "/account", label: "My Account" },
+        ]}
+        title="My Account"
+      />
 
-      <div className="relative overflow-hidden px-6 py-4 sm:py-6 mb-2 sm:mb-5">
+      <div className="relative overflow-hidden px-6 py-4 sm:py-6 my-2 sm:mb-5">
         <div className="flex items-center gap-4 md:gap-6">
           <ProfilePhotoUploader
             currentPhotoUrl={profile.profile_photo_url ?? null}
@@ -139,30 +154,10 @@ export async function AccountPage() {
         </TabsList>
 
         <TabsContent value="profile">
-          <GlassSurface className="divide-y divide-primary-foreground/10 md:grid md:grid-cols-3 md:divide-x md:divide-y-0 md:p-2">
-            {profileDetails.map((detail) => {
-              const Icon = detail.icon;
-
-              return (
-                <div
-                  key={detail.label}
-                  className="flex items-center gap-3 p-4 md:p-5"
-                >
-                  <span className="flex size-10 shrink-0 items-center justify-center rounded-sm bg-primary-foreground/10 text-primary-foreground md:rounded-2xl">
-                    <Icon className="size-5" />
-                  </span>
-                  <div className="min-w-0">
-                    <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary-foreground/60">
-                      {detail.label}
-                    </p>
-                    <p className="mt-1 truncate text-base font-semibold text-primary-foreground">
-                      {detail.value}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-          </GlassSurface>
+          <AccountLicenseSection
+            canSetLicenseDetails={canSetLicenseDetails}
+            details={profileDetails}
+          />
         </TabsContent>
 
         <TabsContent value="log">

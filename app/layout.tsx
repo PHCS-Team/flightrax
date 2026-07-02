@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FlightRax",
+  title: "FlightraX",
   description: "Flight operations command center",
 };
 

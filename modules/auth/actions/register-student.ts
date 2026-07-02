@@ -19,9 +19,6 @@ export const registerStudentAction = actionClient
       password: parsedInput.password,
       fullName: parsedInput.fullName,
       role: ROLE.STUDENT,
-      licenseType: parsedInput.licenseType,
-      licenseNumber: parsedInput.licenseNumber,
-      rating: parsedInput.rating,
     });
 
     if (error) {

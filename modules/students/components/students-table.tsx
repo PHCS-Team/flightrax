@@ -26,6 +26,11 @@ import {
   TableRow,
 } from "@/shared/components/ui/table";
 import { getAvatarFallback } from "@/shared/lib/avatar-fallback";
+import {
+  getLicenseTypeLabel,
+  getRatingLabel,
+} from "@/shared/lib/aviation/license-options";
+import { StudentLicenseEditDialog } from "@/modules/students/components/student-license-edit-dialog";
 import type { ApprovedStudent } from "@/modules/students/types/student";
 
 const columns = [
@@ -66,19 +71,35 @@ const columns = [
     cell: ({ row }) => row.original.email,
   },
   {
-    accessorKey: "licenseType",
-    header: "License type",
-    cell: ({ row }) => row.original.licenseType ?? "Not set",
-  },
-  {
-    accessorKey: "licenseNumber",
-    header: "License number",
-    cell: ({ row }) => row.original.licenseNumber ?? "Not set",
+    id: "license",
+    header: "License",
+    cell: ({ row }) => {
+      const student = row.original;
+      const licenseType =
+        getLicenseTypeLabel(student.licenseType) ?? student.licenseType;
+
+      return (
+        <div className="min-w-48">
+          <p className="font-medium text-primary-foreground">
+            {licenseType ?? "Not set"}
+          </p>
+          <p className="mt-1 text-sm text-primary-foreground/65">
+            {student.licenseNumber ? `No. ${student.licenseNumber}` : "No license number"}
+          </p>
+        </div>
+      );
+    },
   },
   {
     accessorKey: "rating",
     header: "Rating",
-    cell: ({ row }) => row.original.rating ?? "Not set",
+    cell: ({ row }) =>
+      getRatingLabel(row.original.rating) ?? row.original.rating ?? "Not set",
+  },
+  {
+    id: "actions",
+    header: "Actions",
+    cell: ({ row }) => <StudentLicenseEditDialog student={row.original} />,
   },
 ] satisfies ColumnDef<ApprovedStudent>[];
 

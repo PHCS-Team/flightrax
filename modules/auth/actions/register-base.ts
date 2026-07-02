@@ -9,9 +9,6 @@ type RegisterBaseProfileInput = {
   fullName: string;
   role: ProfileRole;
   adminDepartment?: AdminDepartment;
-  licenseType?: string;
-  licenseNumber?: string;
-  rating?: string;
 };
 
 export async function registerBaseProfile(input: RegisterBaseProfileInput) {
@@ -25,9 +22,6 @@ export async function registerBaseProfile(input: RegisterBaseProfileInput) {
         full_name: input.fullName,
         requested_role: input.role,
         admin_department: input.adminDepartment ?? "",
-        license_type: input.licenseType ?? "",
-        license_number: input.licenseNumber ?? "",
-        rating: input.rating ?? "",
       },
     },
   });

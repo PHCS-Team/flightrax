@@ -76,7 +76,7 @@ export function DashboardShell({
         />
       )}
 
-      <div className="mx-auto flex min-h-dvh w-full max-w-7xl gap-6 px-0 pb-0 sm:px-6 sm:py-4">
+      <div className="mx-auto flex min-h-dvh w-full max-w-7xl gap-6 px-0 pb-0 lg:px-6 lg:py-4">
         <aside
           className={cn(
             "fixed inset-y-0 left-0 z-40 flex w-72 flex-col border-r border-primary-foreground/15 bg-primary p-4 text-primary-foreground shadow-xl transition-transform duration-200 ease-out lg:sticky lg:top-4 lg:z-auto lg:h-[calc(100vh-2rem)] lg:rounded-3xl lg:border lg:bg-primary/95 lg:backdrop-blur lg:transition-[width,padding] lg:duration-200 lg:ease-out lg:translate-x-0 lg:shadow-sm",
@@ -105,7 +105,7 @@ export function DashboardShell({
               </span>
               <span className="min-w-0 lg:hidden">
                 <span className="block text-lg font-semibold tracking-tight">
-                  FlightRax
+                  FlightraX
                 </span>
                 <span className="text-xs uppercase tracking-[0.24em] text-primary-foreground/70">
                   Ops control
@@ -122,7 +122,7 @@ export function DashboardShell({
                 variants={sidebarCopyVariants}
               >
                 <span className="block text-lg font-semibold tracking-tight">
-                  FlightRax
+                  FlightraX
                 </span>
                 <span className="text-xs uppercase tracking-[0.24em] text-primary-foreground/70">
                   Ops control
@@ -212,10 +212,10 @@ export function DashboardShell({
                   <MenuIcon className="size-4" />
                 </button>
                 <Image
-                  alt="FlightRax"
+                  alt="FlightraX"
                   className="h-8 sm:h-9 w-auto object-contain"
                   height={32}
-                  src="/logo/flightrax.png"
+                  src="/logo/flightrax-white.png"
                   width={160}
                 />
               </div>

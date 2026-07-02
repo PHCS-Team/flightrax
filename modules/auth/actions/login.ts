@@ -28,12 +28,18 @@ export const loginAction = actionClient
 
     if (!profile) {
       await supabase.auth.signOut();
-      return { ok: false, message: "No FlightRax profile exists for this account." };
+      return {
+        ok: false,
+        message: "No FlightraX profile exists for this account.",
+      };
     }
 
     if (profile.role !== parsedInput.role) {
       await supabase.auth.signOut();
-      return { ok: false, message: "Use the login page for your assigned role." };
+      return {
+        ok: false,
+        message: "Use the login page for your assigned role.",
+      };
     }
 
     if (profile.approval_status !== APPROVAL_STATUS.APPROVED) {

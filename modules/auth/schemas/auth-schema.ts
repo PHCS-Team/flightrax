@@ -8,16 +8,12 @@ const adminDepartmentSchema = z.enum(ADMIN_DEPARTMENTS);
 const baseRegisterSchema = z.object({
   email: z.string().trim().email(),
   password: z.string().min(8),
+  confirmPassword: z.string().min(8),
   fullName: z
     .string()
     .trim()
     .min(2)
     .regex(/^[^,]+,\s*[^,]+$/, "Use the format Lastname, First M."),
-});
-const licenseFieldsSchema = z.object({
-  licenseType: z.string().trim().min(1, "Enter the license type."),
-  licenseNumber: z.string().trim().min(1, "Enter the license number."),
-  rating: z.string().trim().min(1, "Enter the rating."),
 });
 const studentIdDocumentSchema = z.custom<File>(
   (value) => typeof File !== "undefined" && value instanceof File,
@@ -34,11 +30,16 @@ export const registerSchema = baseRegisterSchema
   .extend({
     role: roleSchema,
     adminDepartment: adminDepartmentSchema.optional(),
-    licenseType: z.string().trim().optional(),
-    licenseNumber: z.string().trim().optional(),
-    rating: z.string().trim().optional(),
   })
   .superRefine((value, context) => {
+    if (value.password !== value.confirmPassword) {
+      context.addIssue({
+        code: "custom",
+        path: ["confirmPassword"],
+        message: "Passwords do not match.",
+      });
+    }
+
     if (value.role === ROLE.ADMIN && !value.adminDepartment) {
       context.addIssue({
         code: "custom",
@@ -55,48 +56,22 @@ export const registerSchema = baseRegisterSchema
       });
     }
 
-    if (value.role === ROLE.INSTRUCTOR) {
-      if (!value.licenseType) {
-        context.addIssue({
-          code: "custom",
-          path: ["licenseType"],
-          message: "Enter the license type.",
-        });
-      }
-
-      if (!value.licenseNumber) {
-        context.addIssue({
-          code: "custom",
-          path: ["licenseNumber"],
-          message: "Enter the license number.",
-        });
-      }
-
-      if (!value.rating) {
-        context.addIssue({
-          code: "custom",
-          path: ["rating"],
-          message: "Enter the rating.",
-        });
-      }
-    }
-
-    if (value.role !== ROLE.INSTRUCTOR && (value.licenseType || value.licenseNumber || value.rating)) {
-      context.addIssue({
-        code: "custom",
-        path: ["licenseType"],
-        message: "Only students and instructors can submit license details.",
-      });
-    }
   });
 
 export const studentRegisterSchema = baseRegisterSchema
-  .merge(licenseFieldsSchema)
   .extend({
     studentIdNumber: z.string().trim().min(1, "Enter the student ID number."),
     studentIdDocument: studentIdDocumentSchema,
   })
   .superRefine((value, context) => {
+    if (value.password !== value.confirmPassword) {
+      context.addIssue({
+        code: "custom",
+        path: ["confirmPassword"],
+        message: "Passwords do not match.",
+      });
+    }
+
     if (!STUDENT_ID_DOCUMENT_TYPES.includes(value.studentIdDocument.type as (typeof STUDENT_ID_DOCUMENT_TYPES)[number])) {
       context.addIssue({
         code: "custom",

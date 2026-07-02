@@ -1,29 +1,105 @@
 "use client";
 
+import type { ComponentProps, ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAction } from "next-safe-action/hooks";
-import { useForm } from "react-hook-form";
+import {
+  useForm,
+  useWatch,
+  type FieldError,
+  type UseFormRegisterReturn,
+} from "react-hook-form";
 
 import { ROLE } from "@/shared/lib/rbac/config";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { registerStudentAction } from "@/modules/auth/actions/register-student";
+import { AuthFieldLabel } from "@/modules/auth/components/auth-field-label";
+import { ImageUploadField } from "@/modules/auth/components/image-upload-field";
+import { PasswordInput } from "@/modules/auth/components/password-input";
 import { studentRegisterSchema } from "@/modules/auth/schemas/auth-schema";
 import type { StudentRegisterInput } from "@/modules/auth/types/auth";
+import {
+  AUTH_MODE,
+  AUTH_MODE_CONFIG,
+} from "@/modules/auth/utils/auth-role-config";
+import {
+  STUDENT_ID_DOCUMENT_MAX_BYTES,
+  STUDENT_ID_DOCUMENT_TYPES,
+} from "@/modules/auth/utils/student-document";
+const studentIdDocumentHelperText = `Upload a JPG, PNG, or WebP image of your student ID. Max ${STUDENT_ID_DOCUMENT_MAX_BYTES / 1024 / 1024} MB.`;
+
+type StudentTextFieldProps = {
+  error?: FieldError;
+  id: string;
+  label: string;
+  placeholder: string;
+  registration: UseFormRegisterReturn;
+  type?: ComponentProps<typeof Input>["type"];
+};
+
+function StudentTextField({
+  error,
+  id,
+  label,
+  placeholder,
+  registration,
+  type,
+}: StudentTextFieldProps) {
+  const errorId = error ? `${id}-error` : undefined;
+
+  return (
+    <div className="space-y-2">
+      <AuthFieldLabel htmlFor={id} required>
+        {label}
+      </AuthFieldLabel>
+      <Input
+        aria-describedby={errorId}
+        aria-invalid={Boolean(error)}
+        aria-required="true"
+        id={id}
+        placeholder={placeholder}
+        type={type}
+        {...registration}
+      />
+      {error && (
+        <p className="text-sm text-destructive" id={errorId}>
+          {error.message}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function StudentFormSection({
+  children,
+  title,
+}: {
+  children: ReactNode;
+  title: string;
+}) {
+  return (
+    <section className="space-y-3">
+      <h3 className="text-xs font-bold uppercase tracking-widest text-primary-foreground/70">
+        {title}
+      </h3>
+      {children}
+    </section>
+  );
+}
 
 export function StudentRegisterForm() {
   const router = useRouter();
+  const modeConfig = AUTH_MODE_CONFIG[AUTH_MODE.REGISTER];
   const form = useForm<StudentRegisterInput>({
     resolver: zodResolver(studentRegisterSchema),
     defaultValues: {
       email: "",
       password: "",
+      confirmPassword: "",
       fullName: "",
-      licenseType: "",
-      licenseNumber: "",
-      rating: "",
       studentIdNumber: "",
     },
   });
@@ -34,87 +110,147 @@ export function StudentRegisterForm() {
       }
     },
   });
+  const errors = form.formState.errors;
+  const studentIdDocument = useWatch({
+    control: form.control,
+    name: "studentIdDocument",
+  });
 
   return (
-    <form className="space-y-5" onSubmit={form.handleSubmit((values) => execute(values))}>
+    <form
+      className="space-y-5"
+      onSubmit={form.handleSubmit((values) => execute(values))}
+    >
       <div>
-        <h2 className="text-2xl font-semibold tracking-tight">Request student access</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Use your full name in Lastname, First M. format and upload a clear image of your student ID.
-        </p>
+        <h2 className="text-2xl font-semibold tracking-tight">
+          Fill up the form below
+        </h2>
       </div>
-      <div className="space-y-2">
-        <Input placeholder="Doe, John S." {...form.register("fullName")} />
-        {form.formState.errors.fullName && (
-          <p className="text-sm text-destructive">{form.formState.errors.fullName.message}</p>
-        )}
-      </div>
-      <div className="space-y-2">
-        <Input placeholder="name@campus.edu" type="email" {...form.register("email")} />
-        {form.formState.errors.email && (
-          <p className="text-sm text-destructive">{form.formState.errors.email.message}</p>
-        )}
-      </div>
-      <div className="space-y-2">
-        <Input placeholder="Password" type="password" {...form.register("password")} />
-        {form.formState.errors.password && (
-          <p className="text-sm text-destructive">{form.formState.errors.password.message}</p>
-        )}
-      </div>
-      <div className="space-y-2">
-        <Input placeholder="Student ID number" {...form.register("studentIdNumber")} />
-        {form.formState.errors.studentIdNumber && (
-          <p className="text-sm text-destructive">{form.formState.errors.studentIdNumber.message}</p>
-        )}
-      </div>
-      <div className="grid gap-3 sm:grid-cols-3">
-        <div className="space-y-2">
-          <Input placeholder="License type" {...form.register("licenseType")} />
-          {form.formState.errors.licenseType && (
-            <p className="text-sm text-destructive">{form.formState.errors.licenseType.message}</p>
-          )}
+      <StudentFormSection title="Identity">
+        <div className="grid gap-5 sm:grid-cols-2 sm:gap-3">
+          <StudentTextField
+            error={errors.fullName}
+            id="student-register-full-name"
+            label="Full name"
+            placeholder="Doe, John S."
+            registration={form.register("fullName")}
+          />
+          <StudentTextField
+            error={errors.email}
+            id="student-register-email"
+            label="Email"
+            placeholder="name@campus.edu"
+            registration={form.register("email")}
+            type="email"
+          />
         </div>
         <div className="space-y-2">
-          <Input placeholder="License number" {...form.register("licenseNumber")} />
-          {form.formState.errors.licenseNumber && (
-            <p className="text-sm text-destructive">{form.formState.errors.licenseNumber.message}</p>
-          )}
-        </div>
-        <div className="space-y-2">
-          <Input placeholder="Rating" {...form.register("rating")} />
-          {form.formState.errors.rating && (
-            <p className="text-sm text-destructive">{form.formState.errors.rating.message}</p>
-          )}
-        </div>
-      </div>
-      <div className="space-y-2">
-        <Input
-          accept="image/jpeg,image/png,image/webp"
-          onChange={(event) => {
-            const file = event.target.files?.[0];
-            if (file) {
-              form.setValue("studentIdDocument", file, { shouldValidate: true });
+          <AuthFieldLabel htmlFor="student-register-password" required>
+            Password
+          </AuthFieldLabel>
+          <PasswordInput
+            aria-describedby={
+              errors.password ? "student-register-password-error" : undefined
             }
-          }}
-          type="file"
-        />
-        <p className="text-xs text-muted-foreground">
-          Upload a JPG, PNG, or WebP image of your student ID. Max 5 MB.
-        </p>
-        {form.formState.errors.studentIdDocument && (
-          <p className="text-sm text-destructive">{form.formState.errors.studentIdDocument.message}</p>
-        )}
-      </div>
+            aria-invalid={Boolean(errors.password)}
+            aria-required="true"
+            id="student-register-password"
+            placeholder="At least 8 characters"
+            {...form.register("password")}
+          />
+          {errors.password && (
+            <p
+              className="text-sm text-destructive"
+              id="student-register-password-error"
+            >
+              {errors.password.message}
+            </p>
+          )}
+        </div>
+        <div className="space-y-2">
+          <AuthFieldLabel htmlFor="student-register-confirm-password" required>
+            Confirm password
+          </AuthFieldLabel>
+          <PasswordInput
+            aria-describedby={
+              errors.confirmPassword
+                ? "student-register-confirm-password-error"
+                : undefined
+            }
+            aria-invalid={Boolean(errors.confirmPassword)}
+            aria-required="true"
+            id="student-register-confirm-password"
+            placeholder="Re-enter your password"
+            {...form.register("confirmPassword")}
+          />
+          {errors.confirmPassword && (
+            <p
+              className="text-sm text-destructive"
+              id="student-register-confirm-password-error"
+            >
+              {errors.confirmPassword.message}
+            </p>
+          )}
+        </div>
+      </StudentFormSection>
+      <StudentFormSection title="Student verification">
+        <div className="grid gap-5 sm:grid-cols-2 sm:items-start sm:gap-3">
+          <StudentTextField
+            error={errors.studentIdNumber}
+            id="student-register-id-number"
+            label="Student ID number"
+            placeholder="Student ID number"
+            registration={form.register("studentIdNumber")}
+          />
+          <ImageUploadField
+            accept={STUDENT_ID_DOCUMENT_TYPES}
+            errorText={errors.studentIdDocument?.message}
+            helperText={studentIdDocumentHelperText}
+            id="student-register-id-document"
+            label="Student ID image"
+            onChange={(file) => {
+              if (file) {
+                form.setValue("studentIdDocument", file, {
+                  shouldValidate: true,
+                });
+                return;
+              }
+
+              form.unregister("studentIdDocument");
+              void form.trigger("studentIdDocument");
+            }}
+            required
+            value={studentIdDocument ?? null}
+            variant="compact"
+          />
+        </div>
+      </StudentFormSection>
       {result.data?.message && (
-        <p className={result.data.ok ? "text-sm text-muted-foreground" : "text-sm text-destructive"}>
+        <p
+          className={
+            result.data.ok
+              ? "text-sm text-muted-foreground"
+              : "text-sm text-destructive"
+          }
+        >
           {result.data.message}
         </p>
       )}
-      <Button className="w-full" disabled={isExecuting} type="submit">
+      <Button
+        className="h-12 w-full rounded-lg px-7 font-bold uppercase sm:rounded-2xl"
+        disabled={isExecuting}
+        type="submit"
+      >
         {isExecuting ? "Submitting request..." : "Submit student registration"}
       </Button>
-      <p className="text-center text-sm text-muted-foreground">
-        Already have access? <Link className="font-medium text-foreground" href={`/login/${ROLE.STUDENT}`}>Sign in</Link>
+      <p className="text-center text-sm text-primary-foreground/70">
+        {modeConfig.switchPrompt}{" "}
+        <Link
+          className="font-semibold text-primary-foreground underline-offset-4 transition hover:text-primary-foreground/80 hover:underline"
+          href={`/${modeConfig.switchMode}/${ROLE.STUDENT}`}
+        >
+          {modeConfig.switchLabel}
+        </Link>
       </p>
     </form>
   );

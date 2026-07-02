@@ -7,7 +7,7 @@ export function GlassSurface({ className, ...props }: ComponentProps<"div">) {
     <div
       data-slot="glass-surface"
       className={cn(
-        "bg-primary text-primary-foreground lg:rounded-3xl border-y lg:border border-primary-foreground/15 lg:bg-primary/90 lg:shadow-sm lg:backdrop-blur",
+        "border-y border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground shadow-sm backdrop-blur sm:rounded-3xl sm:border sm:bg-primary-foreground/15 [&_.text-foreground]:text-primary-foreground [&_.text-muted-foreground]:text-primary-foreground/70 [&_input]:border-primary-foreground/20 [&_input]:bg-primary-foreground/95 [&_input]:text-foreground [&_input]:placeholder:text-muted-foreground **:data-[slot=select-trigger]:border-primary-foreground/20 **:data-[slot=select-trigger]:bg-primary-foreground/95 **:data-[slot=select-trigger]:text-foreground [&_[data-slot=select-trigger][data-placeholder]]:text-muted-foreground",
         className,
       )}
       {...props}

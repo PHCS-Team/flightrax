@@ -1,5 +1,5 @@
 export function getAvatarFallback(source: string | null | undefined) {
-  const text = source?.trim() || "FlightRax";
+  const text = source?.trim() || "FlightraX";
   const [lastName, givenNames] = text.split(",").map((part) => part.trim());
   const parts = givenNames
     ? [givenNames, lastName]
