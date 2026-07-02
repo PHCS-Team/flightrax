@@ -15,6 +15,7 @@ import {
 import { ROLE } from "@/shared/lib/rbac/config";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
+import { toastActionResult } from "@/shared/lib/action-toast";
 import { registerStudentAction } from "@/modules/auth/actions/register-student";
 import { AuthFieldLabel } from "@/modules/auth/components/auth-field-label";
 import { ImageUploadField } from "@/modules/auth/components/image-upload-field";
@@ -103,8 +104,10 @@ export function StudentRegisterForm() {
       studentIdNumber: "",
     },
   });
-  const { execute, result, isExecuting } = useAction(registerStudentAction, {
+  const { execute, isExecuting } = useAction(registerStudentAction, {
     onSuccess: ({ data }) => {
+      toastActionResult(data);
+
       if (data?.redirectTo) {
         router.push(data.redirectTo);
       }
@@ -225,17 +228,6 @@ export function StudentRegisterForm() {
           />
         </div>
       </StudentFormSection>
-      {result.data?.message && (
-        <p
-          className={
-            result.data.ok
-              ? "text-sm text-muted-foreground"
-              : "text-sm text-destructive"
-          }
-        >
-          {result.data.message}
-        </p>
-      )}
       <Button
         className="h-12 w-full rounded-lg px-7 font-bold uppercase sm:rounded-2xl"
         disabled={isExecuting}

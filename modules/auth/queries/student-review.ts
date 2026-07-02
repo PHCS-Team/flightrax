@@ -62,7 +62,7 @@ export async function getStudentReviewItems() {
     .from("student_profiles")
     .select("approval_status, id_document_content_type, id_document_path, id_document_size_bytes, id_document_uploaded_at, profile_id, rejected_at, rejection_reason, student_id_number, submitted_at, profiles!student_profiles_profile_id_fkey(email, full_name, created_at)")
     .not("submitted_at", "is", null)
-    .eq("approval_status", APPROVAL_STATUS.PENDING)
+    .in("approval_status", [APPROVAL_STATUS.PENDING, APPROVAL_STATUS.REJECTED])
     .order("submitted_at", { ascending: false });
 
   if (error) {

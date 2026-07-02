@@ -2,6 +2,7 @@ import type { z } from "zod";
 
 import type {
   loginSchema,
+  changePasswordSchema,
   registerSchema,
   rejectStudentSchema,
   studentRegisterSchema,
@@ -10,6 +11,7 @@ import type { profilePhotoSchema } from "@/modules/auth/schemas/profile-photo-sc
 import type { licenseDetailsSchema } from "@/shared/validations/license-schema";
 
 export type LoginInput = z.infer<typeof loginSchema>;
+export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type StudentRegisterInput = z.infer<typeof studentRegisterSchema>;
 export type RejectStudentInput = z.infer<typeof rejectStudentSchema>;

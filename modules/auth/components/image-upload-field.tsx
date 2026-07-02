@@ -112,7 +112,7 @@ export function ImageUploadField(props: ImageUploadFieldProps) {
   }, [props.multiple, props.value]);
 
   return (
-    <div className={cn("space-y-2", props.className)}>
+    <div className={cn("w-full min-w-0 max-w-full space-y-2", props.className)}>
       <AuthFieldLabel htmlFor={inputId} required={props.required}>
         {props.label}
       </AuthFieldLabel>
@@ -191,21 +191,21 @@ function CompactUploadControl({
   return (
     <div
       className={cn(
-        "min-h-12 rounded-lg border border-dashed border-primary-foreground/25 bg-primary-foreground/10 p-1 shadow-sm transition md:min-h-10 sm:rounded-2xl",
+        "min-h-12 w-full min-w-0 max-w-full overflow-hidden rounded-lg border border-dashed border-primary-foreground/25 bg-primary-foreground/10 p-1 shadow-sm transition md:min-h-10 sm:rounded-2xl",
         "focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50",
-        errorText && "border-destructive bg-destructive/10 focus-within:ring-destructive/20",
+        errorText && "border-red-200/60 bg-red-200/10 focus-within:ring-red-200/25",
         disabled && "opacity-60",
       )}
     >
-      <div className="flex min-h-10 items-center gap-2 md:min-h-8">
+      <div className="flex min-h-10 w-full min-w-0 max-w-full items-center gap-2 overflow-hidden md:min-h-8">
         <button
-          className="flex min-w-0 flex-1 items-center gap-3 rounded-md px-2 py-1 text-left text-primary-foreground transition hover:bg-primary-foreground/10 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 sm:rounded-xl"
+          className="flex min-w-0 flex-1 items-center gap-3 overflow-hidden rounded-md px-2 py-1 text-left text-primary-foreground transition hover:bg-primary-foreground/10 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 sm:rounded-xl"
           disabled={disabled}
           onClick={onChoose}
           type="button"
         >
           <PreviewThumbnail preview={previews[0]} size="compact" />
-          <span className="min-w-0 flex-1">
+          <span className="min-w-0 flex-1 overflow-hidden">
             <span className="block truncate text-sm font-semibold">
               {hasFiles ? selectedSummary.title : "Choose image"}
             </span>
@@ -246,7 +246,7 @@ function DefaultUploadControl({
       className={cn(
         "rounded-lg border border-dashed border-primary-foreground/25 bg-primary-foreground/10 p-3 shadow-sm transition sm:rounded-2xl",
         "focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50",
-        errorText && "border-destructive bg-destructive/10 focus-within:ring-destructive/20",
+        errorText && "border-red-200/60 bg-red-200/10 focus-within:ring-red-200/25",
         disabled && "opacity-60",
       )}
     >
@@ -304,7 +304,7 @@ function PreviewThumbnail({
   return (
     <div
       className={cn(
-        "relative flex items-center justify-center overflow-hidden border border-primary-foreground/15 bg-primary/20",
+        "relative flex max-w-full items-center justify-center overflow-hidden border border-primary-foreground/15 bg-primary/20",
         size === "compact"
           ? "size-10 shrink-0 rounded-md md:size-8 sm:rounded-xl"
           : "h-32 rounded-lg sm:h-24 sm:rounded-2xl",
@@ -341,10 +341,10 @@ function SelectedImageRow({
   preview: ImagePreview;
 }) {
   return (
-    <div className="flex items-center justify-between gap-3 rounded-lg bg-primary-foreground/10 p-3 text-sm sm:rounded-2xl">
-      <div className="min-w-0">
+    <div className="flex w-full min-w-0 max-w-full items-center justify-between gap-3 overflow-hidden rounded-lg bg-primary-foreground/10 p-3 text-sm sm:rounded-2xl">
+      <div className="min-w-0 flex-1 overflow-hidden">
         <p className="truncate font-medium text-primary-foreground">{preview.name}</p>
-        <p className="text-xs text-primary-foreground/70">{preview.sizeText} selected</p>
+        <p className="truncate text-xs text-primary-foreground/70">{preview.sizeText} selected</p>
       </div>
       <button
         aria-label={`Remove ${preview.name}`}

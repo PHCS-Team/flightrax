@@ -25,6 +25,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/shared/components/ui/dialog";
+import { toastActionResult } from "@/shared/lib/action-toast";
 
 type ProfilePhotoUploaderProps = {
   currentPhotoUrl: string | null;
@@ -45,6 +46,8 @@ export function ProfilePhotoUploader({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const upload = useAction(uploadProfilePhotoAction, {
     onSuccess: ({ data }) => {
+      toastActionResult(data);
+
       if (data?.ok) {
         updateSelectedFile(null);
         setOpen(false);
@@ -57,6 +60,8 @@ export function ProfilePhotoUploader({
   });
   const remove = useAction(removeProfilePhotoAction, {
     onSuccess: ({ data }) => {
+      toastActionResult(data);
+
       if (data?.ok) {
         updateSelectedFile(null);
         setOpen(false);
@@ -180,17 +185,6 @@ export function ProfilePhotoUploader({
             JPG, PNG, or WebP only. Maximum file size is 5 MB.
           </p>
 
-          {(upload.result.data?.message || remove.result.data?.message) && (
-            <p
-              className={
-                upload.result.data?.ok || remove.result.data?.ok
-                  ? "text-sm text-muted-foreground"
-                  : "text-sm text-destructive"
-              }
-            >
-              {upload.result.data?.message ?? remove.result.data?.message}
-            </p>
-          )}
         </div>
 
         <DialogFooter className="mt-1 sm:justify-between">

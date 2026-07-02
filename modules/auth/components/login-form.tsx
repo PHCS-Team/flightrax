@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
+import { toastActionResult } from "@/shared/lib/action-toast";
 import type { ProfileRole } from "@/shared/lib/rbac/types";
 import { loginAction } from "@/modules/auth/actions/login";
 import { PasswordInput } from "@/modules/auth/components/password-input";
@@ -25,8 +26,10 @@ export function LoginForm({ role }: { role: ProfileRole }) {
     resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "", role },
   });
-  const { execute, result, isExecuting } = useAction(loginAction, {
+  const { execute, isExecuting } = useAction(loginAction, {
     onSuccess: ({ data }) => {
+      toastActionResult(data);
+
       if (data?.redirectTo) {
         router.push(data.redirectTo);
       }
@@ -65,17 +68,6 @@ export function LoginForm({ role }: { role: ProfileRole }) {
           </p>
         )}
       </div>
-      {result.data?.message && (
-        <p
-          className={
-            result.data.ok
-              ? "text-sm text-muted-foreground"
-              : "text-sm text-destructive"
-          }
-        >
-          {result.data.message}
-        </p>
-      )}
       <Button
         className="h-12 w-full rounded-lg px-7 font-bold uppercase sm:rounded-2xl"
         disabled={isExecuting}

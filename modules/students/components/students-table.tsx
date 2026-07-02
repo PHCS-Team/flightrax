@@ -66,11 +66,6 @@ const columns = [
     },
   },
   {
-    accessorKey: "email",
-    header: "Email",
-    cell: ({ row }) => row.original.email,
-  },
-  {
     id: "license",
     header: "License",
     cell: ({ row }) => {
@@ -84,7 +79,9 @@ const columns = [
             {licenseType ?? "Not set"}
           </p>
           <p className="mt-1 text-sm text-primary-foreground/65">
-            {student.licenseNumber ? `No. ${student.licenseNumber}` : "No license number"}
+            {student.licenseNumber
+              ? `No. ${student.licenseNumber}`
+              : "No license number"}
           </p>
         </div>
       );
@@ -112,7 +109,6 @@ function matchesSearch(student: ApprovedStudent, query: string) {
 
   return [
     student.fullName,
-    student.email,
     student.studentIdNumber,
     student.licenseType,
     student.licenseNumber,

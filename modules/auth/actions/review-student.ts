@@ -47,7 +47,7 @@ export const approveStudentForReviewAction = actionClient
         rejection_reason: null,
       })
       .eq("profile_id", parsedInput.studentId)
-      .eq("approval_status", APPROVAL_STATUS.PENDING)
+      .in("approval_status", [APPROVAL_STATUS.PENDING, APPROVAL_STATUS.REJECTED])
       .select("profile_id")
       .maybeSingle();
 

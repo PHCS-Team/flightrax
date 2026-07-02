@@ -9,6 +9,7 @@ import { updateLicenseSetupAction } from "@/modules/auth/actions/update-license-
 import type { LicenseSetupInput } from "@/modules/auth/types/auth";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
+import { toastActionResult } from "@/shared/lib/action-toast";
 import {
   Select,
   SelectContent,
@@ -41,8 +42,10 @@ export function LicenseSetupForm({
       rating: undefined,
     },
   });
-  const { execute, result, isExecuting } = useAction(updateLicenseSetupAction, {
+  const { execute, isExecuting } = useAction(updateLicenseSetupAction, {
     onSuccess: ({ data }) => {
+      toastActionResult(data);
+
       if (data?.ok) {
         router.refresh();
         onSaved?.();
@@ -177,18 +180,6 @@ export function LicenseSetupForm({
           </p>
         )}
       </div>
-
-      {result.data?.message && (
-        <p
-          className={
-            result.data.ok
-              ? "text-sm text-muted-foreground"
-              : "text-sm text-destructive"
-          }
-        >
-          {result.data.message}
-        </p>
-      )}
 
       <Button
         className="h-12 w-full rounded-lg px-7 font-bold uppercase sm:rounded-2xl"

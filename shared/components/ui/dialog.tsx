@@ -7,6 +7,20 @@ import { cn } from "@/shared/lib/utils"
 import { Button } from "@/shared/components/ui/button"
 import { XIcon } from "lucide-react"
 
+function isSelectLayerTarget(target: EventTarget | null) {
+  if (!(target instanceof Element)) {
+    return false
+  }
+
+  if (target.closest("[data-slot='select-content']")) {
+    return true
+  }
+
+  const popperWrapper = target.closest("[data-radix-popper-content-wrapper]")
+
+  return Boolean(popperWrapper?.querySelector("[data-slot='select-content']"))
+}
+
 function Dialog({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Root>) {
@@ -50,6 +64,7 @@ function DialogOverlay({
 function DialogContent({
   className,
   children,
+  onInteractOutside,
   showCloseButton = true,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
@@ -64,6 +79,17 @@ function DialogContent({
           "fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
           className
         )}
+        onInteractOutside={(event) => {
+          onInteractOutside?.(event)
+
+          if (event.defaultPrevented) {
+            return
+          }
+
+          if (isSelectLayerTarget(event.target)) {
+            event.preventDefault()
+          }
+        }}
         {...props}
       >
         {children}

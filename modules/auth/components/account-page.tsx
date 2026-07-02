@@ -2,8 +2,10 @@ import { redirect } from "next/navigation";
 import { format } from "date-fns";
 import { logoutAction } from "@/modules/auth/actions/logout";
 import { AccountLicenseSection } from "@/modules/auth/components/account-license-section";
+import { ChangePasswordDialog } from "@/modules/auth/components/change-password-dialog";
 import { ProfilePhotoUploader } from "@/modules/auth/components/profile-photo-uploader";
 import { getCurrentProfile } from "@/modules/auth/queries/profile";
+import { GlassSurface } from "@/shared/components/layout/glass-surface";
 import {
   getLicenseTypeLabel,
   getRatingLabel,
@@ -11,7 +13,7 @@ import {
 } from "@/shared/lib/aviation/license-options";
 import { PageHeader } from "@/shared/components/layout/page-header";
 import { Button } from "@/shared/components/ui/button";
-import { ROLE } from "@/shared/lib/rbac/config";
+import { ADMIN_DEPARTMENT_LABELS, ROLE } from "@/shared/lib/rbac/config";
 import {
   Tabs,
   TabsContent,
@@ -87,9 +89,20 @@ function getProfileDetails(profile: Profile) {
     {
       icon: "rating" as const,
       label: "Rating",
-      value: getRatingLabel(profile.rating) ?? profile.rating ?? "Pending submission",
+      value:
+        getRatingLabel(profile.rating) ??
+        profile.rating ??
+        "Pending submission",
     },
   ];
+}
+
+function getAdminDepartmentLabel(profile: Profile) {
+  if (!profile.admin_department) {
+    return "Department not assigned";
+  }
+
+  return ADMIN_DEPARTMENT_LABELS[profile.admin_department];
 }
 
 export async function AccountPage() {
@@ -109,15 +122,18 @@ export async function AccountPage() {
     <section>
       <PageHeader
         action={
-          <form action={logoutAction}>
-            <Button
-              className="rounded-lg sm:rounded-2xl"
-              type="submit"
-              variant="outline"
-            >
-              Logout
-            </Button>
-          </form>
+          <div className="flex items-center gap-2">
+            <ChangePasswordDialog />
+            <form action={logoutAction}>
+              <Button
+                className="rounded-lg sm:rounded-2xl"
+                type="submit"
+                variant="outline"
+              >
+                Logout
+              </Button>
+            </form>
+          </div>
         }
         breadcrumbs={[
           { href: "/dashboard", label: "Dashboard" },
@@ -147,64 +163,76 @@ export async function AccountPage() {
         </div>
       </div>
 
-      <Tabs defaultValue="profile" className="gap-0 sm:gap-3">
-        <TabsList className="w-full justify-start border-x-0 md:w-fit md:border-x border-y border-primary-foreground/15 p-1.5">
-          <TabsTrigger value="profile">Profile</TabsTrigger>
-          <TabsTrigger value="log">Log</TabsTrigger>
-        </TabsList>
+      {profile.role === ROLE.SUPERADMIN ? null : profile.role === ROLE.ADMIN ? (
+        <GlassSurface className="p-6">
+          <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary-foreground/60">
+            Department
+          </p>
+          <p className="mt-2 text-xl font-semibold tracking-tight text-primary-foreground">
+            {getAdminDepartmentLabel(profile)}
+          </p>
+        </GlassSurface>
+      ) : (
+        <Tabs defaultValue="profile" className="gap-0 sm:gap-3">
+          <TabsList className="w-full justify-start border-x-0 md:w-fit md:border-x border-y border-primary-foreground/15 p-1.5">
+            <TabsTrigger value="profile">Profile</TabsTrigger>
+            <TabsTrigger value="log">Log</TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="profile">
-          <AccountLicenseSection
-            canSetLicenseDetails={canSetLicenseDetails}
-            details={profileDetails}
-          />
-        </TabsContent>
+          <TabsContent value="profile">
+            <AccountLicenseSection
+              canSetLicenseDetails={canSetLicenseDetails}
+              details={profileDetails}
+            />
+          </TabsContent>
 
-        <TabsContent value="log">
-          <div className="grid sm:gap-3">
-            {logItems.map((item) => (
-              <article
-                key={item.route}
-                className="relative isolate overflow-hidden border-y border-primary-foreground/10 bg-primary p-4 text-primary-foreground md:grid md:grid-cols-[1fr_auto] md:items-center md:gap-6 md:rounded-3xl md:border md:border-primary-foreground/15 md:p-5"
-              >
-                <div
-                  aria-hidden="true"
-                  className="absolute inset-0 -z-20 bg-cover bg-center opacity-60"
-                  style={{ backgroundImage: `url(${item.imageUrl})` }}
-                />
-                <div className="absolute inset-0 -z-10 bg-linear-to-r from-primary/70 via-primary/35 to-primary/0" />
-                <div className="flex min-w-0 items-center gap-3">
-                  <Avatar className="size-11" size="lg">
-                    {profile.profile_photo_url && (
-                      <AvatarImage
-                        alt={`${profile.full_name} profile photo`}
-                        src={profile.profile_photo_url}
-                      />
-                    )}
-                    <AvatarFallback>
-                      {getAvatarFallback(profile.full_name)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="min-w-0">
-                    <p className="truncate font-semibold">
-                      {profile.full_name}
-                    </p>
-                    <p className="text-sm text-primary-foreground/70">
-                      {item.route} / {item.aircraft}
+          <TabsContent value="log">
+            <div className="grid sm:gap-3">
+              {logItems.map((item) => (
+                <article
+                  key={item.route}
+                  className="relative isolate overflow-hidden border-y border-primary-foreground/10 bg-primary p-4 text-primary-foreground md:grid md:grid-cols-[1fr_auto] md:items-center md:gap-6 md:rounded-3xl md:border md:border-primary-foreground/15 md:p-5"
+                >
+                  <div
+                    aria-hidden="true"
+                    className="absolute inset-0 -z-20 bg-cover bg-center opacity-60"
+                    style={{ backgroundImage: `url(${item.imageUrl})` }}
+                  />
+                  <div className="absolute inset-0 -z-10 bg-linear-to-r from-primary/70 via-primary/35 to-primary/0" />
+                  <div className="flex min-w-0 items-center gap-3">
+                    <Avatar className="size-11" size="lg">
+                      {profile.profile_photo_url && (
+                        <AvatarImage
+                          alt={`${profile.full_name} profile photo`}
+                          src={profile.profile_photo_url}
+                        />
+                      )}
+                      <AvatarFallback>
+                        {getAvatarFallback(profile.full_name)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0">
+                      <p className="truncate font-semibold">
+                        {profile.full_name}
+                      </p>
+                      <p className="text-sm text-primary-foreground/70">
+                        {item.route} / {item.aircraft}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-4 grid gap-1 text-sm md:mt-0 md:text-right">
+                    <p className="font-medium">{item.sector}</p>
+                    <p className="text-primary-foreground/70">
+                      {format(new Date(item.date), "MMM d, yyyy")} /{" "}
+                      {item.status}
                     </p>
                   </div>
-                </div>
-                <div className="mt-4 grid gap-1 text-sm md:mt-0 md:text-right">
-                  <p className="font-medium">{item.sector}</p>
-                  <p className="text-primary-foreground/70">
-                    {format(new Date(item.date), "MMM d, yyyy")} / {item.status}
-                  </p>
-                </div>
-              </article>
-            ))}
-          </div>
-        </TabsContent>
-      </Tabs>
+                </article>
+              ))}
+            </div>
+          </TabsContent>
+        </Tabs>
+      )}
     </section>
   );
 }

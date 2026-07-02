@@ -1,4 +1,6 @@
-import { GlassSurface } from "@/shared/components/layout/glass-surface";
+import { GraduationCapIcon } from "lucide-react";
+
+import { EmptyState } from "@/shared/components/layout/empty-state";
 import { PageHeader } from "@/shared/components/layout/page-header";
 import { getApprovedStudents } from "@/modules/students/queries/students";
 import { StudentsTable } from "@/modules/students/components/students-table";
@@ -17,9 +19,11 @@ export async function StudentsPage() {
       />
 
       {students.length === 0 ? (
-        <GlassSurface className="p-6 text-sm text-primary-foreground/75">
-          No approved students are available yet.
-        </GlassSurface>
+        <EmptyState
+          description="Approved student accounts will appear here once they are ready for scheduling and flight operations."
+          icon={<GraduationCapIcon className="size-7" />}
+          title="No approved students yet"
+        />
       ) : (
         <StudentsTable students={students} />
       )}
