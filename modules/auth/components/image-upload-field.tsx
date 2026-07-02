@@ -199,7 +199,7 @@ function CompactUploadControl({
     >
       <div className="flex min-h-10 w-full min-w-0 max-w-full items-center gap-2 overflow-hidden md:min-h-8">
         <button
-          className="flex min-w-0 flex-1 items-center gap-3 overflow-hidden rounded-md px-2 py-1 text-left text-primary-foreground transition hover:bg-primary-foreground/10 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 sm:rounded-xl"
+          className="flex min-w-0 flex-1 cursor-pointer items-center gap-3 overflow-hidden rounded-md px-2 py-1 text-left text-primary-foreground transition hover:bg-primary-foreground/10 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-default sm:rounded-xl"
           disabled={disabled}
           onClick={onChoose}
           type="button"
@@ -217,7 +217,7 @@ function CompactUploadControl({
         {hasFiles ? (
           <button
             aria-label={`Remove ${previews[0].name}`}
-            className="flex size-10 shrink-0 items-center justify-center rounded-full text-primary-foreground/80 transition hover:bg-destructive/15 hover:text-destructive focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 md:size-8"
+            className="flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full text-primary-foreground/80 transition hover:bg-destructive/15 hover:text-destructive focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-default md:size-8"
             disabled={disabled}
             onClick={() => onRemove(0)}
             type="button"
@@ -348,7 +348,7 @@ function SelectedImageRow({
       </div>
       <button
         aria-label={`Remove ${preview.name}`}
-        className="flex size-10 shrink-0 items-center justify-center rounded-full text-primary-foreground/80 transition hover:bg-destructive/15 hover:text-destructive focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+        className="flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full text-primary-foreground/80 transition hover:bg-destructive/15 hover:text-destructive focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-default"
         disabled={disabled}
         onClick={onRemove}
         type="button"

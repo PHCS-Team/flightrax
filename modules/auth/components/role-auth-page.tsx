@@ -1,9 +1,11 @@
 import { ROLE } from "@/shared/lib/rbac/config";
 import type { ProfileRole } from "@/shared/lib/rbac/types";
+import { AdminRegisterForm } from "@/modules/auth/components/admin-register-form";
 import { AuthShell } from "@/modules/auth/components/auth-shell";
+import { InstructorRegisterForm } from "@/modules/auth/components/instructor-register-form";
 import { LoginForm } from "@/modules/auth/components/login-form";
-import { RegisterForm } from "@/modules/auth/components/register-form";
 import { StudentRegisterForm } from "@/modules/auth/components/student-register-form";
+import { SuperadminRegisterForm } from "@/modules/auth/components/superadmin-register-form";
 import {
   AUTH_MODE,
   AUTH_MODE_CONFIG,
@@ -23,21 +25,23 @@ export function RoleAuthPage({
 
   return (
     <AuthShell
-      contentClassName={
-        mode === AUTH_MODE.REGISTER && role === ROLE.STUDENT
-          ? "sm:max-w-2xl xl:max-w-3xl"
-          : undefined
-      }
+      contentClassName={"sm:max-w-lg xl:max-w-xl"}
       eyebrow={config.eyebrow}
       title={config.title[mode]}
       description={modeConfig.selectedDescription}
     >
-      {mode === AUTH_MODE.LOGIN ? (
-        <LoginForm role={role} />
-      ) : role === ROLE.STUDENT ? (
+      {mode === AUTH_MODE.LOGIN && <LoginForm role={role} />}
+      {mode === AUTH_MODE.REGISTER && role === ROLE.STUDENT && (
         <StudentRegisterForm />
-      ) : (
-        <RegisterForm role={role} />
+      )}
+      {mode === AUTH_MODE.REGISTER && role === ROLE.INSTRUCTOR && (
+        <InstructorRegisterForm />
+      )}
+      {mode === AUTH_MODE.REGISTER && role === ROLE.ADMIN && (
+        <AdminRegisterForm />
+      )}
+      {mode === AUTH_MODE.REGISTER && role === ROLE.SUPERADMIN && (
+        <SuperadminRegisterForm />
       )}
     </AuthShell>
   );

@@ -10,6 +10,7 @@ import {
   uploadProfilePhotoAction,
 } from "@/modules/auth/actions/upload-profile-photo";
 import { PROFILE_PHOTO_TYPES } from "@/modules/auth/utils/profile-photo";
+import { DialogSectionHeader } from "@/shared/components/layout/dialog-section-header";
 import {
   Avatar,
   AvatarFallback,
@@ -19,10 +20,6 @@ import { Button } from "@/shared/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from "@/shared/components/ui/dialog";
 import { toastActionResult } from "@/shared/lib/action-toast";
@@ -103,7 +100,7 @@ export function ProfilePhotoUploader({
       <DialogTrigger asChild>
         <button
           aria-label="View or change profile photo"
-          className="group relative size-28 shrink-0 cursor-pointer overflow-hidden rounded-full border border-border bg-muted shadow-sm ring-4 ring-background transition hover:scale-[1.02] hover:border-tertiary/60 sm:size-32 md:size-44"
+          className="group relative size-28 shrink-0 cursor-pointer overflow-hidden rounded-full border border-border bg-muted shadow-sm ring-4 ring-background transition hover:scale-[1.02] hover:border-tertiary/60 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 sm:size-32 md:size-44"
           type="button"
         >
           <Avatar className="size-full">
@@ -126,17 +123,25 @@ export function ProfilePhotoUploader({
         </button>
       </DialogTrigger>
 
-      <DialogContent className="overflow-hidden p-0 sm:max-w-xl">
-        <DialogHeader className="px-5 pt-5">
-          <DialogTitle>Profile picture</DialogTitle>
-          <DialogDescription>
-            Preview your selected image first. It only updates after you save.
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-[calc(100vw-1rem)] overflow-y-auto p-4 sm:max-w-lg sm:p-6">
+        <DialogSectionHeader
+          description="Choose a clear profile photo so your account is easy to identify."
+          icon={CameraIcon}
+          title="Profile picture"
+        />
 
-        <div className="grid gap-5 px-5">
+        <form
+          className="grid min-w-0 gap-5"
+          onSubmit={(event) => {
+            event.preventDefault();
+
+            if (file) {
+              upload.execute({ profilePhoto: file });
+            }
+          }}
+        >
           <div className="flex justify-center">
-            <div className="relative size-72 overflow-hidden rounded-full border bg-muted shadow-sm ring-8 ring-muted/60 sm:size-80">
+            <div className="relative size-28 max-w-full overflow-hidden rounded-full border border-border bg-muted shadow-sm ring-4 ring-muted/50 sm:size-44">
               {displayUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -145,88 +150,84 @@ export function ProfilePhotoUploader({
                   src={displayUrl}
                 />
               ) : (
-                <div className="flex size-full items-center justify-center bg-primary text-8xl font-medium leading-none tracking-tight text-primary-foreground sm:text-9xl">
+                <div className="flex size-full items-center justify-center bg-primary text-4xl font-medium leading-none tracking-tight text-primary-foreground sm:text-6xl">
                   {fallback}
                 </div>
               )}
             </div>
           </div>
 
-          <input
-            ref={inputRef}
-            accept={PROFILE_PHOTO_TYPES.join(",")}
-            className="sr-only"
-            onChange={(event) =>
-              updateSelectedFile(event.target.files?.[0] ?? null)
-            }
-            type="file"
-          />
-
-          <Button
-            className="rounded-2xl border-dashed"
-            onClick={() => inputRef.current?.click()}
-            type="button"
-            variant="outline"
-          >
-            <ImageIcon className="size-4" />
-            {file ? "Choose different image" : "Choose image"}
-          </Button>
-
-          {file && (
-            <div className="rounded-2xl bg-muted/60 p-3 text-sm">
-              <p className="truncate font-medium">{file.name}</p>
-              <p className="text-muted-foreground">
-                {(file.size / 1024 / 1024).toFixed(2)} MB selected
+          <div className="grid min-w-0 gap-2">
+            <label
+              className="text-sm font-semibold text-foreground"
+              htmlFor="profile-photo-input"
+            >
+              Photo file
+            </label>
+            <input
+              ref={inputRef}
+              accept={PROFILE_PHOTO_TYPES.join(",")}
+              className="sr-only"
+              id="profile-photo-input"
+              onChange={(event) =>
+                updateSelectedFile(event.target.files?.[0] ?? null)
+              }
+              type="file"
+            />
+            <button
+              className="group grid min-h-16 w-full min-w-0 max-w-full cursor-pointer grid-cols-[auto_minmax(0,1fr)] items-center gap-3 rounded-lg border border-border bg-background p-3 text-left shadow-sm transition hover:border-primary/40 hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-default sm:flex sm:rounded-2xl"
+              onClick={() => inputRef.current?.click()}
+              type="button"
+            >
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground sm:rounded-xl">
+                <ImageIcon className="size-4" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-sm font-semibold text-foreground">
+                  {file ? file.name : "Choose an image"}
+                </span>
+                <span className="mt-0.5 block truncate text-xs text-muted-foreground">
+                  {file
+                    ? `${(file.size / 1024 / 1024).toFixed(2)} MB selected`
+                    : "Select a profile photo from your device"}
+                </span>
+              </span>
+              <span className="col-span-2 w-full shrink-0 rounded-lg border border-border px-3 py-2 text-center text-xs font-semibold text-foreground transition group-hover:border-primary/40 sm:col-span-1 sm:w-auto sm:rounded-xl">
+                Browse
+              </span>
+            </button>
+            <div className="grid gap-2">
+              <p className="text-xs text-muted-foreground">
+                JPG, PNG, or WebP only. Maximum file size is 5 MB.
               </p>
-            </div>
-          )}
-
-          <p className="text-xs text-muted-foreground">
-            JPG, PNG, or WebP only. Maximum file size is 5 MB.
-          </p>
-
-        </div>
-
-        <DialogFooter className="mt-1 sm:justify-between">
-          <Button
-            className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-            disabled={
-              !currentPhotoUrl || upload.isExecuting || remove.isExecuting
-            }
-            onClick={() => remove.execute()}
-            type="button"
-            variant="ghost"
-          >
-            <Trash2Icon className="size-4" />
-            Remove photo
-          </Button>
-          <div className="flex flex-col-reverse gap-2 sm:flex-row">
-            <Button
-              disabled={upload.isExecuting || remove.isExecuting}
-              onClick={() => setOpen(false)}
-              type="button"
-              variant="outline"
-            >
-              Cancel
-            </Button>
-            <Button
-              disabled={!file || upload.isExecuting || remove.isExecuting}
-              onClick={() => {
-                if (file) {
-                  upload.execute({ profilePhoto: file });
-                }
-              }}
-              type="button"
-            >
-              {upload.isExecuting ? (
-                <UploadIcon className="size-4 animate-pulse" />
-              ) : (
-                <CameraIcon className="size-4" />
+              {currentPhotoUrl && (
+                <Button
+                  className="h-auto w-fit justify-self-start p-0 text-xs font-semibold text-destructive hover:bg-transparent hover:text-destructive/80 disabled:cursor-default"
+                  disabled={upload.isExecuting || remove.isExecuting}
+                  onClick={() => remove.execute()}
+                  type="button"
+                  variant="ghost"
+                >
+                  <Trash2Icon className="size-3.5" />
+                  Remove current photo
+                </Button>
               )}
-              {upload.isExecuting ? "Saving..." : "Save photo"}
-            </Button>
+            </div>
           </div>
-        </DialogFooter>
+
+          <Button
+            className="h-12 w-full min-w-0 cursor-pointer rounded-lg px-4 font-bold uppercase disabled:cursor-default sm:rounded-2xl sm:px-7"
+            disabled={!file || upload.isExecuting || remove.isExecuting}
+            type="submit"
+          >
+            {upload.isExecuting ? (
+              <UploadIcon className="size-4 animate-pulse" />
+            ) : (
+              <CameraIcon className="size-4" />
+            )}
+            {upload.isExecuting ? "Saving..." : "Save photo"}
+          </Button>
+        </form>
       </DialogContent>
     </Dialog>
   );

@@ -42,18 +42,12 @@ export const loginAction = actionClient
       };
     }
 
-    if (profile.approval_status !== APPROVAL_STATUS.APPROVED) {
-      await supabase.auth.signOut();
-      return {
-        ok: false,
-        message: "Your student account is still pending campus approval.",
-        redirectTo: "/pending-approval",
-      };
-    }
-
     return {
       ok: true,
-      message: "Signed in.",
+      message:
+        profile.approval_status === APPROVAL_STATUS.APPROVED
+          ? "Signed in."
+          : "Signed in. Your student account is awaiting campus approval.",
       redirectTo: getDefaultRedirectForProfile(profile),
     };
   });

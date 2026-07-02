@@ -6,42 +6,44 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useAction } from "next-safe-action/hooks";
 import { useForm, useWatch } from "react-hook-form";
 
-import { ROLE } from "@/shared/lib/rbac/config";
-import { Button } from "@/shared/components/ui/button";
-import { toastActionResult } from "@/shared/lib/action-toast";
-import { registerStudentAction } from "@/modules/auth/actions/register-student";
-import { ImageUploadField } from "@/modules/auth/components/image-upload-field";
+import { registerAdminAction } from "@/modules/auth/actions/register-admin";
+import { AuthFieldLabel } from "@/modules/auth/components/auth-field-label";
 import {
   RegisterFormSection,
   RegisterPasswordField,
   RegisterTextField,
 } from "@/modules/auth/components/register-form-parts";
-import { studentRegisterSchema } from "@/modules/auth/schemas/auth-schema";
-import type { StudentRegisterInput } from "@/modules/auth/types/auth";
+import { adminRegisterSchema } from "@/modules/auth/schemas/auth-schema";
+import type { AdminRegisterInput } from "@/modules/auth/types/auth";
 import {
   AUTH_MODE,
   AUTH_MODE_CONFIG,
 } from "@/modules/auth/utils/auth-role-config";
+import { Button } from "@/shared/components/ui/button";
 import {
-  STUDENT_ID_DOCUMENT_MAX_BYTES,
-  STUDENT_ID_DOCUMENT_TYPES,
-} from "@/modules/auth/utils/student-document";
-const studentIdDocumentHelperText = `Upload a JPG, PNG, or WebP image of your student ID. Max ${STUDENT_ID_DOCUMENT_MAX_BYTES / 1024 / 1024} MB.`;
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/components/ui/select";
+import { toastActionResult } from "@/shared/lib/action-toast";
+import { ADMIN_DEPARTMENT_LABELS, ROLE } from "@/shared/lib/rbac/config";
 
-export function StudentRegisterForm() {
+export function AdminRegisterForm() {
   const router = useRouter();
   const modeConfig = AUTH_MODE_CONFIG[AUTH_MODE.REGISTER];
-  const form = useForm<StudentRegisterInput>({
-    resolver: zodResolver(studentRegisterSchema),
+  const form = useForm<AdminRegisterInput>({
+    resolver: zodResolver(adminRegisterSchema),
     defaultValues: {
       email: "",
       password: "",
       confirmPassword: "",
       fullName: "",
-      studentIdNumber: "",
+      adminDepartment: undefined,
     },
   });
-  const { execute, isExecuting } = useAction(registerStudentAction, {
+  const { execute, isExecuting } = useAction(registerAdminAction, {
     onSuccess: ({ data }) => {
       toastActionResult(data);
 
@@ -51,9 +53,9 @@ export function StudentRegisterForm() {
     },
   });
   const errors = form.formState.errors;
-  const studentIdDocument = useWatch({
+  const selectedAdminDepartment = useWatch({
     control: form.control,
-    name: "studentIdDocument",
+    name: "adminDepartment",
   });
 
   return (
@@ -70,14 +72,14 @@ export function StudentRegisterForm() {
         <div className="grid gap-5 sm:grid-cols-2 sm:gap-3">
           <RegisterTextField
             error={errors.fullName}
-            id="student-register-full-name"
+            id="admin-register-full-name"
             label="Full name"
             placeholder="Doe, John S."
             registration={form.register("fullName")}
           />
           <RegisterTextField
             error={errors.email}
-            id="student-register-email"
+            id="admin-register-email"
             label="Email"
             placeholder="name@campus.edu"
             registration={form.register("email")}
@@ -86,49 +88,62 @@ export function StudentRegisterForm() {
         </div>
         <RegisterPasswordField
           error={errors.password}
-          id="student-register-password"
+          id="admin-register-password"
           label="Password"
           placeholder="At least 8 characters"
           registration={form.register("password")}
         />
         <RegisterPasswordField
           error={errors.confirmPassword}
-          id="student-register-confirm-password"
+          id="admin-register-confirm-password"
           label="Confirm password"
           placeholder="Re-enter your password"
           registration={form.register("confirmPassword")}
         />
       </RegisterFormSection>
-      <RegisterFormSection title="Student verification">
-        <div className="grid gap-5 sm:grid-cols-2 sm:items-start sm:gap-3">
-          <RegisterTextField
-            error={errors.studentIdNumber}
-            id="student-register-id-number"
-            label="Student ID number"
-            placeholder="Student ID number"
-            registration={form.register("studentIdNumber")}
-          />
-          <ImageUploadField
-            accept={STUDENT_ID_DOCUMENT_TYPES}
-            errorText={errors.studentIdDocument?.message}
-            helperText={studentIdDocumentHelperText}
-            id="student-register-id-document"
-            label="Student ID image"
-            onChange={(file) => {
-              if (file) {
-                form.setValue("studentIdDocument", file, {
-                  shouldValidate: true,
-                });
-                return;
-              }
-
-              form.unregister("studentIdDocument");
-              void form.trigger("studentIdDocument");
+      <RegisterFormSection title="Department">
+        <div className="space-y-2">
+          <AuthFieldLabel htmlFor="admin-register-department" required>
+            Department
+          </AuthFieldLabel>
+          <Select
+            onValueChange={(value) => {
+              form.setValue(
+                "adminDepartment",
+                value as AdminRegisterInput["adminDepartment"],
+                { shouldDirty: true, shouldValidate: true },
+              );
             }}
-            required
-            value={studentIdDocument ?? null}
-            variant="compact"
-          />
+            value={selectedAdminDepartment}
+          >
+            <SelectTrigger
+              aria-describedby={
+                errors.adminDepartment
+                  ? "admin-register-department-error"
+                  : undefined
+              }
+              aria-invalid={Boolean(errors.adminDepartment)}
+              aria-required="true"
+              id="admin-register-department"
+            >
+              <SelectValue placeholder="Choose department" />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.entries(ADMIN_DEPARTMENT_LABELS).map(([value, label]) => (
+                <SelectItem key={value} value={value}>
+                  {label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {errors.adminDepartment && (
+            <p
+              className="text-sm text-destructive"
+              id="admin-register-department-error"
+            >
+              {errors.adminDepartment.message}
+            </p>
+          )}
         </div>
       </RegisterFormSection>
       <Button
@@ -136,13 +151,13 @@ export function StudentRegisterForm() {
         disabled={isExecuting}
         type="submit"
       >
-        {isExecuting ? "Submitting request..." : "Submit student registration"}
+        {isExecuting ? "Creating account..." : "Create admin account"}
       </Button>
       <p className="text-center text-sm text-primary-foreground/70">
         {modeConfig.switchPrompt}{" "}
         <Link
           className="font-semibold text-primary-foreground underline-offset-4 transition hover:text-primary-foreground/80 hover:underline"
-          href={`/${modeConfig.switchMode}/${ROLE.STUDENT}`}
+          href={`/${modeConfig.switchMode}/${ROLE.ADMIN}`}
         >
           {modeConfig.switchLabel}
         </Link>

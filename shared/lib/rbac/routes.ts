@@ -12,6 +12,7 @@ const PROTECTED_ROUTES: Array<{ prefix: string; permission: Permission }> = [
   { prefix: "/students", permission: "students.view" },
   { prefix: "/student-review", permission: "students.review" },
 ];
+const AUTH_REQUIRED_ROUTES = ["/pending-approval"];
 
 export function getAuthRedirectForRole(role: ProfileRole) {
   return `/login/${role}`;
@@ -48,7 +49,10 @@ export function canAccessPath(profile: Profile, pathname: string) {
 }
 
 export function isProtectedPath(pathname: string) {
-  return Boolean(getRequiredPermission(pathname));
+  return (
+    AUTH_REQUIRED_ROUTES.some((route) => pathname === route) ||
+    Boolean(getRequiredPermission(pathname))
+  );
 }
 
 export function isAuthPath(pathname: string) {
