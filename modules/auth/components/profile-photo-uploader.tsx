@@ -1,15 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-import { useAction } from "next-safe-action/hooks";
 import { CameraIcon, ImageIcon, Trash2Icon, UploadIcon } from "lucide-react";
+import { toast } from "sonner";
 
+import { useProfilePhoto } from "@/modules/auth/hooks/use-profile-photo";
 import {
-  removeProfilePhotoAction,
-  uploadProfilePhotoAction,
-} from "@/modules/auth/actions/upload-profile-photo";
-import { PROFILE_PHOTO_TYPES } from "@/modules/auth/utils/profile-photo";
+  PROFILE_PHOTO_MAX_BYTES,
+  PROFILE_PHOTO_TYPES,
+} from "@/modules/auth/utils/profile-photo";
 import { ConfirmationDialog } from "@/shared/components/layout/confirmation-dialog";
 import { DialogSectionHeader } from "@/shared/components/layout/dialog-section-header";
 import {
@@ -23,7 +22,6 @@ import {
   DialogContent,
   DialogTrigger,
 } from "@/shared/components/ui/dialog";
-import { toastActionResult } from "@/shared/lib/action-toast";
 
 type ProfilePhotoUploaderProps = {
   currentPhotoUrl: string | null;
@@ -32,13 +30,13 @@ type ProfilePhotoUploaderProps = {
 };
 
 const PARENT_CLOSE_RELEASE_MS = 100;
+const PROFILE_PHOTO_HELPER_TEXT = `JPG, PNG, or WebP only. Maximum file size is ${PROFILE_PHOTO_MAX_BYTES / 1024 / 1024} MB.`;
 
 export function ProfilePhotoUploader({
   currentPhotoUrl,
   fallback,
   fullName,
 }: ProfilePhotoUploaderProps) {
-  const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const removeConfirmationActiveRef = useRef(false);
   const previewObjectUrlRef = useRef<string | null>(null);
@@ -46,29 +44,17 @@ export function ProfilePhotoUploader({
   const [removeConfirmationOpen, setRemoveConfirmationOpen] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const upload = useAction(uploadProfilePhotoAction, {
-    onSuccess: ({ data }) => {
-      toastActionResult(data);
-
-      if (data?.ok) {
-        updateSelectedFile(null);
-        setOpen(false);
-        if (inputRef.current) {
-          inputRef.current.value = "";
-        }
-        router.refresh();
-      }
+  const { remove, upload } = useProfilePhoto({
+    onRemoved: () => {
+      updateSelectedFile(null);
+      handleRemoveConfirmationOpenChange(false);
+      setOpen(false);
     },
-  });
-  const remove = useAction(removeProfilePhotoAction, {
-    onSuccess: ({ data }) => {
-      toastActionResult(data);
-
-      if (data?.ok) {
-        updateSelectedFile(null);
-        handleRemoveConfirmationOpenChange(false);
-        setOpen(false);
-        router.refresh();
+    onUploaded: () => {
+      updateSelectedFile(null);
+      setOpen(false);
+      if (inputRef.current) {
+        inputRef.current.value = "";
       }
     },
   });
@@ -97,6 +83,39 @@ export function ProfilePhotoUploader({
     const objectUrl = URL.createObjectURL(selectedFile);
     previewObjectUrlRef.current = objectUrl;
     setPreviewUrl(objectUrl);
+  }
+
+  function handleFileChange(selectedFile: File | null) {
+    if (!selectedFile) {
+      updateSelectedFile(null);
+      return;
+    }
+
+    if (
+      !PROFILE_PHOTO_TYPES.includes(
+        selectedFile.type as (typeof PROFILE_PHOTO_TYPES)[number],
+      )
+    ) {
+      updateSelectedFile(null);
+      if (inputRef.current) {
+        inputRef.current.value = "";
+      }
+      toast.error("Upload a JPG, PNG, or WebP image.");
+      return;
+    }
+
+    if (selectedFile.size > PROFILE_PHOTO_MAX_BYTES) {
+      updateSelectedFile(null);
+      if (inputRef.current) {
+        inputRef.current.value = "";
+      }
+      toast.error(
+        `Profile photo must be ${PROFILE_PHOTO_MAX_BYTES / 1024 / 1024} MB or smaller.`,
+      );
+      return;
+    }
+
+    updateSelectedFile(selectedFile);
   }
 
   const displayUrl = previewUrl ?? currentPhotoUrl;
@@ -210,7 +229,7 @@ export function ProfilePhotoUploader({
               className="sr-only"
               id="profile-photo-input"
               onChange={(event) =>
-                updateSelectedFile(event.target.files?.[0] ?? null)
+                handleFileChange(event.target.files?.[0] ?? null)
               }
               type="file"
             />
@@ -238,7 +257,7 @@ export function ProfilePhotoUploader({
             </button>
             <div className="grid gap-2">
               <p className="text-xs text-muted-foreground">
-                JPG, PNG, or WebP only. Maximum file size is 5 MB.
+                {PROFILE_PHOTO_HELPER_TEXT}
               </p>
               {currentPhotoUrl && (
                 <Button

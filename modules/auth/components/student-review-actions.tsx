@@ -1,18 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { useAction } from "next-safe-action/hooks";
 
+import { useReviewStudent } from "@/modules/auth/hooks/use-review-student";
 import { Button } from "@/shared/components/ui/button";
 import { Textarea } from "@/shared/components/ui/textarea";
-import { toastActionResult } from "@/shared/lib/action-toast";
 import { APPROVAL_STATUS } from "@/shared/lib/rbac/config";
 import type { ApprovalStatus } from "@/shared/lib/rbac/types";
-import {
-  approveStudentForReviewAction,
-  rejectStudentForReviewAction,
-} from "@/modules/auth/actions/review-student";
 
 export function StudentReviewActions({
   approvalStatus,
@@ -21,34 +15,16 @@ export function StudentReviewActions({
   approvalStatus: ApprovalStatus;
   studentId: string;
 }) {
-  const router = useRouter();
   const [localStatus, setLocalStatus] = useState<ApprovalStatus | null>(null);
   const [rejecting, setRejecting] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
-  const approve = useAction(approveStudentForReviewAction, {
-    onSuccess: ({ data }) => {
-      toastActionResult(data);
-
-      if (data?.ok) {
-        setLocalStatus(APPROVAL_STATUS.APPROVED);
-        setRejecting(false);
-        router.refresh();
-      }
+  const { approve, isExecuting, reject } = useReviewStudent({
+    onStatusChange: (status) => {
+      setLocalStatus(status);
+      setRejecting(false);
+      setRejectionReason("");
     },
   });
-  const reject = useAction(rejectStudentForReviewAction, {
-    onSuccess: ({ data }) => {
-      toastActionResult(data);
-
-      if (data?.ok) {
-        setLocalStatus(APPROVAL_STATUS.REJECTED);
-        setRejecting(false);
-        setRejectionReason("");
-        router.refresh();
-      }
-    },
-  });
-  const isExecuting = approve.isExecuting || reject.isExecuting;
   const currentStatus = localStatus ?? approvalStatus;
   const canReject = currentStatus === APPROVAL_STATUS.PENDING;
   const canApprove =

@@ -57,8 +57,10 @@ export function SuperadminSecretTrigger() {
         alt="FlightraX"
         className="h-20 w-auto object-contain sm:h-14"
         height={72}
+        loading="eager"
         priority
         src="/logo/flightrax-white.png"
+        style={{ width: "auto" }}
         width={244}
       />
     </button>

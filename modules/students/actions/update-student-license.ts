@@ -1,7 +1,5 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-
 import { updateStudentLicenseSchema } from "@/modules/students/schemas/student-license-schema";
 import { actionClient } from "@/shared/lib/safe-action";
 import { APPROVAL_STATUS, ROLE } from "@/shared/lib/rbac/config";
@@ -78,7 +76,14 @@ export const updateStudentLicenseAction = actionClient
       return { ok: false, message: updateError.message };
     }
 
-    revalidatePath("/students");
-
-    return { ok: true, message: "Student license details updated." };
+    return {
+      ok: true,
+      message: "Student license details updated.",
+      student: {
+        id: target.profile_id,
+        licenseType: parsedInput.licenseType,
+        licenseNumber: parsedInput.licenseNumber,
+        rating: parsedInput.rating,
+      },
+    };
   });

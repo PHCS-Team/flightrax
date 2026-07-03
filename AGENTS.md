@@ -175,10 +175,14 @@ export const createFlightAction = actionClient
 
 ## Rule 7 — Data Fetching via TanStack Query
 
-- All server-state fetching must use TanStack Query.
-- Query definitions live in `modules/<domain>/queries/`.
+- All server-state fetching must use TanStack Query for client-visible cache ownership. Server-only helpers may fetch the data, but interactive client surfaces must read through `useQuery`, hydrated query data, or query options rather than plain React context or Zustand.
+- Query definitions live in `modules/<domain>/queries/`, including query keys, query options, and browser-safe fetchers that call route/action boundaries instead of Supabase directly.
 - Use query key factories (constants) to keep keys consistent and avoid collisions.
 - Never use Zustand to store data that came from the server.
+- Optimize every query before adding it: select only the columns needed by the caller, avoid `select("*")` unless the full row is truly required, and do not fetch nested relations or signed URLs unless the current surface displays them.
+- Shared server queries that can run more than once in a single render/request, especially auth/profile helpers like `getCurrentProfile`, must be wrapped with React `cache()` or use an existing cached helper. Do not create duplicate Supabase auth/profile calls in a page when the dashboard shell already provides the profile.
+- Split query helpers by data shape when needed. Use lightweight viewer/authorization queries for route guards and permission checks; use detailed queries only for pages that actually display the extra fields.
+- After mutations that change cached server data, invalidate the affected TanStack Query keys on the client and revalidate the affected route or layout with `revalidatePath` when server-rendered data also depends on the change.
 
 ---
 

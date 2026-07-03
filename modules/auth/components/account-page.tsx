@@ -1,10 +1,11 @@
-import { redirect } from "next/navigation";
+"use client";
+
 import { format } from "date-fns";
-import { logoutAction } from "@/modules/auth/actions/logout";
 import { AccountLicenseSection } from "@/modules/auth/components/account-license-section";
 import { ChangePasswordDialog } from "@/modules/auth/components/change-password-dialog";
+import { LogoutConfirmationButton } from "@/modules/auth/components/logout-confirmation-button";
 import { ProfilePhotoUploader } from "@/modules/auth/components/profile-photo-uploader";
-import { getCurrentProfile } from "@/modules/auth/queries/profile";
+import { useDashboardProfile } from "@/modules/auth/hooks/use-dashboard-profile";
 import { GlassSurface } from "@/shared/components/layout/glass-surface";
 import {
   getLicenseTypeLabel,
@@ -12,7 +13,6 @@ import {
   hasMissingLicenseDetails,
 } from "@/shared/lib/aviation/license-options";
 import { PageHeader } from "@/shared/components/layout/page-header";
-import { Button } from "@/shared/components/ui/button";
 import { ADMIN_DEPARTMENT_LABELS, ROLE } from "@/shared/lib/rbac/config";
 import {
   Tabs,
@@ -105,11 +105,11 @@ function getAdminDepartmentLabel(profile: Profile) {
   return ADMIN_DEPARTMENT_LABELS[profile.admin_department];
 }
 
-export async function AccountPage() {
-  const profile = await getCurrentProfile();
+export function AccountPage() {
+  const { data: profile = null } = useDashboardProfile();
 
   if (!profile) {
-    redirect("/login");
+    return null;
   }
 
   const displayName = parseDisplayName(profile.full_name);
@@ -124,15 +124,7 @@ export async function AccountPage() {
         action={
           <div className="flex items-center gap-2">
             <ChangePasswordDialog />
-            <form action={logoutAction}>
-              <Button
-                className="rounded-lg sm:rounded-2xl"
-                type="submit"
-                variant="outline"
-              >
-                Logout
-              </Button>
-            </form>
+            <LogoutConfirmationButton buttonClassName="rounded-lg sm:rounded-2xl" />
           </div>
         }
         breadcrumbs={[
@@ -150,10 +142,10 @@ export async function AccountPage() {
             fullName={profile.full_name}
           />
           <div className="min-w-0 flex-1">
-            <p className="truncate text-4xl font-semibold tracking-tight md:text-6xl">
+            <p className="truncate py-1.5 sm:py-2.5 text-4xl font-semibold tracking-tight md:text-6xl">
               {displayName.lastName}
             </p>
-            <p className="mt-0 sm:mt-1 truncate text-lg font-medium md:text-2xl">
+            <p className="-mt-1 truncate text-xl font-medium md:text-3xl">
               {displayName.givenNames}
             </p>
             <p className="mt-1 sm:mt-2 truncate text-sm md:text-base">

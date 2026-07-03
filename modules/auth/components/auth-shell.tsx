@@ -34,8 +34,10 @@ export function AuthShell({
               alt="FlightraX"
               className="h-10 sm:h-14 w-auto object-contain"
               height={72}
+              loading="eager"
               priority
               src="/logo/flightrax-white.png"
+              style={{ width: "auto" }}
               width={244}
             />
           </Link>

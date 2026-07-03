@@ -114,7 +114,7 @@ export function AdminRegisterForm() {
                 { shouldDirty: true, shouldValidate: true },
               );
             }}
-            value={selectedAdminDepartment}
+            value={selectedAdminDepartment ?? ""}
           >
             <SelectTrigger
               aria-describedby={

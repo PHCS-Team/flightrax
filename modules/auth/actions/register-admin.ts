@@ -4,7 +4,7 @@ import { actionClient } from "@/shared/lib/safe-action";
 import { APPROVAL_STATUS, ROLE } from "@/shared/lib/rbac/config";
 import { getDefaultRedirectForProfile } from "@/shared/lib/rbac/routes";
 import { registerBaseProfile } from "@/modules/auth/actions/register-base";
-import { getProfileByUserId } from "@/modules/auth/queries/profile";
+import { getProfileAccessByUserId } from "@/modules/auth/queries/profile";
 import { adminRegisterSchema } from "@/modules/auth/schemas/auth-schema";
 
 export const registerAdminAction = actionClient
@@ -30,7 +30,7 @@ export const registerAdminAction = actionClient
       };
     }
 
-    const profile = await getProfileByUserId(data.user.id);
+    const profile = await getProfileAccessByUserId(data.user.id);
 
     return {
       ok: true,

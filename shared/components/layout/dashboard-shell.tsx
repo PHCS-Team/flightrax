@@ -8,6 +8,7 @@ import { useState } from "react";
 import { motion, type Variants } from "motion/react";
 import { BellIcon, MenuIcon, PlaneIcon, XIcon } from "lucide-react";
 
+import { useDashboardProfile } from "@/modules/auth/hooks/use-dashboard-profile";
 import {
   Avatar,
   AvatarFallback,
@@ -18,7 +19,6 @@ import { FlightRaxBackground } from "@/shared/components/layout/flightrax-backgr
 import { getDashboardNavigation } from "@/shared/components/layout/navigation";
 import { appMetadata } from "@/shared/lib/app-metadata";
 import { getAvatarFallback } from "@/shared/lib/avatar-fallback";
-import type { Profile } from "@/shared/lib/rbac/types";
 import { cn } from "@/shared/lib/utils";
 
 const copyTransition = {
@@ -77,14 +77,9 @@ function AppInfoCard() {
   );
 }
 
-export function DashboardShell({
-  children,
-  profile,
-}: {
-  children: ReactNode;
-  profile: Profile | null;
-}) {
+export function DashboardShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const { data: profile = null } = useDashboardProfile();
   const [desktopCollapsed, setDesktopCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const navigationItems = getDashboardNavigation(profile);
@@ -100,7 +95,7 @@ export function DashboardShell({
         />
       )}
 
-      <div className="mx-auto flex min-h-dvh w-full max-w-7xl gap-6 px-0 pb-0 lg:px-6 lg:py-4">
+      <div className="mx-auto flex min-h-dvh w-full max-w-[100rem] gap-6 px-0 pb-0 lg:px-6 lg:py-4">
         <aside
           className={cn(
             "fixed inset-y-0 left-0 z-40 flex w-72 flex-col border-r border-primary-foreground/15 bg-primary p-4 text-primary-foreground shadow-xl transition-transform duration-200 ease-out lg:sticky lg:top-4 lg:z-auto lg:h-[calc(100vh-2rem)] lg:rounded-3xl lg:border lg:bg-primary/95 lg:backdrop-blur lg:transition-[width,padding] lg:duration-200 lg:ease-out lg:translate-x-0 lg:shadow-sm",
@@ -239,7 +234,10 @@ export function DashboardShell({
                   alt="FlightraX"
                   className="h-8 sm:h-9 w-auto object-contain"
                   height={32}
+                  loading="eager"
+                  priority
                   src="/logo/flightrax-white.png"
+                  style={{ width: "auto" }}
                   width={160}
                 />
               </div>

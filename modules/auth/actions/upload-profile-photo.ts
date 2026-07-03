@@ -1,15 +1,11 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-
 import { profilePhotoSchema } from "@/modules/auth/schemas/profile-photo-schema";
-import {
-  PROFILE_PHOTO_BUCKET,
-  getProfilePhotoPath,
-} from "@/modules/auth/utils/profile-photo";
+import { getProfilePhotoPath } from "@/modules/auth/utils/profile-photo";
 import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 import { createClient } from "@/shared/lib/supabase/server";
+import { PROFILE_PHOTO_BUCKET } from "@/shared/lib/storage/buckets";
 
 export const uploadProfilePhotoAction = actionClient
   .inputSchema(profilePhotoSchema)
@@ -70,9 +66,6 @@ export const uploadProfilePhotoAction = actionClient
       await supabase.storage.from(PROFILE_PHOTO_BUCKET).remove([oldPath]);
     }
 
-    revalidatePath("/account");
-    revalidatePath("/dashboard", "layout");
-
     return { ok: true, message: "Profile photo updated." };
   });
 
@@ -119,9 +112,6 @@ export const removeProfilePhotoAction = actionClient.action(async () => {
   }
 
   await supabase.storage.from(PROFILE_PHOTO_BUCKET).remove([oldPath]);
-
-  revalidatePath("/account");
-  revalidatePath("/dashboard", "layout");
 
   return { ok: true, message: "Profile photo removed." };
 });

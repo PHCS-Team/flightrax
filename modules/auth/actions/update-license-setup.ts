@@ -1,7 +1,5 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-
 import { actionClient } from "@/shared/lib/safe-action";
 import { ROLE } from "@/shared/lib/rbac/config";
 import { hasMissingLicenseDetails } from "@/shared/lib/aviation/license-options";
@@ -57,9 +55,6 @@ export const updateLicenseSetupAction = actionClient
     if (updateError) {
       return { ok: false, message: updateError.message };
     }
-
-    revalidatePath("/account");
-    revalidatePath("/dashboard", "layout");
 
     return { ok: true, message: "License details saved." };
   });

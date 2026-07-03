@@ -5,7 +5,7 @@ import { createClient } from "@/shared/lib/supabase/server";
 import { APPROVAL_STATUS } from "@/shared/lib/rbac/config";
 import { getDefaultRedirectForProfile } from "@/shared/lib/rbac/routes";
 import { loginSchema } from "@/modules/auth/schemas/auth-schema";
-import { getProfileByUserId } from "@/modules/auth/queries/profile";
+import { getProfileAccessByUserId } from "@/modules/auth/queries/profile";
 
 export const loginAction = actionClient
   .inputSchema(loginSchema)
@@ -24,7 +24,7 @@ export const loginAction = actionClient
       return { ok: false, message: "Unable to load the authenticated user." };
     }
 
-    const profile = await getProfileByUserId(data.user.id);
+    const profile = await getProfileAccessByUserId(data.user.id);
 
     if (!profile) {
       await supabase.auth.signOut();

@@ -1,5 +1,5 @@
-import { StudentReviewPage } from "@/modules/auth/components/student-review-page";
+import { StudentReviewRoute } from "@/modules/auth/components/student-review-route";
 
-export default function Page() {
-  return <StudentReviewPage />;
+export default async function Page() {
+  return <StudentReviewRoute />;
 }

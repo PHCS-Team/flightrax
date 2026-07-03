@@ -189,12 +189,13 @@ proxy.ts                     Next.js proxy for Supabase session refresh
 4. Supabase clients must be created only in `shared/lib/supabase/`.
 5. Client components must not call Supabase directly. Use server side queries or `next-safe-action` actions.
 6. All mutations go through `next-safe-action` with Zod validation.
-7. Server state uses TanStack Query. Zustand is only for UI state.
+7. Server state uses TanStack Query for client-visible cache ownership. Server helpers can fetch data, but interactive client surfaces should read through `useQuery`, hydrated query data, or shared query options. Zustand is only for UI state.
 8. Forms use React Hook Form with Zod schemas.
 9. Use `@/` path aliases. Do not use deep relative imports that traverse up multiple folders.
 10. TypeScript is strict. Do not use `any`.
 11. Do not add custom components to `shared/components/ui/`. That folder is managed by shadcn/ui.
 12. Custom reusable layout components belong in `shared/components/layout/`. Domain specific components belong in their module.
+13. Queries must be optimized before they are added. Select only needed columns, avoid duplicated auth/profile fetches, use cached server helpers for shared request data, keep query keys/options in `modules/<domain>/queries/`, invalidate affected TanStack Query keys after mutations, and revalidate affected routes when server-rendered data also changes.
 
 ## Naming Conventions
 
