@@ -42,13 +42,46 @@ Create `.env.local` from `.env.example` with these variables exactly:
 ```bash
 NEXT_PUBLIC_SUPABASE_URL="https://your-project-ref.supabase.co"
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY="your-supabase-publishable-key"
+NEXT_PUBLIC_APP_VERSION="0.1.0"
+NEXT_PUBLIC_APP_CREDITS="WCC Flight Operations"
+NEXT_PUBLIC_APP_CONTACT="flightops@example.edu"
 SUPABASE_PROJECT_ID="your-project-ref"
 SUPABASE_SERVICE_ROLE_KEY="your-server-only-service-role-key"
 ```
 
 `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` are required by the Supabase client config. A legacy `NEXT_PUBLIC_SUPABASE_ANON_KEY` fallback exists in code, but new setup should use `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
 
+`NEXT_PUBLIC_APP_VERSION`, `NEXT_PUBLIC_APP_CREDITS`, and `NEXT_PUBLIC_APP_CONTACT` are browser safe metadata values used for branded console messaging and the dashboard sidebar info card. Do not place secrets in these values because every `NEXT_PUBLIC_` variable is exposed to browser code.
+
 `SUPABASE_SERVICE_ROLE_KEY` is for server only admin helpers. Never expose it through `NEXT_PUBLIC_`, client components, browser code, logs, or screenshots.
+
+## Versioning Guidance
+
+FlightraX follows semantic versioning for the public `NEXT_PUBLIC_APP_VERSION` value:
+
+1. PATCH: `1.4.2` to `1.4.3`
+
+   Increment this when you fix bugs.
+
+   Use it when you merge a quick fix into staging or a release branch because a button component was broken, a mobile layout was misaligned, copy was incorrect, or an internal implementation issue was fixed. No new features were added.
+
+2. MINOR: `1.4.2` to `1.5.0`
+
+   Increment this when you add functionality in a backwards-compatible manner.
+
+   Use it when you build a brand new module or dashboard feature, such as automated inventory sync statuses or a courier validation screen. Existing features still work the same way, but new capabilities are now available.
+
+   When you bump the MINOR version, reset PATCH to `0`.
+
+3. MAJOR: `1.4.2` to `2.0.0`
+
+   Increment this when you make breaking changes that are not backwards-compatible.
+
+   For web applications, this usually means a major architectural overhaul, such as rewriting the database schema from scratch, upgrading to a major Next.js version that breaks old APIs, or completely changing the application's core workflow.
+
+   When you bump the MAJOR version, reset both MINOR and PATCH to `0`.
+
+Keep the README, `.env.example`, deployment environment, and any release notes aligned when the version changes.
 
 ## Database And Supabase
 

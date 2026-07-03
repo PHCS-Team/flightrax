@@ -16,6 +16,7 @@ import {
 import { Button } from "@/shared/components/ui/button";
 import { FlightRaxBackground } from "@/shared/components/layout/flightrax-background";
 import { getDashboardNavigation } from "@/shared/components/layout/navigation";
+import { appMetadata } from "@/shared/lib/app-metadata";
 import { getAvatarFallback } from "@/shared/lib/avatar-fallback";
 import type { Profile } from "@/shared/lib/rbac/types";
 import { cn } from "@/shared/lib/utils";
@@ -38,17 +39,40 @@ const sidebarCopyVariants = {
   },
 } satisfies Variants;
 
-function NetworkStatusCard() {
+function AppInfoCard() {
   return (
     <div className="rounded-2xl border border-primary-foreground/15 bg-primary-foreground/10 p-3 text-primary-foreground">
-      <div className="text-xs font-medium uppercase tracking-wide opacity-75">
-        Flight Student Tip
+      <div className="flex items-center justify-between gap-3 text-xs font-medium uppercase tracking-wide text-primary-foreground/75">
+        <span>FlightraX</span>
+        <span className="lowercase font-mono tracking-[0.16em]">
+          v{appMetadata.version}
+        </span>
       </div>
-      <p className="mt-1.5 text-sm leading-6">
-        <strong className="text-white">Aviate, Navigate, Communicate:</strong>{" "}
-        Fly the airplane first. Never drop the controls to manage the radio or
-        navigation.
-      </p>
+
+      <div className="mt-3 space-y-0.5 text-sm leading-5">
+        <p className="text-primary-foreground/70">
+          <span className="font-medium text-primary-foreground">
+            {appMetadata.credits}
+          </span>
+        </p>
+
+        {appMetadata.contact && (
+          <p className="text-xs leading-5 text-primary-foreground/60">
+            {appMetadata.contactHref ? (
+              <a
+                className="cursor-pointer wrap-break-word rounded-md font-medium text-primary-foreground/85 underline decoration-primary-foreground/25 underline-offset-4 transition hover:text-primary-foreground hover:decoration-primary-foreground/70 focus-visible:outline-1 focus-visible:outline-ring"
+                href={appMetadata.contactHref}
+              >
+                {appMetadata.contact}
+              </a>
+            ) : (
+              <span className="wrap-break-word font-medium text-primary-foreground/85">
+                {appMetadata.contact}
+              </span>
+            )}
+          </p>
+        )}
+      </div>
     </div>
   );
 }
@@ -186,7 +210,7 @@ export function DashboardShell({
             </nav>
 
             <div className={cn("mt-auto", desktopCollapsed && "lg:hidden")}>
-              <NetworkStatusCard />
+              <AppInfoCard />
             </div>
           </div>
         </aside>

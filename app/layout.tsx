@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist_Mono, Manrope } from "next/font/google";
 
+import { BrowserConsoleBranding } from "@/shared/components/layout/browser-console-branding";
 import { Toaster } from "@/shared/components/ui/sonner";
 
 import "./globals.css";
@@ -34,6 +35,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         {children}
+        <BrowserConsoleBranding />
         <Toaster closeButton position="top-right" richColors />
       </body>
     </html>
