@@ -51,6 +51,7 @@ flightrax/
 │   │   ├── actions/
 │   │   ├── hooks/
 │   │   ├── queries/
+│   │   ├── services/
 │   │   ├── schemas/
 │   │   ├── types/
 │   │   └── utils/
@@ -106,9 +107,10 @@ export default function Page() {
 ## Rule 2 — All Business Logic Lives in `modules/`
 
 - Every feature domain has its own folder under `modules/`.
-- The structure of each module is always: `components/`, `actions/`, `hooks/`, `queries/`, `schemas/`, `types/`, `utils/`.
+- The structure of each module is always: `components/`, `actions/`, `hooks/`, `queries/`, `services/`, `schemas/`, `types/`, `utils/`.
 - If a file only serves one module, it must live inside that module. Do not move it to `shared/`.
 - When creating a new feature, always scaffold all subdirectories even if they start empty.
+- Avoid compatibility barrels and re-export shim files inside a module. Import the canonical file directly unless there is a real public module boundary.
 
 ---
 
@@ -177,6 +179,9 @@ export const createFlightAction = actionClient
 
 - All server-state fetching must use TanStack Query for client-visible cache ownership. Server-only helpers may fetch the data, but interactive client surfaces must read through `useQuery`, hydrated query data, or query options rather than plain React context or Zustand.
 - Query definitions live in `modules/<domain>/queries/`, including query keys, query options, and browser-safe fetchers that call route/action boundaries instead of Supabase directly.
+- Keep one canonical query file per resource or closely related resource group. Do not split connected query options into alias/re-export files like `*-query.ts` when one file is clearer.
+- Standard read flow: `component -> hook -> query options -> client service/API route -> server service -> Supabase`.
+- Hooks that read server state through TanStack Query must use the file suffix `.query.ts`; hooks that wrap `next-safe-action` mutations must use `.action.ts`.
 - Use query key factories (constants) to keep keys consistent and avoid collisions.
 - Never use Zustand to store data that came from the server.
 - Optimize every query before adding it: select only the columns needed by the caller, avoid `select("*")` unless the full row is truly required, and do not fetch nested relations or signed URLs unless the current surface displays them.
@@ -211,6 +216,7 @@ Never use Zustand for server state. Never use TanStack Query for pure UI state.
 
 - Strict TypeScript everywhere. `any` is forbidden. Use `unknown` and narrow explicitly.
 - Module-level types live in `modules/<domain>/types/`.
+- Supabase table-derived row aliases and query projection types for a module must also live in `modules/<domain>/types/`, not inline inside actions, hooks, queries, or services.
 - Global/shared types live in `shared/types/`.
 - Supabase database types are generated and live at `shared/types/supabase.ts`. Always use generated types for DB operations, never write raw type shapes manually.
 
@@ -237,7 +243,7 @@ import { cn } from "../../../shared/lib/utils";
 | ------------------- | -------------------------- | ------------------------ |
 | Files               | kebab-case                 | `flight-card.tsx`        |
 | React Components    | PascalCase                 | `FlightCard`             |
-| Hooks               | camelCase, `use` prefix    | `useFlightFilters`       |
+| Hooks               | kebab-case, `use-` prefix, `.query` or `.action` suffix for server data hooks | `use-flights.query.ts` |
 | Server Actions      | camelCase, `Action` suffix | `createFlightAction`     |
 | Zod Schemas         | camelCase, `Schema` suffix | `createFlightSchema`     |
 | Types / Interfaces  | PascalCase                 | `Flight`, `FlightStatus` |
@@ -280,6 +286,7 @@ modules/<newfeature>/
 ├── actions/
 ├── hooks/
 ├── queries/
+├── services/
 ├── schemas/
 ├── types/
 └── utils/

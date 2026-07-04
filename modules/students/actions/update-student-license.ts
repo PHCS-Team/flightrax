@@ -1,18 +1,11 @@
 "use server";
 
 import { updateStudentLicenseSchema } from "@/modules/students/schemas/student-license-schema";
+import type { UpdateStudentLicenseTargetRow } from "@/modules/students/types/student";
 import { actionClient } from "@/shared/lib/safe-action";
 import { APPROVAL_STATUS, ROLE } from "@/shared/lib/rbac/config";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 import { createClient } from "@/shared/lib/supabase/server";
-import type { Database } from "@/shared/types/supabase";
-
-type StudentProfileRow = Pick<
-  Database["public"]["Tables"]["student_profiles"]["Row"],
-  "approval_status" | "profile_id"
-> & {
-  profiles: Pick<Database["public"]["Tables"]["profiles"]["Row"], "role"> | null;
-};
 
 export const updateStudentLicenseAction = actionClient
   .inputSchema(updateStudentLicenseSchema)
@@ -52,7 +45,7 @@ export const updateStudentLicenseAction = actionClient
       return { ok: false, message: studentError.message };
     }
 
-    const target = studentProfile as StudentProfileRow | null;
+    const target = studentProfile as UpdateStudentLicenseTargetRow | null;
 
     if (
       !target ||

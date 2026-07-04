@@ -2,8 +2,8 @@
 
 import { ClipboardCheckIcon } from "lucide-react";
 
-import { StudentReviewList } from "@/modules/auth/components/student-review-list";
-import { useStudentReview } from "@/modules/auth/hooks/use-student-review";
+import { StudentReviewList } from "@/modules/students/components/student-review-list";
+import { useStudentReview } from "@/modules/students/hooks/use-student-review.query";
 import { EmptyState } from "@/shared/components/layout/empty-state";
 import { GlassSurface } from "@/shared/components/layout/glass-surface";
 import { Skeleton } from "@/shared/components/ui/skeleton";

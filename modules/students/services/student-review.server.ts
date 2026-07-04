@@ -5,27 +5,10 @@ import { APPROVAL_STATUS, hasPermission } from "@/shared/lib/rbac/config";
 import { isApproved } from "@/shared/lib/rbac/guards";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 import { STUDENT_DOCUMENT_BUCKET } from "@/shared/lib/storage/buckets";
-import type { StudentReviewItem } from "@/modules/auth/types/student-review";
-import type { Database } from "@/shared/types/supabase";
-
-type StudentProfileRow = Database["public"]["Tables"]["student_profiles"]["Row"];
-type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
-
-type StudentReviewRow = Pick<
-  StudentProfileRow,
-  | "approval_status"
-  | "id_document_content_type"
-  | "id_document_path"
-  | "id_document_size_bytes"
-  | "id_document_uploaded_at"
-  | "profile_id"
-  | "rejected_at"
-  | "rejection_reason"
-  | "student_id_number"
-  | "submitted_at"
-> & {
-  profiles: Pick<ProfileRow, "email" | "full_name" | "created_at"> | null;
-};
+import type {
+  StudentReviewItem,
+  StudentReviewRow,
+} from "@/modules/students/types/student-review";
 
 async function getSignedDocumentUrl(path: string | null) {
   if (!path) {

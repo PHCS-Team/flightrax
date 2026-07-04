@@ -6,7 +6,6 @@ import type {
   changePasswordSchema,
   instructorRegisterSchema,
   rejectedStudentResubmissionSchema,
-  rejectStudentSchema,
   studentRegisterSchema,
   superadminRegisterSchema,
 } from "@/modules/auth/schemas/auth-schema";
@@ -19,7 +18,6 @@ export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
 export type InstructorRegisterInput = z.infer<typeof instructorRegisterSchema>;
 export type StudentRegisterInput = z.infer<typeof studentRegisterSchema>;
 export type SuperadminRegisterInput = z.infer<typeof superadminRegisterSchema>;
-export type RejectStudentInput = z.infer<typeof rejectStudentSchema>;
 export type RejectedStudentResubmissionInput = z.infer<
   typeof rejectedStudentResubmissionSchema
 >;

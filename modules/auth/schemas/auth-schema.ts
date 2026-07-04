@@ -113,15 +113,6 @@ export const rejectedStudentResubmissionSchema = z
     addStudentIdDocumentIssues(value.studentIdDocument, context);
   });
 
-export const approveStudentSchema = z.object({
-  studentId: z.string().uuid(),
-});
-
-export const rejectStudentSchema = z.object({
-  studentId: z.string().uuid(),
-  rejectionReason: z.string().trim().min(3, "Enter a rejection reason."),
-});
-
 export const changePasswordSchema = z
   .object({
     currentPassword: z.string().min(8, "Enter your current password."),

@@ -13,8 +13,8 @@ import {
   UserRoundCheckIcon,
 } from "lucide-react";
 
-import { StudentReviewActions } from "@/modules/auth/components/student-review-actions";
-import type { StudentReviewItem } from "@/modules/auth/types/student-review";
+import { StudentReviewActions } from "@/modules/students/components/student-review-actions";
+import type { StudentReviewItem } from "@/modules/students/types/student-review";
 import { DialogSectionHeader } from "@/shared/components/layout/dialog-section-header";
 import { EmptyState } from "@/shared/components/layout/empty-state";
 import { GlassSurface } from "@/shared/components/layout/glass-surface";

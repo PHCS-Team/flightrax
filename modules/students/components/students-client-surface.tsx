@@ -3,7 +3,7 @@
 import { GraduationCapIcon } from "lucide-react";
 
 import { StudentsTable } from "@/modules/students/components/students-table";
-import { useApprovedStudents } from "@/modules/students/hooks/use-approved-students";
+import { useApprovedStudents } from "@/modules/students/hooks/use-approved-students.query";
 import { EmptyState } from "@/shared/components/layout/empty-state";
 import { GlassSurface } from "@/shared/components/layout/glass-surface";
 import { Skeleton } from "@/shared/components/ui/skeleton";

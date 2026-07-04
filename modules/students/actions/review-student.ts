@@ -5,7 +5,10 @@ import { APPROVAL_STATUS, hasPermission } from "@/shared/lib/rbac/config";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 import { isApproved } from "@/shared/lib/rbac/guards";
 import { getCurrentAuthorizationProfile } from "@/modules/auth/queries/profile";
-import { approveStudentSchema, rejectStudentSchema } from "@/modules/auth/schemas/auth-schema";
+import {
+  approveStudentSchema,
+  rejectStudentSchema,
+} from "@/modules/students/schemas/student-review-schema";
 
 async function getAuthorizedReviewer() {
   const profile = await getCurrentAuthorizationProfile();

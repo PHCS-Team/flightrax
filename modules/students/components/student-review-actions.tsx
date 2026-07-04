@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { useReviewStudent } from "@/modules/auth/hooks/use-review-student";
+import { useReviewStudent } from "@/modules/students/hooks/use-review-student.action";
 import { Button } from "@/shared/components/ui/button";
 import { Textarea } from "@/shared/components/ui/textarea";
 import { APPROVAL_STATUS } from "@/shared/lib/rbac/config";

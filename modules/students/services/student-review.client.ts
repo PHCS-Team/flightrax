@@ -1,4 +1,4 @@
-import type { StudentReviewItem } from "@/modules/auth/types/student-review";
+import type { StudentReviewItem } from "@/modules/students/types/student-review";
 import { getApiErrorMessage } from "@/shared/lib/api-error";
 
 export async function fetchStudentReviewItems() {

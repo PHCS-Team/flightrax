@@ -160,14 +160,22 @@ app/                         Next.js routing only
     student-review/
     students/
 modules/                     Feature modules and business logic
-  aircrafts/
-  auth/
-  dashboard/
-  flight-documents/
-  instructors/
-  notams/
-  schedule/
   students/
+    components/              UI for the students module
+    hooks/                   React-facing data and mutation hooks
+    queries/                 TanStack Query options and keys
+    services/                Client/server data access helpers
+    actions/                 next-safe-action server mutations
+    schemas/                 Zod validation schemas
+    types/                   Module DTOs, row aliases, and projections
+    utils/                   Module-only utility functions
+  auth/                      Same module structure
+  dashboard/                 Same module structure
+  aircrafts/                 Same module structure
+  flight-documents/          Same module structure
+  instructors/               Same module structure
+  notams/                    Same module structure
+  schedule/                  Same module structure
 shared/                      Cross cutting code only
   components/ui/             shadcn/ui generated components only
   components/layout/         Shell, layout, and custom shared layout components
@@ -181,6 +189,22 @@ supabase/
 proxy.ts                     Next.js proxy for Supabase session refresh
 ```
 
+## Feature Module Flow
+
+Read data through one clear TanStack Query path:
+
+```text
+component -> hook -> query options -> client service/API route -> server service -> Supabase
+```
+
+Mutate data through one clear action path:
+
+```text
+component -> hook -> action -> Supabase/server service
+```
+
+Use `queries/` for canonical query options and query keys. Avoid extra alias files that only re-export another query file. Use `services/` for reusable data access helpers: `.client.ts` files call API routes from the browser, while `.server.ts` files may use server/admin Supabase clients. Use `types/` for module DTOs, Supabase row aliases, and query projection types. Server-data hooks use filename suffixes: `.query.ts` for TanStack Query read hooks and `.action.ts` for `next-safe-action` mutation hooks.
+
 ## Project Rules
 
 1. `app/` is for routing only. Pages should import and render a module root component. Do not put state, hooks, fetching, or business logic in route files.
@@ -189,10 +213,10 @@ proxy.ts                     Next.js proxy for Supabase session refresh
 4. Supabase clients must be created only in `shared/lib/supabase/`.
 5. Client components must not call Supabase directly. Use server side queries or `next-safe-action` actions.
 6. All mutations go through `next-safe-action` with Zod validation.
-7. Server state uses TanStack Query for client-visible cache ownership. Server helpers can fetch data, but interactive client surfaces should read through `useQuery`, hydrated query data, or shared query options. Zustand is only for UI state.
+7. Server state uses TanStack Query for client-visible cache ownership. Server helpers can fetch data, but interactive client surfaces should read through `useQuery`, hydrated query data, or shared query options. Keep one canonical query file per resource or closely related resource group; do not add `*-query.ts` or other re-export shims when direct imports are clearer. Zustand is only for UI state.
 8. Forms use React Hook Form with Zod schemas.
 9. Use `@/` path aliases. Do not use deep relative imports that traverse up multiple folders.
-10. TypeScript is strict. Do not use `any`.
+10. TypeScript is strict. Do not use `any`. Module-local types, including Supabase table-derived row aliases and query projection types, belong in `modules/<domain>/types/`, not inline in actions, hooks, queries, or services.
 11. Do not add custom components to `shared/components/ui/`. That folder is managed by shadcn/ui.
 12. Custom reusable layout components belong in `shared/components/layout/`. Domain specific components belong in their module.
 13. Queries must be optimized before they are added. Select only needed columns, avoid duplicated auth/profile fetches, use cached server helpers for shared request data, keep query keys/options in `modules/<domain>/queries/`, invalidate affected TanStack Query keys after mutations, and revalidate affected routes when server-rendered data also changes.
@@ -203,7 +227,7 @@ proxy.ts                     Next.js proxy for Supabase session refresh
 | --- | --- | --- |
 | Files | kebab case | `flight-card.tsx` |
 | React components | PascalCase | `FlightCard` |
-| Hooks | camelCase with `use` prefix | `useFlightFilters` |
+| Hooks | kebab case with `use-` prefix; server-data hooks use `.query` or `.action` suffix | `use-flights.query.ts` |
 | Server actions | camelCase with `Action` suffix | `createFlightAction` |
 | Zod schemas | camelCase with `Schema` suffix | `createFlightSchema` |
 | Types and interfaces | PascalCase | `FlightStatus` |

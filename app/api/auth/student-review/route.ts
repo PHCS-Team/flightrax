@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { getStudentReviewItems } from "@/modules/auth/services/student-review.server";
+import { getStudentReviewItems } from "@/modules/students/services/student-review.server";
 
 export async function GET() {
   try {

@@ -1,7 +1,7 @@
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
-import { StudentReviewPage } from "@/modules/auth/components/student-review-page";
-import { getStudentReviewItems } from "@/modules/auth/services/student-review.server";
+import { StudentReviewPage } from "@/modules/students/components/student-review-page";
+import { getStudentReviewItems } from "@/modules/students/services/student-review.server";
 import { getQueryClient } from "@/shared/lib/query-client";
 import { STUDENT_REVIEW_QUERY_KEYS } from "@/shared/lib/query-keys";
 

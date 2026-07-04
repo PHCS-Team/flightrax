@@ -3,27 +3,10 @@ import "server-only";
 import { APPROVAL_STATUS, ROLE } from "@/shared/lib/rbac/config";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 import { PROFILE_PHOTO_BUCKET } from "@/shared/lib/storage/buckets";
-import type { ApprovedStudent } from "@/modules/students/types/student";
-import type { Database } from "@/shared/types/supabase";
-
-type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
-type StudentProfileRow = Database["public"]["Tables"]["student_profiles"]["Row"];
-
-type ApprovedStudentRow = Pick<
-  StudentProfileRow,
-  "approval_status" | "profile_id" | "student_id_number"
-> & {
-  profiles: Pick<
-    ProfileRow,
-    | "email"
-    | "full_name"
-    | "license_number"
-    | "license_type"
-    | "profile_photo_path"
-    | "rating"
-    | "role"
-  > | null;
-};
+import type {
+  ApprovedStudent,
+  ApprovedStudentRow,
+} from "@/modules/students/types/student";
 
 async function getSignedProfilePhotoUrl(path: string | null) {
   if (!path) {

@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { studentReviewQueryOptions } from "@/modules/auth/queries/student-review-options";
+import { studentReviewQueryOptions } from "@/modules/students/queries/student-review";
 
 export function useStudentReview() {
   const query = useQuery(studentReviewQueryOptions());

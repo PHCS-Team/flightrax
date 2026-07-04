@@ -5,7 +5,7 @@ import { IdCardIcon } from "lucide-react";
 import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
-import { useUpdateStudentLicense } from "@/modules/students/hooks/use-update-student-license";
+import { useUpdateStudentLicense } from "@/modules/students/hooks/use-update-student-license.action";
 import {
   updateStudentLicenseSchema,
   type UpdateStudentLicenseInput,

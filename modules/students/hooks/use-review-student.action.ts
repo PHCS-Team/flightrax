@@ -3,10 +3,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useAction } from "next-safe-action/hooks";
 
-import {
-  approveStudentForReviewAction,
-  rejectStudentForReviewAction,
-} from "@/modules/auth/actions/review-student";
 import { toastActionResult } from "@/shared/lib/action-toast";
 import {
   STUDENT_REVIEW_QUERY_KEYS,
@@ -14,7 +10,11 @@ import {
 } from "@/shared/lib/query-keys";
 import { APPROVAL_STATUS } from "@/shared/lib/rbac/config";
 import type { ApprovalStatus } from "@/shared/lib/rbac/types";
-import type { StudentReviewItem } from "@/modules/auth/types/student-review";
+import {
+  approveStudentForReviewAction,
+  rejectStudentForReviewAction,
+} from "@/modules/students/actions/review-student";
+import type { StudentReviewItem } from "@/modules/students/types/student-review";
 
 export function useReviewStudent({
   onStatusChange,

@@ -1,4 +1,4 @@
-import { StudentReviewClientSurface } from "@/modules/auth/components/student-review-client-surface";
+import { StudentReviewClientSurface } from "@/modules/students/components/student-review-client-surface";
 import { PageHeader } from "@/shared/components/layout/page-header";
 
 export function StudentReviewPage() {

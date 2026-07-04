@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { approvedStudentsQueryOptions } from "@/modules/students/queries/approved-students";
+import { approvedStudentsQueryOptions } from "@/modules/students/queries/students";
 
 export function useApprovedStudents() {
   const query = useQuery(approvedStudentsQueryOptions());
