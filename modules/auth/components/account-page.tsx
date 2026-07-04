@@ -1,6 +1,7 @@
 "use client";
 
 import { format } from "date-fns";
+import { MailIcon } from "lucide-react";
 import { AccountLicenseSection } from "@/modules/auth/components/account-license-section";
 import { ChangePasswordDialog } from "@/modules/auth/components/change-password-dialog";
 import { LogoutConfirmationButton } from "@/modules/auth/components/logout-confirmation-button";
@@ -148,8 +149,12 @@ export function AccountPage() {
             <p className="-mt-1 truncate text-xl font-medium md:text-3xl">
               {displayName.givenNames}
             </p>
-            <p className="mt-1 sm:mt-2 truncate text-sm md:text-base">
-              {profile.email}
+            <p className="mt-1 flex min-w-0 items-center gap-1.5 text-sm sm:mt-2 md:text-base">
+              <MailIcon
+                aria-hidden="true"
+                className="size-4 mt-0.5 shrink-0 text-primary-foreground/70"
+              />
+              <span className="min-w-0 mb-0.5 truncate">{profile.email}</span>
             </p>
           </div>
         </div>

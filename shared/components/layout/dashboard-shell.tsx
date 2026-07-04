@@ -232,12 +232,12 @@ export function DashboardShell({ children }: { children: ReactNode }) {
                 </button>
                 <Image
                   alt="FlightraX"
-                  className="h-8 sm:h-9 w-auto object-contain"
+                  className="h-auto w-40 object-contain sm:w-44"
                   height={32}
                   loading="eager"
                   priority
                   src="/logo/flightrax-white.png"
-                  style={{ width: "auto" }}
+                  style={{ width: "auto", height: "auto" }}
                   width={160}
                 />
               </div>
