@@ -2,7 +2,7 @@ import type { StudentReviewItem } from "@/modules/students/types/student-review"
 import { getApiErrorMessage } from "@/shared/lib/api-error";
 
 export async function fetchStudentReviewItems() {
-  const response = await fetch("/api/auth/student-review", {
+  const response = await fetch("/api/students/student-review", {
     credentials: "same-origin",
   });
 

@@ -1,10 +1,10 @@
 "use server";
 
 import { actionClient } from "@/shared/lib/safe-action";
+import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { APPROVAL_STATUS, hasPermission } from "@/shared/lib/rbac/config";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 import { isApproved } from "@/shared/lib/rbac/guards";
-import { getCurrentAuthorizationProfile } from "@/modules/auth/queries/profile";
 import {
   approveStudentSchema,
   rejectStudentSchema,

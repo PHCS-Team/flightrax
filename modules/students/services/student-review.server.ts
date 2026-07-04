@@ -1,7 +1,7 @@
 import "server-only";
 
-import { getCurrentAuthorizationProfile } from "@/modules/auth/queries/profile";
 import { APPROVAL_STATUS, hasPermission } from "@/shared/lib/rbac/config";
+import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { isApproved } from "@/shared/lib/rbac/guards";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 import { STUDENT_DOCUMENT_BUCKET } from "@/shared/lib/storage/buckets";

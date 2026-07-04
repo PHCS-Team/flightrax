@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
-import { getCurrentAuthorizationProfile } from "@/modules/auth/queries/profile";
 import { getApprovedStudentsForAuthorizedViewer } from "@/modules/students/services/students.server";
+import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { hasPermission } from "@/shared/lib/rbac/config";
 import { isApproved } from "@/shared/lib/rbac/guards";
 

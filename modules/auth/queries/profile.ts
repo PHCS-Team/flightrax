@@ -1,6 +1,5 @@
 import { cache } from "react";
 
-import { APPROVAL_STATUS } from "@/shared/lib/rbac/config";
 import { PROFILE_PHOTO_BUCKET } from "@/shared/lib/storage/buckets";
 import {
   normalizeProfile,
@@ -8,23 +7,6 @@ import {
 } from "@/shared/lib/rbac/profile";
 import { createClient } from "@/shared/lib/supabase/server";
 import type { Profile } from "@/shared/lib/rbac/types";
-import type { Database } from "@/shared/types/supabase";
-
-type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
-type StudentProfileApproval = Pick<
-  Database["public"]["Tables"]["student_profiles"]["Row"],
-  | "approval_status"
-  | "id_document_content_type"
-  | "id_document_path"
-  | "id_document_size_bytes"
-  | "id_document_uploaded_at"
-  | "rejection_reason"
-  | "student_id_number"
-  | "submitted_at"
->;
-type PendingStudentWithProfile = StudentProfileApproval & {
-  profiles: ProfileRow | null;
-};
 
 const PROFILE_DETAIL_SELECT =
   "*, student_profiles!student_profiles_profile_id_fkey(approval_status, id_document_content_type, id_document_path, id_document_size_bytes, id_document_uploaded_at, rejection_reason, student_id_number, submitted_at), admin_profiles!admin_profiles_profile_id_fkey(department)";
@@ -70,38 +52,6 @@ async function toProfile(
   });
 }
 
-function toPendingStudentProfile(row: PendingStudentWithProfile): Profile | null {
-  if (!row.profiles) {
-    return null;
-  }
-
-  return {
-    id: row.profiles.id,
-    email: row.profiles.email,
-    full_name: row.profiles.full_name,
-    license_type: row.profiles.license_type,
-    license_number: row.profiles.license_number,
-    rating: row.profiles.rating,
-    profile_photo_path: row.profiles.profile_photo_path,
-    profile_photo_content_type: row.profiles.profile_photo_content_type,
-    profile_photo_size_bytes: row.profiles.profile_photo_size_bytes,
-    profile_photo_uploaded_at: row.profiles.profile_photo_uploaded_at,
-    profile_photo_url: null,
-    role: row.profiles.role,
-    created_at: row.profiles.created_at,
-    updated_at: row.profiles.updated_at,
-    admin_department: null,
-    approval_status: row.approval_status,
-    student_id_number: row.student_id_number,
-    id_document_path: row.id_document_path,
-    id_document_content_type: row.id_document_content_type,
-    id_document_size_bytes: row.id_document_size_bytes,
-    id_document_uploaded_at: row.id_document_uploaded_at,
-    submitted_at: row.submitted_at,
-    rejection_reason: row.rejection_reason,
-  };
-}
-
 const getCurrentUser = cache(async function getCurrentUser() {
   const supabase = await createClient();
   const {
@@ -130,18 +80,6 @@ export const getCurrentDashboardProfile = cache(
     }
 
     return getDashboardProfileByUserId(user.id);
-  },
-);
-
-export const getCurrentAuthorizationProfile = cache(
-  async function getCurrentAuthorizationProfile() {
-    const user = await getCurrentUser();
-
-    if (!user) {
-      return null;
-    }
-
-    return getAuthorizationProfileByUserId(user.id);
   },
 );
 
@@ -210,44 +148,3 @@ const getDashboardProfileByUserId = cache(
     return toProfile(data, { includeStudentDocuments: false });
   },
 );
-
-const getAuthorizationProfileByUserId = cache(
-  async function getAuthorizationProfileByUserId(userId: string) {
-    const supabase = await createClient();
-    const { data, error } = await supabase
-      .from("profiles")
-      .select(PROFILE_VIEWER_SELECT)
-      .eq("id", userId)
-      .maybeSingle();
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    if (!data) {
-      return null;
-    }
-
-    return toProfile(data, {
-      includeProfilePhotoUrl: false,
-      includeStudentDocuments: false,
-    });
-  },
-);
-
-export async function getPendingStudentsForApproval() {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("student_profiles")
-    .select("approval_status, id_document_content_type, id_document_path, id_document_size_bytes, id_document_uploaded_at, rejection_reason, student_id_number, submitted_at, profiles!student_profiles_profile_id_fkey(*)")
-    .eq("approval_status", APPROVAL_STATUS.PENDING)
-    .order("created_at", { ascending: true });
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data
-    .map(toPendingStudentProfile)
-    .filter((profile): profile is Profile => profile !== null);
-}

@@ -4,9 +4,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useAction } from "next-safe-action/hooks";
 
 import { updateStudentLicenseAction } from "@/modules/students/actions/update-student-license";
+import { STUDENTS_QUERY_KEYS } from "@/modules/students/queries/query-keys";
 import type { ApprovedStudent } from "@/modules/students/types/student";
 import { toastActionResult } from "@/shared/lib/action-toast";
-import { STUDENTS_QUERY_KEYS } from "@/shared/lib/query-keys";
 
 export function useUpdateStudentLicense({ onSaved }: { onSaved?: () => void } = {}) {
   const queryClient = useQueryClient();

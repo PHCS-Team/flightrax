@@ -1,7 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 
+import { STUDENTS_QUERY_KEYS } from "@/modules/students/queries/query-keys";
 import { fetchApprovedStudents } from "@/modules/students/services/students.client";
-import { STUDENTS_QUERY_KEYS } from "@/shared/lib/query-keys";
 
 export { STUDENTS_QUERY_KEYS };
 

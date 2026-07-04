@@ -7,7 +7,7 @@ import { toastActionResult } from "@/shared/lib/action-toast";
 import {
   STUDENT_REVIEW_QUERY_KEYS,
   STUDENTS_QUERY_KEYS,
-} from "@/shared/lib/query-keys";
+} from "@/modules/students/queries/query-keys";
 import { APPROVAL_STATUS } from "@/shared/lib/rbac/config";
 import type { ApprovalStatus } from "@/shared/lib/rbac/types";
 import {
