@@ -4,7 +4,7 @@ import { actionClient } from "@/shared/lib/safe-action";
 import { createClient } from "@/shared/lib/supabase/server";
 import { APPROVAL_STATUS } from "@/shared/lib/rbac/config";
 import { getDefaultRedirectForProfile } from "@/shared/lib/rbac/routes";
-import { loginSchema } from "@/modules/auth/schemas/auth-schema";
+import { loginSchema } from "@/modules/auth/schemas/login-schema";
 import { getProfileAccessByUserId } from "@/modules/auth/queries/profile";
 
 export const loginAction = actionClient

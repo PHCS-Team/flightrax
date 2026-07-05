@@ -8,7 +8,7 @@ import { useState } from "react";
 import { motion, type Variants } from "motion/react";
 import { BellIcon, MenuIcon, PlaneIcon, XIcon } from "lucide-react";
 
-import { useDashboardProfile } from "@/modules/auth/hooks/use-dashboard-profile";
+import { useDashboardProfile } from "@/modules/auth/hooks/use-dashboard-profile.query";
 import {
   Avatar,
   AvatarFallback,

@@ -1,14 +1,14 @@
 import type { z } from "zod";
 
+import type { changePasswordSchema } from "@/modules/auth/schemas/change-password-schema";
+import type { loginSchema } from "@/modules/auth/schemas/login-schema";
 import type {
-  loginSchema,
   adminRegisterSchema,
-  changePasswordSchema,
   instructorRegisterSchema,
-  rejectedStudentResubmissionSchema,
   studentRegisterSchema,
   superadminRegisterSchema,
-} from "@/modules/auth/schemas/auth-schema";
+} from "@/modules/auth/schemas/register-schema";
+import type { rejectedStudentResubmissionSchema } from "@/modules/auth/schemas/rejected-student-resubmission-schema";
 import type { profilePhotoSchema } from "@/modules/auth/schemas/profile-photo-schema";
 import type { licenseDetailsSchema } from "@/shared/validations/license-schema";
 

@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
-import { AUTH_QUERY_KEYS } from "@/modules/auth/queries/dashboard-profile-query";
+import { AUTH_QUERY_KEYS } from "@/modules/auth/queries/dashboard-profile";
 import { getCurrentDashboardProfile } from "@/modules/auth/queries/profile";
 import { DashboardLicenseSetupGate } from "@/modules/auth/components/dashboard-license-setup-gate";
 import { DashboardShell } from "@/shared/components/layout/dashboard-shell";

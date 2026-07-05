@@ -3,7 +3,7 @@
 import { actionClient } from "@/shared/lib/safe-action";
 import { APPROVAL_STATUS, ROLE } from "@/shared/lib/rbac/config";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
-import { studentRegisterSchema } from "@/modules/auth/schemas/auth-schema";
+import { studentRegisterSchema } from "@/modules/auth/schemas/register-schema";
 import { registerBaseProfile } from "@/modules/auth/actions/register-base";
 import { getStudentIdDocumentPath } from "@/modules/auth/utils/student-document";
 import { STUDENT_DOCUMENT_BUCKET } from "@/shared/lib/storage/buckets";

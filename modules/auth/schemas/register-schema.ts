@@ -1,19 +1,18 @@
 import { z } from "zod";
 
-import { ADMIN_DEPARTMENTS, ROLES } from "@/shared/lib/rbac/config";
+import { ADMIN_DEPARTMENTS } from "@/shared/lib/rbac/config";
 import {
   STUDENT_ID_DOCUMENT_MAX_BYTES,
   STUDENT_ID_DOCUMENT_TYPES,
 } from "@/modules/auth/utils/student-document";
 
-const roleSchema = z.enum(ROLES);
 const adminDepartmentSchema = z.enum(ADMIN_DEPARTMENTS);
-const fullNameSchema = z
+export const fullNameSchema = z
   .string()
   .trim()
   .min(2)
   .regex(/^[^,]+,\s*[^,]+$/, "Use the format Lastname, First M.");
-const studentIdNumberSchema = z
+export const studentIdNumberSchema = z
   .string()
   .trim()
   .min(1, "Enter the student ID number.");
@@ -32,12 +31,12 @@ const passwordMatchSchema = baseRegisterSchema.superRefine((value, context) => {
     });
   }
 });
-const studentIdDocumentSchema = z.custom<File>(
+export const studentIdDocumentSchema = z.custom<File>(
   (value) => typeof File !== "undefined" && value instanceof File,
   "Upload an image of the student ID.",
 );
 
-function addStudentIdDocumentIssues(
+export function addStudentIdDocumentIssues(
   studentIdDocument: File,
   context: z.RefinementCtx,
 ) {
@@ -61,12 +60,6 @@ function addStudentIdDocumentIssues(
     });
   }
 }
-
-export const loginSchema = z.object({
-  email: z.string().trim().email(),
-  password: z.string().min(8),
-  role: roleSchema,
-});
 
 export const instructorRegisterSchema = passwordMatchSchema;
 
@@ -101,38 +94,4 @@ export const studentRegisterSchema = baseRegisterSchema
     }
 
     addStudentIdDocumentIssues(value.studentIdDocument, context);
-  });
-
-export const rejectedStudentResubmissionSchema = z
-  .object({
-    fullName: fullNameSchema,
-    studentIdNumber: studentIdNumberSchema,
-    studentIdDocument: studentIdDocumentSchema,
-  })
-  .superRefine((value, context) => {
-    addStudentIdDocumentIssues(value.studentIdDocument, context);
-  });
-
-export const changePasswordSchema = z
-  .object({
-    currentPassword: z.string().min(8, "Enter your current password."),
-    newPassword: z.string().min(8, "New password must be at least 8 characters."),
-    confirmPassword: z.string().min(8, "Confirm your new password."),
-  })
-  .superRefine((value, context) => {
-    if (value.currentPassword === value.newPassword) {
-      context.addIssue({
-        code: "custom",
-        path: ["newPassword"],
-        message: "Choose a different password.",
-      });
-    }
-
-    if (value.newPassword !== value.confirmPassword) {
-      context.addIssue({
-        code: "custom",
-        path: ["confirmPassword"],
-        message: "Passwords do not match.",
-      });
-    }
   });

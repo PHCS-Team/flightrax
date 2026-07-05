@@ -2,7 +2,7 @@
 
 import { actionClient } from "@/shared/lib/safe-action";
 import { createClient } from "@/shared/lib/supabase/server";
-import { changePasswordSchema } from "@/modules/auth/schemas/auth-schema";
+import { changePasswordSchema } from "@/modules/auth/schemas/change-password-schema";
 
 export const changePasswordAction = actionClient
   .inputSchema(changePasswordSchema)
