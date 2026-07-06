@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { CameraIcon, ImageIcon, Trash2Icon, UploadIcon } from "lucide-react";
 import { toast } from "sonner";
 
-import { useProfilePhoto } from "@/modules/auth/hooks/use-profile-photo";
+import { useProfilePhoto } from "@/modules/auth/hooks/use-profile-photo.action";
 import {
   PROFILE_PHOTO_MAX_BYTES,
   PROFILE_PHOTO_TYPES,

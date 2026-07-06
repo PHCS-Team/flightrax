@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   title: "FlightraX",
   description: "Flight operations command center",
   icons: {
-    icon: "/logo/icon.png",
+    icon: "/logo/flightrax.svg",
   },
 };
 

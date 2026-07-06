@@ -12,7 +12,7 @@ import {
   RegisterPasswordField,
   RegisterTextField,
 } from "@/modules/auth/components/register-form-parts";
-import { instructorRegisterSchema } from "@/modules/auth/schemas/auth-schema";
+import { instructorRegisterSchema } from "@/modules/auth/schemas/register-schema";
 import type { InstructorRegisterInput } from "@/modules/auth/types/auth";
 import {
   AUTH_MODE,

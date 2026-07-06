@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 import { LicenseSetupDialog } from "@/modules/auth/components/license-setup-dialog";
-import { useDashboardProfile } from "@/modules/auth/hooks/use-dashboard-profile";
+import { useDashboardProfile } from "@/modules/auth/hooks/use-dashboard-profile.query";
 import { ROLE } from "@/shared/lib/rbac/config";
 import { hasMissingLicenseDetails } from "@/shared/lib/aviation/license-options";
 

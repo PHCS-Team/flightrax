@@ -5,12 +5,12 @@ import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
 import { ImageUploadField } from "@/modules/auth/components/image-upload-field";
-import { useResubmitRejectedStudent } from "@/modules/auth/hooks/use-resubmit-rejected-student";
+import { useResubmitRejectedStudent } from "@/modules/auth/hooks/use-resubmit-rejected-student.action";
 import {
   RegisterFormSection,
   RegisterTextField,
 } from "@/modules/auth/components/register-form-parts";
-import { rejectedStudentResubmissionSchema } from "@/modules/auth/schemas/auth-schema";
+import { rejectedStudentResubmissionSchema } from "@/modules/auth/schemas/rejected-student-resubmission-schema";
 import type { RejectedStudentResubmissionInput } from "@/modules/auth/types/auth";
 import {
   STUDENT_ID_DOCUMENT_MAX_BYTES,

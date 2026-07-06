@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useWatch } from "react-hook-form";
 
-import { useLicenseSetup } from "@/modules/auth/hooks/use-license-setup";
+import { useLicenseSetup } from "@/modules/auth/hooks/use-license-setup.action";
 import type { LicenseSetupInput } from "@/modules/auth/types/auth";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";

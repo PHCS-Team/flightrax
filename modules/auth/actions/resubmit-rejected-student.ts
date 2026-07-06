@@ -5,7 +5,7 @@ import { APPROVAL_STATUS, ROLE } from "@/shared/lib/rbac/config";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 import { createClient } from "@/shared/lib/supabase/server";
 import { getProfileAccessByUserId } from "@/modules/auth/queries/profile";
-import { rejectedStudentResubmissionSchema } from "@/modules/auth/schemas/auth-schema";
+import { rejectedStudentResubmissionSchema } from "@/modules/auth/schemas/rejected-student-resubmission-schema";
 import { getStudentIdDocumentPath } from "@/modules/auth/utils/student-document";
 import { STUDENT_DOCUMENT_BUCKET } from "@/shared/lib/storage/buckets";
 

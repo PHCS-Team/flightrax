@@ -12,7 +12,7 @@ import { toastActionResult } from "@/shared/lib/action-toast";
 import type { ProfileRole } from "@/shared/lib/rbac/types";
 import { loginAction } from "@/modules/auth/actions/login";
 import { PasswordInput } from "@/modules/auth/components/password-input";
-import { loginSchema } from "@/modules/auth/schemas/auth-schema";
+import { loginSchema } from "@/modules/auth/schemas/login-schema";
 import type { LoginInput } from "@/modules/auth/types/auth";
 import {
   AUTH_MODE,

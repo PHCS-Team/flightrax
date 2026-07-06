@@ -6,7 +6,7 @@ import { AccountLicenseSection } from "@/modules/auth/components/account-license
 import { ChangePasswordDialog } from "@/modules/auth/components/change-password-dialog";
 import { LogoutConfirmationButton } from "@/modules/auth/components/logout-confirmation-button";
 import { ProfilePhotoUploader } from "@/modules/auth/components/profile-photo-uploader";
-import { useDashboardProfile } from "@/modules/auth/hooks/use-dashboard-profile";
+import { useDashboardProfile } from "@/modules/auth/hooks/use-dashboard-profile.query";
 import { GlassSurface } from "@/shared/components/layout/glass-surface";
 import {
   getLicenseTypeLabel,
