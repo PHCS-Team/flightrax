@@ -16,6 +16,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.SYNC_PAT }}
 
       - name: Configure Git
         run: |
@@ -26,4 +27,4 @@ jobs:
         run: |
           git checkout -B staging origin/staging
           git merge origin/main --no-edit
-          git push origin staging
+          git push https://x-access-token:${{ secrets.SYNC_PAT }}@github.com/PHCS-Team/flightrax staging
