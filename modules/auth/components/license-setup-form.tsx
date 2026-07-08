@@ -1,15 +1,12 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useAction } from "next-safe-action/hooks";
 import { useForm, useWatch } from "react-hook-form";
 
-import { updateLicenseSetupAction } from "@/modules/auth/actions/update-license-setup";
+import { useLicenseSetup } from "@/modules/auth/hooks/use-license-setup.action";
 import type { LicenseSetupInput } from "@/modules/auth/types/auth";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
-import { toastActionResult } from "@/shared/lib/action-toast";
 import {
   Select,
   SelectContent,
@@ -33,7 +30,6 @@ export function LicenseSetupForm({
   onSaved,
   surface = "default",
 }: LicenseSetupFormProps) {
-  const router = useRouter();
   const form = useForm<LicenseSetupInput>({
     resolver: zodResolver(licenseDetailsSchema),
     defaultValues: {
@@ -42,16 +38,7 @@ export function LicenseSetupForm({
       rating: undefined,
     },
   });
-  const { execute, isExecuting } = useAction(updateLicenseSetupAction, {
-    onSuccess: ({ data }) => {
-      toastActionResult(data);
-
-      if (data?.ok) {
-        router.refresh();
-        onSaved?.();
-      }
-    },
-  });
+  const { execute, isExecuting } = useLicenseSetup({ onSaved });
   const errors = form.formState.errors;
   const selectedLicenseType = useWatch({
     control: form.control,
@@ -87,7 +74,7 @@ export function LicenseSetupForm({
               },
             )
           }
-          value={selectedLicenseType}
+          value={selectedLicenseType ?? ""}
         >
           <SelectTrigger
             aria-describedby={
@@ -151,7 +138,7 @@ export function LicenseSetupForm({
               shouldValidate: true,
             })
           }
-          value={selectedRating}
+          value={selectedRating ?? ""}
         >
           <SelectTrigger
             aria-describedby={

@@ -1,0 +1,30 @@
+name: Sync Main to Staging
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  sync-branches:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.SYNC_PAT }}
+
+      - name: Configure Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Merge Main into Staging
+        run: |
+          git checkout -B staging origin/staging
+          git merge origin/main --no-edit
+          git push https://x-access-token:${{ secrets.SYNC_PAT }}@github.com/PHCS-Team/flightrax staging

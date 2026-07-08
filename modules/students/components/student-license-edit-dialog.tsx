@@ -1,12 +1,11 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IdCardIcon } from "lucide-react";
-import { useAction } from "next-safe-action/hooks";
+import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
-import { updateStudentLicenseAction } from "@/modules/students/actions/update-student-license";
+import { useUpdateStudentLicense } from "@/modules/students/hooks/use-update-student-license.action";
 import {
   updateStudentLicenseSchema,
   type UpdateStudentLicenseInput,
@@ -33,14 +32,13 @@ import {
   LICENSE_TYPE_OPTIONS,
   RATING_OPTIONS,
 } from "@/shared/lib/aviation/license-options";
-import { toastActionResult } from "@/shared/lib/action-toast";
 
 export function StudentLicenseEditDialog({
   student,
 }: {
   student: ApprovedStudent;
 }) {
-  const router = useRouter();
+  const [open, setOpen] = useState(false);
   const form = useForm<UpdateStudentLicenseInput>({
     resolver: zodResolver(updateStudentLicenseSchema),
     defaultValues: {
@@ -52,18 +50,9 @@ export function StudentLicenseEditDialog({
       rating: isRatingValue(student.rating) ? student.rating : undefined,
     },
   });
-  const { execute, isExecuting } = useAction(
-    updateStudentLicenseAction,
-    {
-      onSuccess: ({ data }) => {
-        toastActionResult(data);
-
-        if (data?.ok) {
-          router.refresh();
-        }
-      },
-    },
-  );
+  const { execute, isExecuting } = useUpdateStudentLicense({
+    onSaved: () => setOpen(false),
+  });
   const errors = form.formState.errors;
   const selectedLicenseType = useWatch({
     control: form.control,
@@ -75,7 +64,7 @@ export function StudentLicenseEditDialog({
   });
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
           className="border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground"
@@ -115,7 +104,7 @@ export function StudentLicenseEditDialog({
                   { shouldDirty: true, shouldValidate: true },
                 )
               }
-              value={selectedLicenseType}
+              value={selectedLicenseType ?? ""}
             >
               <SelectTrigger
                 aria-describedby={
@@ -193,7 +182,7 @@ export function StudentLicenseEditDialog({
                   { shouldDirty: true, shouldValidate: true },
                 )
               }
-              value={selectedRating}
+              value={selectedRating ?? ""}
             >
               <SelectTrigger
                 aria-describedby={

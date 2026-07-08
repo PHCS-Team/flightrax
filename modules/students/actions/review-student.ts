@@ -1,18 +1,17 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-
 import { actionClient } from "@/shared/lib/safe-action";
+import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { APPROVAL_STATUS, hasPermission } from "@/shared/lib/rbac/config";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 import { isApproved } from "@/shared/lib/rbac/guards";
-import { getCurrentProfile } from "@/modules/auth/queries/profile";
-import { approveStudentSchema, rejectStudentSchema } from "@/modules/auth/schemas/auth-schema";
-
-const STUDENT_REVIEW_PATH = "/student-review";
+import {
+  approveStudentSchema,
+  rejectStudentSchema,
+} from "@/modules/students/schemas/student-review-schema";
 
 async function getAuthorizedReviewer() {
-  const profile = await getCurrentProfile();
+  const profile = await getCurrentAuthorizationProfile();
 
   if (!profile || !isApproved(profile)) {
     return null;
@@ -59,9 +58,12 @@ export const approveStudentForReviewAction = actionClient
       return { ok: false, message: "This student request has already been reviewed." };
     }
 
-    revalidatePath(STUDENT_REVIEW_PATH);
-
-    return { ok: true, message: "Student approved." };
+    return {
+      ok: true,
+      message: "Student approved.",
+      studentId: parsedInput.studentId,
+      approvalStatus: APPROVAL_STATUS.APPROVED,
+    };
   });
 
 export const rejectStudentForReviewAction = actionClient
@@ -98,7 +100,12 @@ export const rejectStudentForReviewAction = actionClient
       return { ok: false, message: "This student request has already been reviewed." };
     }
 
-    revalidatePath(STUDENT_REVIEW_PATH);
-
-    return { ok: true, message: "Student rejected." };
+    return {
+      ok: true,
+      message: "Student rejected.",
+      studentId: parsedInput.studentId,
+      approvalStatus: APPROVAL_STATUS.REJECTED,
+      rejectionReason: parsedInput.rejectionReason,
+      rejectedAt: now,
+    };
   });

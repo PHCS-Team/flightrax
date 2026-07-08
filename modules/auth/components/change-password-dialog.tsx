@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form";
 
 import { changePasswordAction } from "@/modules/auth/actions/change-password";
 import { PasswordInput } from "@/modules/auth/components/password-input";
-import { changePasswordSchema } from "@/modules/auth/schemas/auth-schema";
+import { changePasswordSchema } from "@/modules/auth/schemas/change-password-schema";
 import type { ChangePasswordInput } from "@/modules/auth/types/auth";
 import { DialogSectionHeader } from "@/shared/components/layout/dialog-section-header";
 import { Button } from "@/shared/components/ui/button";

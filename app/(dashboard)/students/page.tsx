@@ -1,5 +1,5 @@
-import { StudentsPage } from "@/modules/students/components/students-page";
+import { StudentsRoute } from "@/modules/students/components/students-route";
 
-export default function Page() {
-  return <StudentsPage />;
+export default async function Page() {
+  return <StudentsRoute />;
 }

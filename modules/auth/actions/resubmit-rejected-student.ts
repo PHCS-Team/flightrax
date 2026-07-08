@@ -1,20 +1,13 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-
 import { actionClient } from "@/shared/lib/safe-action";
 import { APPROVAL_STATUS, ROLE } from "@/shared/lib/rbac/config";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 import { createClient } from "@/shared/lib/supabase/server";
-import { getProfileByUserId } from "@/modules/auth/queries/profile";
-import { rejectedStudentResubmissionSchema } from "@/modules/auth/schemas/auth-schema";
-import {
-  STUDENT_DOCUMENT_BUCKET,
-  getStudentIdDocumentPath,
-} from "@/modules/auth/utils/student-document";
-
-const PENDING_APPROVAL_PATH = "/pending-approval";
-const STUDENT_REVIEW_PATH = "/student-review";
+import { getProfileAccessByUserId } from "@/modules/auth/queries/profile";
+import { rejectedStudentResubmissionSchema } from "@/modules/auth/schemas/rejected-student-resubmission-schema";
+import { getStudentIdDocumentPath } from "@/modules/auth/utils/student-document";
+import { STUDENT_DOCUMENT_BUCKET } from "@/shared/lib/storage/buckets";
 
 export const resubmitRejectedStudentAction = actionClient
   .inputSchema(rejectedStudentResubmissionSchema)
@@ -36,7 +29,7 @@ export const resubmitRejectedStudentAction = actionClient
       };
     }
 
-    const profile = await getProfileByUserId(user.id);
+    const profile = await getProfileAccessByUserId(user.id);
 
     if (!profile) {
       return { ok: false, message: "No FlightraX profile exists for this account." };
@@ -53,6 +46,18 @@ export const resubmitRejectedStudentAction = actionClient
     }
 
     const adminSupabase = createAdminClient();
+    const { data: currentStudentProfile, error: currentStudentProfileError } =
+      await adminSupabase
+        .from("student_profiles")
+        .select("id_document_path")
+        .eq("profile_id", user.id)
+        .maybeSingle();
+
+    if (currentStudentProfileError) {
+      return { ok: false, message: currentStudentProfileError.message };
+    }
+
+    const oldDocumentPath = currentStudentProfile?.id_document_path ?? null;
     const documentPath = getStudentIdDocumentPath(user.id, parsedInput.studentIdDocument.type);
     const { error: uploadError } = await adminSupabase.storage
       .from(STUDENT_DOCUMENT_BUCKET)
@@ -75,6 +80,8 @@ export const resubmitRejectedStudentAction = actionClient
       .eq("id", user.id);
 
     if (profileError) {
+      await adminSupabase.storage.from(STUDENT_DOCUMENT_BUCKET).remove([documentPath]);
+
       return { ok: false, message: profileError.message };
     }
 
@@ -98,11 +105,14 @@ export const resubmitRejectedStudentAction = actionClient
       .eq("profile_id", user.id);
 
     if (studentProfileError) {
+      await adminSupabase.storage.from(STUDENT_DOCUMENT_BUCKET).remove([documentPath]);
+
       return { ok: false, message: studentProfileError.message };
     }
 
-    revalidatePath(PENDING_APPROVAL_PATH);
-    revalidatePath(STUDENT_REVIEW_PATH);
+    if (oldDocumentPath && oldDocumentPath !== documentPath) {
+      await adminSupabase.storage.from(STUDENT_DOCUMENT_BUCKET).remove([oldDocumentPath]);
+    }
 
     return {
       ok: true,

@@ -32,10 +32,12 @@ export function AuthShell({
           >
             <Image
               alt="FlightraX"
-              className="h-10 sm:h-14 w-auto object-contain"
+              className="h-auto w-34 object-contain sm:w-47"
               height={72}
+              loading="eager"
               priority
               src="/logo/flightrax-white.png"
+              style={{ width: "auto", height: "auto" }}
               width={244}
             />
           </Link>
@@ -64,7 +66,7 @@ export function AuthShell({
             className={cn(
               "w-full text-primary-foreground",
               surface === "glass"
-                ? "max-w-md border-y border-primary-foreground/20 bg-primary-foreground/10 p-6 shadow-sm backdrop-blur sm:rounded-3xl sm:border sm:bg-primary-foreground/15 [&_.text-destructive]:text-red-200 [&_.text-foreground]:text-primary-foreground [&_.text-muted-foreground]:text-primary-foreground/70 [&_input]:border-primary-foreground/20 [&_input]:bg-primary-foreground/95 [&_input]:text-foreground [&_input]:placeholder:text-muted-foreground [&_input[aria-invalid=true]]:border-red-200/60 [&_input[aria-invalid=true]]:ring-red-200/25 [&_[data-slot=select-trigger]]:border-primary-foreground/20 [&_[data-slot=select-trigger]]:bg-primary-foreground/95 [&_[data-slot=select-trigger]]:text-foreground [&_[data-slot=select-trigger][aria-invalid=true]]:border-red-200/60 [&_[data-slot=select-trigger][aria-invalid=true]]:ring-red-200/25 [&_[data-slot=select-trigger][data-placeholder]]:text-muted-foreground"
+                ? "max-w-md border-y border-primary-foreground/20 bg-primary-foreground/10 p-6 shadow-sm backdrop-blur sm:rounded-3xl sm:border sm:bg-primary-foreground/15 [&_.text-destructive]:text-red-200 [&_.text-foreground]:text-primary-foreground [&_.text-muted-foreground]:text-primary-foreground/70 [&_input]:border-primary-foreground/20 [&_input]:bg-primary-foreground/95 [&_input]:text-foreground [&_input]:placeholder:text-muted-foreground [&_input[aria-invalid=true]]:border-red-200/60 [&_input[aria-invalid=true]]:ring-red-200/25 **:data-[slot=select-trigger]:border-primary-foreground/20 **:data-[slot=select-trigger]:bg-primary-foreground/95 **:data-[slot=select-trigger]:text-foreground [&_[data-slot=select-trigger][aria-invalid=true]]:border-red-200/60 [&_[data-slot=select-trigger][aria-invalid=true]]:ring-red-200/25 [&_[data-slot=select-trigger][data-placeholder]]:text-muted-foreground"
                 : "max-w-xl",
               contentClassName,
             )}

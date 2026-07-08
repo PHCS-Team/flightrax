@@ -1,6 +1,11 @@
 import { APPROVAL_STATUS, ROLE, hasPermission } from "@/shared/lib/rbac/config";
 import type { Permission, Profile, ProfileRole } from "@/shared/lib/rbac/types";
 
+export type RouteAccessProfile = Pick<
+  Profile,
+  "admin_department" | "approval_status" | "role"
+>;
+
 const PROTECTED_ROUTES: Array<{ prefix: string; permission: Permission }> = [
   { prefix: "/account", permission: "account.view" },
   { prefix: "/dashboard", permission: "dashboard.view" },
@@ -18,7 +23,7 @@ export function getAuthRedirectForRole(role: ProfileRole) {
   return `/login/${role}`;
 }
 
-export function getDefaultRedirectForProfile(profile: Profile) {
+export function getDefaultRedirectForProfile(profile: RouteAccessProfile) {
   if (profile.approval_status !== APPROVAL_STATUS.APPROVED) {
     return "/pending-approval";
   }
@@ -34,7 +39,7 @@ export function getRequiredPermission(pathname: string) {
   return PROTECTED_ROUTES.find((route) => pathname.startsWith(route.prefix))?.permission;
 }
 
-export function canAccessPath(profile: Profile, pathname: string) {
+export function canAccessPath(profile: RouteAccessProfile, pathname: string) {
   if (profile.approval_status !== APPROVAL_STATUS.APPROVED) {
     return pathname === "/pending-approval";
   }

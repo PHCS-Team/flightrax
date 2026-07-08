@@ -1,43 +1,14 @@
-import { APPROVAL_STATUS } from "@/shared/lib/rbac/config";
+import "server-only";
+
+import { APPROVAL_STATUS, hasPermission } from "@/shared/lib/rbac/config";
+import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
+import { isApproved } from "@/shared/lib/rbac/guards";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
-import type { ApprovalStatus } from "@/shared/lib/rbac/types";
-import type { Database } from "@/shared/types/supabase";
-import { STUDENT_DOCUMENT_BUCKET } from "@/modules/auth/utils/student-document";
-
-type StudentProfileRow = Database["public"]["Tables"]["student_profiles"]["Row"];
-type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
-
-type StudentReviewRow = Pick<
-  StudentProfileRow,
-  | "approval_status"
-  | "id_document_content_type"
-  | "id_document_path"
-  | "id_document_size_bytes"
-  | "id_document_uploaded_at"
-  | "profile_id"
-  | "rejected_at"
-  | "rejection_reason"
-  | "student_id_number"
-  | "submitted_at"
-> & {
-  profiles: Pick<ProfileRow, "email" | "full_name" | "created_at"> | null;
-};
-
-export type StudentReviewItem = {
-  id: string;
-  email: string;
-  fullName: string;
-  studentIdNumber: string;
-  approvalStatus: ApprovalStatus;
-  documentUrl: string | null;
-  documentContentType: string | null;
-  documentSizeBytes: number | null;
-  documentUploadedAt: string | null;
-  rejectionReason: string | null;
-  rejectedAt: string | null;
-  submittedAt: string | null;
-  createdAt: string;
-};
+import { STUDENT_DOCUMENT_BUCKET } from "@/shared/lib/storage/buckets";
+import type {
+  StudentReviewItem,
+  StudentReviewRow,
+} from "@/modules/students/types/student-review";
 
 async function getSignedDocumentUrl(path: string | null) {
   if (!path) {
@@ -56,7 +27,17 @@ async function getSignedDocumentUrl(path: string | null) {
   return data.signedUrl;
 }
 
-export async function getStudentReviewItems() {
+export async function getStudentReviewItems(): Promise<StudentReviewItem[]> {
+  const viewer = await getCurrentAuthorizationProfile();
+
+  if (
+    !viewer ||
+    !isApproved(viewer) ||
+    !hasPermission(viewer.role, "students.review", viewer.admin_department)
+  ) {
+    throw new Error("You do not have permission to review students.");
+  }
+
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("student_profiles")

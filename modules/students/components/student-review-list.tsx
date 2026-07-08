@@ -13,8 +13,8 @@ import {
   UserRoundCheckIcon,
 } from "lucide-react";
 
-import { StudentReviewActions } from "@/modules/auth/components/student-review-actions";
-import type { StudentReviewItem } from "@/modules/auth/queries/student-review";
+import { StudentReviewActions } from "@/modules/students/components/student-review-actions";
+import type { StudentReviewItem } from "@/modules/students/types/student-review";
 import { DialogSectionHeader } from "@/shared/components/layout/dialog-section-header";
 import { EmptyState } from "@/shared/components/layout/empty-state";
 import { GlassSurface } from "@/shared/components/layout/glass-surface";
@@ -127,9 +127,11 @@ function ReviewMetadata({ student }: { student: StudentReviewItem }) {
 }
 
 function StudentIdPreview({
+  priority = false,
   student,
   variant,
 }: {
+  priority?: boolean;
   student: StudentReviewItem;
   variant: "mobile" | "desktop";
 }) {
@@ -141,7 +143,9 @@ function StudentIdPreview({
         aria-label="Student ID preview"
         className={cn(
           "flex items-center justify-center rounded-2xl bg-primary-foreground/10 text-center text-sm text-primary-foreground/65 ring-1 ring-primary-foreground/10",
-          variant === "mobile" ? "min-h-20 px-4 py-4" : "min-h-52 px-4",
+          variant === "mobile"
+            ? "min-h-20 px-4 py-4"
+            : "min-h-[17.2rem] w-44 px-4",
         )}
       >
         No ID preview available
@@ -156,7 +160,7 @@ function StudentIdPreview({
           className={cn(
             "group relative w-full cursor-pointer overflow-hidden rounded-2xl bg-primary-foreground/10 text-left ring-1 ring-primary-foreground/15 transition hover:bg-primary-foreground/15 hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
             variant === "desktop"
-              ? "block max-w-40 p-2"
+              ? "block w-44 p-2"
               : "flex items-center gap-3 p-2.5",
           )}
           type="button"
@@ -173,6 +177,7 @@ function StudentIdPreview({
               alt={`${student.fullName} student ID thumbnail`}
               className="object-cover transition duration-300 group-hover:scale-[1.03]"
               fill
+              loading={priority ? "eager" : "lazy"}
               sizes={variant === "desktop" ? "160px" : "48px"}
               src={student.documentUrl}
               unoptimized
@@ -251,7 +256,13 @@ function StudentIdPreview({
   );
 }
 
-function StudentReviewRequest({ student }: { student: StudentReviewItem }) {
+function StudentReviewRequest({
+  priority = false,
+  student,
+}: {
+  priority?: boolean;
+  student: StudentReviewItem;
+}) {
   const status = getStatusDetails(student.approvalStatus);
   const StatusIcon = status.icon;
 
@@ -307,7 +318,11 @@ function StudentReviewRequest({ student }: { student: StudentReviewItem }) {
             </div>
 
             <div className="hidden min-w-0 md:flex md:justify-end">
-              <StudentIdPreview student={student} variant="desktop" />
+              <StudentIdPreview
+                priority={priority}
+                student={student}
+                variant="desktop"
+              />
             </div>
           </div>
         </div>
@@ -382,8 +397,12 @@ export function StudentReviewList({
         />
       ) : (
         <div className="grid gap-3">
-          {filteredStudents.map((student) => (
-            <StudentReviewRequest key={student.id} student={student} />
+          {filteredStudents.map((student, index) => (
+            <StudentReviewRequest
+              key={student.id}
+              priority={index === 0}
+              student={student}
+            />
           ))}
         </div>
       )}

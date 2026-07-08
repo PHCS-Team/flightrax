@@ -3,13 +3,10 @@
 import { actionClient } from "@/shared/lib/safe-action";
 import { APPROVAL_STATUS, ROLE } from "@/shared/lib/rbac/config";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
-import { studentRegisterSchema } from "@/modules/auth/schemas/auth-schema";
-import { getProfileByUserId } from "@/modules/auth/queries/profile";
+import { studentRegisterSchema } from "@/modules/auth/schemas/register-schema";
 import { registerBaseProfile } from "@/modules/auth/actions/register-base";
-import {
-  STUDENT_DOCUMENT_BUCKET,
-  getStudentIdDocumentPath,
-} from "@/modules/auth/utils/student-document";
+import { getStudentIdDocumentPath } from "@/modules/auth/utils/student-document";
+import { STUDENT_DOCUMENT_BUCKET } from "@/shared/lib/storage/buckets";
 
 export const registerStudentAction = actionClient
   .inputSchema(studentRegisterSchema)
@@ -69,14 +66,9 @@ export const registerStudentAction = actionClient
       return { ok: false, message: studentProfileError.message };
     }
 
-    const profile = await getProfileByUserId(data.user.id);
-
     return {
       ok: true,
-      message:
-        profile?.approval_status === APPROVAL_STATUS.PENDING
-          ? "Registration received. Your student account is pending approval."
-          : "Registration complete.",
+      message: "Registration received. Your student account is pending approval.",
       redirectTo: "/pending-approval",
     };
   });

@@ -1,35 +1,35 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useAction } from "next-safe-action/hooks";
+import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
-import { resubmitRejectedStudentAction } from "@/modules/auth/actions/resubmit-rejected-student";
 import { ImageUploadField } from "@/modules/auth/components/image-upload-field";
+import { useResubmitRejectedStudent } from "@/modules/auth/hooks/use-resubmit-rejected-student.action";
 import {
   RegisterFormSection,
   RegisterTextField,
 } from "@/modules/auth/components/register-form-parts";
-import { rejectedStudentResubmissionSchema } from "@/modules/auth/schemas/auth-schema";
+import { rejectedStudentResubmissionSchema } from "@/modules/auth/schemas/rejected-student-resubmission-schema";
 import type { RejectedStudentResubmissionInput } from "@/modules/auth/types/auth";
 import {
   STUDENT_ID_DOCUMENT_MAX_BYTES,
   STUDENT_ID_DOCUMENT_TYPES,
 } from "@/modules/auth/utils/student-document";
 import { Button } from "@/shared/components/ui/button";
-import { toastActionResult } from "@/shared/lib/action-toast";
 
 const studentIdDocumentHelperText = `Upload a new JPG, PNG, or WebP image of your student ID. Max ${STUDENT_ID_DOCUMENT_MAX_BYTES / 1024 / 1024} MB.`;
 
 export function RejectedStudentResubmissionForm({
   defaultFullName,
   defaultStudentIdNumber,
+  onResubmitted,
 }: {
   defaultFullName: string;
   defaultStudentIdNumber: string;
+  onResubmitted?: () => void;
 }) {
-  const router = useRouter();
+  const [resubmitted, setResubmitted] = useState(false);
   const form = useForm<RejectedStudentResubmissionInput>({
     resolver: zodResolver(rejectedStudentResubmissionSchema),
     defaultValues: {
@@ -37,13 +37,10 @@ export function RejectedStudentResubmissionForm({
       studentIdNumber: defaultStudentIdNumber,
     },
   });
-  const { execute, isExecuting } = useAction(resubmitRejectedStudentAction, {
-    onSuccess: ({ data }) => {
-      toastActionResult(data);
-
-      if (data?.ok) {
-        router.refresh();
-      }
+  const { execute, isExecuting } = useResubmitRejectedStudent({
+    onResubmitted: () => {
+      setResubmitted(true);
+      onResubmitted?.();
     },
   });
   const errors = form.formState.errors;
@@ -51,6 +48,20 @@ export function RejectedStudentResubmissionForm({
     control: form.control,
     name: "studentIdDocument",
   });
+
+  if (resubmitted && !onResubmitted) {
+    return (
+      <div className="rounded-2xl border border-primary-foreground/15 bg-primary-foreground/10 p-5 text-primary-foreground">
+        <h3 className="text-lg font-semibold tracking-tight">
+          Request received
+        </h3>
+        <p className="mt-2 text-sm leading-6 text-primary-foreground/70">
+          Your corrected student verification details were resubmitted. Please
+          check back after your campus reviewer approves your account.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <form

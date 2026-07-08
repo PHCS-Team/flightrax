@@ -43,7 +43,10 @@ export function SuperadminSecretTrigger() {
       return;
     }
 
-    resetTimerRef.current = window.setTimeout(resetTriggerCount, TRIGGER_RESET_MS);
+    resetTimerRef.current = window.setTimeout(
+      resetTriggerCount,
+      TRIGGER_RESET_MS,
+    );
   }
 
   return (
@@ -55,10 +58,12 @@ export function SuperadminSecretTrigger() {
     >
       <Image
         alt="FlightraX"
-        className="h-20 w-auto object-contain sm:h-14"
+        className="h-auto w-68 object-contain sm:w-47"
         height={72}
+        loading="eager"
         priority
         src="/logo/flightrax-white.png"
+        style={{ width: "auto", height: "auto" }}
         width={244}
       />
     </button>
