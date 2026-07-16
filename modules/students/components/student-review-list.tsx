@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import {
   AlertTriangleIcon,
@@ -14,6 +15,7 @@ import {
 } from "lucide-react";
 
 import { StudentReviewActions } from "@/modules/students/components/student-review-actions";
+import { studentDocumentQueryOptions } from "@/modules/students/queries/student-review";
 import type { StudentReviewItem } from "@/modules/students/types/student-review";
 import { DialogSectionHeader } from "@/shared/components/layout/dialog-section-header";
 import { EmptyState } from "@/shared/components/layout/empty-state";
@@ -127,17 +129,30 @@ function ReviewMetadata({ student }: { student: StudentReviewItem }) {
 }
 
 function StudentIdPreview({
-  priority = false,
   student,
   variant,
 }: {
-  priority?: boolean;
   student: StudentReviewItem;
   variant: "mobile" | "desktop";
 }) {
+  const [open, setOpen] = useState(false);
+
   const uploadedAt = formatRelativeDate(student.documentUploadedAt);
 
-  if (!student.documentUrl) {
+  const {
+    data: documentUrl,
+    isPending: isLoading,
+    error,
+  } = useQuery(studentDocumentQueryOptions(student.id, open));
+
+  const errorMessage =
+    error instanceof Error
+      ? error.message
+      : error
+        ? "Could not load document preview."
+        : null;
+
+  if (!student.documentUploadedAt) {
     return (
       <section
         aria-label="Student ID preview"
@@ -154,7 +169,7 @@ function StudentIdPreview({
   }
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <button
           className={cn(
@@ -165,45 +180,41 @@ function StudentIdPreview({
           )}
           type="button"
         >
-          <span
-            className={cn(
-              "relative block shrink-0 overflow-hidden bg-primary/20 shadow-inner ring-1 ring-primary-foreground/20",
-              variant === "desktop"
-                ? "aspect-3/4 w-full rounded-xl"
-                : "h-16 w-12 rounded-xl",
-            )}
-          >
-            <Image
-              alt={`${student.fullName} student ID thumbnail`}
-              className="object-cover transition duration-300 group-hover:scale-[1.03]"
-              fill
-              loading={priority ? "eager" : "lazy"}
-              sizes={variant === "desktop" ? "160px" : "48px"}
-              src={student.documentUrl}
-              unoptimized
-            />
-          </span>
-          <span
-            className={cn(
-              "min-w-0",
-              variant === "desktop"
-                ? "mt-2 flex items-center justify-between gap-2"
-                : "flex flex-1 items-center gap-3",
-            )}
-          >
-            <span className="min-w-0 flex-1">
-              <span className="flex items-center gap-2 text-sm font-semibold text-primary-foreground">
-                <FileImageIcon className="size-4 shrink-0" />
-                <span className="truncate">Student ID preview</span>
+          {variant === "desktop" ? (
+            <div className="flex flex-col items-center gap-3 py-4">
+              <span className="flex size-12 items-center justify-center rounded-xl bg-primary/20 ring-1 ring-primary-foreground/20">
+                <FileImageIcon className="size-6 text-primary-foreground/60" />
               </span>
-              <span className="mt-0.5 block truncate text-xs text-primary-foreground/65">
-                Uploaded {uploadedAt}
+              <div className="text-center">
+                <p className="text-sm font-semibold text-primary-foreground">
+                  Student ID preview
+                </p>
+                <p className="mt-0.5 text-xs text-primary-foreground/65">
+                  Uploaded {uploadedAt}
+                </p>
+              </div>
+              <span className="rounded-full bg-primary-foreground/10 px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-primary-foreground/70">
+                View
               </span>
-            </span>
-            <span className="shrink-0 rounded-full bg-primary-foreground/10 px-2 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-primary-foreground/70">
-              Open
-            </span>
-          </span>
+            </div>
+          ) : (
+            <>
+              <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary/20 ring-1 ring-primary-foreground/20">
+                <FileImageIcon className="size-6 text-primary-foreground/60" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="flex items-center gap-2 text-sm font-semibold text-primary-foreground">
+                  <span className="truncate">Student ID preview</span>
+                </span>
+                <span className="mt-0.5 block truncate text-xs text-primary-foreground/65">
+                  Uploaded {uploadedAt}
+                </span>
+              </span>
+              <span className="shrink-0 rounded-full bg-primary-foreground/10 px-2 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-primary-foreground/70">
+                Open
+              </span>
+            </>
+          )}
         </button>
       </DialogTrigger>
       <DialogContent className="max-h-[calc(100dvh-2rem)] gap-4 overflow-y-auto bg-background p-4 text-foreground sm:max-w-2xl sm:gap-5 sm:p-5">
@@ -211,58 +222,73 @@ function StudentIdPreview({
           className="**:data-[slot=dialog-description]:text-muted-foreground **:data-[slot=dialog-title]:text-foreground [&_span]:bg-muted [&_span]:text-foreground [&_span]:ring-border"
           description={`Uploaded ${uploadedAt} for review.`}
           icon={FileImageIcon}
-          title={`${student.fullName}'s student ID`}
+          title="Student ID Preview"
         />
         <div className="border-t border-border pt-3 sm:pt-4">
-          <div className="relative mx-auto h-[46dvh] max-h-104 min-h-56 w-full overflow-hidden rounded-2xl bg-muted shadow-inner ring-1 ring-border sm:h-[68vh] sm:max-h-none">
-            <Image
-              alt={`${student.fullName} student ID`}
-              className="object-cover"
-              fill
-              sizes="90vw"
-              src={student.documentUrl}
-              unoptimized
-            />
-          </div>
-          <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-3">
-            <div className="min-w-0">
-              <dt className="text-[0.64rem] font-medium uppercase tracking-[0.16em] text-muted-foreground">
-                Student
-              </dt>
-              <dd className="mt-1 truncate font-semibold text-foreground">
-                {student.fullName}
-              </dd>
+          {isLoading ? (
+            <div className="flex h-[46dvh] min-h-56 w-full max-h-104 items-center justify-center rounded-2xl bg-muted shadow-inner ring-1 ring-border sm:h-[68vh] sm:max-h-none">
+              <p className="text-sm text-muted-foreground">
+                Loading document preview...
+              </p>
             </div>
-            <div className="min-w-0">
-              <dt className="text-[0.64rem] font-medium uppercase tracking-[0.16em] text-muted-foreground">
-                Student ID
-              </dt>
-              <dd className="mt-1 truncate font-semibold text-foreground">
-                {student.studentIdNumber}
-              </dd>
+          ) : errorMessage ? (
+            <div className="flex h-[46dvh] min-h-56 w-full max-h-104 items-center justify-center rounded-2xl bg-muted shadow-inner ring-1 ring-border sm:h-[68vh] sm:max-h-none">
+              <div className="text-center">
+                <p className="text-sm font-medium text-destructive">
+                  Could not load document preview.
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {errorMessage}
+                </p>
+              </div>
             </div>
-            <div className="min-w-0">
-              <dt className="text-[0.64rem] font-medium uppercase tracking-[0.16em] text-muted-foreground">
-                File size
-              </dt>
-              <dd className="mt-1 truncate font-semibold text-foreground">
-                {formatBytes(student.documentSizeBytes)}
-              </dd>
-            </div>
-          </dl>
+          ) : documentUrl ? (
+            <>
+              <div className="relative mx-auto h-[46dvh] max-h-104 min-h-56 w-full overflow-hidden rounded-2xl bg-muted shadow-inner ring-1 ring-border sm:h-[68vh] sm:max-h-none">
+                <Image
+                  alt={`${student.fullName} student ID`}
+                  className="object-cover"
+                  fill
+                  sizes="90vw"
+                  src={documentUrl}
+                  unoptimized
+                />
+              </div>
+              <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-3">
+                <div className="min-w-0">
+                  <dt className="text-[0.64rem] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+                    Student
+                  </dt>
+                  <dd className="mt-1 truncate font-semibold text-foreground">
+                    {student.fullName}
+                  </dd>
+                </div>
+                <div className="min-w-0">
+                  <dt className="text-[0.64rem] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+                    Student ID
+                  </dt>
+                  <dd className="mt-1 truncate font-semibold text-foreground">
+                    {student.studentIdNumber}
+                  </dd>
+                </div>
+                <div className="min-w-0">
+                  <dt className="text-[0.64rem] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+                    File size
+                  </dt>
+                  <dd className="mt-1 truncate font-semibold text-foreground">
+                    {formatBytes(student.documentSizeBytes)}
+                  </dd>
+                </div>
+              </dl>
+            </>
+          ) : null}
         </div>
       </DialogContent>
     </Dialog>
   );
 }
 
-function StudentReviewRequest({
-  priority = false,
-  student,
-}: {
-  priority?: boolean;
-  student: StudentReviewItem;
-}) {
+function StudentReviewRequest({ student }: { student: StudentReviewItem }) {
   const status = getStatusDetails(student.approvalStatus);
   const StatusIcon = status.icon;
 
@@ -278,7 +304,7 @@ function StudentReviewRequest({
                     <UserRoundCheckIcon className="size-3.5" />
                     Student verification
                   </div>
-                  <div className="min-w-0">
+                  <div className="min-w-0 mt-1">
                     <h2 className="truncate text-xl font-semibold tracking-tight text-primary-foreground sm:text-2xl">
                       {student.fullName}
                     </h2>
@@ -318,11 +344,7 @@ function StudentReviewRequest({
             </div>
 
             <div className="hidden min-w-0 md:flex md:justify-end">
-              <StudentIdPreview
-                priority={priority}
-                student={student}
-                variant="desktop"
-              />
+              <StudentIdPreview student={student} variant="desktop" />
             </div>
           </div>
         </div>
@@ -397,12 +419,8 @@ export function StudentReviewList({
         />
       ) : (
         <div className="grid gap-3">
-          {filteredStudents.map((student, index) => (
-            <StudentReviewRequest
-              key={student.id}
-              priority={index === 0}
-              student={student}
-            />
+          {filteredStudents.map((student) => (
+            <StudentReviewRequest key={student.id} student={student} />
           ))}
         </div>
       )}

@@ -31,8 +31,8 @@ export const updateStudentLicenseAction = actionClient
       return { ok: false, message: actorError.message };
     }
 
-    if (!actor || actor.role !== ROLE.INSTRUCTOR) {
-      return { ok: false, message: "Only instructors can edit student license details." };
+    if (!actor || (actor.role !== ROLE.INSTRUCTOR && actor.role !== ROLE.SUPERADMIN)) {
+      return { ok: false, message: "Only instructors and superadmins can edit student license details." };
     }
 
     const { data: studentProfile, error: studentError } = await adminSupabase

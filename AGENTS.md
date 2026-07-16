@@ -252,7 +252,63 @@ import { cn } from "../../../shared/lib/utils";
 
 ---
 
-## Rule 13 — Verification Scope
+## Rule 13 — All Tables Must Use Server-Side Pagination
+
+Every table that displays a list of rows from the database **must** paginate on the server, never on the client. This prevents fetching thousands of rows on every page load.
+
+**The standard pattern across all layers:**
+
+```
+server service → Supabase .range() + count
+API route/action → accepts ?page=&pageSize=
+client service → passes page/pageSize to fetch
+query options → key includes { page, pageSize }; placeholderData: (prev) => prev
+hook → exposes totalCount, totalPages
+nuqs → useQueryState("page", parseAsInteger) for URL-driven state
+TanStack Table → manualPagination: true + pageCount
+mutations → invalidate parent query key (e.g. ["students"]) to refetch all pages
+```
+
+**Reference implementation** — `modules/students/services/students.server.ts`, `modules/students/queries/students.ts`, and `modules/students/components/students-table.tsx`.
+
+Key rules:
+- Server service returns `PaginatedResponse<T>` from `shared/types/pagination.ts`.
+- Query key factory must have a parent key (e.g. `all: ["resource"]`) for invalidation and a parameterized key (e.g. `list: (page, pageSize) => ["resource", "list", { page, pageSize }]`).
+- Use `placeholderData: (previousData) => previousData` to keep the previous page visible while the next loads.
+- Use `nuqs` `useQueryState("page", parseAsInteger.withDefault(1))` for pagination state — never `useState`.
+- Table component uses `manualPagination: true` and `pageCount` from the query response. Do NOT use `getPaginationRowModel`.
+- Mutations that change listed data must invalidate the parent query key, not a specific page key.
+
+```ts
+// ✅ CORRECT — server returns PaginatedResponse
+export async function getResourcePage(page: number, pageSize: number) {
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+  const { count } = await supabase.from("table").select("*", { count: "exact", head: true }).eq(...);
+  const { data } = await supabase.from("table").select("...").range(from, to);
+  return { data, totalCount: count ?? 0, page, pageSize, totalPages: Math.ceil((count ?? 0) / pageSize) };
+}
+
+// ✅ CORRECT — query options with page in key and placeholderData
+queryOptions({
+  queryKey: RESOURCE_KEYS.list(page, pageSize),
+  queryFn: () => fetchResourcePage(page, pageSize),
+  placeholderData: (prev) => prev,
+});
+
+// ✅ CORRECT — table uses manual pagination
+useReactTable({
+  data: data?.data ?? [],
+  pageCount: data?.totalPages ?? -1,
+  manualPagination: true,
+  state: { pagination: { pageIndex: page - 1, pageSize } },
+  onPaginationChange: (updater) => { /* updates nuqs page state */ },
+});
+```
+
+---
+
+## Rule 14 — Verification Scope
 
 - Do **not** run Playwright, browser automation, E2E tests, or broad test suites unless the user explicitly asks for them.
 - This is a small project on a tight deadline. Default verification is `npm run lint`, `npm run typecheck`, and `npm run build` only when relevant.
@@ -273,6 +329,7 @@ These are hard rules. There are no exceptions.
 - ❌ Never manage server/async data with Zustand.
 - ❌ Never use relative imports that traverse up more than one level (`../../`).
 - ❌ Never call Supabase directly from a client component — always go through an action or server-side query.
+- ❌ Never use client-side pagination (`getPaginationRowModel`) in tables — all pagination must be server-side with `manualPagination: true`.
 
 ---
 
