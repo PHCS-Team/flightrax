@@ -43,6 +43,127 @@ export type Database = {
           },
         ]
       }
+      aircraft_types: {
+        Row: {
+          created_at: string
+          type: string
+          type_key: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          type: string
+          type_key: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          type?: string
+          type_key?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      aircraft_weight_balance_configs: {
+        Row: {
+          aircraft_id: string
+          arm: number
+          basic_empty_weight: number
+          created_at: string
+          id: string
+          moment: number
+          updated_at: string
+        }
+        Insert: {
+          aircraft_id: string
+          arm: number
+          basic_empty_weight: number
+          created_at?: string
+          id?: string
+          moment: number
+          updated_at?: string
+        }
+        Update: {
+          aircraft_id?: string
+          arm?: number
+          basic_empty_weight?: number
+          created_at?: string
+          id?: string
+          moment?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "aircraft_weight_balance_configs_aircraft_id_fkey"
+            columns: ["aircraft_id"]
+            isOneToOne: true
+            referencedRelation: "aircrafts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      aircrafts: {
+        Row: {
+          aircraft_identification: string
+          aircraft_type: string
+          color_markings: string
+          created_at: string
+          id: string
+          model: string
+          photo_content_type: string | null
+          photo_path: string | null
+          photo_size_bytes: number | null
+          photo_uploaded_at: string | null
+          registration: string
+          remarks: string | null
+          serial_number: string | null
+          status: Database["public"]["Enums"]["aircraft_status"]
+          updated_at: string
+        }
+        Insert: {
+          aircraft_identification: string
+          aircraft_type: string
+          color_markings: string
+          created_at?: string
+          id?: string
+          model: string
+          photo_content_type?: string | null
+          photo_path?: string | null
+          photo_size_bytes?: number | null
+          photo_uploaded_at?: string | null
+          registration: string
+          remarks?: string | null
+          serial_number?: string | null
+          status?: Database["public"]["Enums"]["aircraft_status"]
+          updated_at?: string
+        }
+        Update: {
+          aircraft_identification?: string
+          aircraft_type?: string
+          color_markings?: string
+          created_at?: string
+          id?: string
+          model?: string
+          photo_content_type?: string | null
+          photo_path?: string | null
+          photo_size_bytes?: number | null
+          photo_uploaded_at?: string | null
+          registration?: string
+          remarks?: string | null
+          serial_number?: string | null
+          status?: Database["public"]["Enums"]["aircraft_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "aircrafts_aircraft_type_fkey"
+            columns: ["aircraft_type"]
+            isOneToOne: false
+            referencedRelation: "aircraft_types"
+            referencedColumns: ["type_key"]
+          },
+        ]
+      }
       instructor_profiles: {
         Row: {
           created_at: string
@@ -205,6 +326,7 @@ export type Database = {
         | "flight_operations_personnel"
         | "air_traffic_controller"
         | "safety_personnel"
+      aircraft_status: "active" | "maintenance" | "grounded" | "retired"
       app_role: "student" | "instructor" | "admin" | "superadmin"
       approval_status: "pending" | "approved" | "rejected"
     }
@@ -339,6 +461,7 @@ export const Constants = {
         "air_traffic_controller",
         "safety_personnel",
       ],
+      aircraft_status: ["active", "maintenance", "grounded", "retired"],
       app_role: ["student", "instructor", "admin", "superadmin"],
       approval_status: ["pending", "approved", "rejected"],
     },

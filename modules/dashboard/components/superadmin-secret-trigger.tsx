@@ -63,7 +63,6 @@ export function SuperadminSecretTrigger() {
         loading="eager"
         priority
         src="/logo/flightrax-white.png"
-        style={{ width: "auto", height: "auto" }}
         width={244}
       />
     </button>
