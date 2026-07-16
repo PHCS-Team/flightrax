@@ -15,39 +15,33 @@ const PROFILE_VIEWER_SELECT =
 const PROFILE_ACCESS_SELECT =
   "id, email, full_name, role, created_at, updated_at, license_type, license_number, rating, profile_photo_path, profile_photo_content_type, profile_photo_size_bytes, profile_photo_uploaded_at, student_profiles!student_profiles_profile_id_fkey(approval_status), admin_profiles!admin_profiles_profile_id_fkey(department)";
 
-const getSignedProfilePhotoUrl = cache(async function getSignedProfilePhotoUrl(
+function getPublicProfilePhotoUrl(
+  supabase: Awaited<ReturnType<typeof createClient>>,
   path: string | null,
-) {
+): string | null {
   if (!path) {
     return null;
   }
 
-  const supabase = await createClient();
-  const { data, error } = await supabase.storage
-    .from(PROFILE_PHOTO_BUCKET)
-    .createSignedUrl(path, 60 * 10);
+  return supabase.storage.from(PROFILE_PHOTO_BUCKET).getPublicUrl(path).data.publicUrl;
+}
 
-  if (error) {
-    return null;
-  }
-
-  return data.signedUrl;
-});
-
-async function toProfile(
+function toProfile(
   row: ProfileWithRoleProfiles,
   {
+    supabase,
     includeProfilePhotoUrl = true,
     includeStudentDocuments = true,
   }: {
+    supabase: Awaited<ReturnType<typeof createClient>>;
     includeProfilePhotoUrl?: boolean;
     includeStudentDocuments?: boolean;
-  } = {},
-): Promise<Profile> {
+  },
+): Profile {
   return normalizeProfile(row, {
     includeStudentDocuments,
     profilePhotoUrl: includeProfilePhotoUrl
-      ? await getSignedProfilePhotoUrl(row.profile_photo_path)
+      ? getPublicProfilePhotoUrl(supabase, row.profile_photo_path)
       : null,
   });
 }
@@ -101,7 +95,7 @@ export const getProfileByUserId = cache(async function getProfileByUserId(
     return null;
   }
 
-  return toProfile(data);
+  return toProfile(data, { supabase });
 });
 
 export const getProfileAccessByUserId = cache(
@@ -122,6 +116,7 @@ export const getProfileAccessByUserId = cache(
     }
 
     return toProfile(data, {
+      supabase,
       includeProfilePhotoUrl: false,
       includeStudentDocuments: false,
     });
@@ -145,6 +140,6 @@ const getDashboardProfileByUserId = cache(
       return null;
     }
 
-    return toProfile(data, { includeStudentDocuments: false });
+    return toProfile(data, { supabase, includeStudentDocuments: false });
   },
 );

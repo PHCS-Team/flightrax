@@ -8,23 +8,6 @@ import type {
   ApprovedStudentRow,
 } from "@/modules/students/types/student";
 
-async function getSignedProfilePhotoUrl(path: string | null) {
-  if (!path) {
-    return null;
-  }
-
-  const supabase = createAdminClient();
-  const { data, error } = await supabase.storage
-    .from(PROFILE_PHOTO_BUCKET)
-    .createSignedUrl(path, 60 * 10);
-
-  if (error) {
-    return null;
-  }
-
-  return data.signedUrl;
-}
-
 export async function getApprovedStudentsForAuthorizedViewer(): Promise<
   ApprovedStudent[]
 > {
@@ -41,19 +24,18 @@ export async function getApprovedStudentsForAuthorizedViewer(): Promise<
 
   const rows = data satisfies ApprovedStudentRow[];
   const students = rows.filter((row) => row.profiles?.role === ROLE.STUDENT);
+  const { storage } = supabase;
 
-  return Promise.all(
-    students.map(async (row) => ({
-      id: row.profile_id,
-      email: row.profiles?.email ?? "Unknown email",
-      fullName: row.profiles?.full_name ?? "Unknown student",
-      studentIdNumber: row.student_id_number ?? "Missing ID number",
-      licenseType: row.profiles?.license_type ?? null,
-      licenseNumber: row.profiles?.license_number ?? null,
-      rating: row.profiles?.rating ?? null,
-      profilePhotoUrl: await getSignedProfilePhotoUrl(
-        row.profiles?.profile_photo_path ?? null,
-      ),
-    })),
-  );
+  return students.map((row) => ({
+    id: row.profile_id,
+    email: row.profiles?.email ?? "Unknown email",
+    fullName: row.profiles?.full_name ?? "Unknown student",
+    studentIdNumber: row.student_id_number ?? "Missing ID number",
+    licenseType: row.profiles?.license_type ?? null,
+    licenseNumber: row.profiles?.license_number ?? null,
+    rating: row.profiles?.rating ?? null,
+    profilePhotoUrl: row.profiles?.profile_photo_path
+      ? storage.from(PROFILE_PHOTO_BUCKET).getPublicUrl(row.profiles.profile_photo_path).data.publicUrl
+      : null,
+  }));
 }
