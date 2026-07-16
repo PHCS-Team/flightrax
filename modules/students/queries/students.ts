@@ -1,14 +1,15 @@
 import { queryOptions } from "@tanstack/react-query";
 
 import { STUDENTS_QUERY_KEYS } from "@/modules/students/queries/query-keys";
-import { fetchApprovedStudents } from "@/modules/students/services/students.client";
+import { fetchApprovedStudentsPage } from "@/modules/students/services/students.client";
 
 export { STUDENTS_QUERY_KEYS };
 
-export function approvedStudentsQueryOptions() {
+export function approvedStudentsQueryOptions(page: number, pageSize: number) {
   return queryOptions({
-    queryFn: fetchApprovedStudents,
-    queryKey: STUDENTS_QUERY_KEYS.approved,
+    queryFn: () => fetchApprovedStudentsPage(page, pageSize),
+    queryKey: STUDENTS_QUERY_KEYS.approved(page, pageSize),
     staleTime: 5 * 60 * 1000,
+    placeholderData: (previousData) => previousData,
   });
 }

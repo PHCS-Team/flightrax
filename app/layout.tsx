@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist_Mono, Manrope } from "next/font/google";
 
+import { NuqsAdapter } from "nuqs/adapters/next/app";
+
 import { BrowserConsoleBranding } from "@/shared/components/layout/browser-console-branding";
 import { QueryProvider } from "@/shared/components/providers/query-provider";
 import { Toaster } from "@/shared/components/ui/sonner";
@@ -38,7 +40,9 @@ export default function RootLayout({
       className={`${manrope.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <QueryProvider>{children}</QueryProvider>
+        <NuqsAdapter>
+          <QueryProvider>{children}</QueryProvider>
+        </NuqsAdapter>
         <BrowserConsoleBranding />
         <Toaster closeButton position="top-right" richColors />
       </body>

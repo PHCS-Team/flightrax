@@ -4,9 +4,9 @@ import { useMemo, useState } from "react";
 import {
   flexRender,
   getCoreRowModel,
-  getPaginationRowModel,
   useReactTable,
   type ColumnDef,
+  type PaginationState,
 } from "@tanstack/react-table";
 
 import {
@@ -118,23 +118,48 @@ function matchesSearch(student: ApprovedStudent, query: string) {
     .some((value) => value.toLowerCase().includes(normalizedQuery));
 }
 
-export function StudentsTable({ students }: { students: ApprovedStudent[] }) {
+export function StudentsTable({
+  onPageChange,
+  page,
+  pageSize,
+  students,
+  totalCount,
+  totalPages,
+}: {
+  onPageChange: (page: number) => void;
+  page: number;
+  pageSize: number;
+  students: ApprovedStudent[];
+  totalCount: number;
+  totalPages: number;
+}) {
   const [search, setSearch] = useState("");
+
+  const pagination: PaginationState = {
+    pageIndex: page - 1,
+    pageSize,
+  };
+
   const filteredStudents = useMemo(
     () => students.filter((student) => matchesSearch(student, search)),
     [students, search],
   );
+
   // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Table exposes non-memoizable table helpers by design.
   const table = useReactTable({
     columns,
     data: filteredStudents,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    initialState: {
-      pagination: {
-        pageSize: 10,
-      },
+    manualPagination: true,
+    pageCount: totalPages,
+    onPaginationChange: (updater) => {
+      const next =
+        typeof updater === "function"
+          ? updater(pagination)
+          : updater;
+      onPageChange(next.pageIndex + 1);
     },
+    state: { pagination },
   });
 
   return (
@@ -150,7 +175,7 @@ export function StudentsTable({ students }: { students: ApprovedStudent[] }) {
           value={search}
         />
         <p className="text-sm text-primary-foreground/70">
-          {filteredStudents.length} of {students.length} students
+          {filteredStudents.length} of {totalCount} students
         </p>
       </div>
 

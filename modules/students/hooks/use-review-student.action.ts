@@ -34,7 +34,7 @@ export function useReviewStudent({
             students?.filter((student) => student.id !== data.studentId),
         );
         queryClient.invalidateQueries({
-          queryKey: STUDENTS_QUERY_KEYS.approved,
+          queryKey: STUDENTS_QUERY_KEYS.all,
         });
       }
     },
