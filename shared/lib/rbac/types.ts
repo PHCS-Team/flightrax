@@ -1,5 +1,10 @@
 import type { Database } from "@/shared/types/supabase";
 
+import {
+  STUDENTS_VIEW,
+  STUDENTS_REVIEW,
+} from "@/modules/students/constants/permissions";
+
 export type ProfileRole = Database["public"]["Enums"]["app_role"];
 export type AdminDepartment = Database["public"]["Enums"]["admin_department"];
 export type ApprovalStatus = Database["public"]["Enums"]["approval_status"];
@@ -31,8 +36,8 @@ export type Permission =
   | "schedule.view"
   | "aircrafts.view"
   | "notams.view"
-  | "students.view"
-  | "students.review"
+  | typeof STUDENTS_VIEW
+  | typeof STUDENTS_REVIEW
   | "admin.flight_operations_personnel"
   | "admin.air_traffic_controller"
   | "admin.safety_personnel"

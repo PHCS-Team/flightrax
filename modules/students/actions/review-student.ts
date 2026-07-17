@@ -1,5 +1,6 @@
 "use server";
 
+import { STUDENTS_REVIEW } from "@/modules/students/constants/permissions";
 import { actionClient } from "@/shared/lib/safe-action";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { APPROVAL_STATUS, hasPermission } from "@/shared/lib/rbac/config";
@@ -17,7 +18,7 @@ async function getAuthorizedReviewer() {
     return null;
   }
 
-  if (!hasPermission(profile.role, "students.review", profile.admin_department)) {
+  if (!hasPermission(profile.role, STUDENTS_REVIEW, profile.admin_department)) {
     return null;
   }
 

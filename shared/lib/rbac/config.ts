@@ -1,3 +1,7 @@
+import {
+  STUDENTS_VIEW,
+  STUDENTS_REVIEW,
+} from "@/modules/students/constants/permissions";
 import type {
   AdminDepartment,
   ApprovalStatus,
@@ -50,8 +54,8 @@ const ROLE_PERMISSIONS = {
     "flight_documents.view",
     "instructors.view",
     "schedule.view",
-    "students.view",
-    "students.review",
+    STUDENTS_VIEW,
+    STUDENTS_REVIEW,
   ],
   [ROLE.ADMIN]: [
     "account.view",

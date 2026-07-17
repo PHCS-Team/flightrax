@@ -1,5 +1,6 @@
 import "server-only";
 
+import { STUDENTS_REVIEW } from "@/modules/students/constants/permissions";
 import { APPROVAL_STATUS, hasPermission } from "@/shared/lib/rbac/config";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { isApproved } from "@/shared/lib/rbac/guards";
@@ -16,7 +17,7 @@ export async function getStudentReviewItems(): Promise<StudentReviewItem[]> {
   if (
     !viewer ||
     !isApproved(viewer) ||
-    !hasPermission(viewer.role, "students.review", viewer.admin_department)
+    !hasPermission(viewer.role, STUDENTS_REVIEW, viewer.admin_department)
   ) {
     throw new Error("You do not have permission to review students.");
   }
@@ -60,7 +61,7 @@ export async function getStudentDocumentSignedUrl(
   if (
     !viewer ||
     !isApproved(viewer) ||
-    !hasPermission(viewer.role, "students.review", viewer.admin_department)
+    !hasPermission(viewer.role, STUDENTS_REVIEW, viewer.admin_department)
   ) {
     return null;
   }
