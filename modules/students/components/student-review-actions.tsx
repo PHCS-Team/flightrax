@@ -47,20 +47,19 @@ export function StudentReviewActions({
           />
           <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
             <Button
-              className="border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground w-full sm:w-auto"
+              className="sm:h-8 border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground w-full sm:w-auto"
               disabled={isExecuting}
               onClick={() => {
                 setRejecting(false);
                 setRejectionReason("");
               }}
-              size="lg"
               type="button"
               variant="outline"
             >
               Cancel
             </Button>
             <Button
-              className="w-full sm:w-auto"
+              className="sm:h-8 w-full sm:w-auto"
               disabled={isExecuting || rejectionReason.trim().length < 3}
               onClick={() =>
                 reject.execute({
@@ -68,7 +67,6 @@ export function StudentReviewActions({
                   rejectionReason: rejectionReason.trim(),
                 })
               }
-              size="lg"
               type="button"
               variant="destructive"
             >
@@ -80,10 +78,9 @@ export function StudentReviewActions({
         <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
           {canReject && (
             <Button
-              className="border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground w-full sm:w-auto"
+              className="sm:h-8 border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground w-full sm:w-auto"
               disabled={isExecuting}
               onClick={() => setRejecting(true)}
-              size="lg"
               type="button"
               variant="outline"
             >
@@ -91,10 +88,9 @@ export function StudentReviewActions({
             </Button>
           )}
           <Button
-            className="w-full sm:w-auto"
+            className="sm:h-8 w-full sm:w-auto"
             disabled={isExecuting}
             onClick={() => approve.execute({ studentId })}
-            size="lg"
             type="button"
           >
             Approve

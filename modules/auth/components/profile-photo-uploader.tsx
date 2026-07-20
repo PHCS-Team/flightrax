@@ -275,7 +275,7 @@ export function ProfilePhotoUploader({
           </div>
 
           <Button
-            className="h-12 w-full min-w-0 cursor-pointer rounded-lg px-4 font-bold uppercase disabled:cursor-default sm:rounded-2xl sm:px-7"
+            className="h-12 w-full min-w-0 px-4 font-bold uppercase sm:px-7"
             disabled={!file || upload.isExecuting || remove.isExecuting}
             type="submit"
           >

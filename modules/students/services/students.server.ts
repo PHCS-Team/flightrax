@@ -9,37 +9,68 @@ import type {
   ApprovedStudentRow,
 } from "@/modules/students/types/student";
 
+async function getMatchingProfileIds(
+  supabase: ReturnType<typeof createAdminClient>,
+  search: string,
+): Promise<string[]> {
+  const { data } = await supabase
+    .from("profiles")
+    .select("id")
+    .or(`full_name.ilike.%${search}%,email.ilike.%${search}%`)
+    .eq("role", ROLE.STUDENT);
+
+  return data?.map((p) => p.id) ?? [];
+}
+
+function buildSearchFilter(search: string, matchingProfileIds: string[]) {
+  const filters: string[] = [
+    `student_id_number.ilike.%${search}%`,
+  ];
+
+  if (matchingProfileIds.length > 0) {
+    filters.push(`profile_id.in.(${matchingProfileIds.join(",")})`);
+  }
+
+  return filters.join(",");
+}
+
 export async function getApprovedStudentsPage(
   page: number,
   pageSize: number,
+  search: string,
 ): Promise<PaginatedResponse<ApprovedStudent>> {
   const supabase = createAdminClient();
 
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
-  const { count: totalCount, error: countError } = await supabase
+  let query = supabase
     .from("student_profiles")
-    .select("*", { count: "exact", head: true })
+    .select(
+      "approval_status, profile_id, student_id_number, profiles!student_profiles_profile_id_fkey(email, full_name, license_number, license_type, profile_photo_path, rating, role)",
+      { count: "exact" },
+    )
     .eq("approval_status", APPROVAL_STATUS.APPROVED);
 
-  if (countError) {
-    throw new Error(countError.message);
+  if (search) {
+    const matchingProfileIds = await getMatchingProfileIds(supabase, search);
+    query = query.or(buildSearchFilter(search, matchingProfileIds));
   }
 
-  const total = totalCount ?? 0;
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
-
-  const { data, error } = await supabase
-    .from("student_profiles")
-    .select("approval_status, profile_id, student_id_number, profiles!student_profiles_profile_id_fkey(email, full_name, license_number, license_type, profile_photo_path, rating, role)")
-    .eq("approval_status", APPROVAL_STATUS.APPROVED)
+  const {
+    data,
+    error,
+    count: totalCount,
+  } = await query
     .order("student_id_number", { ascending: true })
     .range(from, to);
 
   if (error) {
     throw new Error(error.message);
   }
+
+  const total = totalCount ?? 0;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
   const rows = data satisfies ApprovedStudentRow[];
   const students = rows.filter((row) => row.profiles?.role === ROLE.STUDENT);
@@ -55,7 +86,9 @@ export async function getApprovedStudentsPage(
       licenseNumber: row.profiles?.license_number ?? null,
       rating: row.profiles?.rating ?? null,
       profilePhotoUrl: row.profiles?.profile_photo_path
-        ? storage.from(PROFILE_PHOTO_BUCKET).getPublicUrl(row.profiles.profile_photo_path).data.publicUrl
+        ? storage
+            .from(PROFILE_PHOTO_BUCKET)
+            .getPublicUrl(row.profiles.profile_photo_path).data.publicUrl
         : null,
     })),
     totalCount: total,

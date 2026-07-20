@@ -1,3 +1,9 @@
+import { ACCOUNT_VIEW } from "@/modules/auth/constants/permissions";
+import { AIRCRAFTS_VIEW } from "@/modules/aircrafts/constants/permissions";
+import {
+  STUDENTS_VIEW,
+  STUDENTS_REVIEW,
+} from "@/modules/students/constants/permissions";
 import type {
   AdminDepartment,
   ApprovalStatus,
@@ -26,7 +32,8 @@ export const ADMIN_DEPARTMENT = {
   SAFETY_PERSONNEL: "safety_personnel",
 } as const satisfies Record<string, AdminDepartment>;
 
-export const ADMIN_DEPARTMENTS: AdminDepartment[] = Object.values(ADMIN_DEPARTMENT);
+export const ADMIN_DEPARTMENTS: AdminDepartment[] =
+  Object.values(ADMIN_DEPARTMENT);
 
 export const APPROVAL_STATUS = {
   PENDING: "pending",
@@ -34,28 +41,29 @@ export const APPROVAL_STATUS = {
   REJECTED: "rejected",
 } as const satisfies Record<string, ApprovalStatus>;
 
-export const APPROVAL_STATUSES: ApprovalStatus[] = Object.values(APPROVAL_STATUS);
+export const APPROVAL_STATUSES: ApprovalStatus[] =
+  Object.values(APPROVAL_STATUS);
 
 const ROLE_PERMISSIONS = {
   [ROLE.STUDENT]: [
-    "account.view",
+    ACCOUNT_VIEW,
     "dashboard.view",
     "flight_documents.view",
     "instructors.view",
     "schedule.view",
   ],
   [ROLE.INSTRUCTOR]: [
-    "account.view",
+    ACCOUNT_VIEW,
     "dashboard.view",
     "flight_documents.view",
     "instructors.view",
     "schedule.view",
-    "students.view",
-    "students.review",
+    STUDENTS_VIEW,
+    STUDENTS_REVIEW,
   ],
   [ROLE.ADMIN]: [
-    "account.view",
-    "aircrafts.view",
+    ACCOUNT_VIEW,
+    AIRCRAFTS_VIEW,
     "notams.view",
     "schedule.view",
     "instructors.view",
@@ -66,28 +74,31 @@ const ROLE_PERMISSIONS = {
 const ADMIN_DEPARTMENT_PERMISSIONS = {
   [ADMIN_DEPARTMENT.FLIGHT_OPERATIONS_PERSONNEL]: [
     "admin.flight_operations_personnel",
-    "aircrafts.view",
+    AIRCRAFTS_VIEW,
     "notams.view",
     "schedule.view",
     "instructors.view",
   ],
   [ADMIN_DEPARTMENT.AIR_TRAFFIC_CONTROLLER]: [
     "admin.air_traffic_controller",
-    "aircrafts.view",
+    AIRCRAFTS_VIEW,
     "notams.view",
     "schedule.view",
     "instructors.view",
   ],
   [ADMIN_DEPARTMENT.SAFETY_PERSONNEL]: [
     "admin.safety_personnel",
-    "aircrafts.view",
+    AIRCRAFTS_VIEW,
     "notams.view",
     "schedule.view",
     "instructors.view",
   ],
 } satisfies Record<AdminDepartment, Permission[]>;
 
-export function getRolePermissions(role: ProfileRole, department?: AdminDepartment | null) {
+export function getRolePermissions(
+  role: ProfileRole,
+  department?: AdminDepartment | null,
+) {
   if (role === ROLE.SUPERADMIN) {
     return ["system.manage"] satisfies Permission[];
   }
@@ -108,7 +119,10 @@ export function hasPermission(
   permission: Permission,
   department?: AdminDepartment | null,
 ) {
-  return role === ROLE.SUPERADMIN || getRolePermissions(role, department).includes(permission);
+  return (
+    role === ROLE.SUPERADMIN ||
+    getRolePermissions(role, department).includes(permission)
+  );
 }
 
 export const ROLE_LABELS = {

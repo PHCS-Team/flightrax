@@ -187,7 +187,7 @@ export const createFlightAction = actionClient
 - Optimize every query before adding it: select only the columns needed by the caller, avoid `select("*")` unless the full row is truly required, and do not fetch nested relations or signed URLs unless the current surface displays them.
 - Shared server queries that can run more than once in a single render/request, especially auth/profile helpers like `getCurrentProfile`, must be wrapped with React `cache()` or use an existing cached helper. Do not create duplicate Supabase auth/profile calls in a page when the dashboard shell already provides the profile.
 - Split query helpers by data shape when needed. Use lightweight viewer/authorization queries for route guards and permission checks; use detailed queries only for pages that actually display the extra fields.
-- After mutations that change cached server data, invalidate the affected TanStack Query keys on the client and revalidate the affected route or layout with `revalidatePath` when server-rendered data also depends on the change.
+- After mutations that change cached server data, invalidate the affected TanStack Query keys on the client side in the mutation hook's `onSuccess` callback. Do NOT call `revalidatePath` in server actions — that is redundant when the client hook already invalidates TanStack Query keys, because the refetch triggered by invalidation will update the UI reactively. `revalidatePath` should only be used outside the TanStack Query flow (e.g., middleware, standalone server components that fetch directly without TanStack Query).
 
 ---
 
@@ -316,6 +316,42 @@ useReactTable({
 
 ---
 
+## Rule 15 — Loading States
+
+- Every client surface that fetches server data must use the `LoadingScreen` component from `shared/components/layout/loading-screen.tsx` for its loading state and the `EmptyState` component from `shared/components/layout/empty-state.tsx` for its error state.
+- Do not write inline skeleton components inside page-level components or surfaces.
+- The `LoadingScreen` component provides a branded loading experience with rotating aviation facts. Using it ensures consistency across every module.
+- The pattern is: check `isPending` → return `<LoadingScreen />`, check `error` → return `<EmptyState />`, otherwise render the main component.
+
+```tsx
+// ✅ CORRECT — students-client-surface.tsx as reference
+if (isPending) {
+  return <LoadingScreen />;
+}
+
+if (error) {
+  return (
+    <EmptyState
+      description={error.message}
+      icon={<Icon className="size-7" />}
+      title="Title could not be loaded"
+    />
+  );
+}
+
+return <DataComponent ... />;
+```
+
+```tsx
+// ❌ WRONG — inline skeleton components
+function MyPageSkeleton() { ... }
+if (isPending) {
+  return <MyPageSkeleton />;
+}
+```
+
+---
+
 ## Absolute Prohibitions
 
 These are hard rules. There are no exceptions.
@@ -330,6 +366,23 @@ These are hard rules. There are no exceptions.
 - ❌ Never use relative imports that traverse up more than one level (`../../`).
 - ❌ Never call Supabase directly from a client component — always go through an action or server-side query.
 - ❌ Never use client-side pagination (`getPaginationRowModel`) in tables — all pagination must be server-side with `manualPagination: true`.
+
+## Rule 16 — Input & Text Visibility on Different Backgrounds
+
+Input text and all other text must always be readable against its background. The common mistake is using `text-primary-foreground` (white) inside a dialog or card with `bg-popover` (white/light), which renders the text invisible.
+
+| Container background | Text color to use | Example |
+|---|---|---|
+| `bg-primary` (dark brand) | `text-primary-foreground` | Table header, nav, shell |
+| `bg-popover` / `bg-card` (white/light) | `text-foreground` or `text-popover-foreground` | Dialogs, modals, cards |
+| `bg-muted` or `bg-muted/30` | `text-foreground` | Inputs, list items |
+| Unknown / mixed | `text-foreground` (always safe) | Default when unsure |
+
+Apply the same principle to borders and placeholder text:
+- On dark brand bg → `border-primary-foreground/xx`, `bg-primary-foreground/xx`, `placeholder:text-primary-foreground/xx`
+- On light/brand-white bg → `border-border`, `bg-muted/xx`, `placeholder:text-muted-foreground/xx`
+
+Interactive controls and text inputs that appear inside a dialog (including dialogs opened from a dark-themed shell) must use the lighter-background color scheme, not the shell's dark-background scheme.
 
 ---
 

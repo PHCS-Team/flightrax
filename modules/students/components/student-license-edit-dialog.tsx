@@ -186,7 +186,9 @@ export function StudentLicenseEditDialog({
             >
               <SelectTrigger
                 aria-describedby={
-                  errors.rating ? `student-rating-${student.id}-error` : undefined
+                  errors.rating
+                    ? `student-rating-${student.id}-error`
+                    : undefined
                 }
                 aria-invalid={Boolean(errors.rating)}
                 aria-required="true"
@@ -213,7 +215,7 @@ export function StudentLicenseEditDialog({
           </div>
 
           <Button
-            className="h-12 w-full rounded-lg px-7 font-bold uppercase sm:rounded-2xl"
+            className="w-full px-7 font-bold uppercase"
             disabled={isExecuting}
             type="submit"
           >
