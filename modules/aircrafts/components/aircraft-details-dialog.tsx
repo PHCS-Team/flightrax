@@ -1,6 +1,6 @@
 "use client";
 
-import { StickyNoteIcon, WrenchIcon } from "lucide-react";
+import { PaletteIcon, StickyNoteIcon, WrenchIcon } from "lucide-react";
 
 import { DialogSectionHeader } from "@/shared/components/layout/dialog-section-header";
 import {
@@ -8,13 +8,15 @@ import {
   DialogContent,
 } from "@/shared/components/ui/dialog";
 
-export function AircraftRemarksDialog({
+export function AircraftDetailsDialog({
   aircraftIdentification,
+  colorMarkings,
   onOpenChange,
   open,
   remarks,
 }: {
   aircraftIdentification: string;
+  colorMarkings: string;
   onOpenChange: (open: boolean) => void;
   open: boolean;
   remarks: string | null;
@@ -23,10 +25,23 @@ export function AircraftRemarksDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogSectionHeader
-          description={`Maintenance notes and remarks for ${aircraftIdentification}`}
+          description={`Details and notes for ${aircraftIdentification}`}
           icon={WrenchIcon}
-          title="Aircraft remarks"
+          title="Aircraft details"
         />
+
+        <div className="rounded-xl border bg-muted/40 p-4 shadow-xs">
+          <div className="mb-2 flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+            <PaletteIcon className="size-3.5" />
+            Color &amp; markings
+          </div>
+          <div className="border-l-2 border-primary/25 pl-3">
+            <p className="text-sm leading-relaxed text-foreground whitespace-pre-wrap">
+              {colorMarkings}
+            </p>
+          </div>
+        </div>
+
         {remarks ? (
           <div className="rounded-xl border bg-muted/40 p-4 shadow-xs">
             <div className="mb-2 flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
