@@ -10,6 +10,7 @@ import {
 } from "@tanstack/react-table";
 import {
   CheckIcon,
+  CircleHelpIcon,
   CopyIcon,
   EyeIcon,
   ImageIcon,
@@ -35,6 +36,11 @@ import { GlassSurface } from "@/shared/components/layout/glass-surface";
 import { Button } from "@/shared/components/ui/button";
 import { cn } from "@/shared/lib/utils";
 import { Input } from "@/shared/components/ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/shared/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -143,7 +149,61 @@ export function AircraftsTable({
       },
       {
         id: "weightBalance",
-        header: "Weight & balance",
+        header: () => (
+          <span className="inline-flex items-center gap-1">
+            Weight & balance
+            <Popover>
+              <PopoverTrigger asChild>
+                <button
+                  className="-m-0.5 inline-flex cursor-pointer items-center justify-center rounded-full p-0.5 text-primary-foreground/50 transition hover:bg-primary-foreground/10 hover:text-primary-foreground"
+                  type="button"
+                >
+                  <CircleHelpIcon className="size-3.5" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent
+                align="start"
+                className="w-64 p-3"
+                side="bottom"
+              >
+                <div className="space-y-3">
+                  <p className="text-xs font-medium text-foreground">
+                    How to read weight &amp; balance
+                  </p>
+                  <div className="rounded-lg border bg-muted/30 p-2.5">
+                    <p className="text-sm font-medium text-foreground/90">
+                      Basic empty weight (lbs)
+                    </p>
+                    <p className="mt-0.5 text-xs text-foreground/60">
+                      Arm (in) / Moment (lbs-in)
+                    </p>
+                  </div>
+                  <div className="space-y-1.5">
+                    <p className="text-xs leading-relaxed text-muted-foreground">
+                      <span className="font-medium text-foreground/80">
+                        Basic empty weight
+                      </span>
+                      {" \u2014 "}Aircraft standard weight without payload or
+                      fuel.
+                    </p>
+                    <p className="text-xs leading-relaxed text-muted-foreground">
+                      <span className="font-medium text-foreground/80">
+                        Arm
+                      </span>
+                      {" \u2014 "}Horizontal distance from datum in inches.
+                    </p>
+                    <p className="text-xs leading-relaxed text-muted-foreground">
+                      <span className="font-medium text-foreground/80">
+                        Moment
+                      </span>
+                      {" \u2014 "}Weight × arm in pound-inches.
+                    </p>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
+          </span>
+        ),
         cell: ({ row }) => (
           <div className="max-w-80">
             <AircraftWeightBalanceCell aircraft={row.original} />

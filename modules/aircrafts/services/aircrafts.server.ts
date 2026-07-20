@@ -10,7 +10,7 @@ import { AIRCRAFT_PHOTOS_BUCKET } from "@/shared/lib/storage/buckets";
 import type { PaginatedResponse } from "@/shared/types/pagination";
 
 const AIRCRAFT_SELECT =
-  "aircraft_identification, aircraft_type, aircraft_types!inner(type), color_markings, created_at, id, model, photo_path, remarks, serial_number, status, updated_at" as const;
+  "aircraft_identification, aircraft_type, aircraft_types!inner(type), color_markings, created_at, id, model, photo_path, remarks, serial_number, status, updated_at, aircraft_weight_balance_configs(id, basic_empty_weight, arm, moment)" as const;
 
 async function getMatchingAircraftTypes(
   supabase: ReturnType<typeof createAdminClient>,
@@ -93,6 +93,8 @@ export async function getAircraftsPage(
       ? storage.getPublicUrl(row.photo_path).data.publicUrl
       : null;
 
+    const wb = row.aircraft_weight_balance_configs;
+
     return {
       aircraftIdentification: row.aircraft_identification,
       aircraftType: row.aircraft_type,
@@ -107,6 +109,15 @@ export async function getAircraftsPage(
       status: row.status,
       typeName: row.aircraft_types.type,
       updatedAt: row.updated_at,
+      weightBalance: wb
+        ? {
+            id: wb.id,
+            aircraftId: row.id,
+            basicEmptyWeight: wb.basic_empty_weight,
+            arm: wb.arm,
+            moment: wb.moment,
+          }
+        : null,
     };
   });
 

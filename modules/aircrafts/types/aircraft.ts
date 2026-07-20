@@ -7,6 +7,7 @@ import type {
   updateAircraftSchema,
   updateAircraftStatusSchema,
 } from "@/modules/aircrafts/schemas/aircraft-schema";
+import type { AircraftWeightBalance } from "@/modules/aircrafts/types/aircraft-weight-balance";
 import type { Database } from "@/shared/types/supabase";
 
 export type AircraftStatus = Database["public"]["Enums"]["aircraft_status"];
@@ -41,6 +42,7 @@ export type Aircraft = {
   status: AircraftStatus;
   typeName: string;
   updatedAt: string;
+  weightBalance: AircraftWeightBalance | null;
 };
 
 export type AircraftFormInput = z.infer<typeof aircraftFormSchema>;
