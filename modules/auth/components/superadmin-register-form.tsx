@@ -89,7 +89,7 @@ export function SuperadminRegisterForm() {
         />
       </RegisterFormSection>
       <Button
-        className="h-12 w-full rounded-lg px-7 font-bold uppercase sm:rounded-2xl"
+        className="h-12 w-full px-7 font-bold uppercase"
         disabled={isExecuting}
         type="submit"
       >

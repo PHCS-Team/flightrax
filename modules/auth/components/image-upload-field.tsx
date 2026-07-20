@@ -265,7 +265,7 @@ function DefaultUploadControl({
             </div>
 
             <Button
-              className="h-12 w-full rounded-lg border-primary-foreground/25 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/20 sm:rounded-2xl"
+              className="h-12 w-full border-primary-foreground/25 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/20"
               disabled={disabled}
               onClick={onChoose}
               type="button"

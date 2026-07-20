@@ -1,6 +1,5 @@
 "use client";
 
-import { useMemo, useState } from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -100,63 +99,40 @@ const columns = [
   },
 ] satisfies ColumnDef<ApprovedStudent>[];
 
-function matchesSearch(student: ApprovedStudent, query: string) {
-  const normalizedQuery = query.trim().toLowerCase();
-
-  if (!normalizedQuery) {
-    return true;
-  }
-
-  return [
-    student.fullName,
-    student.studentIdNumber,
-    student.licenseType,
-    student.licenseNumber,
-    student.rating,
-  ]
-    .filter((value): value is string => Boolean(value))
-    .some((value) => value.toLowerCase().includes(normalizedQuery));
-}
-
 export function StudentsTable({
   onPageChange,
+  onSearchChange,
   page,
   pageSize,
+  search,
   students,
   totalCount,
   totalPages,
 }: {
   onPageChange: (page: number) => void;
+  onSearchChange: (search: string) => void;
   page: number;
   pageSize: number;
+  search: string;
   students: ApprovedStudent[];
   totalCount: number;
   totalPages: number;
 }) {
-  const [search, setSearch] = useState("");
-
   const pagination: PaginationState = {
     pageIndex: page - 1,
     pageSize,
   };
 
-  const filteredStudents = useMemo(
-    () => students.filter((student) => matchesSearch(student, search)),
-    [students, search],
-  );
-
   // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Table exposes non-memoizable table helpers by design.
   const table = useReactTable({
     columns,
-    data: filteredStudents,
+    data: students,
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
     pageCount: totalPages,
     onPaginationChange: (updater) => {
       const next =
-        typeof updater === "function"
-          ? updater(pagination)
-          : updater;
+        typeof updater === "function" ? updater(pagination) : updater;
       onPageChange(next.pageIndex + 1);
     },
     state: { pagination },
@@ -168,14 +144,13 @@ export function StudentsTable({
         <Input
           className="max-w-sm border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground placeholder:text-primary-foreground/55 focus-visible:border-primary-foreground/45 focus-visible:ring-primary-foreground/20"
           onChange={(event) => {
-            setSearch(event.target.value);
-            table.setPageIndex(0);
+            onSearchChange(event.target.value);
           }}
-          placeholder="Search name, ID, email, license, or rating"
+          placeholder="Search name, email, or student ID"
           value={search}
         />
         <p className="text-sm text-primary-foreground/70">
-          {filteredStudents.length} of {totalCount} students
+          {students.length} of {totalCount} students
         </p>
       </div>
 

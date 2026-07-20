@@ -18,13 +18,13 @@ const LOGOUT_FORM_CONFIG = {
   primary: {
     buttonVariant: "default",
     className:
-      "h-12 w-full cursor-pointer rounded-lg px-7 font-bold uppercase disabled:cursor-default sm:rounded-2xl",
+      "h-12 w-full px-7 font-bold uppercase",
     label: "Back to login options",
   },
   secondary: {
     buttonVariant: "outline",
     className:
-      "h-11 w-full cursor-pointer rounded-lg border-primary-foreground/20 bg-transparent px-7 font-medium text-primary-foreground/75 hover:bg-primary-foreground/10 hover:text-primary-foreground disabled:cursor-default sm:rounded-2xl",
+      "h-12 w-full border-primary-foreground/20 bg-transparent px-7 font-medium text-primary-foreground/75 hover:bg-primary-foreground/10 hover:text-primary-foreground",
     label: "Return to login options",
   },
 } as const satisfies Record<
@@ -45,7 +45,8 @@ export function PendingApprovalClientSurface({
     profile?.approval_status ?? null,
   );
   const isRejectedStudent =
-    profile?.role === ROLE.STUDENT && approvalStatus === APPROVAL_STATUS.REJECTED;
+    profile?.role === ROLE.STUDENT &&
+    approvalStatus === APPROVAL_STATUS.REJECTED;
 
   if (isRejectedStudent) {
     return (

@@ -5,10 +5,10 @@ import { fetchApprovedStudentsPage } from "@/modules/students/services/students.
 
 export { STUDENTS_QUERY_KEYS };
 
-export function approvedStudentsQueryOptions(page: number, pageSize: number) {
+export function approvedStudentsQueryOptions(page: number, pageSize: number, search: string) {
   return queryOptions({
-    queryFn: () => fetchApprovedStudentsPage(page, pageSize),
-    queryKey: STUDENTS_QUERY_KEYS.approved(page, pageSize),
+    queryFn: () => fetchApprovedStudentsPage(page, pageSize, search),
+    queryKey: STUDENTS_QUERY_KEYS.approved(page, pageSize, search),
     staleTime: 5 * 60 * 1000,
     placeholderData: (previousData) => previousData,
   });
