@@ -40,7 +40,7 @@ export function StudentReviewActions({
       {rejecting ? (
         <div className="grid gap-3">
           <Textarea
-            className="min-h-24 w-full border-primary-foreground/20 bg-primary-foreground/95 text-primary placeholder:text-muted-foreground focus-visible:border-red-200/60 focus-visible:ring-red-200/25"
+            className="min-h-24 w-full border-primary-foreground/20 bg-primary-foreground/95 text-[#121212] placeholder:text-muted-foreground focus-visible:border-red-200/60 focus-visible:ring-red-200/25"
             onChange={(event) => setRejectionReason(event.target.value)}
             placeholder="Add the reason the student should fix before resubmitting"
             value={rejectionReason}

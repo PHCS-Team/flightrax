@@ -29,7 +29,10 @@ import { AircraftTypeManager } from "@/modules/aircrafts/components/aircraft-typ
 import { AircraftWeightBalanceCell } from "@/modules/aircrafts/components/aircraft-weight-balance-cell";
 import { useAircraftTypes } from "@/modules/aircrafts/hooks/use-aircraft-types.query";
 import { useUpdateAircraftStatus } from "@/modules/aircrafts/hooks/use-update-aircraft-status.action";
-import type { Aircraft, AircraftStatus } from "@/modules/aircrafts/types/aircraft";
+import type {
+  Aircraft,
+  AircraftStatus,
+} from "@/modules/aircrafts/types/aircraft";
 import { useCopyToClipboard } from "@/shared/hooks/use-copy-to-clipboard";
 import { toast } from "sonner";
 import { GlassSurface } from "@/shared/components/layout/glass-surface";
@@ -161,43 +164,45 @@ export function AircraftsTable({
                   <CircleHelpIcon className="size-3.5" />
                 </button>
               </PopoverTrigger>
-              <PopoverContent
-                align="start"
-                className="w-64 p-3"
-                side="bottom"
-              >
+              <PopoverContent align="start" className="w-72 p-3" side="bottom">
                 <div className="space-y-3">
-                  <p className="text-xs font-medium text-foreground">
-                    How to read weight &amp; balance
-                  </p>
                   <div className="rounded-lg border bg-muted/30 p-2.5">
                     <p className="text-sm font-medium text-foreground/90">
-                      Basic empty weight (lbs)
+                      Basic empty weight{" "}
+                      <span className="text-foreground/50">(lbs)</span>
+                      <span className="mx-1 text-foreground/30">&times;</span>
+                      Arm <span className="text-foreground/50">(in)</span>
                     </p>
-                    <p className="mt-0.5 text-xs text-foreground/60">
-                      Arm (in) / Moment (lbs-in)
+                    <p className="mt-1 text-xs text-foreground/60">
+                      Moment{" "}
+                      <span className="text-foreground/40">(lbs-in)</span>
                     </p>
                   </div>
-                  <div className="space-y-1.5">
-                    <p className="text-xs leading-relaxed text-muted-foreground">
-                      <span className="font-medium text-foreground/80">
+                  <div className="space-y-2">
+                    <div>
+                      <p className="text-xs font-medium text-foreground/80">
                         Basic empty weight
-                      </span>
-                      {" \u2014 "}Aircraft standard weight without payload or
-                      fuel.
-                    </p>
-                    <p className="text-xs leading-relaxed text-muted-foreground">
-                      <span className="font-medium text-foreground/80">
+                      </p>
+                      <p className="text-xs leading-relaxed text-muted-foreground">
+                        Aircraft standard weight without payload or fuel.
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-foreground/80">
                         Arm
-                      </span>
-                      {" \u2014 "}Horizontal distance from datum in inches.
-                    </p>
-                    <p className="text-xs leading-relaxed text-muted-foreground">
-                      <span className="font-medium text-foreground/80">
+                      </p>
+                      <p className="text-xs leading-relaxed text-muted-foreground">
+                        Horizontal distance from datum in inches.
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-foreground/80">
                         Moment
-                      </span>
-                      {" \u2014 "}Weight × arm in pound-inches.
-                    </p>
+                      </p>
+                      <p className="text-xs leading-relaxed text-muted-foreground">
+                        Weight × arm in pound-inches.
+                      </p>
+                    </div>
                   </div>
                 </div>
               </PopoverContent>
@@ -304,7 +309,7 @@ export function AircraftsTable({
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:flex-1">
             <Input
-              className="max-w-sm border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground placeholder:text-primary-foreground/55 focus-visible:border-primary-foreground/45 focus-visible:ring-primary-foreground/20"
+              className="max-w-sm border-primary-foreground/20 bg-primary-foreground/10 text-[#121212] placeholder:text-[#121212]/55 focus-visible:border-primary-foreground/45 focus-visible:ring-primary-foreground/20"
               onChange={(event) => {
                 onSearchChange(event.target.value);
               }}
@@ -323,8 +328,8 @@ export function AircraftsTable({
                   className={cn(
                     "h-10 w-full gap-1.5 border bg-primary-foreground/10 pl-2.5 pr-8 text-left text-sm font-medium capitalize transition hover:bg-primary-foreground/15 sm:w-36 *:data-[slot=select-value]:line-clamp-none",
                     typeFilter
-                      ? "border-primary-foreground/30 text-primary-foreground"
-                      : "border-primary-foreground/15 text-primary-foreground/70",
+                      ? "border-primary-foreground/30 text-[#121212]"
+                      : "border-primary-foreground/15 text-[#121212]/70",
                   )}
                 >
                   <ListFilterIcon

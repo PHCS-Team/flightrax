@@ -107,7 +107,7 @@ function AircraftTypeList() {
                 <SearchIcon className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground/50" />
                 <Input
                   autoFocus
-                  className="border-border bg-muted/30 pl-9 text-foreground placeholder:text-muted-foreground/55"
+                  className="border-border bg-muted/30 pl-9 text-[#121212] placeholder:text-muted-foreground/55"
                   onChange={(e) => setFilter(e.target.value)}
                   placeholder="Filter types..."
                   value={filter}
@@ -184,7 +184,7 @@ function CreateTypeRow() {
       </label>
       <form className="flex items-center gap-2" onSubmit={handleSubmit}>
         <Input
-          className="flex-1 border-border bg-muted/30 text-foreground placeholder:text-muted-foreground/55"
+          className="flex-1 border-border bg-muted/30 text-[#121212] placeholder:text-muted-foreground/55"
           disabled={createType.isExecuting}
           id="new-type-name"
           onChange={(e) => setType(e.target.value)}

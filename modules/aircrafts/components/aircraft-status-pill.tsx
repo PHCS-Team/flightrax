@@ -23,7 +23,7 @@ export function AircraftStatusPill({
     <div
       aria-label="Aircraft status"
       className={cn(
-        "inline-flex self-start rounded-full",
+        "flex w-full self-start rounded-full sm:inline-flex sm:w-auto",
         isGlass
           ? "border border-primary-foreground/20 bg-primary-foreground/10 p-1"
           : "border bg-muted/30 p-0.5",
@@ -37,12 +37,12 @@ export function AircraftStatusPill({
           <button
             aria-checked={isSelected}
             className={cn(
-              "inline-flex cursor-pointer items-center rounded-full font-medium transition-colors disabled:cursor-default",
+              "inline-flex flex-1 cursor-pointer items-center justify-center rounded-full font-medium transition-colors disabled:cursor-default sm:flex-none sm:justify-start",
               size === "sm"
-                ? "px-2 py-0.5 text-[10px]"
+                ? "px-3 sm:px-2 py-1 sm:py-0.5 text-xs sm:text-[10px]"
                 : size === "table"
-                  ? "px-2.5 py-1 text-xs"
-                  : "px-3 py-1 text-xs",
+                  ? "px-3 sm:px-2.5 py-1.5 sm:py-1 text-sm sm:text-xs"
+                  : "px-4 sm:px-3 py-1.5 sm:py-1 text-sm sm:text-xs",
               isGlass
                 ? isSelected
                   ? "bg-primary-foreground/25 text-primary-foreground ring-1 ring-primary-foreground/35"
