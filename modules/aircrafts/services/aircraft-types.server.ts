@@ -24,7 +24,7 @@ export async function getAircraftTypes(): Promise<AircraftType[]> {
   const { data, error } = await supabase
     .from("aircraft_types")
     .select(AIRCRAFT_TYPES_SELECT)
-    .order("created_at", { ascending: false });
+    .order("type", { ascending: true });
 
   if (error) {
     throw new Error(error.message);

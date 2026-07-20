@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
-import { ImageUploadField } from "@/modules/auth/components/image-upload-field";
+import { ImageUploadField } from "@/shared/components/image-upload-field";
 import { useResubmitRejectedStudent } from "@/modules/auth/hooks/use-resubmit-rejected-student.action";
 import {
   RegisterFormSection,
@@ -87,28 +87,29 @@ export function RejectedStudentResubmissionForm({
         </div>
       </RegisterFormSection>
       <RegisterFormSection title="Replacement document">
-        <ImageUploadField
-          accept={STUDENT_ID_DOCUMENT_TYPES}
-          disabled={isExecuting}
-          errorText={errors.studentIdDocument?.message}
-          helperText={studentIdDocumentHelperText}
-          id="rejected-student-id-document"
-          label="Student ID image"
-          onChange={(file) => {
-            if (file) {
-              form.setValue("studentIdDocument", file, {
-                shouldValidate: true,
-              });
-              return;
-            }
+          <ImageUploadField
+            accept={STUDENT_ID_DOCUMENT_TYPES}
+            disabled={isExecuting}
+            errorText={errors.studentIdDocument?.message}
+            helperText={studentIdDocumentHelperText}
+            id="rejected-student-id-document"
+            label="Student ID image"
+            onChange={(file) => {
+              if (file) {
+                form.setValue("studentIdDocument", file, {
+                  shouldValidate: true,
+                });
+                return;
+              }
 
-            form.unregister("studentIdDocument");
-            void form.trigger("studentIdDocument");
-          }}
-          required
-          value={studentIdDocument ?? null}
-          variant="compact"
-        />
+              form.unregister("studentIdDocument");
+              void form.trigger("studentIdDocument");
+            }}
+            required
+            theme="dark"
+            value={studentIdDocument ?? null}
+            variant="compact"
+          />
       </RegisterFormSection>
       <Button
         className="h-12 w-full px-7 font-bold uppercase"

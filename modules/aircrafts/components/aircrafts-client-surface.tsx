@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 
 import { PlaneIcon } from "lucide-react";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
@@ -25,14 +25,22 @@ export function AircraftsClientSurface() {
     parseAsString.withDefault(""),
   );
 
+  const [typeFilter, setTypeFilter] = useQueryState(
+    "type",
+    parseAsString.withDefault(""),
+  );
+
+  const resetPage = useCallback(() => setPage(1), [setPage]);
+
   useEffect(() => {
-    setPage(1);
-  }, [committedSearch]); // eslint-disable-line react-hooks/exhaustive-deps
+    resetPage();
+  }, [committedSearch, typeFilter]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const { aircrafts, error, isPending, totalCount, totalPages } = useAircrafts(
     page,
     pageSize,
     committedSearch,
+    typeFilter || undefined,
   );
 
   if (isPending) {
@@ -54,9 +62,11 @@ export function AircraftsClientSurface() {
       aircrafts={aircrafts}
       onPageChange={setPage}
       onSearchChange={setSearchInput}
+      onTypeFilterChange={setTypeFilter}
       page={page}
       pageSize={pageSize}
       search={searchInput}
+      typeFilter={typeFilter}
       totalCount={totalCount}
       totalPages={totalPages}
     />

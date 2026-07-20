@@ -94,7 +94,7 @@ function AircraftTypeList() {
                 }}
                 type="button"
               >
-                Click to search
+                {showFilter ? "Click to close search" : "Click to search"}
               </button>
               <span className="text-xs text-muted-foreground">
                 {filteredTypes.length} of {aircraftTypes.length} type

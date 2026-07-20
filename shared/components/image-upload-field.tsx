@@ -3,7 +3,6 @@
 import { useEffect, useId, useRef, useState, type ChangeEvent } from "react";
 import { ImageIcon, Trash2Icon, UploadCloudIcon } from "lucide-react";
 
-import { AuthFieldLabel } from "@/modules/auth/components/auth-field-label";
 import { Button } from "@/shared/components/ui/button";
 import { cn } from "@/shared/lib/utils";
 
@@ -14,6 +13,8 @@ type ImagePreview = {
   url: string;
 };
 
+type Theme = "light" | "dark";
+
 type ImageUploadFieldBaseProps = {
   accept?: readonly string[] | string;
   className?: string;
@@ -23,6 +24,7 @@ type ImageUploadFieldBaseProps = {
   id?: string;
   label: string;
   required?: boolean;
+  theme?: Theme;
   variant?: "default" | "compact";
 };
 
@@ -52,6 +54,7 @@ export function ImageUploadField(props: ImageUploadFieldProps) {
   const accept = typeof props.accept === "string" ? props.accept : (props.accept?.join(",") ?? "image/*");
   const hasFiles = previews.length > 0;
   const variant = props.variant ?? "default";
+  const theme = props.theme ?? "light";
 
   useEffect(() => {
     return () => {
@@ -113,9 +116,24 @@ export function ImageUploadField(props: ImageUploadFieldProps) {
 
   return (
     <div className={cn("w-full min-w-0 max-w-full space-y-2", props.className)}>
-      <AuthFieldLabel htmlFor={inputId} required={props.required}>
-        {props.label}
-      </AuthFieldLabel>
+      <label
+        className={cn(
+          "flex items-center gap-1.5 text-sm font-semibold",
+          theme === "dark" ? "text-primary-foreground/90" : "text-foreground",
+        )}
+        htmlFor={inputId}
+      >
+        <span>{props.label}</span>
+        {props.required && (
+          <span
+            className={cn(theme === "dark" ? "text-blue-300" : "text-secondary")}
+            aria-hidden="true"
+          >
+            *
+          </span>
+        )}
+        {props.required && <span className="sr-only">required</span>}
+      </label>
 
       <input
         ref={inputRef}
@@ -140,6 +158,7 @@ export function ImageUploadField(props: ImageUploadFieldProps) {
           onChoose={() => inputRef.current?.click()}
           onRemove={handleRemove}
           previews={previews}
+          theme={theme}
         />
       ) : (
         <DefaultUploadControl
@@ -150,11 +169,18 @@ export function ImageUploadField(props: ImageUploadFieldProps) {
           onChoose={() => inputRef.current?.click()}
           onRemove={handleRemove}
           previews={previews}
+          theme={theme}
         />
       )}
 
       {props.helperText && (
-        <p className="text-xs text-muted-foreground" id={helperId}>
+        <p
+          className={cn(
+            "text-xs",
+            theme === "dark" ? "text-primary-foreground/70" : "text-muted-foreground",
+          )}
+          id={helperId}
+        >
           {props.helperText}
         </p>
       )}
@@ -175,6 +201,7 @@ type UploadControlProps = {
   onChoose: () => void;
   onRemove: (index: number) => void;
   previews: ImagePreview[];
+  theme: Theme;
 };
 
 function CompactUploadControl({
@@ -185,39 +212,63 @@ function CompactUploadControl({
   onChoose,
   onRemove,
   previews,
+  theme,
 }: UploadControlProps) {
   const selectedSummary = getSelectedSummary(previews, multiple);
 
   return (
     <div
       className={cn(
-        "min-h-12 w-full min-w-0 max-w-full overflow-hidden rounded-lg border border-dashed border-primary-foreground/25 bg-primary-foreground/10 p-1 shadow-sm transition md:min-h-10 sm:rounded-2xl",
-        "focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50",
-        errorText && "border-red-200/60 bg-red-200/10 focus-within:ring-red-200/25",
+        "min-h-12 w-full min-w-0 max-w-full overflow-hidden rounded-lg border border-dashed p-1 shadow-sm transition md:min-h-10 sm:rounded-2xl",
+        "focus-within:ring-3 focus-within:ring-ring/50",
+        theme === "dark"
+          ? "border-primary-foreground/25 bg-primary-foreground/10"
+          : "bg-muted/30 focus-within:border-ring",
+        errorText &&
+          (theme === "dark"
+            ? "border-red-200/60 bg-red-200/10 focus-within:ring-red-200/25"
+            : "border-destructive/50 bg-destructive/10 focus-within:ring-destructive/20"),
         disabled && "opacity-60",
       )}
     >
       <div className="flex min-h-10 w-full min-w-0 max-w-full items-center gap-2 overflow-hidden md:min-h-8">
         <button
-          className="flex min-w-0 flex-1 cursor-pointer items-center gap-3 overflow-hidden rounded-md px-2 py-1 text-left text-primary-foreground transition hover:bg-primary-foreground/10 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-default sm:rounded-xl"
+          className={cn(
+            "flex min-w-0 flex-1 cursor-pointer items-center gap-3 overflow-hidden rounded-md px-2 py-1 text-left transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-default sm:rounded-xl",
+            theme === "dark"
+              ? "text-primary-foreground hover:bg-primary-foreground/10"
+              : "text-foreground hover:bg-muted/50",
+          )}
           disabled={disabled}
           onClick={onChoose}
           type="button"
         >
-          <PreviewThumbnail preview={previews[0]} size="compact" />
+          <PreviewThumbnail preview={previews[0]} size="compact" theme={theme} />
           <span className="min-w-0 flex-1 overflow-hidden">
             <span className="block truncate text-sm font-semibold">
               {hasFiles ? selectedSummary.title : "Choose image"}
             </span>
-            <span className="block truncate text-xs text-primary-foreground/70">
-              {hasFiles ? selectedSummary.detail : multiple ? "Select image files" : "Select one image file"}
+            <span
+              className={cn(
+                "block truncate text-xs",
+                theme === "dark" ? "text-primary-foreground/70" : "text-muted-foreground",
+              )}
+            >
+              {hasFiles
+                ? selectedSummary.detail
+                : multiple
+                  ? "Select image files"
+                  : "Select one image file"}
             </span>
           </span>
         </button>
         {hasFiles ? (
           <button
             aria-label={`Remove ${previews[0].name}`}
-            className="flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full text-primary-foreground/80 transition hover:bg-destructive/15 hover:text-destructive focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-default md:size-8"
+            className={cn(
+              "flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full transition hover:bg-destructive/15 hover:text-destructive focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-default md:size-8",
+              theme === "dark" ? "text-primary-foreground/80" : "text-muted-foreground/80",
+            )}
             disabled={disabled}
             onClick={() => onRemove(0)}
             type="button"
@@ -225,7 +276,12 @@ function CompactUploadControl({
             <Trash2Icon className="size-4" />
           </button>
         ) : (
-          <UploadCloudIcon className="mr-2 size-4 shrink-0 text-primary-foreground/70" />
+          <UploadCloudIcon
+            className={cn(
+              "mr-2 size-4 shrink-0",
+              theme === "dark" ? "text-primary-foreground/70" : "text-muted-foreground/70",
+            )}
+          />
         )}
       </div>
     </div>
@@ -240,40 +296,69 @@ function DefaultUploadControl({
   onChoose,
   onRemove,
   previews,
+  theme,
 }: UploadControlProps) {
   return (
     <div
       className={cn(
-        "rounded-lg border border-dashed border-primary-foreground/25 bg-primary-foreground/10 p-3 shadow-sm transition sm:rounded-2xl",
-        "focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50",
-        errorText && "border-red-200/60 bg-red-200/10 focus-within:ring-red-200/25",
+        "rounded-lg border border-dashed p-3 shadow-sm transition sm:rounded-2xl",
+        "focus-within:ring-3 focus-within:ring-ring/50",
+        theme === "dark"
+          ? "border-primary-foreground/25 bg-primary-foreground/10"
+          : "bg-muted/30 focus-within:border-ring",
+        errorText &&
+          (theme === "dark"
+            ? "border-red-200/60 bg-red-200/10 focus-within:ring-red-200/25"
+            : "border-destructive/50 bg-destructive/10 focus-within:ring-destructive/20"),
         disabled && "opacity-60",
       )}
     >
       <div className="flex flex-col gap-3">
         <div className="grid gap-3 sm:grid-cols-[6rem_1fr] sm:items-center">
-          <PreviewThumbnail preview={previews[0]} size="default" />
+          <PreviewThumbnail preview={previews[0]} size="default" theme={theme} />
 
           <div className="space-y-3">
             <div className="space-y-1">
-              <p className="text-sm font-semibold text-primary-foreground">
+              <p
+                className={cn(
+                  "text-sm font-semibold",
+                  theme === "dark" ? "text-primary-foreground" : "text-foreground",
+                )}
+              >
                 {hasFiles ? "Image ready for review" : "Upload a clear image"}
               </p>
-              <p className="text-xs text-primary-foreground/70">
+              <p
+                className={cn(
+                  "text-xs",
+                  theme === "dark" ? "text-primary-foreground/70" : "text-muted-foreground",
+                )}
+              >
                 {multiple ? "Select one or more image files." : "Select one image file."}
               </p>
             </div>
 
-            <Button
-              className="h-12 w-full border-primary-foreground/25 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/20"
-              disabled={disabled}
-              onClick={onChoose}
-              type="button"
-              variant="outline"
-            >
-              <UploadCloudIcon className="size-4" />
-              {hasFiles ? "Choose different image" : "Choose image"}
-            </Button>
+            {theme === "dark" ? (
+              <button
+                className="flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-primary-foreground/25 bg-primary-foreground/10 px-4 text-sm font-semibold text-primary-foreground transition hover:bg-primary-foreground/20 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-default disabled:opacity-50 sm:rounded-2xl"
+                disabled={disabled}
+                onClick={onChoose}
+                type="button"
+              >
+                <UploadCloudIcon className="size-4" />
+                {hasFiles ? "Choose different image" : "Choose image"}
+              </button>
+            ) : (
+              <Button
+                className="w-full"
+                disabled={disabled}
+                onClick={onChoose}
+                type="button"
+                variant="outline"
+              >
+                <UploadCloudIcon className="size-4" />
+                {hasFiles ? "Choose different image" : "Choose image"}
+              </Button>
+            )}
           </div>
         </div>
 
@@ -285,6 +370,7 @@ function DefaultUploadControl({
                 key={preview.key}
                 onRemove={() => onRemove(index)}
                 preview={preview}
+                theme={theme}
               />
             ))}
           </div>
@@ -297,14 +383,19 @@ function DefaultUploadControl({
 function PreviewThumbnail({
   preview,
   size,
+  theme,
 }: {
   preview?: ImagePreview;
   size: "default" | "compact";
+  theme: Theme;
 }) {
   return (
     <div
       className={cn(
-        "relative flex max-w-full items-center justify-center overflow-hidden border border-primary-foreground/15 bg-primary/20",
+        "relative flex max-w-full items-center justify-center overflow-hidden",
+        theme === "dark"
+          ? "border border-primary-foreground/15 bg-primary/20"
+          : "border bg-muted/50",
         size === "compact"
           ? "size-10 shrink-0 rounded-md md:size-8 sm:rounded-xl"
           : "h-32 rounded-lg sm:h-24 sm:rounded-2xl",
@@ -320,7 +411,10 @@ function PreviewThumbnail({
       ) : (
         <div
           className={cn(
-            "flex items-center justify-center rounded-full bg-primary-foreground/15 text-primary-foreground",
+            "flex items-center justify-center rounded-full",
+            theme === "dark"
+              ? "bg-primary-foreground/15 text-primary-foreground"
+              : "text-muted-foreground",
             size === "compact" ? "size-8 md:size-6" : "size-12",
           )}
         >
@@ -335,20 +429,44 @@ function SelectedImageRow({
   disabled,
   onRemove,
   preview,
+  theme,
 }: {
   disabled?: boolean;
   onRemove: () => void;
   preview: ImagePreview;
+  theme: Theme;
 }) {
   return (
-    <div className="flex w-full min-w-0 max-w-full items-center justify-between gap-3 overflow-hidden rounded-lg bg-primary-foreground/10 p-3 text-sm sm:rounded-2xl">
+    <div
+      className={cn(
+        "flex w-full min-w-0 max-w-full items-center justify-between gap-3 overflow-hidden rounded-lg p-3 text-sm sm:rounded-2xl",
+        theme === "dark" ? "bg-primary-foreground/10" : "bg-muted/50",
+      )}
+    >
       <div className="min-w-0 flex-1 overflow-hidden">
-        <p className="truncate font-medium text-primary-foreground">{preview.name}</p>
-        <p className="truncate text-xs text-primary-foreground/70">{preview.sizeText} selected</p>
+        <p
+          className={cn(
+            "truncate font-medium",
+            theme === "dark" ? "text-primary-foreground" : "text-foreground",
+          )}
+        >
+          {preview.name}
+        </p>
+        <p
+          className={cn(
+            "truncate text-xs",
+            theme === "dark" ? "text-primary-foreground/70" : "text-muted-foreground",
+          )}
+        >
+          {preview.sizeText} selected
+        </p>
       </div>
       <button
         aria-label={`Remove ${preview.name}`}
-        className="flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full text-primary-foreground/80 transition hover:bg-destructive/15 hover:text-destructive focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-default"
+        className={cn(
+          "flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full transition hover:bg-destructive/15 hover:text-destructive focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-default",
+          theme === "dark" ? "text-primary-foreground/80" : "text-muted-foreground/80",
+        )}
         disabled={disabled}
         onClick={onRemove}
         type="button"

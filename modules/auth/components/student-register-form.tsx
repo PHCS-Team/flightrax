@@ -10,7 +10,7 @@ import { ROLE } from "@/shared/lib/rbac/config";
 import { Button } from "@/shared/components/ui/button";
 import { toastActionResult } from "@/shared/lib/action-toast";
 import { registerStudentAction } from "@/modules/auth/actions/register-student";
-import { ImageUploadField } from "@/modules/auth/components/image-upload-field";
+import { ImageUploadField } from "@/shared/components/image-upload-field";
 import {
   RegisterFormSection,
   RegisterPasswordField,
@@ -126,6 +126,7 @@ export function StudentRegisterForm() {
               void form.trigger("studentIdDocument");
             }}
             required
+            theme="dark"
             value={studentIdDocument ?? null}
             variant="compact"
           />
