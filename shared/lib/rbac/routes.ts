@@ -1,3 +1,9 @@
+import { ACCOUNT_VIEW } from "@/modules/auth/constants/permissions";
+import { AIRCRAFTS_VIEW } from "@/modules/aircrafts/constants/permissions";
+import {
+  STUDENTS_VIEW,
+  STUDENTS_REVIEW,
+} from "@/modules/students/constants/permissions";
 import { APPROVAL_STATUS, ROLE, hasPermission } from "@/shared/lib/rbac/config";
 import type { Permission, Profile, ProfileRole } from "@/shared/lib/rbac/types";
 
@@ -7,15 +13,15 @@ export type RouteAccessProfile = Pick<
 >;
 
 const PROTECTED_ROUTES: Array<{ prefix: string; permission: Permission }> = [
-  { prefix: "/account", permission: "account.view" },
+  { prefix: "/account", permission: ACCOUNT_VIEW },
   { prefix: "/dashboard", permission: "dashboard.view" },
   { prefix: "/flight-documents", permission: "flight_documents.view" },
   { prefix: "/instructors", permission: "instructors.view" },
   { prefix: "/schedule", permission: "schedule.view" },
-  { prefix: "/aircrafts", permission: "aircrafts.view" },
+  { prefix: "/aircrafts", permission: AIRCRAFTS_VIEW },
   { prefix: "/notams", permission: "notams.view" },
-  { prefix: "/students", permission: "students.view" },
-  { prefix: "/student-review", permission: "students.review" },
+  { prefix: "/students", permission: STUDENTS_VIEW },
+  { prefix: "/student-review", permission: STUDENTS_REVIEW },
 ];
 const AUTH_REQUIRED_ROUTES = ["/pending-approval"];
 

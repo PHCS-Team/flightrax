@@ -24,15 +24,5 @@ export function StudentReviewClientSurface() {
     );
   }
 
-  if (students.length === 0) {
-    return (
-      <EmptyState
-        description="Submitted student accounts that are pending or need a second look will appear here."
-        icon={<ClipboardCheckIcon className="size-7" />}
-        title="No student requests are waiting for review"
-      />
-    );
-  }
-
   return <StudentReviewList students={students} />;
 }

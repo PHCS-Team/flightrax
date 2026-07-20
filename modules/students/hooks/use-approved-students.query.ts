@@ -4,8 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 
 import { approvedStudentsQueryOptions } from "@/modules/students/queries/students";
 
-export function useApprovedStudents(page: number, pageSize: number) {
-  const query = useQuery(approvedStudentsQueryOptions(page, pageSize));
+export function useApprovedStudents(page: number, pageSize: number, search: string) {
+  const query = useQuery(approvedStudentsQueryOptions(page, pageSize, search));
 
   return {
     ...query,

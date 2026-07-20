@@ -1,12 +1,15 @@
 "use client";
 
+import { useEffect } from "react";
+
 import { GraduationCapIcon } from "lucide-react";
-import { parseAsInteger, useQueryState } from "nuqs";
+import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 
 import { StudentsTable } from "@/modules/students/components/students-table";
 import { useApprovedStudents } from "@/modules/students/hooks/use-approved-students.query";
-import { LoadingScreen } from "@/shared/components/layout/loading-screen";
+import { useDebouncedQueryState } from "@/shared/hooks/use-debounced-query-state";
 import { EmptyState } from "@/shared/components/layout/empty-state";
+import { LoadingScreen } from "@/shared/components/layout/loading-screen";
 
 const DEFAULT_PAGE_SIZE = 10;
 
@@ -17,8 +20,17 @@ export function StudentsClientSurface() {
     parseAsInteger.withDefault(DEFAULT_PAGE_SIZE),
   );
 
+  const [searchInput, setSearchInput, committedSearch] = useDebouncedQueryState(
+    "search",
+    parseAsString.withDefault(""),
+  );
+
+  useEffect(() => {
+    setPage(1);
+  }, [committedSearch]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const { error, isPending, students, totalCount, totalPages } =
-    useApprovedStudents(page, pageSize);
+    useApprovedStudents(page, pageSize, committedSearch);
 
   if (isPending) {
     return <LoadingScreen />;
@@ -34,21 +46,13 @@ export function StudentsClientSurface() {
     );
   }
 
-  if (students.length === 0) {
-    return (
-      <EmptyState
-        description="Approved student accounts will appear here once they are ready for scheduling and flight operations."
-        icon={<GraduationCapIcon className="size-7" />}
-        title="No approved students yet"
-      />
-    );
-  }
-
   return (
     <StudentsTable
       onPageChange={setPage}
+      onSearchChange={setSearchInput}
       page={page}
       pageSize={pageSize}
+      search={searchInput}
       students={students}
       totalCount={totalCount}
       totalPages={totalPages}

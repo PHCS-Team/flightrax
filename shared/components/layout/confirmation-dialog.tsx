@@ -45,7 +45,6 @@ export function ConfirmationDialog({
         />
         <DialogFooter className="-mx-6 -mb-6 mt-2 sm:justify-end">
           <Button
-            className="cursor-pointer rounded-lg disabled:cursor-default sm:rounded-2xl"
             disabled={isConfirming}
             onClick={() => onOpenChange(false)}
             type="button"
@@ -54,7 +53,6 @@ export function ConfirmationDialog({
             {cancelLabel}
           </Button>
           <Button
-            className="cursor-pointer rounded-lg disabled:cursor-default sm:rounded-2xl"
             disabled={isConfirming}
             onClick={onConfirm}
             type="button"

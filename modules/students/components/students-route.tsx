@@ -9,8 +9,8 @@ export async function StudentsRoute() {
   const queryClient = getQueryClient();
 
   await queryClient.prefetchQuery({
-    queryKey: STUDENTS_QUERY_KEYS.approved(1, 10),
-    queryFn: () => getApprovedStudentsPage(1, 10),
+      queryKey: STUDENTS_QUERY_KEYS.approved(1, 10, ""),
+      queryFn: () => getApprovedStudentsPage(1, 10, ""),
   });
 
   return (

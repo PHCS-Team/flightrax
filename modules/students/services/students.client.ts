@@ -5,11 +5,14 @@ import { getApiErrorMessage } from "@/shared/lib/api-error";
 export async function fetchApprovedStudentsPage(
   page: number,
   pageSize: number,
+  search: string,
 ) {
-  const response = await fetch(
-    `/api/students/approved?page=${page}&pageSize=${pageSize}`,
-    { credentials: "same-origin" },
-  );
+  const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize) });
+  if (search) params.set("search", search);
+
+  const response = await fetch(`/api/students/approved?${params}`, {
+    credentials: "same-origin",
+  });
 
   if (!response.ok) {
     throw new Error(

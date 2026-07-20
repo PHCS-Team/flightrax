@@ -27,16 +27,14 @@ export function HomePage() {
           <div className="flex w-full flex-col gap-4 sm:gap-3 sm:flex-row sm:justify-center lg:justify-start">
             <Button
               asChild
-              size="lg"
-              className="h-12 rounded-lg bg-primary-foreground px-7 font-bold uppercase text-primary hover:bg-primary-foreground/90 sm:rounded-2xl"
+              className="h-12 bg-primary-foreground px-7 font-bold uppercase text-primary hover:bg-primary-foreground/90"
             >
               <Link href="/login">Sign In</Link>
             </Button>
             <Button
               asChild
               variant="outline"
-              size="lg"
-              className="h-12 rounded-lg border-primary-foreground/25 bg-primary-foreground/10 px-7 font-bold uppercase text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground sm:rounded-2xl"
+              className="h-12 border-primary-foreground/25 bg-primary-foreground/10 px-7 font-bold uppercase text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground"
             >
               <Link href="/register">Register</Link>
             </Button>

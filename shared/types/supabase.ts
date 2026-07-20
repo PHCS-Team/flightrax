@@ -114,7 +114,6 @@ export type Database = {
           photo_path: string | null
           photo_size_bytes: number | null
           photo_uploaded_at: string | null
-          registration: string
           remarks: string | null
           serial_number: string | null
           status: Database["public"]["Enums"]["aircraft_status"]
@@ -131,7 +130,6 @@ export type Database = {
           photo_path?: string | null
           photo_size_bytes?: number | null
           photo_uploaded_at?: string | null
-          registration: string
           remarks?: string | null
           serial_number?: string | null
           status?: Database["public"]["Enums"]["aircraft_status"]
@@ -148,7 +146,6 @@ export type Database = {
           photo_path?: string | null
           photo_size_bytes?: number | null
           photo_uploaded_at?: string | null
-          registration?: string
           remarks?: string | null
           serial_number?: string | null
           status?: Database["public"]["Enums"]["aircraft_status"]

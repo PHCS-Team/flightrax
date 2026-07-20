@@ -10,7 +10,7 @@ import { LoadingScreen } from "@/shared/components/layout/loading-screen";
 export function AccountClientSurface() {
   const { data: profile, isPending, error } = useDashboardProfile();
 
-  if (isPending) {
+  if (isPending || !profile) {
     return <LoadingScreen />;
   }
 
@@ -22,10 +22,6 @@ export function AccountClientSurface() {
         title="Profile could not be loaded"
       />
     );
-  }
-
-  if (!profile) {
-    return <LoadingScreen />;
   }
 
   return <AccountProfile profile={profile} />;

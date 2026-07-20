@@ -1,3 +1,4 @@
+import { STUDENTS_REVIEW } from "@/modules/students/constants/permissions";
 import { APPROVAL_STATUS, ROLE, hasPermission } from "@/shared/lib/rbac/config";
 import type { Profile } from "@/shared/lib/rbac/types";
 
@@ -10,5 +11,5 @@ export function canApproveStudent(actor: Profile | null, target: Profile | null)
     return false;
   }
 
-  return isApproved(actor) && hasPermission(actor.role, "students.review", actor.admin_department);
+  return isApproved(actor) && hasPermission(actor.role, STUDENTS_REVIEW, actor.admin_department);
 }

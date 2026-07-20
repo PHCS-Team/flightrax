@@ -48,7 +48,7 @@ export function ChangePasswordDialog() {
       <DialogTrigger asChild>
         <Button
           aria-label="Change password"
-          className="rounded-lg sm:rounded-2xl"
+          className=""
           type="button"
           variant="ghost"
         >
@@ -146,7 +146,7 @@ export function ChangePasswordDialog() {
           </div>
 
           <Button
-            className="h-12 w-full rounded-lg px-7 font-bold uppercase sm:rounded-2xl"
+            className="h-12 w-full px-7 font-bold uppercase"
             disabled={isExecuting}
             type="submit"
           >
