@@ -23,7 +23,7 @@ import {
 
 import { AircraftDeleteConfirmation } from "@/modules/aircrafts/components/aircraft-delete-confirmation";
 import { AircraftFormDialog } from "@/modules/aircrafts/components/aircraft-form-dialog";
-import { AircraftRemarksDialog } from "@/modules/aircrafts/components/aircraft-remarks-dialog";
+import { AircraftDetailsDialog } from "@/modules/aircrafts/components/aircraft-details-dialog";
 import { AircraftStatusPill } from "@/modules/aircrafts/components/aircraft-status-pill";
 import { AircraftTypeManager } from "@/modules/aircrafts/components/aircraft-type-manager";
 import { AircraftWeightBalanceCell } from "@/modules/aircrafts/components/aircraft-weight-balance-cell";
@@ -257,7 +257,7 @@ export function AircraftsTable({
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>View remarks</p>
+                  <p>View details</p>
                 </TooltipContent>
               </Tooltip>
               <Tooltip>
@@ -496,8 +496,9 @@ export function AircraftsTable({
       />
 
       {remarksAircraft && (
-        <AircraftRemarksDialog
+        <AircraftDetailsDialog
           aircraftIdentification={remarksAircraft.aircraftIdentification}
+          colorMarkings={remarksAircraft.colorMarkings}
           onOpenChange={(open) => {
             if (!open) {
               setRemarksAircraft(null);
