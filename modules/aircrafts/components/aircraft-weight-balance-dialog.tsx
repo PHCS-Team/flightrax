@@ -130,14 +130,14 @@ export function AircraftWeightBalanceDialog({
 
         <form className="grid gap-5" onSubmit={form.handleSubmit(handleSubmit)}>
           <div className="grid gap-4">
-            <WbField
-              error={errors.basicEmptyWeight?.message}
-              hint="lbs"
-              id="basic-empty-weight"
-              label="Basic empty weight"
-              register={form.register("basicEmptyWeight")}
-            />
             <div className="grid grid-cols-2 gap-4">
+              <WbField
+                error={errors.basicEmptyWeight?.message}
+                hint="lbs"
+                id="basic-empty-weight"
+                label="Basic empty weight"
+                register={form.register("basicEmptyWeight")}
+              />
               <WbField
                 error={errors.arm?.message}
                 hint="in"
@@ -145,30 +145,43 @@ export function AircraftWeightBalanceDialog({
                 label="Arm"
                 register={form.register("arm")}
               />
-              <WbField
-                error={errors.moment?.message}
-                hint="lbs-in"
-                id="moment"
-                label="Moment"
-                labelAction={
-                  momentLocked ? (
-                    <button
-                      className="-mr-0.5 inline-flex cursor-pointer items-center justify-center rounded p-0.5 text-muted-foreground transition hover:bg-muted hover:text-foreground"
-                      onClick={reenableMomentAutoCalc}
-                      title="Re-enable auto-calculate"
-                      type="button"
-                    >
-                      <RotateCwIcon className="size-3" />
-                    </button>
-                  ) : undefined
-                }
-                register={form.register("moment", {
-                  onChange: () => {
-                    setMomentLocked(true);
-                  },
-                })}
-              />
             </div>
+            <WbField
+              error={errors.moment?.message}
+              hint="lbs-in"
+              id="moment"
+              label="Moment"
+              labelAction={
+                momentLocked ? (
+                  <button
+                    className="-mr-0.5 inline-flex cursor-pointer items-center justify-center rounded p-0.5 text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                    onClick={reenableMomentAutoCalc}
+                    title="Re-enable auto-calculate"
+                    type="button"
+                  >
+                    <RotateCwIcon className="size-3" />
+                  </button>
+                ) : undefined
+              }
+              register={form.register("moment", {
+                onChange: () => {
+                  setMomentLocked(true);
+                },
+              })}
+            />
+          </div>
+
+          <div className="rounded-lg border bg-muted/30 px-3 py-2 text-xs leading-relaxed text-muted-foreground">
+            <p>
+              <span className="font-medium text-foreground/80">Moment</span>{" "}
+              auto-calculates as{" "}
+              <span className="font-medium text-foreground/80">
+                Basic Empty Weight &times; Arm
+              </span>
+              . Typing in Moment manually stops auto-calculation &mdash; click
+              the <RotateCwIcon className="inline size-2.5 align-middle" /> icon
+              to re-enable.
+            </p>
           </div>
 
           <DialogFooter className="-mx-6 -mb-6 mt-1 sm:justify-end">
