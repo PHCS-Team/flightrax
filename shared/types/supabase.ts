@@ -164,16 +164,19 @@ export type Database = {
       instructor_profiles: {
         Row: {
           created_at: string
+          passcode_hash: string | null
           profile_id: string
           updated_at: string
         }
         Insert: {
           created_at?: string
+          passcode_hash?: string | null
           profile_id: string
           updated_at?: string
         }
         Update: {
           created_at?: string
+          passcode_hash?: string | null
           profile_id?: string
           updated_at?: string
         }
@@ -201,6 +204,7 @@ export type Database = {
           profile_photo_uploaded_at: string | null
           rating: string | null
           role: Database["public"]["Enums"]["app_role"]
+          signature_svg: string | null
           updated_at: string
         }
         Insert: {
@@ -216,6 +220,7 @@ export type Database = {
           profile_photo_uploaded_at?: string | null
           rating?: string | null
           role: Database["public"]["Enums"]["app_role"]
+          signature_svg?: string | null
           updated_at?: string
         }
         Update: {
@@ -231,6 +236,7 @@ export type Database = {
           profile_photo_uploaded_at?: string | null
           rating?: string | null
           role?: Database["public"]["Enums"]["app_role"]
+          signature_svg?: string | null
           updated_at?: string
         }
         Relationships: []

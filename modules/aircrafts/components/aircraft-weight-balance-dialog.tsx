@@ -64,7 +64,10 @@ export function AircraftWeightBalanceDialog({
   const errors = form.formState.errors;
   const isExecuting = setWeightBalance.isExecuting;
   const [momentLocked, setMomentLocked] = useState(false);
-  const watchedWeight = useWatch({ control: form.control, name: "basicEmptyWeight" });
+  const watchedWeight = useWatch({
+    control: form.control,
+    name: "basicEmptyWeight",
+  });
   const watchedArm = useWatch({ control: form.control, name: "arm" });
 
   useEffect(() => {
@@ -125,7 +128,7 @@ export function AircraftWeightBalanceDialog({
         <DialogSectionHeader
           description={`Set weight and balance configuration for ${aircraftLabel}.`}
           icon={ScaleIcon}
-          title="Weight & balance"
+          title="Weight & Balance"
         />
 
         <form className="grid gap-5" onSubmit={form.handleSubmit(handleSubmit)}>
@@ -135,7 +138,7 @@ export function AircraftWeightBalanceDialog({
                 error={errors.basicEmptyWeight?.message}
                 hint="lbs"
                 id="basic-empty-weight"
-                label="Basic empty weight"
+                label="Basic Empty Weight"
                 register={form.register("basicEmptyWeight")}
               />
               <WbField

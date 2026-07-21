@@ -186,7 +186,7 @@ export function ProfilePhotoUploader({
           <DialogSectionHeader
             description="Choose a clear profile photo so your account is easy to identify."
             icon={CameraIcon}
-            title="Profile picture"
+            title="Profile Picture"
           />
 
           <form
@@ -199,94 +199,94 @@ export function ProfilePhotoUploader({
               }
             }}
           >
-          <div className="flex justify-center">
-            <div className="relative size-28 max-w-full overflow-hidden rounded-full border border-border bg-muted shadow-sm ring-4 ring-muted/50 sm:size-44">
-              {displayUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  alt={`${fullName} profile preview`}
-                  className="size-full object-cover"
-                  src={displayUrl}
-                />
+            <div className="flex justify-center">
+              <div className="relative size-28 max-w-full overflow-hidden rounded-full border border-border bg-muted shadow-sm ring-4 ring-muted/50 sm:size-44">
+                {displayUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    alt={`${fullName} profile preview`}
+                    className="size-full object-cover"
+                    src={displayUrl}
+                  />
+                ) : (
+                  <div className="flex size-full items-center justify-center bg-primary text-4xl font-medium leading-none tracking-tight text-primary-foreground sm:text-6xl">
+                    {fallback}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="grid min-w-0 gap-2">
+              <label
+                className="text-sm font-semibold text-foreground"
+                htmlFor="profile-photo-input"
+              >
+                Photo file
+              </label>
+              <input
+                ref={inputRef}
+                accept={PROFILE_PHOTO_TYPES.join(",")}
+                className="sr-only"
+                id="profile-photo-input"
+                onChange={(event) =>
+                  handleFileChange(event.target.files?.[0] ?? null)
+                }
+                type="file"
+              />
+              <button
+                className="group grid min-h-16 w-full min-w-0 max-w-full cursor-pointer grid-cols-[auto_minmax(0,1fr)] items-center gap-3 rounded-lg border border-border bg-background p-3 text-left shadow-sm transition hover:border-primary/40 hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-default sm:flex sm:rounded-2xl"
+                onClick={() => inputRef.current?.click()}
+                type="button"
+              >
+                <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground sm:rounded-xl">
+                  <ImageIcon className="size-4" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-sm font-semibold text-foreground">
+                    {file ? file.name : "Choose an image"}
+                  </span>
+                  <span className="mt-0.5 block truncate text-xs text-muted-foreground">
+                    {file
+                      ? `${(file.size / 1024 / 1024).toFixed(2)} MB selected`
+                      : "Select a profile photo from your device"}
+                  </span>
+                </span>
+                <span className="col-span-2 w-full shrink-0 rounded-lg border border-border px-3 py-2 text-center text-xs font-semibold text-foreground transition group-hover:border-primary/40 sm:col-span-1 sm:w-auto sm:rounded-xl">
+                  Browse
+                </span>
+              </button>
+              <div className="grid gap-2">
+                <p className="text-xs text-muted-foreground">
+                  {PROFILE_PHOTO_HELPER_TEXT}
+                </p>
+                {currentPhotoUrl && (
+                  <Button
+                    className="h-auto w-fit justify-self-start p-0 text-xs font-semibold text-destructive hover:bg-transparent hover:text-destructive/80 disabled:cursor-default"
+                    disabled={upload.isExecuting || remove.isExecuting}
+                    onClick={() => handleRemoveConfirmationOpenChange(true)}
+                    type="button"
+                    variant="ghost"
+                  >
+                    <Trash2Icon className="size-3.5" />
+                    Remove current photo
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            <Button
+              className="h-12 w-full min-w-0 px-4 font-bold uppercase sm:px-7"
+              disabled={!file || upload.isExecuting || remove.isExecuting}
+              type="submit"
+            >
+              {upload.isExecuting ? (
+                <UploadIcon className="size-4 animate-pulse" />
               ) : (
-                <div className="flex size-full items-center justify-center bg-primary text-4xl font-medium leading-none tracking-tight text-primary-foreground sm:text-6xl">
-                  {fallback}
-                </div>
+                <CameraIcon className="size-4" />
               )}
-            </div>
-          </div>
-
-          <div className="grid min-w-0 gap-2">
-            <label
-              className="text-sm font-semibold text-foreground"
-              htmlFor="profile-photo-input"
-            >
-              Photo file
-            </label>
-            <input
-              ref={inputRef}
-              accept={PROFILE_PHOTO_TYPES.join(",")}
-              className="sr-only"
-              id="profile-photo-input"
-              onChange={(event) =>
-                handleFileChange(event.target.files?.[0] ?? null)
-              }
-              type="file"
-            />
-            <button
-              className="group grid min-h-16 w-full min-w-0 max-w-full cursor-pointer grid-cols-[auto_minmax(0,1fr)] items-center gap-3 rounded-lg border border-border bg-background p-3 text-left shadow-sm transition hover:border-primary/40 hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-default sm:flex sm:rounded-2xl"
-              onClick={() => inputRef.current?.click()}
-              type="button"
-            >
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground sm:rounded-xl">
-                <ImageIcon className="size-4" />
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block truncate text-sm font-semibold text-foreground">
-                  {file ? file.name : "Choose an image"}
-                </span>
-                <span className="mt-0.5 block truncate text-xs text-muted-foreground">
-                  {file
-                    ? `${(file.size / 1024 / 1024).toFixed(2)} MB selected`
-                    : "Select a profile photo from your device"}
-                </span>
-              </span>
-              <span className="col-span-2 w-full shrink-0 rounded-lg border border-border px-3 py-2 text-center text-xs font-semibold text-foreground transition group-hover:border-primary/40 sm:col-span-1 sm:w-auto sm:rounded-xl">
-                Browse
-              </span>
-            </button>
-            <div className="grid gap-2">
-              <p className="text-xs text-muted-foreground">
-                {PROFILE_PHOTO_HELPER_TEXT}
-              </p>
-              {currentPhotoUrl && (
-                <Button
-                  className="h-auto w-fit justify-self-start p-0 text-xs font-semibold text-destructive hover:bg-transparent hover:text-destructive/80 disabled:cursor-default"
-                  disabled={upload.isExecuting || remove.isExecuting}
-                  onClick={() => handleRemoveConfirmationOpenChange(true)}
-                  type="button"
-                  variant="ghost"
-                >
-                  <Trash2Icon className="size-3.5" />
-                  Remove current photo
-                </Button>
-              )}
-            </div>
-          </div>
-
-          <Button
-            className="h-12 w-full min-w-0 px-4 font-bold uppercase sm:px-7"
-            disabled={!file || upload.isExecuting || remove.isExecuting}
-            type="submit"
-          >
-            {upload.isExecuting ? (
-              <UploadIcon className="size-4 animate-pulse" />
-            ) : (
-              <CameraIcon className="size-4" />
-            )}
-            {upload.isExecuting ? "Saving..." : "Save photo"}
-          </Button>
-        </form>
+              {upload.isExecuting ? "Saving..." : "Save photo"}
+            </Button>
+          </form>
         </DialogContent>
       </Dialog>
       <ConfirmationDialog
@@ -299,7 +299,7 @@ export function ProfilePhotoUploader({
         onConfirm={() => remove.execute()}
         onOpenChange={handleRemoveConfirmationOpenChange}
         open={removeConfirmationOpen}
-        title="Remove profile photo?"
+        title="Remove Profile Photo?"
       />
     </>
   );

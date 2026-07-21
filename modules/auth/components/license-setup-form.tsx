@@ -60,8 +60,8 @@ export function LicenseSetupForm({
     >
       <div className="grid gap-2">
         <label className={labelClassName} htmlFor="license-setup-type">
-          License type
-          <span className="ml-1 text-secondary">*</span>
+          License Type
+          <span className="ml-1 text-destructive">*</span>
         </label>
         <Select
           onValueChange={(value) =>
@@ -103,8 +103,8 @@ export function LicenseSetupForm({
 
       <div className="grid gap-2">
         <label className={labelClassName} htmlFor="license-setup-number">
-          License number
-          <span className="ml-1 text-secondary">*</span>
+          License Number
+          <span className="ml-1 text-destructive">*</span>
         </label>
         <Input
           aria-describedby={
@@ -129,7 +129,7 @@ export function LicenseSetupForm({
       <div className="grid gap-2">
         <label className={labelClassName} htmlFor="license-setup-rating">
           Rating
-          <span className="ml-1 text-secondary">*</span>
+          <span className="ml-1 text-destructive">*</span>
         </label>
         <Select
           onValueChange={(value) =>
@@ -168,11 +168,7 @@ export function LicenseSetupForm({
         )}
       </div>
 
-      <Button
-        className="h-12 w-full px-7 font-bold uppercase"
-        disabled={isExecuting}
-        type="submit"
-      >
+      <Button className="w-full" disabled={isExecuting} type="submit">
         {isExecuting ? "Saving license..." : "Save license details"}
       </Button>
     </form>

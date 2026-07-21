@@ -60,7 +60,7 @@ export function InstructorRegisterForm() {
           <RegisterTextField
             error={errors.fullName}
             id="instructor-register-full-name"
-            label="Full name"
+            label="Full Name"
             placeholder="Doe, John S."
             registration={form.register("fullName")}
           />
@@ -83,7 +83,7 @@ export function InstructorRegisterForm() {
         <RegisterPasswordField
           error={errors.confirmPassword}
           id="instructor-register-confirm-password"
-          label="Confirm password"
+          label="Confirm Password"
           placeholder="Re-enter your password"
           registration={form.register("confirmPassword")}
         />
