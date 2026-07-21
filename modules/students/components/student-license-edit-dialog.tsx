@@ -72,14 +72,14 @@ export function StudentLicenseEditDialog({
           type="button"
           variant="outline"
         >
-          Edit License
+Edit license
         </Button>
       </DialogTrigger>
       <DialogContent className="p-6 sm:max-w-lg">
         <DialogSectionHeader
           description={`Update the active license and rating for ${student.fullName}.`}
           icon={IdCardIcon}
-          title="Edit license details"
+          title="Edit License Details"
         />
         <form
           className="grid gap-5"
@@ -93,7 +93,7 @@ export function StudentLicenseEditDialog({
               className="text-sm font-semibold text-foreground"
               htmlFor={`student-license-type-${student.id}`}
             >
-              License type
+              License Type
               <span className="ml-1 text-secondary">*</span>
             </label>
             <Select
@@ -141,7 +141,7 @@ export function StudentLicenseEditDialog({
               className="text-sm font-semibold text-foreground"
               htmlFor={`student-license-number-${student.id}`}
             >
-              License number
+              License Number
               <span className="ml-1 text-secondary">*</span>
             </label>
             <Input

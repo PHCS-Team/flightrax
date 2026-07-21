@@ -53,7 +53,7 @@ export function RejectedStudentResubmissionForm({
     return (
       <div className="rounded-2xl border border-primary-foreground/15 bg-primary-foreground/10 p-5 text-primary-foreground">
         <h3 className="text-lg font-semibold tracking-tight">
-          Request received
+          Request Received
         </h3>
         <p className="mt-2 text-sm leading-6 text-primary-foreground/70">
           Your corrected student verification details were resubmitted. Please
@@ -68,32 +68,32 @@ export function RejectedStudentResubmissionForm({
       className="space-y-5"
       onSubmit={form.handleSubmit((values) => execute(values))}
     >
-      <RegisterFormSection title="Corrected identity">
+      <RegisterFormSection title="Corrected Identity">
         <div className="grid gap-5 sm:grid-cols-2 sm:gap-3">
           <RegisterTextField
             error={errors.fullName}
             id="rejected-student-full-name"
-            label="Full name"
+            label="Full Name"
             placeholder="Doe, John S."
             registration={form.register("fullName")}
           />
           <RegisterTextField
             error={errors.studentIdNumber}
             id="rejected-student-id-number"
-            label="Student ID number"
+            label="Student ID Number"
             placeholder="Student ID number"
             registration={form.register("studentIdNumber")}
           />
         </div>
       </RegisterFormSection>
-      <RegisterFormSection title="Replacement document">
+      <RegisterFormSection title="Replacement Document">
           <ImageUploadField
             accept={STUDENT_ID_DOCUMENT_TYPES}
             disabled={isExecuting}
             errorText={errors.studentIdDocument?.message}
             helperText={studentIdDocumentHelperText}
             id="rejected-student-id-document"
-            label="Student ID image"
+            label="Student ID Image"
             onChange={(file) => {
               if (file) {
                 form.setValue("studentIdDocument", file, {

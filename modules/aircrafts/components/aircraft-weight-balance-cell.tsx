@@ -74,7 +74,7 @@ export function AircraftWeightBalanceCell({
               </span>
             </TooltipTrigger>
             <TooltipContent side="top">
-              <p>Click to reconfigure</p>
+              <p>Reconfigure</p>
             </TooltipContent>
           </Tooltip>
         </div>

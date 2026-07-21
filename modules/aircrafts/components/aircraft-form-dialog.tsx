@@ -117,13 +117,13 @@ export function AircraftFormDialog({
               : "Create an aircraft profile for fleet planning and flight plan defaults."
           }
           icon={PlaneIcon}
-          title={isEditing ? "Edit aircraft" : "Create aircraft"}
+          title={isEditing ? "Edit Aircraft" : "Create Aircraft"}
         />
 
         <form className="grid gap-5" onSubmit={form.handleSubmit(handleSubmit)}>
           <div className="-mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-              Important aircraft details
+              Important Aircraft Details
             </h3>
 
             <AircraftStatusPill
@@ -146,7 +146,7 @@ export function AircraftFormDialog({
                   className="text-sm font-semibold text-foreground"
                   htmlFor={`${dialogId}-type`}
                 >
-                  Aircraft type
+                  Aircraft Type
                   <span className="ml-1 text-secondary">*</span>
                 </label>
                 <span className="inline text-xs text-muted-foreground sm:hidden">
@@ -197,7 +197,7 @@ export function AircraftFormDialog({
             <AircraftTextField
               error={errors.aircraftIdentification?.message}
               id={`${dialogId}-identification`}
-              label="Aircraft identification"
+              label="Aircraft Identification"
               placeholder="WCC trainer 218"
               register={form.register("aircraftIdentification")}
               required
@@ -205,7 +205,7 @@ export function AircraftFormDialog({
             <AircraftTextField
               error={errors.serialNumber?.message}
               id={`${dialogId}-serial`}
-              label="Serial number"
+              label="Serial Number"
               placeholder="172-12345"
               register={form.register("serialNumber")}
               required
@@ -215,14 +215,14 @@ export function AircraftFormDialog({
           <AircraftTextField
             error={errors.colorMarkings?.message}
             id={`${dialogId}-color-markings`}
-            label="Color and markings"
+            label="Color and Markings"
             placeholder="White fuselage with blue training stripe"
             register={form.register("colorMarkings")}
             required
           />
 
           <h3 className="-mb-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
-            Additional information
+            Additional Information
           </h3>
 
           <div className="grid gap-2">
@@ -243,7 +243,7 @@ export function AircraftFormDialog({
             accept={AIRCRAFT_PHOTO_TYPES}
             helperText={AIRCRAFT_PHOTO_HELPER_TEXT}
             id={`${dialogId}-photo`}
-            label="Aircraft image"
+            label="Aircraft Image"
             onChange={(file) =>
               form.setValue("photo", file, {
                 shouldDirty: true,

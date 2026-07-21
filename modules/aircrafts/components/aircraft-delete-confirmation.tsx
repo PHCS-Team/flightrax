@@ -37,7 +37,7 @@ export function AircraftDeleteConfirmation({
       }}
       onOpenChange={onOpenChange}
       open={open}
-      title="Delete aircraft?"
+      title="Delete Aircraft?"
     />
   );
 }

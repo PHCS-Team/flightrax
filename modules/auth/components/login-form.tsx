@@ -43,7 +43,7 @@ export function LoginForm({ role }: { role: ProfileRole }) {
     >
       <input type="hidden" {...form.register("role")} />
       <div>
-        <h2 className="text-2xl font-semibold tracking-tight">Welcome back</h2>
+        <h2 className="text-2xl font-semibold tracking-tight">Welcome Back</h2>
         <p className="mt-2 text-sm text-muted-foreground">
           Use the credentials for this role lane.
         </p>

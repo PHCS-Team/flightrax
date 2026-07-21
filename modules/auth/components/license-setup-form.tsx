@@ -60,7 +60,7 @@ export function LicenseSetupForm({
     >
       <div className="grid gap-2">
         <label className={labelClassName} htmlFor="license-setup-type">
-          License type
+          License Type
           <span className="ml-1 text-destructive">*</span>
         </label>
         <Select
@@ -103,7 +103,7 @@ export function LicenseSetupForm({
 
       <div className="grid gap-2">
         <label className={labelClassName} htmlFor="license-setup-number">
-          License number
+          License Number
           <span className="ml-1 text-destructive">*</span>
         </label>
         <Input
@@ -168,11 +168,7 @@ export function LicenseSetupForm({
         )}
       </div>
 
-      <Button
-        className="w-full"
-        disabled={isExecuting}
-        type="submit"
-      >
+      <Button className="w-full" disabled={isExecuting} type="submit">
         {isExecuting ? "Saving license..." : "Save license details"}
       </Button>
     </form>

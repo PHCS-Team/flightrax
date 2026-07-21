@@ -54,7 +54,7 @@ export function AccountPasscodeSection({
         </span>
         <div>
           <h2 className="text-xl font-semibold tracking-tight text-primary-foreground">
-            Approval passcode
+            Approval Passcode
           </h2>
           <p className="mt-0.5 text-sm text-primary-foreground/70">
             {isSetup

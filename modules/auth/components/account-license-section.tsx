@@ -42,7 +42,7 @@ export function AccountLicenseSection({
               </span>
               <div>
                 <h2 className="text-xl font-semibold tracking-tight text-primary-foreground">
-                  Complete license details
+                  Complete License Details
                 </h2>
                 <p className="mt-0.5 text-sm text-primary-foreground/70">
                   {role === ROLE.STUDENT
@@ -63,7 +63,7 @@ export function AccountLicenseSection({
               </span>
               <div>
                 <h2 className="text-xl font-semibold tracking-tight text-primary-foreground">
-                  License details
+                  License Details
                 </h2>
                 <p className="mt-0.5 text-sm text-primary-foreground/70">
                   Your current license information on file.

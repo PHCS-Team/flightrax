@@ -60,7 +60,7 @@ export function ChangePasswordDialog() {
         <DialogSectionHeader
           description="Update your password using your current credentials."
           icon={KeyRoundIcon}
-          title="Change password"
+          title="Change Password"
         />
         <form
           className="grid gap-5"
