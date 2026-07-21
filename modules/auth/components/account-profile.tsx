@@ -2,6 +2,8 @@ import { MailIcon } from "lucide-react";
 
 import { AccountLicenseSection } from "@/modules/auth/components/account-license-section";
 import { AccountLogSection } from "@/modules/auth/components/account-log-section";
+import { AccountPasscodeSection } from "@/modules/auth/components/account-passcode-section";
+import { AccountSignatureSection } from "@/modules/auth/components/account-signature-section";
 import { ProfilePhotoUploader } from "@/modules/auth/components/profile-photo-uploader";
 import { parseDisplayName } from "@/modules/auth/utils/display-name";
 import {
@@ -70,11 +72,16 @@ export function AccountProfile({ profile }: { profile: Profile }) {
             <TabsTrigger value="log">Log</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="profile">
+          <TabsContent value="profile" className="w-full space-y-6 sm:max-w-xl">
             <AccountLicenseSection
               canSetLicenseDetails={canSetLicenseDetails}
               details={profileDetails}
+              role={profile.role}
             />
+            <AccountSignatureSection profile={profile} />
+            {profile.role === ROLE.INSTRUCTOR && (
+              <AccountPasscodeSection />
+            )}
           </TabsContent>
 
           <TabsContent value="log">

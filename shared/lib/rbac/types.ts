@@ -29,6 +29,7 @@ export type Profile = BaseProfile & {
   id_document_uploaded_at?: string | null;
   submitted_at?: string | null;
   rejection_reason?: string | null;
+  signature_svg?: string | null;
 };
 
 export type Permission =

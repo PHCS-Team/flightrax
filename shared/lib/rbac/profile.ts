@@ -72,6 +72,7 @@ export function normalizeProfile(
     profile_photo_size_bytes: row.profile_photo_size_bytes,
     profile_photo_uploaded_at: row.profile_photo_uploaded_at,
     profile_photo_url: profilePhotoUrl,
+    signature_svg: row.signature_svg,
     role: row.role,
     created_at: row.created_at,
     updated_at: row.updated_at,

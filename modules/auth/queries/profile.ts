@@ -13,7 +13,7 @@ const PROFILE_DETAIL_SELECT =
 const PROFILE_VIEWER_SELECT =
   "*, student_profiles!student_profiles_profile_id_fkey(approval_status), admin_profiles!admin_profiles_profile_id_fkey(department)";
 const PROFILE_ACCESS_SELECT =
-  "id, email, full_name, role, created_at, updated_at, license_type, license_number, rating, profile_photo_path, profile_photo_content_type, profile_photo_size_bytes, profile_photo_uploaded_at, student_profiles!student_profiles_profile_id_fkey(approval_status), admin_profiles!admin_profiles_profile_id_fkey(department)";
+  "id, email, full_name, role, created_at, updated_at, license_type, license_number, rating, signature_svg, profile_photo_path, profile_photo_content_type, profile_photo_size_bytes, profile_photo_uploaded_at, student_profiles!student_profiles_profile_id_fkey(approval_status), admin_profiles!admin_profiles_profile_id_fkey(department)";
 
 function getPublicProfilePhotoUrl(
   supabase: Awaited<ReturnType<typeof createClient>>,
