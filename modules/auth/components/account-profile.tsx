@@ -80,7 +80,7 @@ export function AccountProfile({ profile }: { profile: Profile }) {
             />
             <AccountSignatureSection profile={profile} />
             {profile.role === ROLE.INSTRUCTOR && (
-              <AccountPasscodeSection />
+              <AccountPasscodeSection passcodeHash={profile.passcode_hash} />
             )}
           </TabsContent>
 

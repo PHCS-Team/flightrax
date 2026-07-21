@@ -9,11 +9,11 @@ import { createClient } from "@/shared/lib/supabase/server";
 import type { Profile } from "@/shared/lib/rbac/types";
 
 const PROFILE_DETAIL_SELECT =
-  "*, student_profiles!student_profiles_profile_id_fkey(approval_status, id_document_content_type, id_document_path, id_document_size_bytes, id_document_uploaded_at, rejection_reason, student_id_number, submitted_at), admin_profiles!admin_profiles_profile_id_fkey(department)";
+  "*, student_profiles!student_profiles_profile_id_fkey(approval_status, id_document_content_type, id_document_path, id_document_size_bytes, id_document_uploaded_at, rejection_reason, student_id_number, submitted_at), admin_profiles!admin_profiles_profile_id_fkey(department), instructor_profiles!instructor_profiles_profile_id_fkey(passcode_hash)";
 const PROFILE_VIEWER_SELECT =
-  "*, student_profiles!student_profiles_profile_id_fkey(approval_status), admin_profiles!admin_profiles_profile_id_fkey(department)";
+  "*, student_profiles!student_profiles_profile_id_fkey(approval_status), admin_profiles!admin_profiles_profile_id_fkey(department), instructor_profiles!instructor_profiles_profile_id_fkey(passcode_hash)";
 const PROFILE_ACCESS_SELECT =
-  "id, email, full_name, role, created_at, updated_at, license_type, license_number, rating, signature_svg, profile_photo_path, profile_photo_content_type, profile_photo_size_bytes, profile_photo_uploaded_at, student_profiles!student_profiles_profile_id_fkey(approval_status), admin_profiles!admin_profiles_profile_id_fkey(department)";
+  "id, email, full_name, role, created_at, updated_at, license_type, license_number, rating, signature_svg, profile_photo_path, profile_photo_content_type, profile_photo_size_bytes, profile_photo_uploaded_at, student_profiles!student_profiles_profile_id_fkey(approval_status), admin_profiles!admin_profiles_profile_id_fkey(department), instructor_profiles!instructor_profiles_profile_id_fkey(passcode_hash)";
 
 function getPublicProfilePhotoUrl(
   supabase: Awaited<ReturnType<typeof createClient>>,

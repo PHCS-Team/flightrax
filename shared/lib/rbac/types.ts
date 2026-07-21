@@ -30,6 +30,7 @@ export type Profile = BaseProfile & {
   submitted_at?: string | null;
   rejection_reason?: string | null;
   signature_svg?: string | null;
+  passcode_hash?: string | null;
 };
 
 export type Permission =

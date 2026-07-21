@@ -122,9 +122,9 @@ export function SignaturePad({
         <p className="text-xs text-primary-foreground/60">
           Draw your signature
         </p>
-        <div className="flex gap-1">
+        <div className="flex gap-0.5">
           <Button
-            className="h-6 px-3 text-xs"
+            className="h-6 px-1.5 text-xs"
             disabled={!canUndo}
             onClick={handleUndo}
             type="button"
@@ -133,7 +133,7 @@ export function SignaturePad({
             Undo
           </Button>
           <Button
-            className="h-6 px-3 text-xs"
+            className="h-6 px-1.5 text-xs"
             onClick={handleClear}
             type="button"
             variant="ghost"
