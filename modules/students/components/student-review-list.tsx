@@ -108,7 +108,7 @@ function ReviewMetadata({ student }: { student: StudentReviewItem }) {
     <section aria-label="Student review metadata">
       <div className="flex items-center gap-3">
         <p className="text-[0.64rem] font-semibold uppercase tracking-[0.18em] text-primary-foreground/55">
-          Request details
+          Request Details
         </p>
         <span className="h-px flex-1 bg-primary-foreground/10" />
       </div>
@@ -187,7 +187,7 @@ function StudentIdPreview({
               </span>
               <div className="text-center">
                 <p className="text-sm font-semibold text-primary-foreground">
-                  Student ID preview
+Student ID Preview
                 </p>
                 <p className="mt-0.5 text-xs text-primary-foreground/65">
                   Uploaded {uploadedAt}
@@ -302,7 +302,7 @@ function StudentReviewRequest({ student }: { student: StudentReviewItem }) {
                 <div className="min-w-0 flex-1">
                   <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-primary-foreground/15 bg-primary-foreground/10 px-2.5 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-primary-foreground/65">
                     <UserRoundCheckIcon className="size-3.5" />
-                    Student verification
+                    Student Verification
                   </div>
                   <div className="min-w-0 mt-1">
                     <h2 className="truncate text-xl font-semibold tracking-tight text-primary-foreground sm:text-2xl">
@@ -334,7 +334,7 @@ function StudentReviewRequest({ student }: { student: StudentReviewItem }) {
               {student.rejectionReason && (
                 <section className="rounded-2xl bg-destructive/10 px-4 py-3 text-sm text-primary-foreground ring-1 ring-destructive/20">
                   <p className="text-[0.64rem] font-semibold uppercase tracking-[0.18em] text-red-200">
-                    Rejection reason
+                    Rejection Reason
                   </p>
                   <p className="mt-2 leading-6 text-primary-foreground/75">
                     {student.rejectionReason}
@@ -353,7 +353,7 @@ function StudentReviewRequest({ student }: { student: StudentReviewItem }) {
           <div className="grid gap-3 md:grid-cols-[minmax(0,16rem)_minmax(0,1fr)] md:items-start lg:grid-cols-[minmax(0,18rem)_minmax(0,1fr)]">
             <div className="min-w-0">
               <p className="text-sm font-semibold text-primary-foreground">
-                Review decision
+                Review Decision
               </p>
               <p className="mt-0.5 text-xs leading-5 text-primary-foreground/65">
                 Approve verified students, or reject pending submissions with a

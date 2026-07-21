@@ -18,8 +18,8 @@ export const AUTH_MODE = {
 
 export const AUTH_MODE_CONFIG = {
   [AUTH_MODE.LOGIN]: {
-    eyebrow: "Choose access",
-    title: "Select your organizational entry point.",
+    eyebrow: "Choose Access",
+    title: "Select Your Organizational Entry Point",
     description:
       "Select your official organizational access to continue through the correct permission lane.",
     selectedDescription:
@@ -30,8 +30,8 @@ export const AUTH_MODE_CONFIG = {
     switchMode: AUTH_MODE.REGISTER,
   },
   [AUTH_MODE.REGISTER]: {
-    eyebrow: "Choose registration",
-    title: "Select your registration entry point.",
+    eyebrow: "Choose Registration",
+    title: "Select Your Registration Entry Point",
     description:
       "Select your official organizational access to register for the correct permission lane.",
     selectedDescription:
@@ -58,38 +58,38 @@ export const AUTH_MODE_CONFIG = {
 export const AUTH_ROLE_CONFIG = {
   [ROLE.STUDENT]: {
     label: "Student",
-    eyebrow: "Campus access",
+    eyebrow: "Campus Access",
     icon: GraduationCapIcon,
     title: {
-      [AUTH_MODE.LOGIN]: "Student sign in",
-      [AUTH_MODE.REGISTER]: "Request student access",
+      [AUTH_MODE.LOGIN]: "Student Sign In",
+      [AUTH_MODE.REGISTER]: "Request Student Access",
     },
   },
   [ROLE.INSTRUCTOR]: {
     label: "Instructor",
-    eyebrow: "Instructor desk",
+    eyebrow: "Instructor Desk",
     icon: PlaneIcon,
     title: {
-      [AUTH_MODE.LOGIN]: "Instructor sign in",
-      [AUTH_MODE.REGISTER]: "Create instructor access",
+      [AUTH_MODE.LOGIN]: "Instructor Sign In",
+      [AUTH_MODE.REGISTER]: "Create Instructor Access",
     },
   },
   [ROLE.ADMIN]: {
     label: "Admin",
-    eyebrow: "Department control",
+    eyebrow: "Department Control",
     icon: ShieldCheckIcon,
     title: {
-      [AUTH_MODE.LOGIN]: "Admin sign in",
-      [AUTH_MODE.REGISTER]: "Create department admin access",
+      [AUTH_MODE.LOGIN]: "Admin Sign In",
+      [AUTH_MODE.REGISTER]: "Create Department Admin Access",
     },
   },
   [ROLE.SUPERADMIN]: {
     label: "Superadmin",
-    eyebrow: "IT command",
+    eyebrow: "IT Command",
     icon: CrownIcon,
     title: {
-      [AUTH_MODE.LOGIN]: "Superadmin sign in",
-      [AUTH_MODE.REGISTER]: "Create superadmin access",
+      [AUTH_MODE.LOGIN]: "Superadmin Sign In",
+      [AUTH_MODE.REGISTER]: "Create Superadmin Access",
     },
   },
 } satisfies Record<

@@ -71,7 +71,7 @@ export function StudentRegisterForm() {
           <RegisterTextField
             error={errors.fullName}
             id="student-register-full-name"
-            label="Full name"
+            label="Full Name"
             placeholder="Doe, John S."
             registration={form.register("fullName")}
           />
@@ -94,17 +94,17 @@ export function StudentRegisterForm() {
         <RegisterPasswordField
           error={errors.confirmPassword}
           id="student-register-confirm-password"
-          label="Confirm password"
+          label="Confirm Password"
           placeholder="Re-enter your password"
           registration={form.register("confirmPassword")}
         />
       </RegisterFormSection>
-      <RegisterFormSection title="Student verification">
+      <RegisterFormSection title="Student Verification">
         <div className="grid gap-5 sm:grid-cols-2 sm:items-start sm:gap-3">
           <RegisterTextField
             error={errors.studentIdNumber}
             id="student-register-id-number"
-            label="Student ID number"
+            label="Student ID Number"
             placeholder="Student ID number"
             registration={form.register("studentIdNumber")}
           />
@@ -113,7 +113,7 @@ export function StudentRegisterForm() {
             errorText={errors.studentIdDocument?.message}
             helperText={studentIdDocumentHelperText}
             id="student-register-id-document"
-            label="Student ID image"
+            label="Student ID Image"
             onChange={(file) => {
               if (file) {
                 form.setValue("studentIdDocument", file, {

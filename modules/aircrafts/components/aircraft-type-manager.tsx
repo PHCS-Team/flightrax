@@ -45,7 +45,7 @@ export function AircraftTypeManager({
         <DialogSectionHeader
           description="Create and delete aircraft types used across the fleet."
           icon={PencilIcon}
-          title="Manage aircraft types"
+          title="Manage Aircraft Types"
         />
         <AircraftTypeList />
       </DialogContent>
@@ -179,7 +179,7 @@ function CreateTypeRow() {
         className="text-sm font-semibold text-foreground"
         htmlFor="new-type-name"
       >
-        Type name
+        Type Name
         <span className="ml-1 text-secondary">*</span>
       </label>
       <form className="flex items-center gap-2" onSubmit={handleSubmit}>
@@ -231,7 +231,7 @@ function DeleteTypeButton({ typeKey }: { typeKey: string }) {
         onConfirm={() => deleteType.execute({ typeKey })}
         onOpenChange={setConfirmOpen}
         open={confirmOpen}
-        title="Delete aircraft type?"
+        title="Delete Aircraft Type?"
       />
     </>
   );

@@ -143,7 +143,7 @@ export function AircraftsTable({
       },
       {
         accessorKey: "colorMarkings",
-        header: "Color / markings",
+        header: "Color / Markings",
         cell: ({ row }) => (
           <p className="max-w-80 whitespace-normal text-sm text-primary-foreground/80 line-clamp-3">
             {row.original.colorMarkings}
@@ -154,7 +154,7 @@ export function AircraftsTable({
         id: "weightBalance",
         header: () => (
           <span className="inline-flex items-center gap-1">
-            Weight & balance
+            Weight & Balance
             <Popover>
               <PopoverTrigger asChild>
                 <button
@@ -241,7 +241,7 @@ export function AircraftsTable({
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Edit aircraft</p>
+                  <p>Edit Aircraft</p>
                 </TooltipContent>
               </Tooltip>
               <Tooltip>
@@ -257,7 +257,7 @@ export function AircraftsTable({
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>View details</p>
+                  <p>View Details</p>
                 </TooltipContent>
               </Tooltip>
               <Tooltip>
@@ -273,7 +273,7 @@ export function AircraftsTable({
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Delete aircraft</p>
+                  <p>Delete Aircraft</p>
                 </TooltipContent>
               </Tooltip>
             </div>

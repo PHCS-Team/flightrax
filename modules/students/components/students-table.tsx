@@ -35,7 +35,7 @@ import type { ApprovedStudent } from "@/modules/students/types/student";
 const columns = [
   {
     accessorKey: "fullName",
-    header: "Student profile",
+    header: "Student Profile",
     cell: ({ row }) => {
       const student = row.original;
 

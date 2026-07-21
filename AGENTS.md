@@ -386,6 +386,57 @@ Interactive controls and text inputs that appear inside a dialog (including dial
 
 ---
 
+## Rule 17 — Text Capitalization
+
+All user-facing text must follow these capitalization rules by default. Do not rely on CSS `uppercase` to do the capitalization — use the correct case in JSX source.
+
+| Element | Convention | Examples |
+|---|---|---|
+| Dialog titles, page headers, section headers | **Title Case** (every word capitalized) | `"Change Password"`, `"Edit License Details"`, `"Student Verification"` |
+| Form labels | **Title Case** (every word capitalized) | `"Full Name"`, `"Student ID Number"`, `"License Type"` |
+| Tooltips | **Title Case** (every word capitalized) | `"Edit Aircraft"`, `"View Details"`, `"Delete Aircraft"` |
+| Button text | **Sentence case** (first word only) | `"Save changes"`, `"Delete student"`, `"Remove photo"` |
+| Confirmation dialog button labels | **Sentence case** | `"Delete aircraft"`, `"Keep photo"`, `"Stay signed in"` |
+| Placeholders | **Sentence case** or lowercase | `"Enter license number"`, `"Search name..."` |
+
+```tsx
+// ✅ CORRECT — headers and dialog titles
+<DialogSectionHeader title="Edit License Details" />
+<h2>Weight & Balance</h2>
+
+// ❌ WRONG — headers
+<DialogSectionHeader title="Edit license details" />
+<h2>Weight & balance</h2>
+
+// ✅ CORRECT — form labels
+<label>Full Name</label>
+<label>Student ID Number</label>
+
+// ❌ WRONG — form labels
+<label>Full name</label>
+<label>Student ID number</label>
+
+// ✅ CORRECT — buttons
+<Button>Save changes</Button>
+<Button>Cancel</Button>
+<Button>Delete student</Button>
+
+// ❌ WRONG — buttons
+<Button>Save Changes</Button>
+<Button>cancel</Button>
+<Button>delete student</Button>
+
+// ✅ CORRECT — tooltips
+<TooltipContent><p>Edit Aircraft</p></TooltipContent>
+
+// ❌ WRONG — tooltips
+<TooltipContent><p>edit aircraft</p></TooltipContent>
+```
+
+The `font-bold uppercase` classes may be added for visual styling, but the JSX source text itself must follow the rules above regardless.
+
+---
+
 ## When Adding a New Module
 
 Every new feature module must have all of these subdirectories created before any code is written:

@@ -73,7 +73,7 @@ export function AdminRegisterForm() {
           <RegisterTextField
             error={errors.fullName}
             id="admin-register-full-name"
-            label="Full name"
+            label="Full Name"
             placeholder="Doe, John S."
             registration={form.register("fullName")}
           />
@@ -96,7 +96,7 @@ export function AdminRegisterForm() {
         <RegisterPasswordField
           error={errors.confirmPassword}
           id="admin-register-confirm-password"
-          label="Confirm password"
+          label="Confirm Password"
           placeholder="Re-enter your password"
           registration={form.register("confirmPassword")}
         />

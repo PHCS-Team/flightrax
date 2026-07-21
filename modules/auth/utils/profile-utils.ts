@@ -8,7 +8,6 @@ import type { Profile } from "@/shared/lib/rbac/types";
 export function getProfileDetails(profile: Profile) {
   return [
     {
-      icon: "licenseType" as const,
       label: "License type",
       value:
         getLicenseTypeLabel(profile.license_type) ??
@@ -16,12 +15,10 @@ export function getProfileDetails(profile: Profile) {
         "Pending submission",
     },
     {
-      icon: "licenseNumber" as const,
       label: "License number",
       value: profile.license_number ?? "Pending submission",
     },
     {
-      icon: "rating" as const,
       label: "Rating",
       value:
         getRatingLabel(profile.rating) ??

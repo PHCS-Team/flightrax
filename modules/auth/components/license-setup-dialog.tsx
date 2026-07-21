@@ -21,7 +21,7 @@ export function LicenseSetupDialog({
         <DialogSectionHeader
           description="Complete your license profile before creating schedules or using flight operation tools."
           icon={IdCardIcon}
-          title="Set your license details"
+          title="Set Your License Details"
         />
         <LicenseSetupForm onSaved={() => onOpenChange?.(false)} />
       </DialogContent>
