@@ -190,6 +190,39 @@ export type Database = {
           },
         ]
       }
+      notams: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          expires_at: string | null
+          id: string
+          severity: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          expires_at?: string | null
+          id?: string
+          severity?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          expires_at?: string | null
+          id?: string
+          severity?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
