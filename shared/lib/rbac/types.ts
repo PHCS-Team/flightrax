@@ -18,9 +18,6 @@ export type StudentProfile =
 export type Profile = BaseProfile & {
   admin_department: AdminDepartment | null;
   approval_status: ApprovalStatus;
-  license_type: string | null;
-  license_number: string | null;
-  rating: string | null;
   profile_photo_url?: string | null;
   student_id_number?: string | null;
   id_document_path?: string | null;

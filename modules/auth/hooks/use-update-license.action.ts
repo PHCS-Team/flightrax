@@ -3,20 +3,20 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useAction } from "next-safe-action/hooks";
 
-import { updateStudentLicenseAction } from "@/modules/students/actions/update-student-license";
-import { STUDENTS_QUERY_KEYS } from "@/modules/students/queries/query-keys";
+import { updateLicenseAction } from "@/modules/auth/actions/update-license";
+import { LICENSE_QUERY_KEYS } from "@/modules/auth/queries/licenses";
 import { toastActionResult } from "@/shared/lib/action-toast";
 
-export function useUpdateStudentLicense({ onSaved }: { onSaved?: () => void } = {}) {
+export function useUpdateLicense({ onSaved }: { onSaved?: () => void } = {}) {
   const queryClient = useQueryClient();
 
-  return useAction(updateStudentLicenseAction, {
+  return useAction(updateLicenseAction, {
     onSuccess: ({ data }) => {
       toastActionResult(data);
 
       if (data?.ok) {
         queryClient.invalidateQueries({
-          queryKey: STUDENTS_QUERY_KEYS.all,
+          queryKey: LICENSE_QUERY_KEYS.all,
         });
         onSaved?.();
       }

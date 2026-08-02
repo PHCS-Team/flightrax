@@ -161,6 +161,50 @@ export type Database = {
           },
         ]
       }
+      certificates: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          image_content_type: string | null
+          image_path: string | null
+          image_size_bytes: number | null
+          image_uploaded_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          image_content_type?: string | null
+          image_path?: string | null
+          image_size_bytes?: number | null
+          image_uploaded_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          image_content_type?: string | null
+          image_path?: string | null
+          image_size_bytes?: number | null
+          image_uploaded_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "certificates_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       instructor_profiles: {
         Row: {
           created_at: string
@@ -185,6 +229,77 @@ export type Database = {
             foreignKeyName: "instructor_profiles_profile_id_fkey"
             columns: ["profile_id"]
             isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      licenses: {
+        Row: {
+          created_at: string
+          expiry_date: string | null
+          has_no_expiry: boolean
+          id: string
+          id_back_content_type: string | null
+          id_back_path: string | null
+          id_back_size_bytes: number | null
+          id_back_uploaded_at: string | null
+          id_front_content_type: string | null
+          id_front_path: string | null
+          id_front_size_bytes: number | null
+          id_front_uploaded_at: string | null
+          license_number: string
+          license_type: string
+          ratings: string[]
+          status: Database["public"]["Enums"]["license_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expiry_date?: string | null
+          has_no_expiry?: boolean
+          id?: string
+          id_back_content_type?: string | null
+          id_back_path?: string | null
+          id_back_size_bytes?: number | null
+          id_back_uploaded_at?: string | null
+          id_front_content_type?: string | null
+          id_front_path?: string | null
+          id_front_size_bytes?: number | null
+          id_front_uploaded_at?: string | null
+          license_number: string
+          license_type: string
+          ratings?: string[]
+          status?: Database["public"]["Enums"]["license_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expiry_date?: string | null
+          has_no_expiry?: boolean
+          id?: string
+          id_back_content_type?: string | null
+          id_back_path?: string | null
+          id_back_size_bytes?: number | null
+          id_back_uploaded_at?: string | null
+          id_front_content_type?: string | null
+          id_front_path?: string | null
+          id_front_size_bytes?: number | null
+          id_front_uploaded_at?: string | null
+          license_number?: string
+          license_type?: string
+          ratings?: string[]
+          status?: Database["public"]["Enums"]["license_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "licenses_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -229,13 +344,10 @@ export type Database = {
           email: string
           full_name: string
           id: string
-          license_number: string | null
-          license_type: string | null
           profile_photo_content_type: string | null
           profile_photo_path: string | null
           profile_photo_size_bytes: number | null
           profile_photo_uploaded_at: string | null
-          rating: string | null
           role: Database["public"]["Enums"]["app_role"]
           signature_svg: string | null
           updated_at: string
@@ -245,13 +357,10 @@ export type Database = {
           email: string
           full_name: string
           id: string
-          license_number?: string | null
-          license_type?: string | null
           profile_photo_content_type?: string | null
           profile_photo_path?: string | null
           profile_photo_size_bytes?: number | null
           profile_photo_uploaded_at?: string | null
-          rating?: string | null
           role: Database["public"]["Enums"]["app_role"]
           signature_svg?: string | null
           updated_at?: string
@@ -261,13 +370,10 @@ export type Database = {
           email?: string
           full_name?: string
           id?: string
-          license_number?: string | null
-          license_type?: string | null
           profile_photo_content_type?: string | null
           profile_photo_path?: string | null
           profile_photo_size_bytes?: number | null
           profile_photo_uploaded_at?: string | null
-          rating?: string | null
           role?: Database["public"]["Enums"]["app_role"]
           signature_svg?: string | null
           updated_at?: string
@@ -365,6 +471,7 @@ export type Database = {
       aircraft_status: "active" | "maintenance" | "grounded" | "retired"
       app_role: "student" | "instructor" | "admin" | "superadmin"
       approval_status: "pending" | "approved" | "rejected"
+      license_status: "active" | "expired"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -500,6 +607,7 @@ export const Constants = {
       aircraft_status: ["active", "maintenance", "grounded", "retired"],
       app_role: ["student", "instructor", "admin", "superadmin"],
       approval_status: ["pending", "approved", "rejected"],
+      license_status: ["active", "expired"],
     },
   },
 } as const

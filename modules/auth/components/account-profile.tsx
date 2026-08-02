@@ -6,12 +6,8 @@ import { AccountPasscodeSection } from "@/modules/auth/components/account-passco
 import { AccountSignatureSection } from "@/modules/auth/components/account-signature-section";
 import { ProfilePhotoUploader } from "@/modules/auth/components/profile-photo-uploader";
 import { parseDisplayName } from "@/modules/auth/utils/display-name";
-import {
-  getAdminDepartmentLabel,
-  getProfileDetails,
-} from "@/modules/auth/utils/profile-utils";
+import { getAdminDepartmentLabel } from "@/modules/auth/utils/profile-utils";
 import { getAvatarFallback } from "@/shared/lib/avatar-fallback";
-import { hasMissingLicenseDetails } from "@/shared/lib/aviation/license-options";
 import { GlassSurface } from "@/shared/components/layout/glass-surface";
 import { ROLE } from "@/shared/lib/rbac/config";
 import type { Profile } from "@/shared/lib/rbac/types";
@@ -24,10 +20,6 @@ import {
 
 export function AccountProfile({ profile }: { profile: Profile }) {
   const displayName = parseDisplayName(profile.full_name);
-  const profileDetails = getProfileDetails(profile);
-  const canSetLicenseDetails =
-    (profile.role === ROLE.STUDENT || profile.role === ROLE.INSTRUCTOR) &&
-    hasMissingLicenseDetails(profile);
 
   return (
     <>
@@ -73,11 +65,7 @@ export function AccountProfile({ profile }: { profile: Profile }) {
           </TabsList>
 
           <TabsContent value="profile" className="w-full space-y-6 sm:max-w-xl">
-            <AccountLicenseSection
-              canSetLicenseDetails={canSetLicenseDetails}
-              details={profileDetails}
-              role={profile.role}
-            />
+            <AccountLicenseSection />
             <AccountSignatureSection profile={profile} />
             {profile.role === ROLE.INSTRUCTOR && (
               <AccountPasscodeSection passcodeHash={profile.passcode_hash} />

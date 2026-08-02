@@ -7,6 +7,7 @@ import {
   type ColumnDef,
   type PaginationState,
 } from "@tanstack/react-table";
+import { useState } from "react";
 
 import {
   Avatar,
@@ -25,79 +26,10 @@ import {
   TableRow,
 } from "@/shared/components/ui/table";
 import { getAvatarFallback } from "@/shared/lib/avatar-fallback";
-import {
-  getLicenseTypeLabel,
-  getRatingLabel,
-} from "@/shared/lib/aviation/license-options";
-import { StudentLicenseEditDialog } from "@/modules/students/components/student-license-edit-dialog";
+import { LicenseTags } from "@/shared/components/license-tags";
+import { LicenseDetailsDialog } from "@/shared/components/license-details-dialog";
+import type { LicenseSummary } from "@/shared/types/license-summary";
 import type { ApprovedStudent } from "@/modules/students/types/student";
-
-const columns = [
-  {
-    accessorKey: "fullName",
-    header: "Student Profile",
-    cell: ({ row }) => {
-      const student = row.original;
-
-      return (
-        <div className="flex min-w-64 items-center gap-3">
-          <Avatar className="size-11" size="lg">
-            {student.profilePhotoUrl && (
-              <AvatarImage
-                alt={`${student.fullName} profile photo`}
-                src={student.profilePhotoUrl}
-              />
-            )}
-            <AvatarFallback className="bg-primary-foreground/15 text-primary-foreground">
-              {getAvatarFallback(student.fullName)}
-            </AvatarFallback>
-          </Avatar>
-          <div className="min-w-0">
-            <p className="truncate font-semibold text-primary-foreground">
-              {student.fullName}
-            </p>
-            <p className="text-sm text-primary-foreground/65">
-              ID Number: {student.studentIdNumber}
-            </p>
-          </div>
-        </div>
-      );
-    },
-  },
-  {
-    id: "license",
-    header: "License",
-    cell: ({ row }) => {
-      const student = row.original;
-      const licenseType =
-        getLicenseTypeLabel(student.licenseType) ?? student.licenseType;
-
-      return (
-        <div className="min-w-48">
-          <p className="font-medium text-primary-foreground">
-            {licenseType ?? "Not set"}
-          </p>
-          <p className="mt-1 text-sm text-primary-foreground/65">
-            {student.licenseNumber
-              ? `No. ${student.licenseNumber}`
-              : "No license number"}
-          </p>
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "rating",
-    header: "Rating",
-    cell: ({ row }) =>
-      getRatingLabel(row.original.rating) ?? row.original.rating ?? "Not set",
-  },
-  {
-    id: "actions",
-    header: "Actions",
-    cell: ({ row }) => <StudentLicenseEditDialog student={row.original} />,
-  },
-] satisfies ColumnDef<ApprovedStudent>[];
 
 export function StudentsTable({
   onPageChange,
@@ -118,6 +50,53 @@ export function StudentsTable({
   totalCount: number;
   totalPages: number;
 }) {
+  const [detailsLicense, setDetailsLicense] = useState<LicenseSummary | null>(
+    null,
+  );
+  const columns = [
+    {
+      accessorKey: "fullName",
+      header: "Student Profile",
+      cell: ({ row }) => {
+        const student = row.original;
+
+        return (
+          <div className="flex min-w-64 items-center gap-3">
+            <Avatar className="size-11" size="lg">
+              {student.profilePhotoUrl && (
+                <AvatarImage
+                  alt={`${student.fullName} profile photo`}
+                  src={student.profilePhotoUrl}
+                />
+              )}
+              <AvatarFallback className="bg-primary-foreground/15 text-primary-foreground">
+                {getAvatarFallback(student.fullName)}
+              </AvatarFallback>
+            </Avatar>
+            <div className="min-w-0">
+              <p className="truncate font-semibold text-primary-foreground">
+                {student.fullName}
+              </p>
+              <p className="text-sm text-primary-foreground/65">
+                ID Number: {student.studentIdNumber}
+              </p>
+            </div>
+          </div>
+        );
+      },
+    },
+    {
+      id: "licenses",
+      header: "Licenses",
+      cell: ({ row }) => (
+        <LicenseTags
+          licenses={row.original.licenses}
+          onLicenseClick={setDetailsLicense}
+        />
+      ),
+    },
+  ] satisfies ColumnDef<ApprovedStudent>[];
+
   const pagination: PaginationState = {
     pageIndex: page - 1,
     pageSize,
@@ -230,6 +209,18 @@ export function StudentsTable({
           </Button>
         </div>
       </div>
+
+      {detailsLicense && (
+        <LicenseDetailsDialog
+          license={detailsLicense}
+          onOpenChange={(open) => {
+            if (!open) {
+              setDetailsLicense(null);
+            }
+          }}
+          open
+        />
+      )}
     </GlassSurface>
   );
 }

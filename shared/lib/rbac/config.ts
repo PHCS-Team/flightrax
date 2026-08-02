@@ -64,6 +64,8 @@ const ROLE_PERMISSIONS = {
   [ROLE.ADMIN]: [
     ACCOUNT_VIEW,
     AIRCRAFTS_VIEW,
+    STUDENTS_VIEW,
+    STUDENTS_REVIEW,
     "notams.view",
     "schedule.view",
     "instructors.view",

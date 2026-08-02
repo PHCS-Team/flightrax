@@ -3,10 +3,6 @@ export const LICENSE_TYPE_VALUES = [
   "private_pilot_license",
   "commercial_pilot_license",
   "flight_instructor_license",
-  "radio_telephony_license",
-  "class_1_medical_certificate",
-  "class_2_medical_certificate",
-  "english_language_proficiency",
 ] as const;
 
 export const RATING_VALUES = [
@@ -23,10 +19,6 @@ export const LICENSE_TYPE_OPTIONS = [
   { value: "private_pilot_license", label: "Private Pilot License" },
   { value: "commercial_pilot_license", label: "Commercial Pilot License" },
   { value: "flight_instructor_license", label: "Flight Instructor License" },
-  { value: "radio_telephony_license", label: "Radio Telephony License" },
-  { value: "class_1_medical_certificate", label: "Class 1 Medical Certificate" },
-  { value: "class_2_medical_certificate", label: "Class 2 Medical Certificate" },
-  { value: "english_language_proficiency", label: "English Language Proficiency" },
 ] as const satisfies ReadonlyArray<{
   label: string;
   value: (typeof LICENSE_TYPE_VALUES)[number];
@@ -55,18 +47,18 @@ export function getRatingLabel(value: string | null) {
   return RATING_OPTIONS.find((option) => option.value === value)?.label ?? null;
 }
 
+export function getRatingsLabels(values: readonly string[] | null | undefined) {
+  if (!values || values.length === 0) {
+    return [];
+  }
+
+  return values.map((value) => getRatingLabel(value)).filter(Boolean);
+}
+
 export function isLicenseTypeValue(value: string | null): value is LicenseTypeValue {
   return LICENSE_TYPE_VALUES.some((option) => option === value);
 }
 
 export function isRatingValue(value: string | null): value is RatingValue {
   return RATING_VALUES.some((option) => option === value);
-}
-
-export function hasMissingLicenseDetails(profile: {
-  license_type: string | null;
-  license_number: string | null;
-  rating: string | null;
-}) {
-  return !profile.license_type || !profile.license_number || !profile.rating;
 }

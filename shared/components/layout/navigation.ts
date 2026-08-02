@@ -99,6 +99,8 @@ const ADMIN_NAVIGATION_ITEM_IDS = [
   "notams",
   "schedule",
   "instructors",
+  "students",
+  "studentReview",
 ] as const satisfies readonly DashboardNavigationItemId[];
 
 const SUPERADMIN_NAVIGATION_ITEM_IDS = [

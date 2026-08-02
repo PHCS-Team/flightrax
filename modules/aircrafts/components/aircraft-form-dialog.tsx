@@ -241,6 +241,7 @@ export function AircraftFormDialog({
 
           <ImageUploadField
             accept={AIRCRAFT_PHOTO_TYPES}
+            currentImageUrl={aircraft?.photoUrl ?? null}
             helperText={AIRCRAFT_PHOTO_HELPER_TEXT}
             id={`${dialogId}-photo`}
             label="Aircraft Image"

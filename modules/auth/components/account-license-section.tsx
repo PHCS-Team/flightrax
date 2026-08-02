@@ -1,93 +1,214 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
-import { IdCardIcon } from "lucide-react";
+import { format } from "date-fns";
+import { EyeIcon, IdCardIcon, PencilIcon, PlusIcon } from "lucide-react";
+import { useState } from "react";
 
-import { LicenseSetupForm } from "@/modules/auth/components/license-setup-form";
+import { LicenseDetailsDialog } from "@/shared/components/license-details-dialog";
+import { LicenseFormDialog } from "@/modules/auth/components/license-form-dialog";
+import { useLicenses } from "@/modules/auth/hooks/use-licenses.query";
+import type { License } from "@/shared/types/license";
+import {
+  getLicenseTypeLabel,
+  getRatingsLabels,
+} from "@/shared/lib/aviation/license-options";
+import { EmptyState } from "@/shared/components/layout/empty-state";
 import { GlassSurface } from "@/shared/components/layout/glass-surface";
-import { ROLE } from "@/shared/lib/rbac/config";
-import type { ProfileRole } from "@/shared/lib/rbac/types";
+import { LoadingScreen } from "@/shared/components/layout/loading-screen";
+import { Badge } from "@/shared/components/ui/badge";
+import { Button } from "@/shared/components/ui/button";
+import { cn } from "@/shared/lib/utils";
 
-type AccountLicenseDetail = {
-  label: string;
-  value: string;
-};
+const DARK_OUTLINE_BUTTON_CLASS =
+  "border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground";
 
-type AccountLicenseSectionProps = {
-  canSetLicenseDetails: boolean;
-  details: AccountLicenseDetail[];
-  role: ProfileRole;
-};
+function getStatusDetails(license: License) {
+  const todayIso = new Date().toISOString().slice(0, 10);
+  const isExpired =
+    license.status === "expired" ||
+    (license.expiry_date !== null && license.expiry_date < todayIso);
 
-const panelMotion = {
-  animate: { opacity: 1, y: 0, scale: 1 },
-  exit: { opacity: 0, y: -10, scale: 0.98 },
-  initial: { opacity: 0, y: 12, scale: 0.98 },
-  transition: { duration: 0.18, ease: "easeOut" },
-} as const;
+  return isExpired
+    ? {
+        label: "Expired",
+        className:
+          "border-destructive/35 bg-destructive/15 text-primary-foreground",
+      }
+    : {
+        label: "Active",
+        className: "border-success/40 bg-success/20 text-primary-foreground",
+      };
+}
 
-export function AccountLicenseSection({
-  canSetLicenseDetails,
-  details,
-  role,
-}: AccountLicenseSectionProps) {
+function formatExpiryDate(license: License) {
+  if (license.has_no_expiry || !license.expiry_date) {
+    return "No expiry";
+  }
+
+  return format(new Date(`${license.expiry_date}T00:00:00`), "MMM d, yyyy");
+}
+
+export function AccountLicenseSection() {
+  const { data, isPending, error } = useLicenses();
+  const [formDialogOpen, setFormDialogOpen] = useState(false);
+  const [editingLicense, setEditingLicense] = useState<License | null>(null);
+  const [detailsLicense, setDetailsLicense] = useState<License | null>(null);
+
+  if (isPending) {
+    return <LoadingScreen />;
+  }
+
+  if (error) {
+    return (
+      <EmptyState
+        description={error.message}
+        icon={<IdCardIcon className="size-7" />}
+        title="Licenses could not be loaded"
+      />
+    );
+  }
+
+  const licenses = data ?? [];
+
+  function openCreateDialog() {
+    setEditingLicense(null);
+    setFormDialogOpen(true);
+  }
+
+  function openEditDialog(license: License) {
+    setEditingLicense(license);
+    setFormDialogOpen(true);
+  }
+
   return (
-    <AnimatePresence mode="wait" initial={false}>
-      {canSetLicenseDetails ? (
-        <motion.div key="license-setup" {...panelMotion}>
-          <GlassSurface className="w-full p-6">
-            <div className="mb-5 flex items-center gap-3">
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary-foreground/10 text-primary-foreground">
-                <IdCardIcon className="size-5" />
-              </span>
-              <div>
-                <h2 className="text-xl font-semibold tracking-tight text-primary-foreground">
-                  Complete License Details
-                </h2>
-                <p className="mt-0.5 text-sm text-primary-foreground/70">
-                  {role === ROLE.STUDENT
-                    ? "You can set these details once. Ask an instructor to edit them later if needed."
-                    : "You can set these details once."}
-                </p>
-              </div>
-            </div>
-            <LicenseSetupForm surface="onPrimary" />
-          </GlassSurface>
-        </motion.div>
+    <div className="space-y-4">
+      {licenses.length === 0 ? (
+        <EmptyState
+          action={
+            <Button
+              className={DARK_OUTLINE_BUTTON_CLASS}
+              onClick={openCreateDialog}
+              type="button"
+              variant="outline"
+            >
+              <PlusIcon className="size-4" />
+              Add license
+            </Button>
+          }
+          description="You need at least one license on file to file flight plans. Add your license type, number, and ID photos."
+          icon={<IdCardIcon className="size-7" />}
+          title="No Licenses Yet"
+        />
       ) : (
-        <motion.div key="license-details" {...panelMotion}>
-          <GlassSurface className="overflow-hidden">
-            <div className="flex items-center gap-3 border-b border-primary-foreground/10 px-5 py-4 md:px-6 md:py-5">
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary-foreground/10 text-primary-foreground">
-                <IdCardIcon className="size-5" />
-              </span>
-              <div>
-                <h2 className="text-xl font-semibold tracking-tight text-primary-foreground">
-                  License Details
-                </h2>
-                <p className="mt-0.5 text-sm text-primary-foreground/70">
-                  Your current license information on file.
-                </p>
-              </div>
+        <GlassSurface className="overflow-hidden">
+          <div className="flex items-center gap-3 border-b border-primary-foreground/10 px-5 py-4 md:px-6 md:py-5">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary-foreground/10 text-primary-foreground">
+              <IdCardIcon className="size-5" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <h2 className="text-xl font-semibold tracking-tight text-primary-foreground">
+                Licenses
+              </h2>
+              <p className="mt-0.5 text-sm text-primary-foreground/70">
+                Your licenses and ratings on file.
+              </p>{" "}
             </div>
-            <div className="divide-y divide-primary-foreground/10">
-              {details.map((detail) => (
+            <Button
+              className={cn("shrink-0", DARK_OUTLINE_BUTTON_CLASS)}
+              onClick={openCreateDialog}
+              type="button"
+              variant="outline"
+            >
+              <PlusIcon className="size-4" />
+              Add license
+            </Button>
+          </div>
+
+          <div className="divide-y divide-primary-foreground/10">
+            {licenses.map((license) => {
+              const status = getStatusDetails(license);
+              const licenseTypeLabel =
+                getLicenseTypeLabel(license.license_type) ??
+                license.license_type;
+              const ratingLabels = getRatingsLabels(license.ratings);
+
+              return (
                 <div
-                  key={detail.label}
-                  className="px-5 py-4 md:px-6 md:py-5"
+                  className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between md:px-6 md:py-5"
+                  key={license.id}
                 >
-                  <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary-foreground/60">
-                    {detail.label}
-                  </p>
-                  <p className="mt-1 text-base font-semibold text-primary-foreground">
-                    {detail.value}
-                  </p>
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="truncate text-base font-semibold text-primary-foreground">
+                        {licenseTypeLabel}
+                      </p>
+                      <Badge
+                        className={cn(
+                          "h-6 shrink-0 gap-1.5 px-2.5 capitalize",
+                          status.className,
+                        )}
+                        variant="outline"
+                      >
+                        {status.label}
+                      </Badge>
+                    </div>
+                    <p className="mt-1 truncate text-sm text-primary-foreground/70">
+                      {license.license_number}
+                      {ratingLabels.length > 0 &&
+                        ` · ${ratingLabels.join(", ")}`}
+                      {` · Expires ${formatExpiryDate(license)}`}
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
+                    <Button
+                      className={DARK_OUTLINE_BUTTON_CLASS}
+                      onClick={() => setDetailsLicense(license)}
+                      type="button"
+                      variant="outline"
+                    >
+                      <EyeIcon className="size-4" />
+                      View details
+                    </Button>
+                    <Button
+                      className={DARK_OUTLINE_BUTTON_CLASS}
+                      onClick={() => openEditDialog(license)}
+                      type="button"
+                      variant="outline"
+                    >
+                      <PencilIcon className="size-4" />
+                      Edit
+                    </Button>
+                  </div>
                 </div>
-              ))}
-            </div>
-          </GlassSurface>
-        </motion.div>
+              );
+            })}
+          </div>
+        </GlassSurface>
       )}
-    </AnimatePresence>
+
+      <LicenseFormDialog
+        key={editingLicense?.id ?? "new"}
+        license={editingLicense}
+        onOpenChange={setFormDialogOpen}
+        open={formDialogOpen}
+      />
+
+      {detailsLicense && (
+        <LicenseDetailsDialog
+          license={detailsLicense}
+          onEdit={() => {
+            setEditingLicense(detailsLicense);
+            setDetailsLicense(null);
+            setFormDialogOpen(true);
+          }}
+          onOpenChange={(open) => {
+            if (!open) {
+              setDetailsLicense(null);
+            }
+          }}
+          open
+        />
+      )}
+    </div>
   );
 }

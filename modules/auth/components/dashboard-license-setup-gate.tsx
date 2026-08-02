@@ -5,33 +5,33 @@ import { useState } from "react";
 
 import { LicenseSetupDialog } from "@/modules/auth/components/license-setup-dialog";
 import { useDashboardProfile } from "@/modules/auth/hooks/use-dashboard-profile.query";
+import { useLicenses } from "@/modules/auth/hooks/use-licenses.query";
 import { ROLE } from "@/shared/lib/rbac/config";
-import { hasMissingLicenseDetails } from "@/shared/lib/aviation/license-options";
 
 export function DashboardLicenseSetupGate() {
   const pathname = usePathname();
   const { data: profile = null } = useDashboardProfile();
+  const { data: licenses, error, isPending } = useLicenses();
   const [dismissed, setDismissed] = useState(false);
+
   const shouldPrompt = Boolean(
     profile &&
       (profile.role === ROLE.STUDENT || profile.role === ROLE.INSTRUCTOR) &&
-      hasMissingLicenseDetails(profile) &&
+      !isPending &&
+      !error &&
+      licenses?.length === 0 &&
       pathname !== "/account" &&
       !dismissed,
   );
 
-  if (!shouldPrompt) {
-    return null;
-  }
-
   return (
     <LicenseSetupDialog
-      open={shouldPrompt}
       onOpenChange={(nextOpen) => {
         if (!nextOpen) {
           setDismissed(true);
         }
       }}
+      open={shouldPrompt}
     />
   );
 }
