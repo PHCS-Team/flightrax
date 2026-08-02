@@ -59,7 +59,6 @@ const ROLE_PERMISSIONS = {
     "instructors.view",
     "schedule.view",
     STUDENTS_VIEW,
-    STUDENTS_REVIEW,
   ],
   [ROLE.ADMIN]: [
     ACCOUNT_VIEW,

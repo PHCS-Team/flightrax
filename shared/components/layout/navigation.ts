@@ -91,7 +91,6 @@ const STUDENT_NAVIGATION_ITEM_IDS = [
 const INSTRUCTOR_NAVIGATION_ITEM_IDS = [
   ...STUDENT_NAVIGATION_ITEM_IDS,
   "students",
-  "studentReview",
 ] as const satisfies readonly DashboardNavigationItemId[];
 
 const ADMIN_NAVIGATION_ITEM_IDS = [
