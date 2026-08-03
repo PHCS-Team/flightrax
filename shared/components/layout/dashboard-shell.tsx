@@ -6,7 +6,13 @@ import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { useState } from "react";
 import { motion, type Variants } from "motion/react";
-import { BellIcon, MenuIcon, PlaneIcon, XIcon } from "lucide-react";
+import {
+  BellIcon,
+  ChevronDownIcon,
+  MenuIcon,
+  PlaneIcon,
+  XIcon,
+} from "lucide-react";
 
 import { useDashboardProfile } from "@/modules/auth/hooks/use-dashboard-profile.query";
 import {
@@ -16,7 +22,11 @@ import {
 } from "@/shared/components/ui/avatar";
 import { Button } from "@/shared/components/ui/button";
 import { FlightRaxBackground } from "@/shared/components/layout/flightrax-background";
-import { getDashboardNavigation } from "@/shared/components/layout/navigation";
+import {
+  getDashboardNavigation,
+  isNavigationGroup,
+  isNavigationItem,
+} from "@/shared/components/layout/navigation";
 import { appMetadata } from "@/shared/lib/app-metadata";
 import { getAvatarFallback } from "@/shared/lib/avatar-fallback";
 import { cn } from "@/shared/lib/utils";
@@ -82,7 +92,19 @@ export function DashboardShell({ children }: { children: ReactNode }) {
   const { data: profile = null } = useDashboardProfile();
   const [desktopCollapsed, setDesktopCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const navigationItems = getDashboardNavigation(profile);
+  const navigationSections = getDashboardNavigation(profile);
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
+    {},
+  );
+
+  const isGroupExpanded = (groupId: string) => expandedGroups[groupId] ?? true;
+
+  const toggleGroup = (groupId: string) => {
+    setExpandedGroups((prev) => ({
+      ...prev,
+      [groupId]: !(prev[groupId] ?? true),
+    }));
+  };
 
   return (
     <FlightRaxBackground>
@@ -160,47 +182,164 @@ export function DashboardShell({ children }: { children: ReactNode }) {
 
           <div className="mt-6 flex min-h-0 flex-1 flex-col gap-6">
             <nav className="grid gap-1">
-              {navigationItems.map((item) => {
-                const Icon = item.icon;
-                const active =
-                  pathname === item.href ||
-                  pathname.startsWith(`${item.href}/`);
+              {navigationSections.map((section) => {
+                if (isNavigationGroup(section)) {
+                  const groupId = section.id;
+                  const isExpanded = isGroupExpanded(groupId);
 
-                return (
-                  <Button
-                    key={item.href}
-                    asChild
-                    title={desktopCollapsed ? item.label : undefined}
-                    variant="ghost"
-                    className={cn(
-                      "justify-start gap-3 rounded-2xl text-primary-foreground/80 hover:bg-primary-foreground/10 hover:text-primary-foreground aria-expanded:bg-primary-foreground/10 aria-expanded:text-primary-foreground",
-                      active &&
-                        "bg-primary-foreground/15 text-primary-foreground shadow-sm ring-1 ring-primary-foreground/15",
-                      desktopCollapsed && "lg:justify-center lg:gap-0 lg:px-0",
-                    )}
-                  >
-                    <Link
-                      aria-current={active ? "page" : undefined}
-                      href={item.href}
-                      onClick={() => setMobileOpen(false)}
-                    >
-                      <Icon className="size-4 shrink-0" />
-                      <span className="lg:hidden">{item.label}</span>
-                      <motion.span
-                        animate={desktopCollapsed ? "collapsed" : "expanded"}
-                        aria-hidden={desktopCollapsed}
+                  return (
+                    <div key={groupId} className="space-y-1">
+                      <button
+                        type="button"
+                        onClick={() => toggleGroup(groupId)}
                         className={cn(
-                          "hidden overflow-hidden whitespace-nowrap lg:inline-block",
-                          desktopCollapsed ? "lg:w-0" : "lg:w-auto",
+                          "flex w-full cursor-pointer items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium transition-colors hover:bg-primary-foreground/10",
+                          "text-primary-foreground/60 hover:text-primary-foreground",
+                          desktopCollapsed && "lg:justify-center lg:px-0",
                         )}
-                        initial={false}
-                        variants={sidebarCopyVariants}
+                        aria-expanded={isExpanded}
                       >
-                        {item.label}
-                      </motion.span>
-                    </Link>
-                  </Button>
-                );
+                        {section.icon && (
+                          <section.icon className="size-4 shrink-0" />
+                        )}
+                        <span className="lg:hidden">{section.label}</span>
+                        <motion.span
+                          animate={desktopCollapsed ? "collapsed" : "expanded"}
+                          aria-hidden={desktopCollapsed}
+                          className={cn(
+                            "hidden overflow-hidden whitespace-nowrap lg:inline-block",
+                            desktopCollapsed ? "lg:w-0" : "lg:w-auto",
+                          )}
+                          initial={false}
+                          variants={sidebarCopyVariants}
+                        >
+                          {section.label}
+                        </motion.span>
+                        <ChevronDownIcon
+                          className={cn(
+                            "ml-auto size-4 shrink-0 transition-transform",
+                            isExpanded && "rotate-180",
+                            desktopCollapsed && "lg:hidden",
+                          )}
+                        />
+                      </button>
+
+                      <motion.div
+                        initial={false}
+                        animate={{
+                          height: isExpanded ? "auto" : 0,
+                          opacity: isExpanded ? 1 : 0,
+                        }}
+                        style={{ overflow: "hidden" }}
+                      >
+                        <div
+                          className={cn(
+                            "mt-1 ml-4 mr-1 space-y-0.5",
+                            desktopCollapsed && "lg:ml-0",
+                          )}
+                        >
+                          {section.items.map((item) => {
+                            const Icon = item.icon;
+                            const active =
+                              pathname === item.href ||
+                              pathname.startsWith(`${item.href}/`);
+
+                            return (
+                              <Button
+                                key={item.href}
+                                asChild
+                                title={
+                                  desktopCollapsed ? item.label : undefined
+                                }
+                                variant="ghost"
+                                className={cn(
+                                  "w-full justify-start gap-3 rounded-2xl text-primary-foreground/80 hover:bg-primary-foreground/10 hover:text-primary-foreground aria-expanded:bg-primary-foreground/10 aria-expanded:text-primary-foreground",
+                                  active &&
+                                    "bg-primary-foreground/15 text-primary-foreground shadow-sm ring-1 ring-primary-foreground/15",
+                                  desktopCollapsed &&
+                                    "lg:justify-center lg:gap-0 lg:px-0",
+                                )}
+                              >
+                                <Link
+                                  aria-current={active ? "page" : undefined}
+                                  href={item.href}
+                                  onClick={() => setMobileOpen(false)}
+                                >
+                                  <Icon className="size-4 shrink-0" />
+                                  <span className="lg:hidden">
+                                    {item.label}
+                                  </span>
+                                  <motion.span
+                                    animate={
+                                      desktopCollapsed
+                                        ? "collapsed"
+                                        : "expanded"
+                                    }
+                                    aria-hidden={desktopCollapsed}
+                                    className={cn(
+                                      "hidden overflow-hidden whitespace-nowrap lg:inline-block",
+                                      desktopCollapsed ? "lg:w-0" : "lg:w-auto",
+                                    )}
+                                    initial={false}
+                                    variants={sidebarCopyVariants}
+                                  >
+                                    {item.label}
+                                  </motion.span>
+                                </Link>
+                              </Button>
+                            );
+                          })}
+                        </div>
+                      </motion.div>
+                    </div>
+                  );
+                }
+
+                if (isNavigationItem(section)) {
+                  const Icon = section.icon;
+                  const active =
+                    pathname === section.href ||
+                    pathname.startsWith(`${section.href}/`);
+
+                  return (
+                    <Button
+                      key={section.href}
+                      asChild
+                      title={desktopCollapsed ? section.label : undefined}
+                      variant="ghost"
+                      className={cn(
+                        "justify-start gap-3 rounded-2xl text-primary-foreground/80 hover:bg-primary-foreground/10 hover:text-primary-foreground aria-expanded:bg-primary-foreground/10 aria-expanded:text-primary-foreground",
+                        active &&
+                          "bg-primary-foreground/15 text-primary-foreground shadow-sm ring-1 ring-primary-foreground/15",
+                        desktopCollapsed &&
+                          "lg:justify-center lg:gap-0 lg:px-0",
+                      )}
+                    >
+                      <Link
+                        aria-current={active ? "page" : undefined}
+                        href={section.href}
+                        onClick={() => setMobileOpen(false)}
+                      >
+                        <Icon className="size-4 shrink-0" />
+                        <span className="lg:hidden">{section.label}</span>
+                        <motion.span
+                          animate={desktopCollapsed ? "collapsed" : "expanded"}
+                          aria-hidden={desktopCollapsed}
+                          className={cn(
+                            "hidden overflow-hidden whitespace-nowrap lg:inline-block",
+                            desktopCollapsed ? "lg:w-0" : "lg:w-auto",
+                          )}
+                          initial={false}
+                          variants={sidebarCopyVariants}
+                        >
+                          {section.label}
+                        </motion.span>
+                      </Link>
+                    </Button>
+                  );
+                }
+
+                return null;
               })}
             </nav>
 

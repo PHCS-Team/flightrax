@@ -67,7 +67,7 @@ export function AccountProfile({ profile }: { profile: Profile }) {
           <TabsContent value="profile" className="w-full space-y-6 sm:max-w-xl">
             <AccountLicenseSection />
             <AccountSignatureSection profile={profile} />
-            {profile.role === ROLE.INSTRUCTOR && (
+            {(profile.role === ROLE.INSTRUCTOR || profile.role === ROLE.STUDENT) && (
               <AccountPasscodeSection passcodeHash={profile.passcode_hash} />
             )}
           </TabsContent>

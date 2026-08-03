@@ -3,8 +3,9 @@
 import { scryptSync, randomBytes } from "node:crypto";
 
 import { actionClient } from "@/shared/lib/safe-action";
+import { ROLE } from "@/shared/lib/rbac/config";
 import { createClient } from "@/shared/lib/supabase/server";
-import { passcodeSchema } from "@/modules/auth/schemas/instructor-passcode-schema";
+import { passcodeSchema } from "@/modules/auth/schemas/passcode-schema";
 
 export const savePasscodeAction = actionClient
   .inputSchema(passcodeSchema)
@@ -35,12 +36,38 @@ export const savePasscodeAction = actionClient
       }
     }
 
+    const {
+      data: profile,
+      error: profileError,
+    } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (profileError || !profile) {
+      return { ok: false, message: "Profile could not be loaded." };
+    }
+
+    if (
+      profile.role !== ROLE.STUDENT &&
+      profile.role !== ROLE.INSTRUCTOR
+    ) {
+      return {
+        ok: false,
+        message: "Passcodes are only available to students and instructors.",
+      };
+    }
+
     const salt = randomBytes(16).toString("hex");
     const hash = scryptSync(parsedInput.passcode, salt, 64).toString("hex");
     const stored = `${salt}:${hash}`;
 
+    const table =
+      profile.role === ROLE.STUDENT ? "student_profiles" : "instructor_profiles";
+
     const { error: updateError } = await supabase
-      .from("instructor_profiles")
+      .from(table)
       .update({ passcode_hash: stored })
       .eq("profile_id", user.id);
 

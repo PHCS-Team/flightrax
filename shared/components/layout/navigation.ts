@@ -7,11 +7,12 @@ import {
   PlaneIcon,
   UserCheckIcon,
   UsersIcon,
+  UsersRoundIcon,
   type LucideIcon,
 } from "lucide-react";
 
-import { ADMIN_DEPARTMENT, ROLE } from "@/shared/lib/rbac/config";
-import type { AdminDepartment, Profile } from "@/shared/lib/rbac/types";
+import { ROLE } from "@/shared/lib/rbac/config";
+import type { Profile } from "@/shared/lib/rbac/types";
 
 export type DashboardNavigationItemId =
   | "home"
@@ -29,6 +30,21 @@ export type DashboardNavigationItem = {
   id: DashboardNavigationItemId;
   label: string;
 };
+
+export type DashboardNavigationGroupId = "users";
+
+export type DashboardNavigationGroup = {
+  icon: LucideIcon;
+  id: DashboardNavigationGroupId;
+  items: readonly DashboardNavigationItem[];
+  label: string;
+};
+
+export type DashboardNavigationSection =
+  | DashboardNavigationItem
+  | DashboardNavigationGroup;
+
+export type DashboardNavigation = readonly DashboardNavigationSection[];
 
 const DASHBOARD_NAVIGATION_ITEMS = {
   home: {
@@ -81,71 +97,75 @@ const DASHBOARD_NAVIGATION_ITEMS = {
   },
 } satisfies Record<DashboardNavigationItemId, DashboardNavigationItem>;
 
-const STUDENT_NAVIGATION_ITEM_IDS = [
-  "home",
-  "flightDocuments",
-  "instructors",
-  "schedule",
-] as const satisfies readonly DashboardNavigationItemId[];
+const USERS_GROUP: DashboardNavigationGroup = {
+  id: "users",
+  icon: UsersRoundIcon,
+  label: "Users",
+  items: [
+    DASHBOARD_NAVIGATION_ITEMS.instructors,
+    DASHBOARD_NAVIGATION_ITEMS.students,
+    DASHBOARD_NAVIGATION_ITEMS.studentReview,
+  ],
+};
 
-const INSTRUCTOR_NAVIGATION_ITEM_IDS = [
-  ...STUDENT_NAVIGATION_ITEM_IDS,
-  "students",
-] as const satisfies readonly DashboardNavigationItemId[];
+const STUDENT_NAVIGATION: DashboardNavigation = [
+  DASHBOARD_NAVIGATION_ITEMS.home,
+  DASHBOARD_NAVIGATION_ITEMS.flightDocuments,
+  DASHBOARD_NAVIGATION_ITEMS.instructors,
+  DASHBOARD_NAVIGATION_ITEMS.schedule,
+];
 
-const ADMIN_NAVIGATION_ITEM_IDS = [
-  "aircrafts",
-  "notams",
-  "schedule",
-  "instructors",
-  "students",
-  "studentReview",
-] as const satisfies readonly DashboardNavigationItemId[];
+const INSTRUCTOR_NAVIGATION: DashboardNavigation = [
+  ...STUDENT_NAVIGATION,
+  DASHBOARD_NAVIGATION_ITEMS.students,
+];
 
-const SUPERADMIN_NAVIGATION_ITEM_IDS = [
-  ...INSTRUCTOR_NAVIGATION_ITEM_IDS,
-  "aircrafts",
-  "notams",
-] as const satisfies readonly DashboardNavigationItemId[];
+const ADMIN_NAVIGATION: DashboardNavigation = [
+  DASHBOARD_NAVIGATION_ITEMS.schedule,
+  USERS_GROUP,
+  DASHBOARD_NAVIGATION_ITEMS.aircrafts,
+  DASHBOARD_NAVIGATION_ITEMS.notams,
+];
 
-export const ADMIN_NAVIGATION_BY_DEPARTMENT = {
-  [ADMIN_DEPARTMENT.FLIGHT_OPERATIONS_PERSONNEL]: ADMIN_NAVIGATION_ITEM_IDS,
-  [ADMIN_DEPARTMENT.AIR_TRAFFIC_CONTROLLER]: ADMIN_NAVIGATION_ITEM_IDS,
-  [ADMIN_DEPARTMENT.SAFETY_PERSONNEL]: ADMIN_NAVIGATION_ITEM_IDS,
-} satisfies Record<AdminDepartment, readonly DashboardNavigationItemId[]>;
-
-function resolveItems(itemIds: readonly DashboardNavigationItemId[]) {
-  return itemIds.map((itemId) => DASHBOARD_NAVIGATION_ITEMS[itemId]);
-}
-
-export function getAdminNavigationItemIds(
-  department: AdminDepartment | null,
-) {
-  if (!department) {
-    return ADMIN_NAVIGATION_ITEM_IDS;
-  }
-
-  return ADMIN_NAVIGATION_BY_DEPARTMENT[department];
-}
+const SUPERADMIN_NAVIGATION: DashboardNavigation = [
+  DASHBOARD_NAVIGATION_ITEMS.home,
+  DASHBOARD_NAVIGATION_ITEMS.flightDocuments,
+  DASHBOARD_NAVIGATION_ITEMS.schedule,
+  USERS_GROUP,
+  DASHBOARD_NAVIGATION_ITEMS.aircrafts,
+  DASHBOARD_NAVIGATION_ITEMS.notams,
+];
 
 export function getDashboardNavigation(
-  profile: Pick<Profile, "admin_department" | "role"> | null,
-) {
+  profile: Pick<Profile, "role"> | null,
+): DashboardNavigation {
   if (!profile) {
     return [];
   }
 
   if (profile.role === ROLE.SUPERADMIN) {
-    return resolveItems(SUPERADMIN_NAVIGATION_ITEM_IDS);
+    return SUPERADMIN_NAVIGATION;
   }
 
   if (profile.role === ROLE.ADMIN) {
-    return resolveItems(getAdminNavigationItemIds(profile.admin_department));
+    return ADMIN_NAVIGATION;
   }
 
   if (profile.role === ROLE.INSTRUCTOR) {
-    return resolveItems(INSTRUCTOR_NAVIGATION_ITEM_IDS);
+    return INSTRUCTOR_NAVIGATION;
   }
 
-  return resolveItems(STUDENT_NAVIGATION_ITEM_IDS);
+  return STUDENT_NAVIGATION;
+}
+
+export function isNavigationItem(
+  section: DashboardNavigationSection,
+): section is DashboardNavigationItem {
+  return "href" in section;
+}
+
+export function isNavigationGroup(
+  section: DashboardNavigationSection,
+): section is DashboardNavigationGroup {
+  return !("href" in section);
 }

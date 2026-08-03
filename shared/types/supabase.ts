@@ -390,6 +390,7 @@ export type Database = {
           id_document_path: string | null
           id_document_size_bytes: number | null
           id_document_uploaded_at: string | null
+          passcode_hash: string | null
           profile_id: string
           rejected_at: string | null
           rejected_by: string | null
@@ -407,6 +408,7 @@ export type Database = {
           id_document_path?: string | null
           id_document_size_bytes?: number | null
           id_document_uploaded_at?: string | null
+          passcode_hash?: string | null
           profile_id: string
           rejected_at?: string | null
           rejected_by?: string | null
@@ -424,6 +426,7 @@ export type Database = {
           id_document_path?: string | null
           id_document_size_bytes?: number | null
           id_document_uploaded_at?: string | null
+          passcode_hash?: string | null
           profile_id?: string
           rejected_at?: string | null
           rejected_by?: string | null
