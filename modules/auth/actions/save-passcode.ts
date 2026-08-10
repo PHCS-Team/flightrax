@@ -3,7 +3,8 @@
 import { scryptSync, randomBytes } from "node:crypto";
 
 import { actionClient } from "@/shared/lib/safe-action";
-import { ROLE } from "@/shared/lib/rbac/config";
+import { canManagePasscode } from "@/shared/lib/rbac/config";
+import { createAdminClient } from "@/shared/lib/supabase/admin";
 import { createClient } from "@/shared/lib/supabase/server";
 import { passcodeSchema } from "@/modules/auth/schemas/passcode-schema";
 
@@ -49,10 +50,7 @@ export const savePasscodeAction = actionClient
       return { ok: false, message: "Profile could not be loaded." };
     }
 
-    if (
-      profile.role !== ROLE.STUDENT &&
-      profile.role !== ROLE.INSTRUCTOR
-    ) {
+    if (!canManagePasscode(profile.role)) {
       return {
         ok: false,
         message: "Passcodes are only available to students and instructors.",
@@ -63,13 +61,11 @@ export const savePasscodeAction = actionClient
     const hash = scryptSync(parsedInput.passcode, salt, 64).toString("hex");
     const stored = `${salt}:${hash}`;
 
-    const table =
-      profile.role === ROLE.STUDENT ? "student_profiles" : "instructor_profiles";
-
-    const { error: updateError } = await supabase
-      .from(table)
+    const adminSupabase = createAdminClient();
+    const { error: updateError } = await adminSupabase
+      .from("profiles")
       .update({ passcode_hash: stored })
-      .eq("profile_id", user.id);
+      .eq("id", user.id);
 
     if (updateError) {
       return { ok: false, message: updateError.message };

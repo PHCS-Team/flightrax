@@ -26,6 +26,12 @@ export const PUBLIC_AUTH_ROLES: ProfileRole[] = [
   ROLE.ADMIN,
 ];
 
+export const PASSCODE_ROLES: ProfileRole[] = [ROLE.STUDENT, ROLE.INSTRUCTOR];
+
+export function canManagePasscode(role: ProfileRole) {
+  return PASSCODE_ROLES.includes(role);
+}
+
 export const ADMIN_DEPARTMENT = {
   FLIGHT_OPERATIONS_PERSONNEL: "flight_operations_personnel",
   AIR_TRAFFIC_CONTROLLER: "air_traffic_controller",

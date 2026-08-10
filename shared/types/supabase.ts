@@ -208,19 +208,16 @@ export type Database = {
       instructor_profiles: {
         Row: {
           created_at: string
-          passcode_hash: string | null
           profile_id: string
           updated_at: string
         }
         Insert: {
           created_at?: string
-          passcode_hash?: string | null
           profile_id: string
           updated_at?: string
         }
         Update: {
           created_at?: string
-          passcode_hash?: string | null
           profile_id?: string
           updated_at?: string
         }
@@ -344,6 +341,7 @@ export type Database = {
           email: string
           full_name: string
           id: string
+          passcode_hash: string | null
           profile_photo_content_type: string | null
           profile_photo_path: string | null
           profile_photo_size_bytes: number | null
@@ -357,6 +355,7 @@ export type Database = {
           email: string
           full_name: string
           id: string
+          passcode_hash?: string | null
           profile_photo_content_type?: string | null
           profile_photo_path?: string | null
           profile_photo_size_bytes?: number | null
@@ -370,6 +369,7 @@ export type Database = {
           email?: string
           full_name?: string
           id?: string
+          passcode_hash?: string | null
           profile_photo_content_type?: string | null
           profile_photo_path?: string | null
           profile_photo_size_bytes?: number | null
@@ -390,7 +390,6 @@ export type Database = {
           id_document_path: string | null
           id_document_size_bytes: number | null
           id_document_uploaded_at: string | null
-          passcode_hash: string | null
           profile_id: string
           rejected_at: string | null
           rejected_by: string | null
@@ -408,7 +407,6 @@ export type Database = {
           id_document_path?: string | null
           id_document_size_bytes?: number | null
           id_document_uploaded_at?: string | null
-          passcode_hash?: string | null
           profile_id: string
           rejected_at?: string | null
           rejected_by?: string | null
@@ -426,7 +424,6 @@ export type Database = {
           id_document_path?: string | null
           id_document_size_bytes?: number | null
           id_document_uploaded_at?: string | null
-          passcode_hash?: string | null
           profile_id?: string
           rejected_at?: string | null
           rejected_by?: string | null

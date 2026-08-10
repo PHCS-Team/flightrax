@@ -19,7 +19,6 @@ type StudentProfileFields = Partial<
     | "id_document_path"
     | "id_document_size_bytes"
     | "id_document_uploaded_at"
-    | "passcode_hash"
     | "rejection_reason"
     | "student_id_number"
     | "submitted_at"
@@ -27,15 +26,10 @@ type StudentProfileFields = Partial<
 >;
 
 type AdminProfileFields = Pick<AdminProfileRow, "department">;
-type InstructorProfileFields = Pick<
-  Database["public"]["Tables"]["instructor_profiles"]["Row"],
-  "passcode_hash"
->;
 
 export type ProfileWithRoleProfiles = ProfileRow & {
   student_profiles: StudentProfileFields | null;
   admin_profiles: AdminProfileFields | null;
-  instructor_profiles: InstructorProfileFields | null;
 };
 
 export function getEffectiveApprovalStatus(
@@ -76,10 +70,7 @@ export function normalizeProfile(
     profile_photo_uploaded_at: row.profile_photo_uploaded_at,
     profile_photo_url: profilePhotoUrl,
     signature_svg: row.signature_svg,
-    passcode_hash:
-      row.role === ROLE.STUDENT
-        ? (row.student_profiles?.passcode_hash ?? null)
-        : (row.instructor_profiles?.passcode_hash ?? null),
+    passcode_hash: row.passcode_hash,
     role: row.role,
     created_at: row.created_at,
     updated_at: row.updated_at,

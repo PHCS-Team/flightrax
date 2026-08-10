@@ -9,7 +9,7 @@ import { parseDisplayName } from "@/modules/auth/utils/display-name";
 import { getAdminDepartmentLabel } from "@/modules/auth/utils/profile-utils";
 import { getAvatarFallback } from "@/shared/lib/avatar-fallback";
 import { GlassSurface } from "@/shared/components/layout/glass-surface";
-import { ROLE } from "@/shared/lib/rbac/config";
+import { canManagePasscode, ROLE } from "@/shared/lib/rbac/config";
 import type { Profile } from "@/shared/lib/rbac/types";
 import {
   Tabs,
@@ -67,7 +67,7 @@ export function AccountProfile({ profile }: { profile: Profile }) {
           <TabsContent value="profile" className="w-full space-y-6 sm:max-w-xl">
             <AccountLicenseSection />
             <AccountSignatureSection profile={profile} />
-            {(profile.role === ROLE.INSTRUCTOR || profile.role === ROLE.STUDENT) && (
+            {canManagePasscode(profile.role) && (
               <AccountPasscodeSection passcodeHash={profile.passcode_hash} />
             )}
           </TabsContent>
