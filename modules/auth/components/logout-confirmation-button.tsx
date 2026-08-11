@@ -2,6 +2,7 @@
 
 import type { ComponentProps } from "react";
 import { useState, useTransition } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { LogOutIcon } from "lucide-react";
 
 import { logoutAction } from "@/modules/auth/actions/logout";
@@ -21,8 +22,10 @@ export function LogoutConfirmationButton({
 }) {
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const queryClient = useQueryClient();
 
   function confirmLogout() {
+    queryClient.clear();
     startTransition(() => {
       void logoutAction();
     });

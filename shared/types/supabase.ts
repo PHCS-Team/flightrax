@@ -243,34 +243,43 @@ export type Database = {
       certificates: {
         Row: {
           created_at: string
-          description: string
+          description: string | null
+          expiry_date: string | null
+          has_no_expiry: boolean
           id: string
           image_content_type: string | null
           image_path: string | null
           image_size_bytes: number | null
           image_uploaded_at: string | null
+          title: string
           updated_at: string
           user_id: string
         }
         Insert: {
           created_at?: string
-          description: string
+          description?: string | null
+          expiry_date?: string | null
+          has_no_expiry?: boolean
           id?: string
           image_content_type?: string | null
           image_path?: string | null
           image_size_bytes?: number | null
           image_uploaded_at?: string | null
+          title: string
           updated_at?: string
           user_id: string
         }
         Update: {
           created_at?: string
-          description?: string
+          description?: string | null
+          expiry_date?: string | null
+          has_no_expiry?: boolean
           id?: string
           image_content_type?: string | null
           image_path?: string | null
           image_size_bytes?: number | null
           image_uploaded_at?: string | null
+          title?: string
           updated_at?: string
           user_id?: string
         }

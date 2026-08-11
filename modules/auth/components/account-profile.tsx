@@ -1,5 +1,7 @@
 import { MailIcon } from "lucide-react";
 
+import { AccountCertificateSection } from "@/modules/auth/components/account-certificate-section";
+import { AccountCredentialsSummary } from "@/modules/auth/components/account-credentials-summary";
 import { AccountLicenseSection } from "@/modules/auth/components/account-license-section";
 import { AccountLogSection } from "@/modules/auth/components/account-log-section";
 import { AccountPasscodeSection } from "@/modules/auth/components/account-passcode-section";
@@ -61,15 +63,29 @@ export function AccountProfile({ profile }: { profile: Profile }) {
         <Tabs defaultValue="profile" className="gap-0 sm:gap-3">
           <TabsList className="w-full justify-start border-x-0 md:w-fit md:border-x border-y border-primary-foreground/15 p-1.5">
             <TabsTrigger value="profile">Profile</TabsTrigger>
+            <TabsTrigger value="credentials">Documents</TabsTrigger>
             <TabsTrigger value="log">Log</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="profile" className="w-full space-y-6 sm:max-w-xl">
+          <TabsContent
+            value="profile"
+            className="w-full space-y-1.5 sm:space-y-6"
+          >
+            <AccountCredentialsSummary />
+            <div className="grid gap-1.5 sm:gap-6 lg:grid-cols-2 lg:items-start">
+              <AccountSignatureSection profile={profile} />
+              {canManagePasscode(profile.role) && (
+                <AccountPasscodeSection passcodeHash={profile.passcode_hash} />
+              )}
+            </div>
+          </TabsContent>
+
+          <TabsContent
+            value="credentials"
+            className="w-full space-y-1.5 sm:space-y-6"
+          >
             <AccountLicenseSection />
-            <AccountSignatureSection profile={profile} />
-            {canManagePasscode(profile.role) && (
-              <AccountPasscodeSection passcodeHash={profile.passcode_hash} />
-            )}
+            <AccountCertificateSection />
           </TabsContent>
 
           <TabsContent value="log">

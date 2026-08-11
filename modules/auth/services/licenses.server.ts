@@ -2,10 +2,7 @@ import "server-only";
 
 import { cache } from "react";
 
-import type {
-  License,
-  LicenseImageUrls,
-} from "@/shared/types/license";
+import type { License, LicenseImageUrls } from "@/shared/types/license";
 import { LICENSE_IMAGES_BUCKET } from "@/shared/lib/storage/buckets";
 import { createClient } from "@/shared/lib/supabase/server";
 
@@ -18,9 +15,18 @@ export const getOwnLicenses = cache(async function getOwnLicenses(): Promise<
   License[]
 > {
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return [];
+  }
+
   const { data, error } = await supabase
     .from("licenses")
     .select(OWN_LICENSE_SELECT)
+    .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
   if (error) {

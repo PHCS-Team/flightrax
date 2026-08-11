@@ -1,17 +1,13 @@
 "use client";
 
 import { format } from "date-fns";
-import { EyeIcon, IdCardIcon, PencilIcon, PlusIcon } from "lucide-react";
+import { AwardIcon, EyeIcon, PencilIcon, PlusIcon } from "lucide-react";
 import { useState } from "react";
 
-import { LicenseDetailsDialog } from "@/shared/components/license-details-dialog";
-import { LicenseFormDialog } from "@/modules/auth/components/license-form-dialog";
-import { useLicenses } from "@/modules/auth/hooks/use-licenses.query";
-import type { License } from "@/shared/types/license";
-import {
-  getLicenseTypeLabel,
-  getRatingsLabels,
-} from "@/shared/lib/aviation/license-options";
+import { CertificateDetailsDialog } from "@/modules/auth/components/certificate-details-dialog";
+import { CertificateFormDialog } from "@/modules/auth/components/certificate-form-dialog";
+import { useCertificates } from "@/modules/auth/hooks/use-certificates.query";
+import type { Certificate } from "@/modules/auth/types/certificate";
 import { EmptyState } from "@/shared/components/layout/empty-state";
 import { GlassSurface } from "@/shared/components/layout/glass-surface";
 import { LoadingScreen } from "@/shared/components/layout/loading-screen";
@@ -22,11 +18,10 @@ import { cn } from "@/shared/lib/utils";
 const DARK_OUTLINE_BUTTON_CLASS =
   "border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground";
 
-function getStatusDetails(license: License) {
+function getStatusDetails(certificate: Certificate) {
   const todayIso = new Date().toISOString().slice(0, 10);
   const isExpired =
-    license.status === "expired" ||
-    (license.expiry_date !== null && license.expiry_date < todayIso);
+    certificate.expiry_date !== null && certificate.expiry_date < todayIso;
 
   return isExpired
     ? {
@@ -40,19 +35,21 @@ function getStatusDetails(license: License) {
       };
 }
 
-function formatExpiryDate(license: License) {
-  if (license.has_no_expiry || !license.expiry_date) {
+function formatExpiryDate(certificate: Certificate) {
+  if (certificate.has_no_expiry || !certificate.expiry_date) {
     return "No expiry";
   }
 
-  return format(new Date(`${license.expiry_date}T00:00:00`), "MMM d, yyyy");
+  return format(new Date(`${certificate.expiry_date}T00:00:00`), "MMM d, yyyy");
 }
 
-export function AccountLicenseSection() {
-  const { data, isPending, error } = useLicenses();
+export function AccountCertificateSection() {
+  const { data, isPending, error } = useCertificates();
   const [formDialogOpen, setFormDialogOpen] = useState(false);
-  const [editingLicense, setEditingLicense] = useState<License | null>(null);
-  const [detailsLicense, setDetailsLicense] = useState<License | null>(null);
+  const [editingCertificate, setEditingCertificate] =
+    useState<Certificate | null>(null);
+  const [detailsCertificate, setDetailsCertificate] =
+    useState<Certificate | null>(null);
 
   if (isPending) {
     return <LoadingScreen />;
@@ -62,27 +59,27 @@ export function AccountLicenseSection() {
     return (
       <EmptyState
         description={error.message}
-        icon={<IdCardIcon className="size-7" />}
-        title="Licenses could not be loaded"
+        icon={<AwardIcon className="size-7" />}
+        title="Certificates could not be loaded"
       />
     );
   }
 
-  const licenses = data ?? [];
+  const certificates = data ?? [];
 
   function openCreateDialog() {
-    setEditingLicense(null);
+    setEditingCertificate(null);
     setFormDialogOpen(true);
   }
 
-  function openEditDialog(license: License) {
-    setEditingLicense(license);
+  function openEditDialog(certificate: Certificate) {
+    setEditingCertificate(certificate);
     setFormDialogOpen(true);
   }
 
   return (
     <div className="space-y-4">
-      {licenses.length === 0 ? (
+      {certificates.length === 0 ? (
         <EmptyState
           action={
             <Button
@@ -92,26 +89,26 @@ export function AccountLicenseSection() {
               variant="outline"
             >
               <PlusIcon className="size-4" />
-              Add license
+              Add certificate
             </Button>
           }
-          description="You need at least one license on file to file flight plans. Add your license type, number, and ID photos."
-          icon={<IdCardIcon className="size-7" />}
-          title="No Licenses Yet"
+          description="Keep your training records complete by adding your certificates with an image and expiry date."
+          icon={<AwardIcon className="size-7" />}
+          title="No Certificates Yet"
         />
       ) : (
         <GlassSurface className="overflow-hidden">
           <div className="flex items-center gap-3 border-b border-primary-foreground/10 px-5 py-4 md:px-6 md:py-5">
             <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary-foreground/10 text-primary-foreground">
-              <IdCardIcon className="size-5" />
+              <AwardIcon className="size-5" />
             </span>
             <div className="min-w-0 flex-1">
               <h2 className="text-xl font-semibold tracking-tight text-primary-foreground">
-                Licenses
+                Certificates
               </h2>
               <p className="mt-0.5 text-sm text-primary-foreground/70">
-                Your licenses and ratings on file.
-              </p>{" "}
+                Your certificates on file.
+              </p>
             </div>
             <Button
               className={cn("shrink-0", DARK_OUTLINE_BUTTON_CLASS)}
@@ -121,28 +118,24 @@ export function AccountLicenseSection() {
               variant="outline"
             >
               <PlusIcon className="size-4" />
-              <span className="hidden sm:inline">Add license</span>
+              <span className="hidden sm:inline">Add certificate</span>
               <span className="sm:hidden">Add</span>
             </Button>
           </div>
 
           <div className="divide-y divide-primary-foreground/10">
-            {licenses.map((license) => {
-              const status = getStatusDetails(license);
-              const licenseTypeLabel =
-                getLicenseTypeLabel(license.license_type) ??
-                license.license_type;
-              const ratingLabels = getRatingsLabels(license.ratings);
+            {certificates.map((certificate) => {
+              const status = getStatusDetails(certificate);
 
               return (
                 <div
                   className="flex items-center justify-between gap-3 px-5 py-4 md:px-6 md:py-5"
-                  key={license.id}
+                  key={certificate.id}
                 >
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
                       <p className="truncate text-base font-semibold text-primary-foreground">
-                        {licenseTypeLabel}
+                        {certificate.title}
                       </p>
                       <Badge
                         className={cn(
@@ -155,16 +148,14 @@ export function AccountLicenseSection() {
                       </Badge>
                     </div>
                     <p className="mt-1 truncate text-sm text-primary-foreground/70">
-                      {license.license_number}
-                      {ratingLabels.length > 0 &&
-                        ` · ${ratingLabels.join(", ")}`}
-                      {` · Expires ${formatExpiryDate(license)}`}
+                      {certificate.description && `${certificate.description} · `}
+                      Expires {formatExpiryDate(certificate)}
                     </p>
                   </div>
                   <div className="flex shrink-0 gap-2">
                     <Button
                       className={DARK_OUTLINE_BUTTON_CLASS}
-                      onClick={() => setDetailsLicense(license)}
+                      onClick={() => setDetailsCertificate(certificate)}
                       size="sm"
                       type="button"
                       variant="outline"
@@ -174,7 +165,7 @@ export function AccountLicenseSection() {
                     </Button>
                     <Button
                       className={DARK_OUTLINE_BUTTON_CLASS}
-                      onClick={() => openEditDialog(license)}
+                      onClick={() => openEditDialog(certificate)}
                       size="sm"
                       type="button"
                       variant="outline"
@@ -190,24 +181,24 @@ export function AccountLicenseSection() {
         </GlassSurface>
       )}
 
-      <LicenseFormDialog
-        key={editingLicense?.id ?? "new"}
-        license={editingLicense}
+      <CertificateFormDialog
+        key={editingCertificate?.id ?? "new"}
+        certificate={editingCertificate}
         onOpenChange={setFormDialogOpen}
         open={formDialogOpen}
       />
 
-      {detailsLicense && (
-        <LicenseDetailsDialog
-          license={detailsLicense}
+      {detailsCertificate && (
+        <CertificateDetailsDialog
+          certificate={detailsCertificate}
           onEdit={() => {
-            setEditingLicense(detailsLicense);
-            setDetailsLicense(null);
+            setEditingCertificate(detailsCertificate);
+            setDetailsCertificate(null);
             setFormDialogOpen(true);
           }}
-          onOpenChange={(open) => {
-            if (!open) {
-              setDetailsLicense(null);
+          onOpenChange={(nextOpen) => {
+            if (!nextOpen) {
+              setDetailsCertificate(null);
             }
           }}
           open
