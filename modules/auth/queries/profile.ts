@@ -9,11 +9,11 @@ import { createClient } from "@/shared/lib/supabase/server";
 import type { Profile } from "@/shared/lib/rbac/types";
 
 const PROFILE_DETAIL_SELECT =
-  "*, student_profiles!student_profiles_profile_id_fkey(approval_status, id_document_content_type, id_document_path, id_document_size_bytes, id_document_uploaded_at, rejection_reason, student_id_number, submitted_at), admin_profiles!admin_profiles_profile_id_fkey(department)";
+  "*, account_requests!account_requests_profile_id_fkey(approval_status, id_document_content_type, id_document_path, id_document_size_bytes, id_document_uploaded_at, id_number, rejection_reason, submitted_at), admin_profiles!admin_profiles_profile_id_fkey(department)";
 const PROFILE_VIEWER_SELECT =
-  "*, student_profiles!student_profiles_profile_id_fkey(approval_status), admin_profiles!admin_profiles_profile_id_fkey(department)";
+  "*, account_requests!account_requests_profile_id_fkey(approval_status), admin_profiles!admin_profiles_profile_id_fkey(department)";
 const PROFILE_ACCESS_SELECT =
-  "id, email, full_name, role, created_at, updated_at, signature_svg, passcode_hash, profile_photo_path, profile_photo_content_type, profile_photo_size_bytes, profile_photo_uploaded_at, student_profiles!student_profiles_profile_id_fkey(approval_status), admin_profiles!admin_profiles_profile_id_fkey(department)";
+  "id, email, full_name, role, created_at, updated_at, signature_svg, passcode_hash, profile_photo_path, profile_photo_content_type, profile_photo_size_bytes, profile_photo_uploaded_at, account_requests!account_requests_profile_id_fkey(approval_status), admin_profiles!admin_profiles_profile_id_fkey(department)";
 
 function getPublicProfilePhotoUrl(
   supabase: Awaited<ReturnType<typeof createClient>>,
@@ -31,15 +31,15 @@ function toProfile(
   {
     supabase,
     includeProfilePhotoUrl = true,
-    includeStudentDocuments = true,
+    includeRequestDetails = true,
   }: {
     supabase: Awaited<ReturnType<typeof createClient>>;
     includeProfilePhotoUrl?: boolean;
-    includeStudentDocuments?: boolean;
+    includeRequestDetails?: boolean;
   },
 ): Profile {
   return normalizeProfile(row, {
-    includeStudentDocuments,
+    includeRequestDetails,
     profilePhotoUrl: includeProfilePhotoUrl
       ? getPublicProfilePhotoUrl(supabase, row.profile_photo_path)
       : null,
@@ -118,7 +118,7 @@ export const getProfileAccessByUserId = cache(
     return toProfile(data, {
       supabase,
       includeProfilePhotoUrl: false,
-      includeStudentDocuments: false,
+      includeRequestDetails: false,
     });
   },
 );
@@ -140,6 +140,6 @@ const getDashboardProfileByUserId = cache(
       return null;
     }
 
-    return toProfile(data, { supabase, includeStudentDocuments: false });
+    return toProfile(data, { supabase, includeRequestDetails: false });
   },
 );

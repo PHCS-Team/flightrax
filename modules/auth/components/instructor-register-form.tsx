@@ -4,14 +4,16 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAction } from "next-safe-action/hooks";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 
 import { registerInstructorAction } from "@/modules/auth/actions/register-instructor";
+import { AccountVerificationFields } from "@/modules/auth/components/account-verification-fields";
 import {
   RegisterFormSection,
   RegisterPasswordField,
   RegisterTextField,
 } from "@/modules/auth/components/register-form-parts";
+import { ACCOUNT_REQUEST_COPY } from "@/modules/auth/utils/account-request-copy";
 import { instructorRegisterSchema } from "@/modules/auth/schemas/register-schema";
 import type { InstructorRegisterInput } from "@/modules/auth/types/auth";
 import {
@@ -32,6 +34,7 @@ export function InstructorRegisterForm() {
       password: "",
       confirmPassword: "",
       fullName: "",
+      idNumber: "",
     },
   });
   const { execute, isExecuting } = useAction(registerInstructorAction, {
@@ -44,6 +47,10 @@ export function InstructorRegisterForm() {
     },
   });
   const errors = form.formState.errors;
+  const idDocument = useWatch({
+    control: form.control,
+    name: "idDocument",
+  });
 
   return (
     <form
@@ -88,12 +95,37 @@ export function InstructorRegisterForm() {
           registration={form.register("confirmPassword")}
         />
       </RegisterFormSection>
+      <RegisterFormSection
+        title={ACCOUNT_REQUEST_COPY[ROLE.INSTRUCTOR].sectionTitle}
+      >
+        <AccountVerificationFields
+          idDocument={idDocument ?? null}
+          idDocumentError={errors.idDocument?.message}
+          idNumberError={errors.idNumber}
+          idNumberRegistration={form.register("idNumber")}
+          idPrefix="instructor-register"
+          onIdDocumentChange={(file) => {
+            if (file) {
+              form.setValue("idDocument", file, {
+                shouldValidate: true,
+              });
+              return;
+            }
+
+            form.unregister("idDocument");
+            void form.trigger("idDocument");
+          }}
+          role={ROLE.INSTRUCTOR}
+        />
+      </RegisterFormSection>
       <Button
         className="mt-3 h-12 w-full px-7 font-bold uppercase"
         disabled={isExecuting}
         type="submit"
       >
-        {isExecuting ? "Creating account..." : "Create instructor account"}
+        {isExecuting
+          ? "Submitting request..."
+          : "Submit instructor registration"}
       </Button>
       <p className="text-center text-sm text-primary-foreground/70">
         {modeConfig.switchPrompt}{" "}

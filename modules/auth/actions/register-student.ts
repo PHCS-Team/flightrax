@@ -1,12 +1,10 @@
 "use server";
 
 import { actionClient } from "@/shared/lib/safe-action";
-import { APPROVAL_STATUS, ROLE } from "@/shared/lib/rbac/config";
-import { createAdminClient } from "@/shared/lib/supabase/admin";
+import { ROLE } from "@/shared/lib/rbac/config";
 import { studentRegisterSchema } from "@/modules/auth/schemas/register-schema";
 import { registerBaseProfile } from "@/modules/auth/actions/register-base";
-import { getStudentIdDocumentPath } from "@/modules/auth/utils/student-document";
-import { STUDENT_DOCUMENT_BUCKET } from "@/shared/lib/storage/buckets";
+import { submitAccountRequest } from "@/modules/auth/services/account-request.server";
 
 export const registerStudentAction = actionClient
   .inputSchema(studentRegisterSchema)
@@ -30,40 +28,15 @@ export const registerStudentAction = actionClient
       };
     }
 
-    const adminSupabase = createAdminClient();
-    const documentPath = getStudentIdDocumentPath(data.user.id, parsedInput.studentIdDocument.type);
-    const { error: uploadError } = await adminSupabase.storage
-      .from(STUDENT_DOCUMENT_BUCKET)
-      .upload(documentPath, parsedInput.studentIdDocument, {
-        contentType: parsedInput.studentIdDocument.type,
-        upsert: false,
-      });
+    const requestError = await submitAccountRequest({
+      userId: data.user.id,
+      role: ROLE.STUDENT,
+      idNumber: parsedInput.idNumber,
+      idDocument: parsedInput.idDocument,
+    });
 
-    if (uploadError) {
-      return { ok: false, message: uploadError.message };
-    }
-
-    const now = new Date().toISOString();
-    const { error: studentProfileError } = await adminSupabase
-      .from("student_profiles")
-      .update({
-        student_id_number: parsedInput.studentIdNumber,
-        id_document_path: documentPath,
-        id_document_content_type: parsedInput.studentIdDocument.type,
-        id_document_size_bytes: parsedInput.studentIdDocument.size,
-        id_document_uploaded_at: now,
-        submitted_at: now,
-        approval_status: APPROVAL_STATUS.PENDING,
-        approved_at: null,
-        approved_by: null,
-        rejected_at: null,
-        rejected_by: null,
-        rejection_reason: null,
-      })
-      .eq("profile_id", data.user.id);
-
-    if (studentProfileError) {
-      return { ok: false, message: studentProfileError.message };
+    if (requestError) {
+      return { ok: false, message: requestError };
     }
 
     return {

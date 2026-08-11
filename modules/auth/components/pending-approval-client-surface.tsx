@@ -4,9 +4,13 @@ import { useState, type ComponentProps } from "react";
 
 import { AuthShell } from "@/modules/auth/components/auth-shell";
 import { LogoutConfirmationButton } from "@/modules/auth/components/logout-confirmation-button";
-import { RejectedStudentResubmissionForm } from "@/modules/auth/components/rejected-student-resubmission-form";
+import { RejectedAccountResubmissionForm } from "@/modules/auth/components/rejected-account-resubmission-form";
 import { Button } from "@/shared/components/ui/button";
-import { APPROVAL_STATUS, ROLE } from "@/shared/lib/rbac/config";
+import {
+  APPROVAL_STATUS,
+  ROLE_LABELS,
+  requiresAccountApproval,
+} from "@/shared/lib/rbac/config";
 import type { ApprovalStatus, Profile } from "@/shared/lib/rbac/types";
 
 type LogoutFormVariant = "primary" | "secondary";
@@ -37,24 +41,28 @@ const LOGOUT_FORM_CONFIG = {
 >;
 
 export function PendingApprovalClientSurface({
+  currentDocumentUrl,
   profile,
 }: {
+  currentDocumentUrl: string | null;
   profile: Profile | null;
 }) {
   const [approvalStatus, setApprovalStatus] = useState<ApprovalStatus | null>(
     profile?.approval_status ?? null,
   );
-  const isRejectedStudent =
-    profile?.role === ROLE.STUDENT &&
-    approvalStatus === APPROVAL_STATUS.REJECTED;
+  const gatedRole =
+    profile && requiresAccountApproval(profile.role) ? profile.role : null;
+  const roleLabel = gatedRole ? ROLE_LABELS[gatedRole].toLowerCase() : "account";
+  const isRejectedRequest =
+    gatedRole !== null && approvalStatus === APPROVAL_STATUS.REJECTED;
 
-  if (isRejectedStudent) {
+  if (profile && gatedRole && isRejectedRequest) {
     return (
       <AuthShell
         contentClassName="max-w-xl"
         eyebrow="Account request rejected"
-        title="Update your student verification details."
-        description="Your campus reviewer needs corrected identity details before FlightraX can approve your student account."
+        title={`Update your ${roleLabel} verification details.`}
+        description={`Your campus reviewer needs corrected identity details before FlightraX can approve your ${roleLabel} account.`}
       >
         <h2 className="text-2xl mb-5 font-semibold tracking-tight">
           Resubmission Required
@@ -65,14 +73,16 @@ export function PendingApprovalClientSurface({
           </p>
           <p className="mt-1 text-sm leading-6 text-primary-foreground/70">
             {profile.rejection_reason ??
-              "Your campus reviewer requested updated student verification details."}
+              "Your campus reviewer requested updated verification details."}
           </p>
         </div>
         <div className="space-y-2">
-          <RejectedStudentResubmissionForm
+          <RejectedAccountResubmissionForm
+            currentDocumentUrl={currentDocumentUrl}
             defaultFullName={profile.full_name}
-            defaultStudentIdNumber={profile.student_id_number ?? ""}
+            defaultIdNumber={profile.id_number ?? ""}
             onResubmitted={() => setApprovalStatus(APPROVAL_STATUS.PENDING)}
+            role={gatedRole}
           />
           <LogoutForm variant="secondary" />
         </div>
@@ -83,14 +93,14 @@ export function PendingApprovalClientSurface({
   return (
     <AuthShell
       eyebrow="Account request pending"
-      title="Your student account is waiting for campus approval."
+      title={`Your ${roleLabel} account is waiting for campus approval.`}
     >
       <div className="space-y-5">
         <h2 className="text-2xl font-semibold tracking-tight">
           Request Received
         </h2>
         <p className="text-sm leading-6 text-muted-foreground">
-          An instructor must approve your student profile before you can access
+          An admin must approve your {roleLabel} account before you can access
           FlightraX. Please check back after your campus verifies your account.
         </p>
         <LogoutForm variant="primary" />

@@ -10,23 +10,19 @@ import { ROLE } from "@/shared/lib/rbac/config";
 import { Button } from "@/shared/components/ui/button";
 import { toastActionResult } from "@/shared/lib/action-toast";
 import { registerStudentAction } from "@/modules/auth/actions/register-student";
-import { ImageUploadField } from "@/shared/components/image-upload-field";
+import { AccountVerificationFields } from "@/modules/auth/components/account-verification-fields";
 import {
   RegisterFormSection,
   RegisterPasswordField,
   RegisterTextField,
 } from "@/modules/auth/components/register-form-parts";
+import { ACCOUNT_REQUEST_COPY } from "@/modules/auth/utils/account-request-copy";
 import { studentRegisterSchema } from "@/modules/auth/schemas/register-schema";
 import type { StudentRegisterInput } from "@/modules/auth/types/auth";
 import {
   AUTH_MODE,
   AUTH_MODE_CONFIG,
 } from "@/modules/auth/utils/auth-role-config";
-import {
-  STUDENT_ID_DOCUMENT_MAX_BYTES,
-  STUDENT_ID_DOCUMENT_TYPES,
-} from "@/modules/auth/utils/student-document";
-const studentIdDocumentHelperText = `Upload a JPG, PNG, or WebP image of your student ID. Max ${STUDENT_ID_DOCUMENT_MAX_BYTES / 1024 / 1024} MB.`;
 
 export function StudentRegisterForm() {
   const router = useRouter();
@@ -38,7 +34,7 @@ export function StudentRegisterForm() {
       password: "",
       confirmPassword: "",
       fullName: "",
-      studentIdNumber: "",
+      idNumber: "",
     },
   });
   const { execute, isExecuting } = useAction(registerStudentAction, {
@@ -51,9 +47,9 @@ export function StudentRegisterForm() {
     },
   });
   const errors = form.formState.errors;
-  const studentIdDocument = useWatch({
+  const idDocument = useWatch({
     control: form.control,
-    name: "studentIdDocument",
+    name: "idDocument",
   });
 
   return (
@@ -99,38 +95,26 @@ export function StudentRegisterForm() {
           registration={form.register("confirmPassword")}
         />
       </RegisterFormSection>
-      <RegisterFormSection title="Student Verification">
-        <div className="grid gap-5 sm:grid-cols-2 sm:items-start sm:gap-3">
-          <RegisterTextField
-            error={errors.studentIdNumber}
-            id="student-register-id-number"
-            label="Student ID Number"
-            placeholder="Student ID number"
-            registration={form.register("studentIdNumber")}
-          />
-          <ImageUploadField
-            accept={STUDENT_ID_DOCUMENT_TYPES}
-            errorText={errors.studentIdDocument?.message}
-            helperText={studentIdDocumentHelperText}
-            id="student-register-id-document"
-            label="Student ID Image"
-            onChange={(file) => {
-              if (file) {
-                form.setValue("studentIdDocument", file, {
-                  shouldValidate: true,
-                });
-                return;
-              }
+      <RegisterFormSection title={ACCOUNT_REQUEST_COPY[ROLE.STUDENT].sectionTitle}>
+        <AccountVerificationFields
+          idDocument={idDocument ?? null}
+          idDocumentError={errors.idDocument?.message}
+          idNumberError={errors.idNumber}
+          idNumberRegistration={form.register("idNumber")}
+          idPrefix="student-register"
+          onIdDocumentChange={(file) => {
+            if (file) {
+              form.setValue("idDocument", file, {
+                shouldValidate: true,
+              });
+              return;
+            }
 
-              form.unregister("studentIdDocument");
-              void form.trigger("studentIdDocument");
-            }}
-            required
-            theme="dark"
-            value={studentIdDocument ?? null}
-            variant="compact"
-          />
-        </div>
+            form.unregister("idDocument");
+            void form.trigger("idDocument");
+          }}
+          role={ROLE.STUDENT}
+        />
       </RegisterFormSection>
       <Button
         className="mt-3 h-12 w-full px-7 font-bold uppercase"

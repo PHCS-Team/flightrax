@@ -1,9 +1,7 @@
 import { ACCOUNT_VIEW } from "@/modules/auth/constants/permissions";
 import { AIRCRAFTS_VIEW } from "@/modules/aircrafts/constants/permissions";
-import {
-  STUDENTS_VIEW,
-  STUDENTS_REVIEW,
-} from "@/modules/students/constants/permissions";
+import { ACCOUNT_REVIEW } from "@/modules/account-review/constants/permissions";
+import { STUDENTS_VIEW } from "@/modules/students/constants/permissions";
 import type {
   AdminDepartment,
   ApprovalStatus,
@@ -30,6 +28,16 @@ export const PASSCODE_ROLES: ProfileRole[] = [ROLE.STUDENT, ROLE.INSTRUCTOR];
 
 export function canManagePasscode(role: ProfileRole) {
   return PASSCODE_ROLES.includes(role);
+}
+
+export const ACCOUNT_REQUEST_ROLES = [ROLE.STUDENT, ROLE.INSTRUCTOR] as const;
+
+export type AccountRequestRole = (typeof ACCOUNT_REQUEST_ROLES)[number];
+
+export function requiresAccountApproval(
+  role: ProfileRole,
+): role is AccountRequestRole {
+  return (ACCOUNT_REQUEST_ROLES as readonly ProfileRole[]).includes(role);
 }
 
 export const ADMIN_DEPARTMENT = {
@@ -70,7 +78,7 @@ const ROLE_PERMISSIONS = {
     ACCOUNT_VIEW,
     AIRCRAFTS_VIEW,
     STUDENTS_VIEW,
-    STUDENTS_REVIEW,
+    ACCOUNT_REVIEW,
     "notams.view",
     "schedule.view",
     "instructors.view",

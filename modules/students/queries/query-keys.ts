@@ -1,11 +1,7 @@
-export const STUDENTS_QUERY_KEYS = {
-  all: ["students"] as const,
-  approved: (page: number, pageSize: number, search: string) =>
-    ["students", "approved", { page, pageSize, search }] as const,
-};
+import { STUDENTS_PARENT_QUERY_KEY } from "@/shared/lib/query-keys";
 
-export const STUDENT_REVIEW_QUERY_KEYS = {
-  list: ["student-review", "list"] as const,
-  documentUrl: (studentId: string) =>
-    ["student-review", "document", studentId] as const,
+export const STUDENTS_QUERY_KEYS = {
+  all: STUDENTS_PARENT_QUERY_KEY,
+  approved: (page: number, pageSize: number, search: string) =>
+    [...STUDENTS_PARENT_QUERY_KEY, "approved", { page, pageSize, search }] as const,
 };

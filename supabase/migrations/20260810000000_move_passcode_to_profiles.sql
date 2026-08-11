@@ -5,18 +5,6 @@
 alter table public.profiles
   add column if not exists passcode_hash text;
 
-update public.profiles p
-set passcode_hash = sp.passcode_hash
-from public.student_profiles sp
-where sp.profile_id = p.id
-  and sp.passcode_hash is not null;
-
-update public.profiles p
-set passcode_hash = ip.passcode_hash
-from public.instructor_profiles ip
-where ip.profile_id = p.id
-  and ip.passcode_hash is not null;
-
 -- The role-table self-update policies and the approval-field guard existed
 -- only so users could write their own passcode_hash; drop them with the columns.
 

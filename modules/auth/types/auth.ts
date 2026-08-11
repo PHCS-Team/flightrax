@@ -8,7 +8,7 @@ import type {
   studentRegisterSchema,
   superadminRegisterSchema,
 } from "@/modules/auth/schemas/register-schema";
-import type { rejectedStudentResubmissionSchema } from "@/modules/auth/schemas/rejected-student-resubmission-schema";
+import type { rejectedAccountResubmissionSchema } from "@/modules/auth/schemas/rejected-account-resubmission-schema";
 import type { profilePhotoSchema } from "@/modules/auth/schemas/profile-photo-schema";
 
 export type LoginInput = z.infer<typeof loginSchema>;
@@ -17,7 +17,7 @@ export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
 export type InstructorRegisterInput = z.infer<typeof instructorRegisterSchema>;
 export type StudentRegisterInput = z.infer<typeof studentRegisterSchema>;
 export type SuperadminRegisterInput = z.infer<typeof superadminRegisterSchema>;
-export type RejectedStudentResubmissionInput = z.infer<
-  typeof rejectedStudentResubmissionSchema
+export type RejectedAccountResubmissionInput = z.infer<
+  typeof rejectedAccountResubmissionSchema
 >;
 export type ProfilePhotoInput = z.infer<typeof profilePhotoSchema>;

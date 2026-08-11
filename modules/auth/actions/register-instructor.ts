@@ -1,11 +1,10 @@
 "use server";
 
 import { actionClient } from "@/shared/lib/safe-action";
-import { APPROVAL_STATUS, ROLE } from "@/shared/lib/rbac/config";
-import { getDefaultRedirectForProfile } from "@/shared/lib/rbac/routes";
-import { registerBaseProfile } from "@/modules/auth/actions/register-base";
-import { getProfileAccessByUserId } from "@/modules/auth/queries/profile";
+import { ROLE } from "@/shared/lib/rbac/config";
 import { instructorRegisterSchema } from "@/modules/auth/schemas/register-schema";
+import { registerBaseProfile } from "@/modules/auth/actions/register-base";
+import { submitAccountRequest } from "@/modules/auth/services/account-request.server";
 
 export const registerInstructorAction = actionClient
   .inputSchema(instructorRegisterSchema)
@@ -29,16 +28,21 @@ export const registerInstructorAction = actionClient
       };
     }
 
-    const profile = await getProfileAccessByUserId(data.user.id);
+    const requestError = await submitAccountRequest({
+      userId: data.user.id,
+      role: ROLE.INSTRUCTOR,
+      idNumber: parsedInput.idNumber,
+      idDocument: parsedInput.idDocument,
+    });
+
+    if (requestError) {
+      return { ok: false, message: requestError };
+    }
 
     return {
       ok: true,
       message:
-        profile?.approval_status === APPROVAL_STATUS.PENDING
-          ? "Registration received. Your account is pending approval."
-          : "Registration complete.",
-      redirectTo: profile
-        ? getDefaultRedirectForProfile(profile)
-        : `/login/${ROLE.INSTRUCTOR}`,
+        "Registration received. Your instructor account is pending approval.",
+      redirectTo: "/pending-approval",
     };
   });

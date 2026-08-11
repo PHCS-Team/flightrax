@@ -20,7 +20,7 @@ export type DashboardNavigationItemId =
   | "instructors"
   | "schedule"
   | "students"
-  | "studentReview"
+  | "accountReview"
   | "aircrafts"
   | "notams";
 
@@ -77,11 +77,11 @@ const DASHBOARD_NAVIGATION_ITEMS = {
     id: "students",
     label: "Students",
   },
-  studentReview: {
-    href: "/student-review",
+  accountReview: {
+    href: "/account-review",
     icon: UserCheckIcon,
-    id: "studentReview",
-    label: "Student Review",
+    id: "accountReview",
+    label: "Account Review",
   },
   aircrafts: {
     href: "/aircrafts",
@@ -104,7 +104,7 @@ const USERS_GROUP: DashboardNavigationGroup = {
   items: [
     DASHBOARD_NAVIGATION_ITEMS.instructors,
     DASHBOARD_NAVIGATION_ITEMS.students,
-    DASHBOARD_NAVIGATION_ITEMS.studentReview,
+    DASHBOARD_NAVIGATION_ITEMS.accountReview,
   ],
 };
 

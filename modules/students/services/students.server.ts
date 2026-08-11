@@ -24,7 +24,7 @@ async function getMatchingProfileIds(
 }
 
 function buildSearchFilter(search: string, matchingProfileIds: string[]) {
-  const filters: string[] = [`student_id_number.ilike.%${search}%`];
+  const filters: string[] = [`id_number.ilike.%${search}%`];
 
   if (matchingProfileIds.length > 0) {
     filters.push(`profile_id.in.(${matchingProfileIds.join(",")})`);
@@ -74,11 +74,12 @@ export async function getApprovedStudentsPage(
   const to = from + pageSize - 1;
 
   let query = supabase
-    .from("student_profiles")
+    .from("account_requests")
     .select(
-      "approval_status, profile_id, student_id_number, profiles!student_profiles_profile_id_fkey(email, full_name, profile_photo_path, role)",
+      "approval_status, profile_id, id_number, profiles!account_requests_profile_id_fkey(email, full_name, profile_photo_path, role)",
       { count: "exact" },
     )
+    .eq("request_type", ROLE.STUDENT)
     .eq("approval_status", APPROVAL_STATUS.APPROVED);
 
   if (search) {
@@ -91,7 +92,7 @@ export async function getApprovedStudentsPage(
     error,
     count: totalCount,
   } = await query
-    .order("student_id_number", { ascending: true })
+    .order("id_number", { ascending: true })
     .range(from, to);
 
   if (error) {
@@ -114,7 +115,7 @@ export async function getApprovedStudentsPage(
       id: row.profile_id,
       email: row.profiles?.email ?? "Unknown email",
       fullName: row.profiles?.full_name ?? "Unknown student",
-      studentIdNumber: row.student_id_number ?? "Missing ID number",
+      studentIdNumber: row.id_number ?? "Missing ID number",
       profilePhotoUrl: row.profiles?.profile_photo_path
         ? storage
             .from(PROFILE_PHOTO_BUCKET)

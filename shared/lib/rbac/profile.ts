@@ -1,4 +1,8 @@
-import { APPROVAL_STATUS, ROLE } from "@/shared/lib/rbac/config";
+import {
+  APPROVAL_STATUS,
+  ROLE,
+  requiresAccountApproval,
+} from "@/shared/lib/rbac/config";
 import type {
   AdminDepartment,
   ApprovalStatus,
@@ -8,19 +12,19 @@ import type {
 import type { Database } from "@/shared/types/supabase";
 
 type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
-type StudentProfileRow = Database["public"]["Tables"]["student_profiles"]["Row"];
+type AccountRequestRow = Database["public"]["Tables"]["account_requests"]["Row"];
 type AdminProfileRow = Database["public"]["Tables"]["admin_profiles"]["Row"];
 
-type StudentProfileFields = Partial<
+type AccountRequestFields = Partial<
   Pick<
-    StudentProfileRow,
+    AccountRequestRow,
     | "approval_status"
     | "id_document_content_type"
     | "id_document_path"
     | "id_document_size_bytes"
     | "id_document_uploaded_at"
+    | "id_number"
     | "rejection_reason"
-    | "student_id_number"
     | "submitted_at"
   >
 >;
@@ -28,16 +32,16 @@ type StudentProfileFields = Partial<
 type AdminProfileFields = Pick<AdminProfileRow, "department">;
 
 export type ProfileWithRoleProfiles = ProfileRow & {
-  student_profiles: StudentProfileFields | null;
+  account_requests: AccountRequestFields | null;
   admin_profiles: AdminProfileFields | null;
 };
 
 export function getEffectiveApprovalStatus(
   role: ProfileRole,
-  studentApprovalStatus: ApprovalStatus | null,
+  requestApprovalStatus: ApprovalStatus | null,
 ): ApprovalStatus {
-  if (role === ROLE.STUDENT) {
-    return studentApprovalStatus ?? APPROVAL_STATUS.PENDING;
+  if (requiresAccountApproval(role)) {
+    return requestApprovalStatus ?? APPROVAL_STATUS.PENDING;
   }
 
   return APPROVAL_STATUS.APPROVED;
@@ -53,10 +57,10 @@ export function getAdminDepartment(
 export function normalizeProfile(
   row: ProfileWithRoleProfiles,
   {
-    includeStudentDocuments = false,
+    includeRequestDetails = false,
     profilePhotoUrl = null,
   }: {
-    includeStudentDocuments?: boolean;
+    includeRequestDetails?: boolean;
     profilePhotoUrl?: string | null;
   } = {},
 ): Profile {
@@ -80,23 +84,24 @@ export function normalizeProfile(
     ),
     approval_status: getEffectiveApprovalStatus(
       row.role,
-      row.student_profiles?.approval_status ?? null,
+      row.account_requests?.approval_status ?? null,
     ),
   };
 
-  if (!includeStudentDocuments) {
+  if (!includeRequestDetails) {
     return profile;
   }
 
   return {
     ...profile,
-    student_id_number: row.student_profiles?.student_id_number ?? null,
-    id_document_path: row.student_profiles?.id_document_path ?? null,
+    id_number: row.account_requests?.id_number ?? null,
+    id_document_path: row.account_requests?.id_document_path ?? null,
     id_document_content_type:
-      row.student_profiles?.id_document_content_type ?? null,
-    id_document_size_bytes: row.student_profiles?.id_document_size_bytes ?? null,
-    id_document_uploaded_at: row.student_profiles?.id_document_uploaded_at ?? null,
-    submitted_at: row.student_profiles?.submitted_at ?? null,
-    rejection_reason: row.student_profiles?.rejection_reason ?? null,
+      row.account_requests?.id_document_content_type ?? null,
+    id_document_size_bytes: row.account_requests?.id_document_size_bytes ?? null,
+    id_document_uploaded_at:
+      row.account_requests?.id_document_uploaded_at ?? null,
+    submitted_at: row.account_requests?.submitted_at ?? null,
+    rejection_reason: row.account_requests?.rejection_reason ?? null,
   };
 }

@@ -1,9 +1,7 @@
 import { ACCOUNT_VIEW } from "@/modules/auth/constants/permissions";
 import { AIRCRAFTS_VIEW } from "@/modules/aircrafts/constants/permissions";
-import {
-  STUDENTS_VIEW,
-  STUDENTS_REVIEW,
-} from "@/modules/students/constants/permissions";
+import { ACCOUNT_REVIEW } from "@/modules/account-review/constants/permissions";
+import { STUDENTS_VIEW } from "@/modules/students/constants/permissions";
 import { APPROVAL_STATUS, ROLE, hasPermission } from "@/shared/lib/rbac/config";
 import type { Permission, Profile, ProfileRole } from "@/shared/lib/rbac/types";
 
@@ -21,7 +19,7 @@ const PROTECTED_ROUTES: Array<{ prefix: string; permission: Permission }> = [
   { prefix: "/aircrafts", permission: AIRCRAFTS_VIEW },
   { prefix: "/notams", permission: "notams.view" },
   { prefix: "/students", permission: STUDENTS_VIEW },
-  { prefix: "/student-review", permission: STUDENTS_REVIEW },
+  { prefix: "/account-review", permission: ACCOUNT_REVIEW },
 ];
 const AUTH_REQUIRED_ROUTES = ["/pending-approval"];
 
