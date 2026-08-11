@@ -115,9 +115,21 @@ const STUDENT_NAVIGATION: DashboardNavigation = [
   DASHBOARD_NAVIGATION_ITEMS.schedule,
 ];
 
+const INSTRUCTOR_USERS_GROUP: DashboardNavigationGroup = {
+  id: "users",
+  icon: UsersRoundIcon,
+  label: "Users",
+  items: [
+    DASHBOARD_NAVIGATION_ITEMS.instructors,
+    DASHBOARD_NAVIGATION_ITEMS.students,
+  ],
+};
+
 const INSTRUCTOR_NAVIGATION: DashboardNavigation = [
-  ...STUDENT_NAVIGATION,
-  DASHBOARD_NAVIGATION_ITEMS.students,
+  DASHBOARD_NAVIGATION_ITEMS.home,
+  DASHBOARD_NAVIGATION_ITEMS.flightDocuments,
+  INSTRUCTOR_USERS_GROUP,
+  DASHBOARD_NAVIGATION_ITEMS.schedule,
 ];
 
 const ADMIN_NAVIGATION: DashboardNavigation = [

@@ -1,6 +1,7 @@
 import { ACCOUNT_VIEW } from "@/modules/auth/constants/permissions";
 import { AIRCRAFTS_VIEW } from "@/modules/aircrafts/constants/permissions";
 import { ACCOUNT_REVIEW } from "@/modules/account-review/constants/permissions";
+import { INSTRUCTORS_VIEW } from "@/modules/instructors/constants/permissions";
 import { STUDENTS_VIEW } from "@/modules/students/constants/permissions";
 import { APPROVAL_STATUS, ROLE, hasPermission } from "@/shared/lib/rbac/config";
 import type { Permission, Profile, ProfileRole } from "@/shared/lib/rbac/types";
@@ -14,7 +15,7 @@ const PROTECTED_ROUTES: Array<{ prefix: string; permission: Permission }> = [
   { prefix: "/account", permission: ACCOUNT_VIEW },
   { prefix: "/dashboard", permission: "dashboard.view" },
   { prefix: "/flight-documents", permission: "flight_documents.view" },
-  { prefix: "/instructors", permission: "instructors.view" },
+  { prefix: "/instructors", permission: INSTRUCTORS_VIEW },
   { prefix: "/schedule", permission: "schedule.view" },
   { prefix: "/aircrafts", permission: AIRCRAFTS_VIEW },
   { prefix: "/notams", permission: "notams.view" },

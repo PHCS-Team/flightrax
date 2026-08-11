@@ -32,58 +32,67 @@ import { LicenseTags } from "@/shared/components/license-tags";
 import { LicenseDetailsDialog } from "@/shared/components/license-details-dialog";
 import type { CertificateSummary } from "@/shared/types/certificate-summary";
 import type { LicenseSummary } from "@/shared/types/license-summary";
-import type { ApprovedStudent } from "@/modules/students/types/student";
+import type { ApprovedInstructor } from "@/modules/instructors/types/instructor";
 
-export function StudentsTable({
+export function InstructorsTable({
+  instructors,
   onPageChange,
   onSearchChange,
   page,
   pageSize,
+  restrictPeerCredentials,
   search,
-  students,
   totalCount,
   totalPages,
+  viewerId,
 }: {
+  instructors: ApprovedInstructor[];
   onPageChange: (page: number) => void;
   onSearchChange: (search: string) => void;
   page: number;
   pageSize: number;
+  restrictPeerCredentials: boolean;
   search: string;
-  students: ApprovedStudent[];
   totalCount: number;
   totalPages: number;
+  viewerId: string | null;
 }) {
   const [detailsLicense, setDetailsLicense] = useState<LicenseSummary | null>(
     null,
   );
   const [detailsCertificate, setDetailsCertificate] =
     useState<CertificateSummary | null>(null);
+
+  function canViewCredentials(instructor: ApprovedInstructor) {
+    return !restrictPeerCredentials || instructor.id === viewerId;
+  }
+
   const columns = [
     {
       accessorKey: "fullName",
-      header: "Student Profile",
+      header: "Instructor Profile",
       cell: ({ row }) => {
-        const student = row.original;
+        const instructor = row.original;
 
         return (
           <div className="flex min-w-64 items-center gap-3">
             <Avatar className="size-11" size="lg">
-              {student.profilePhotoUrl && (
+              {instructor.profilePhotoUrl && (
                 <AvatarImage
-                  alt={`${student.fullName} profile photo`}
-                  src={student.profilePhotoUrl}
+                  alt={`${instructor.fullName} profile photo`}
+                  src={instructor.profilePhotoUrl}
                 />
               )}
               <AvatarFallback className="bg-primary-foreground/15 text-primary-foreground">
-                {getAvatarFallback(student.fullName)}
+                {getAvatarFallback(instructor.fullName)}
               </AvatarFallback>
             </Avatar>
             <div className="min-w-0">
               <p className="truncate font-semibold text-primary-foreground">
-                {student.fullName}
+                {instructor.fullName}
               </p>
               <p className="text-sm text-primary-foreground/65">
-                ID Number: {student.studentIdNumber}
+                ID Number: {instructor.instructorIdNumber}
               </p>
             </div>
           </div>
@@ -96,7 +105,9 @@ export function StudentsTable({
       cell: ({ row }) => (
         <LicenseTags
           licenses={row.original.licenses}
-          onLicenseClick={setDetailsLicense}
+          onLicenseClick={
+            canViewCredentials(row.original) ? setDetailsLicense : undefined
+          }
         />
       ),
     },
@@ -106,11 +117,15 @@ export function StudentsTable({
       cell: ({ row }) => (
         <CertificateTags
           certificates={row.original.certificates}
-          onCertificateClick={setDetailsCertificate}
+          onCertificateClick={
+            canViewCredentials(row.original)
+              ? setDetailsCertificate
+              : undefined
+          }
         />
       ),
     },
-  ] satisfies ColumnDef<ApprovedStudent>[];
+  ] satisfies ColumnDef<ApprovedInstructor>[];
 
   const pagination: PaginationState = {
     pageIndex: page - 1,
@@ -120,7 +135,7 @@ export function StudentsTable({
   // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Table exposes non-memoizable table helpers by design.
   const table = useReactTable({
     columns,
-    data: students,
+    data: instructors,
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
     pageCount: totalPages,
@@ -140,11 +155,11 @@ export function StudentsTable({
           onChange={(event) => {
             onSearchChange(event.target.value);
           }}
-          placeholder="Search name, email, or student ID"
+          placeholder="Search name, email, or instructor ID"
           value={search}
         />
         <p className="text-sm text-primary-foreground/70">
-          {students.length} of {totalCount} students
+          {instructors.length} of {totalCount} instructors
         </p>
       </div>
 
@@ -191,7 +206,7 @@ export function StudentsTable({
                 className="h-24 text-center text-primary-foreground/70"
                 colSpan={columns.length}
               >
-                No students match your search.
+                No instructors match your search.
               </TableCell>
             </TableRow>
           )}

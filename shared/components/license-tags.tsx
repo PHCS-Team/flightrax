@@ -1,3 +1,5 @@
+import { EyeIcon } from "lucide-react";
+
 import type { LicenseSummary } from "@/shared/types/license-summary";
 import { getLicenseTypeLabel } from "@/shared/lib/aviation/license-options";
 
@@ -34,6 +36,7 @@ export function LicenseTags({
               title={`${label} · No. ${license.license_number}`}
               type="button"
             >
+              <EyeIcon className="size-3 text-primary-foreground/70" />
               {label}
             </button>
           );
@@ -41,7 +44,7 @@ export function LicenseTags({
 
         return (
           <span
-            className="inline-flex items-center gap-1.5 rounded-full border border-primary-foreground/20 bg-primary-foreground/10 px-2.5 py-0.5 text-xs font-medium text-primary-foreground"
+            className="inline-flex items-center gap-1.5 rounded-full border border-dashed border-primary-foreground/15 px-2.5 py-0.5 text-xs font-medium text-primary-foreground/45"
             key={license.id}
             title={`${label} · No. ${license.license_number}`}
           >

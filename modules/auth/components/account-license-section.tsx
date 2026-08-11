@@ -86,10 +86,9 @@ export function AccountLicenseSection() {
         <EmptyState
           action={
             <Button
-              className={DARK_OUTLINE_BUTTON_CLASS}
+              className="px-4 font-semibold"
               onClick={openCreateDialog}
               type="button"
-              variant="outline"
             >
               <PlusIcon className="size-4" />
               Add license
@@ -114,11 +113,9 @@ export function AccountLicenseSection() {
               </p>{" "}
             </div>
             <Button
-              className={cn("shrink-0", DARK_OUTLINE_BUTTON_CLASS)}
+              className="shrink-0 px-4 font-semibold"
               onClick={openCreateDialog}
-              size="sm"
               type="button"
-              variant="outline"
             >
               <PlusIcon className="size-4" />
               <span className="hidden sm:inline">Add license</span>

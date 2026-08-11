@@ -7,11 +7,11 @@ import { useForm, useWatch } from "react-hook-form";
 
 import { useCreateCertificate } from "@/modules/auth/hooks/use-create-certificate.action";
 import { useUpdateCertificate } from "@/modules/auth/hooks/use-update-certificate.action";
-import { useCertificateImage } from "@/modules/auth/hooks/use-certificate-image.query";
+import { useCertificateImage } from "@/shared/hooks/use-certificate-image.query";
 import { CertificateDeleteConfirmation } from "@/modules/auth/components/certificate-delete-confirmation";
 import { certificateFormSchema } from "@/modules/auth/schemas/certificate-schema";
 import type { CertificateFormInput } from "@/modules/auth/schemas/certificate-schema";
-import type { Certificate } from "@/modules/auth/types/certificate";
+import type { Certificate } from "@/shared/types/certificate";
 import {
   CERTIFICATE_IMAGE_MAX_BYTES,
   CERTIFICATE_IMAGE_TYPES,

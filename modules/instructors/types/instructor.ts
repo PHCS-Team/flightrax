@@ -6,17 +6,17 @@ type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
 type AccountRequestRow =
   Database["public"]["Tables"]["account_requests"]["Row"];
 
-export type ApprovedStudent = {
+export type ApprovedInstructor = {
   id: string;
   email: string;
   fullName: string;
-  studentIdNumber: string;
+  instructorIdNumber: string;
   profilePhotoUrl: string | null;
   licenses: LicenseSummary[];
   certificates: CertificateSummary[];
 };
 
-export type ApprovedStudentRow = Pick<
+export type ApprovedInstructorRow = Pick<
   AccountRequestRow,
   "approval_status" | "profile_id" | "id_number"
 > & {

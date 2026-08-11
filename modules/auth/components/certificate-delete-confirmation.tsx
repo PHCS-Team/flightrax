@@ -3,7 +3,7 @@
 import { Trash2Icon } from "lucide-react";
 
 import { useDeleteCertificate } from "@/modules/auth/hooks/use-delete-certificate.action";
-import type { Certificate } from "@/modules/auth/types/certificate";
+import type { Certificate } from "@/shared/types/certificate";
 import { ConfirmationDialog } from "@/shared/components/layout/confirmation-dialog";
 
 export function CertificateDeleteConfirmation({

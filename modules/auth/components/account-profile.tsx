@@ -60,7 +60,7 @@ export function AccountProfile({ profile }: { profile: Profile }) {
           </p>
         </GlassSurface>
       ) : (
-        <Tabs defaultValue="profile" className="gap-0 sm:gap-3">
+        <Tabs defaultValue="profile" className="gap-0 sm:gap-4">
           <TabsList className="w-full justify-start border-x-0 md:w-fit md:border-x border-y border-primary-foreground/15 p-1.5">
             <TabsTrigger value="profile">Profile</TabsTrigger>
             <TabsTrigger value="credentials">Documents</TabsTrigger>
@@ -69,10 +69,10 @@ export function AccountProfile({ profile }: { profile: Profile }) {
 
           <TabsContent
             value="profile"
-            className="w-full space-y-1.5 sm:space-y-6"
+            className="w-full space-y-1.5 sm:space-y-4"
           >
             <AccountCredentialsSummary />
-            <div className="grid gap-1.5 sm:gap-6 lg:grid-cols-2 lg:items-start">
+            <div className="grid gap-1.5 sm:gap-4 lg:grid-cols-2 lg:items-start">
               <AccountSignatureSection profile={profile} />
               {canManagePasscode(profile.role) && (
                 <AccountPasscodeSection passcodeHash={profile.passcode_hash} />
@@ -82,7 +82,7 @@ export function AccountProfile({ profile }: { profile: Profile }) {
 
           <TabsContent
             value="credentials"
-            className="w-full space-y-1.5 sm:space-y-6"
+            className="w-full space-y-1.5 sm:space-y-4"
           >
             <AccountLicenseSection />
             <AccountCertificateSection />

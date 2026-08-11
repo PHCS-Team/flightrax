@@ -3,6 +3,7 @@ import type { Database } from "@/shared/types/supabase";
 import { ACCOUNT_VIEW } from "@/modules/auth/constants/permissions";
 import { AIRCRAFTS_VIEW } from "@/modules/aircrafts/constants/permissions";
 import { ACCOUNT_REVIEW } from "@/modules/account-review/constants/permissions";
+import { INSTRUCTORS_VIEW } from "@/modules/instructors/constants/permissions";
 import { STUDENTS_VIEW } from "@/modules/students/constants/permissions";
 
 export type ProfileRole = Database["public"]["Enums"]["app_role"];
@@ -31,7 +32,7 @@ export type Permission =
   | typeof ACCOUNT_VIEW
   | "dashboard.view"
   | "flight_documents.view"
-  | "instructors.view"
+  | typeof INSTRUCTORS_VIEW
   | "schedule.view"
   | typeof AIRCRAFTS_VIEW
   | "notams.view"

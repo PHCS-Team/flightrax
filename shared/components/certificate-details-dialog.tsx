@@ -4,8 +4,8 @@ import { format } from "date-fns";
 import { AwardIcon } from "lucide-react";
 import Image from "next/image";
 
-import { useCertificateImage } from "@/modules/auth/hooks/use-certificate-image.query";
-import type { Certificate } from "@/modules/auth/types/certificate";
+import { useCertificateImage } from "@/shared/hooks/use-certificate-image.query";
+import type { CertificateSummary } from "@/shared/types/certificate-summary";
 import { DialogSectionHeader } from "@/shared/components/layout/dialog-section-header";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
@@ -16,7 +16,7 @@ import {
 } from "@/shared/components/ui/dialog";
 import { cn } from "@/shared/lib/utils";
 
-function getStatusDetails(certificate: Certificate) {
+function getStatusDetails(certificate: CertificateSummary) {
   const todayIso = new Date().toISOString().slice(0, 10);
   const isExpired =
     certificate.expiry_date !== null && certificate.expiry_date < todayIso;
@@ -32,7 +32,7 @@ function getStatusDetails(certificate: Certificate) {
       };
 }
 
-function formatExpiryDate(certificate: Certificate) {
+function formatExpiryDate(certificate: CertificateSummary) {
   if (certificate.has_no_expiry || !certificate.expiry_date) {
     return "No expiry";
   }
@@ -46,7 +46,7 @@ export function CertificateDetailsDialog({
   onOpenChange,
   open,
 }: {
-  certificate: Certificate;
+  certificate: CertificateSummary;
   onEdit?: () => void;
   onOpenChange: (open: boolean) => void;
   open: boolean;

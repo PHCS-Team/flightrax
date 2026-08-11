@@ -4,10 +4,10 @@ import { format } from "date-fns";
 import { AwardIcon, EyeIcon, PencilIcon, PlusIcon } from "lucide-react";
 import { useState } from "react";
 
-import { CertificateDetailsDialog } from "@/modules/auth/components/certificate-details-dialog";
+import { CertificateDetailsDialog } from "@/shared/components/certificate-details-dialog";
 import { CertificateFormDialog } from "@/modules/auth/components/certificate-form-dialog";
 import { useCertificates } from "@/modules/auth/hooks/use-certificates.query";
-import type { Certificate } from "@/modules/auth/types/certificate";
+import type { Certificate } from "@/shared/types/certificate";
 import { EmptyState } from "@/shared/components/layout/empty-state";
 import { GlassSurface } from "@/shared/components/layout/glass-surface";
 import { LoadingScreen } from "@/shared/components/layout/loading-screen";
@@ -83,10 +83,9 @@ export function AccountCertificateSection() {
         <EmptyState
           action={
             <Button
-              className={DARK_OUTLINE_BUTTON_CLASS}
+              className="px-4 font-semibold"
               onClick={openCreateDialog}
               type="button"
-              variant="outline"
             >
               <PlusIcon className="size-4" />
               Add certificate
@@ -111,11 +110,9 @@ export function AccountCertificateSection() {
               </p>
             </div>
             <Button
-              className={cn("shrink-0", DARK_OUTLINE_BUTTON_CLASS)}
+              className="shrink-0 px-4 font-semibold"
               onClick={openCreateDialog}
-              size="sm"
               type="button"
-              variant="outline"
             >
               <PlusIcon className="size-4" />
               <span className="hidden sm:inline">Add certificate</span>

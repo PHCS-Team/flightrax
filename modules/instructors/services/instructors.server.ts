@@ -7,9 +7,9 @@ import type { CertificateSummary } from "@/shared/types/certificate-summary";
 import type { LicenseSummary } from "@/shared/types/license-summary";
 import type { PaginatedResponse } from "@/shared/types/pagination";
 import type {
-  ApprovedStudent,
-  ApprovedStudentRow,
-} from "@/modules/students/types/student";
+  ApprovedInstructor,
+  ApprovedInstructorRow,
+} from "@/modules/instructors/types/instructor";
 
 async function getMatchingProfileIds(
   supabase: ReturnType<typeof createAdminClient>,
@@ -19,7 +19,7 @@ async function getMatchingProfileIds(
     .from("profiles")
     .select("id")
     .or(`full_name.ilike.%${search}%,email.ilike.%${search}%`)
-    .eq("role", ROLE.STUDENT);
+    .eq("role", ROLE.INSTRUCTOR);
 
   return data?.map((p) => p.id) ?? [];
 }
@@ -94,11 +94,11 @@ async function getCertificatesByProfileIds(
   return certificatesByProfile;
 }
 
-export async function getApprovedStudentsPage(
+export async function getApprovedInstructorsPage(
   page: number,
   pageSize: number,
   search: string,
-): Promise<PaginatedResponse<ApprovedStudent>> {
+): Promise<PaginatedResponse<ApprovedInstructor>> {
   const supabase = createAdminClient();
 
   const from = (page - 1) * pageSize;
@@ -110,7 +110,7 @@ export async function getApprovedStudentsPage(
       "approval_status, profile_id, id_number, profiles!account_requests_profile_id_fkey(email, full_name, profile_photo_path, role)",
       { count: "exact" },
     )
-    .eq("request_type", ROLE.STUDENT)
+    .eq("request_type", ROLE.INSTRUCTOR)
     .eq("approval_status", APPROVAL_STATUS.APPROVED);
 
   if (search) {
@@ -122,9 +122,7 @@ export async function getApprovedStudentsPage(
     data,
     error,
     count: totalCount,
-  } = await query
-    .order("id_number", { ascending: true })
-    .range(from, to);
+  } = await query.order("id_number", { ascending: true }).range(from, to);
 
   if (error) {
     throw new Error(error.message);
@@ -133,21 +131,23 @@ export async function getApprovedStudentsPage(
   const total = totalCount ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
-  const rows = data satisfies ApprovedStudentRow[];
-  const students = rows.filter((row) => row.profiles?.role === ROLE.STUDENT);
-  const studentIds = students.map((student) => student.profile_id);
+  const rows = data satisfies ApprovedInstructorRow[];
+  const instructors = rows.filter(
+    (row) => row.profiles?.role === ROLE.INSTRUCTOR,
+  );
+  const instructorIds = instructors.map((instructor) => instructor.profile_id);
   const [licensesByProfile, certificatesByProfile] = await Promise.all([
-    getLicensesByProfileIds(supabase, studentIds),
-    getCertificatesByProfileIds(supabase, studentIds),
+    getLicensesByProfileIds(supabase, instructorIds),
+    getCertificatesByProfileIds(supabase, instructorIds),
   ]);
   const { storage } = supabase;
 
   return {
-    data: students.map((row) => ({
+    data: instructors.map((row) => ({
       id: row.profile_id,
       email: row.profiles?.email ?? "Unknown email",
-      fullName: row.profiles?.full_name ?? "Unknown student",
-      studentIdNumber: row.id_number ?? "Missing ID number",
+      fullName: row.profiles?.full_name ?? "Unknown instructor",
+      instructorIdNumber: row.id_number ?? "Missing ID number",
       profilePhotoUrl: row.profiles?.profile_photo_path
         ? storage
             .from(PROFILE_PHOTO_BUCKET)

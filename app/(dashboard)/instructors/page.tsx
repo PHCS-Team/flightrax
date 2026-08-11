@@ -1,5 +1,5 @@
-import { InstructorsPage } from "@/modules/instructors/components/instructors-page";
+import { InstructorsRoute } from "@/modules/instructors/components/instructors-route";
 
-export default function Page() {
-  return <InstructorsPage />;
+export default async function Page() {
+  return <InstructorsRoute />;
 }

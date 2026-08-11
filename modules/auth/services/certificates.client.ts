@@ -1,4 +1,4 @@
-import type { Certificate } from "@/modules/auth/types/certificate";
+import type { Certificate } from "@/shared/types/certificate";
 import { getApiErrorMessage } from "@/shared/lib/api-error";
 
 export async function fetchOwnCertificates(): Promise<Certificate[]> {

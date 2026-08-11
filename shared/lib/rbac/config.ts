@@ -1,6 +1,7 @@
 import { ACCOUNT_VIEW } from "@/modules/auth/constants/permissions";
 import { AIRCRAFTS_VIEW } from "@/modules/aircrafts/constants/permissions";
 import { ACCOUNT_REVIEW } from "@/modules/account-review/constants/permissions";
+import { INSTRUCTORS_VIEW } from "@/modules/instructors/constants/permissions";
 import { STUDENTS_VIEW } from "@/modules/students/constants/permissions";
 import type {
   AdminDepartment,
@@ -62,14 +63,14 @@ const ROLE_PERMISSIONS = {
     ACCOUNT_VIEW,
     "dashboard.view",
     "flight_documents.view",
-    "instructors.view",
+    INSTRUCTORS_VIEW,
     "schedule.view",
   ],
   [ROLE.INSTRUCTOR]: [
     ACCOUNT_VIEW,
     "dashboard.view",
     "flight_documents.view",
-    "instructors.view",
+    INSTRUCTORS_VIEW,
     "schedule.view",
     STUDENTS_VIEW,
   ],
@@ -80,7 +81,7 @@ const ROLE_PERMISSIONS = {
     ACCOUNT_REVIEW,
     "notams.view",
     "schedule.view",
-    "instructors.view",
+    INSTRUCTORS_VIEW,
   ],
   [ROLE.SUPERADMIN]: ["system.manage"],
 } satisfies Record<ProfileRole, Permission[]>;
@@ -91,21 +92,21 @@ const ADMIN_DEPARTMENT_PERMISSIONS = {
     AIRCRAFTS_VIEW,
     "notams.view",
     "schedule.view",
-    "instructors.view",
+    INSTRUCTORS_VIEW,
   ],
   [ADMIN_DEPARTMENT.AIR_TRAFFIC_CONTROLLER]: [
     "admin.air_traffic_controller",
     AIRCRAFTS_VIEW,
     "notams.view",
     "schedule.view",
-    "instructors.view",
+    INSTRUCTORS_VIEW,
   ],
   [ADMIN_DEPARTMENT.SAFETY_PERSONNEL]: [
     "admin.safety_personnel",
     AIRCRAFTS_VIEW,
     "notams.view",
     "schedule.view",
-    "instructors.view",
+    INSTRUCTORS_VIEW,
   ],
 } satisfies Record<AdminDepartment, Permission[]>;
 

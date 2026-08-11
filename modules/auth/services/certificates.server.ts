@@ -5,7 +5,7 @@ import { cache } from "react";
 import type {
   Certificate,
   CertificateImageUrl,
-} from "@/modules/auth/types/certificate";
+} from "@/shared/types/certificate";
 import { CERTIFICATE_IMAGES_BUCKET } from "@/shared/lib/storage/buckets";
 import { createClient } from "@/shared/lib/supabase/server";
 
