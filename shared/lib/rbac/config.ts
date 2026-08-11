@@ -1,9 +1,8 @@
 import { ACCOUNT_VIEW } from "@/modules/auth/constants/permissions";
 import { AIRCRAFTS_VIEW } from "@/modules/aircrafts/constants/permissions";
-import {
-  STUDENTS_VIEW,
-  STUDENTS_REVIEW,
-} from "@/modules/students/constants/permissions";
+import { ACCOUNT_REVIEW } from "@/modules/account-review/constants/permissions";
+import { INSTRUCTORS_VIEW } from "@/modules/instructors/constants/permissions";
+import { STUDENTS_VIEW } from "@/modules/students/constants/permissions";
 import type {
   AdminDepartment,
   ApprovalStatus,
@@ -20,11 +19,26 @@ export const ROLE = {
 
 export const ROLES: ProfileRole[] = Object.values(ROLE);
 
-export const PUBLIC_AUTH_ROLES: ProfileRole[] = [
-  ROLE.STUDENT,
-  ROLE.INSTRUCTOR,
-  ROLE.ADMIN,
-];
+// Roles offered on the public login/register pickers. Admin access is
+// deliberately excluded — it lives on its own pages reached via the
+// hold-to-fly plane trigger, since admins skip the account review gate.
+export const PUBLIC_AUTH_ROLES: ProfileRole[] = [ROLE.STUDENT, ROLE.INSTRUCTOR];
+
+export const PASSCODE_ROLES: ProfileRole[] = [ROLE.STUDENT, ROLE.INSTRUCTOR];
+
+export function canManagePasscode(role: ProfileRole) {
+  return PASSCODE_ROLES.includes(role);
+}
+
+export const ACCOUNT_REQUEST_ROLES = [ROLE.STUDENT, ROLE.INSTRUCTOR] as const;
+
+export type AccountRequestRole = (typeof ACCOUNT_REQUEST_ROLES)[number];
+
+export function requiresAccountApproval(
+  role: ProfileRole,
+): role is AccountRequestRole {
+  return (ACCOUNT_REQUEST_ROLES as readonly ProfileRole[]).includes(role);
+}
 
 export const ADMIN_DEPARTMENT = {
   FLIGHT_OPERATIONS_PERSONNEL: "flight_operations_personnel",
@@ -49,24 +63,25 @@ const ROLE_PERMISSIONS = {
     ACCOUNT_VIEW,
     "dashboard.view",
     "flight_documents.view",
-    "instructors.view",
+    INSTRUCTORS_VIEW,
     "schedule.view",
   ],
   [ROLE.INSTRUCTOR]: [
     ACCOUNT_VIEW,
     "dashboard.view",
     "flight_documents.view",
-    "instructors.view",
+    INSTRUCTORS_VIEW,
     "schedule.view",
     STUDENTS_VIEW,
-    STUDENTS_REVIEW,
   ],
   [ROLE.ADMIN]: [
     ACCOUNT_VIEW,
     AIRCRAFTS_VIEW,
+    STUDENTS_VIEW,
+    ACCOUNT_REVIEW,
     "notams.view",
     "schedule.view",
-    "instructors.view",
+    INSTRUCTORS_VIEW,
   ],
   [ROLE.SUPERADMIN]: ["system.manage"],
 } satisfies Record<ProfileRole, Permission[]>;
@@ -77,21 +92,21 @@ const ADMIN_DEPARTMENT_PERMISSIONS = {
     AIRCRAFTS_VIEW,
     "notams.view",
     "schedule.view",
-    "instructors.view",
+    INSTRUCTORS_VIEW,
   ],
   [ADMIN_DEPARTMENT.AIR_TRAFFIC_CONTROLLER]: [
     "admin.air_traffic_controller",
     AIRCRAFTS_VIEW,
     "notams.view",
     "schedule.view",
-    "instructors.view",
+    INSTRUCTORS_VIEW,
   ],
   [ADMIN_DEPARTMENT.SAFETY_PERSONNEL]: [
     "admin.safety_personnel",
     AIRCRAFTS_VIEW,
     "notams.view",
     "schedule.view",
-    "instructors.view",
+    INSTRUCTORS_VIEW,
   ],
 } satisfies Record<AdminDepartment, Permission[]>;
 

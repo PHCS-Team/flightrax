@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { PUBLIC_AUTH_ROLES } from "@/shared/lib/rbac/config";
+import { AdminAccessTrigger } from "@/modules/auth/components/admin-access-trigger";
 import { AuthShell } from "@/modules/auth/components/auth-shell";
 import {
   AUTH_MODE_CONFIG,
@@ -14,23 +15,28 @@ export function AuthRolePicker({ mode }: { mode: AuthMode }) {
   return (
     <AuthShell
       eyebrow={modeConfig.eyebrow}
-      title={modeConfig.title}
+      title={
+        <>
+          {modeConfig.title}
+          <AdminAccessTrigger className="ml-0.5 align-middle sm:ml-3" />
+        </>
+      }
       description={modeConfig.description}
       surface="bare"
     >
       <nav
         aria-label={`${modeConfig.submitLabel} role`}
-        className="relative mx-auto w-full max-w-lg py-4"
+        className="relative mx-auto w-full max-w-sm sm:max-w-md py-4"
       >
         <div
           aria-hidden="true"
-          className="absolute left-12 right-12 top-20 h-1 rounded-full bg-primary-foreground/25 sm:left-16 sm:right-16"
+          className="absolute left-12 right-12 top-17.5 sm:top-20 h-1 rounded-full bg-primary-foreground sm:left-16 sm:right-16"
         />
         <div
           aria-hidden="true"
-          className="absolute left-12 right-12 top-20 h-px translate-y-1 rounded-full bg-primary-foreground/60 sm:left-16 sm:right-16"
+          className="absolute left-12 right-12 top-17.5 sm:top-20 h-px translate-y-1 rounded-full bg-primary-foreground/60 sm:left-16 sm:right-16"
         />
-        <div className="grid grid-cols-3 gap-2 sm:gap-5">
+        <div className="grid grid-cols-2 gap-10 sm:gap-10">
           {PUBLIC_AUTH_ROLES.map((role) => {
             const config = AUTH_ROLE_CONFIG[role];
             const Icon = config.icon;
@@ -42,7 +48,7 @@ export function AuthRolePicker({ mode }: { mode: AuthMode }) {
                 href={`/${mode}/${role}`}
                 key={role}
               >
-                <span className="relative flex size-24 items-center justify-center rounded-full bg-primary-foreground text-primary shadow-lg shadow-primary/20 ring-4 ring-primary-foreground/20 transition duration-200 group-hover:-translate-y-1 group-hover:bg-primary-foreground/95 group-hover:ring-primary-foreground/35 group-focus-visible:ring-primary-foreground/60 group-active:translate-y-0 sm:size-28">
+                <span className="relative flex size-24 items-center justify-center rounded-full bg-primary-foreground text-primary shadow-lg shadow-primary/20 ring-4 ring-primary-foreground/20 transition duration-200 group-hover:-translate-y-1 group-hover:bg-primary-foreground group-hover:ring-primary-foreground/35 group-focus-visible:ring-primary-foreground/60 group-active:translate-y-0 sm:size-28">
                   <span className="absolute inset-3 rounded-full border border-primary/15" />
                   <Icon className="relative size-9 sm:size-10" />
                 </span>

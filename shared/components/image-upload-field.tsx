@@ -18,6 +18,7 @@ type Theme = "light" | "dark";
 type ImageUploadFieldBaseProps = {
   accept?: readonly string[] | string;
   className?: string;
+  currentImageUrl?: string | null;
   disabled?: boolean;
   errorText?: string;
   helperText?: string;
@@ -53,6 +54,7 @@ export function ImageUploadField(props: ImageUploadFieldProps) {
   const describedBy = [helperId, errorId].filter(Boolean).join(" ") || undefined;
   const accept = typeof props.accept === "string" ? props.accept : (props.accept?.join(",") ?? "image/*");
   const hasFiles = previews.length > 0;
+  const hasCurrentImage = !hasFiles && Boolean(props.currentImageUrl);
   const variant = props.variant ?? "default";
   const theme = props.theme ?? "light";
 
@@ -151,6 +153,7 @@ export function ImageUploadField(props: ImageUploadFieldProps) {
 
       {variant === "compact" ? (
         <CompactUploadControl
+          currentImageUrl={hasCurrentImage ? props.currentImageUrl : null}
           disabled={props.disabled}
           errorText={props.errorText}
           hasFiles={hasFiles}
@@ -162,6 +165,7 @@ export function ImageUploadField(props: ImageUploadFieldProps) {
         />
       ) : (
         <DefaultUploadControl
+          currentImageUrl={hasCurrentImage ? props.currentImageUrl : null}
           disabled={props.disabled}
           errorText={props.errorText}
           hasFiles={hasFiles}
@@ -194,6 +198,7 @@ export function ImageUploadField(props: ImageUploadFieldProps) {
 }
 
 type UploadControlProps = {
+  currentImageUrl?: string | null;
   disabled?: boolean;
   errorText?: string;
   hasFiles: boolean;
@@ -205,6 +210,7 @@ type UploadControlProps = {
 };
 
 function CompactUploadControl({
+  currentImageUrl,
   disabled,
   errorText,
   hasFiles,
@@ -215,6 +221,7 @@ function CompactUploadControl({
   theme,
 }: UploadControlProps) {
   const selectedSummary = getSelectedSummary(previews, multiple);
+  const showsCurrent = !hasFiles && Boolean(currentImageUrl);
 
   return (
     <div
@@ -243,10 +250,19 @@ function CompactUploadControl({
           onClick={onChoose}
           type="button"
         >
-          <PreviewThumbnail preview={previews[0]} size="compact" theme={theme} />
+          <PreviewThumbnail
+            imageUrl={showsCurrent ? currentImageUrl : undefined}
+            preview={previews[0]}
+            size="compact"
+            theme={theme}
+          />
           <span className="min-w-0 flex-1 overflow-hidden">
             <span className="block truncate text-sm font-semibold">
-              {hasFiles ? selectedSummary.title : "Choose image"}
+              {hasFiles
+                ? selectedSummary.title
+                : showsCurrent
+                  ? "Current image"
+                  : "Choose image"}
             </span>
             <span
               className={cn(
@@ -256,9 +272,11 @@ function CompactUploadControl({
             >
               {hasFiles
                 ? selectedSummary.detail
-                : multiple
-                  ? "Select image files"
-                  : "Select one image file"}
+                : showsCurrent
+                  ? "Choose a new image to replace it"
+                  : multiple
+                    ? "Select image files"
+                    : "Select one image file"}
             </span>
           </span>
         </button>
@@ -289,6 +307,7 @@ function CompactUploadControl({
 }
 
 function DefaultUploadControl({
+  currentImageUrl,
   disabled,
   errorText,
   hasFiles,
@@ -298,6 +317,7 @@ function DefaultUploadControl({
   previews,
   theme,
 }: UploadControlProps) {
+  const showsCurrent = !hasFiles && Boolean(currentImageUrl);
   return (
     <div
       className={cn(
@@ -315,7 +335,12 @@ function DefaultUploadControl({
     >
       <div className="flex flex-col gap-3">
         <div className="grid gap-3 sm:grid-cols-[6rem_1fr] sm:items-center">
-          <PreviewThumbnail preview={previews[0]} size="default" theme={theme} />
+          <PreviewThumbnail
+            imageUrl={showsCurrent ? currentImageUrl : undefined}
+            preview={previews[0]}
+            size="default"
+            theme={theme}
+          />
 
           <div className="space-y-3">
             <div className="space-y-1">
@@ -325,7 +350,11 @@ function DefaultUploadControl({
                   theme === "dark" ? "text-primary-foreground" : "text-foreground",
                 )}
               >
-                {hasFiles ? "Image ready for review" : "Upload a clear image"}
+                {hasFiles
+                  ? "Image ready for review"
+                  : showsCurrent
+                    ? "Current image"
+                    : "Upload a clear image"}
               </p>
               <p
                 className={cn(
@@ -333,7 +362,11 @@ function DefaultUploadControl({
                   theme === "dark" ? "text-primary-foreground/70" : "text-muted-foreground",
                 )}
               >
-                {multiple ? "Select one or more image files." : "Select one image file."}
+                {multiple
+                  ? "Select one or more image files."
+                  : showsCurrent
+                    ? "Choose a new image to replace it."
+                    : "Select one image file."}
               </p>
             </div>
 
@@ -345,7 +378,11 @@ function DefaultUploadControl({
                 type="button"
               >
                 <UploadCloudIcon className="size-4" />
-                {hasFiles ? "Choose different image" : "Choose image"}
+                {hasFiles
+                  ? "Choose different image"
+                  : showsCurrent
+                    ? "Replace image"
+                    : "Choose image"}
               </button>
             ) : (
               <Button
@@ -356,7 +393,11 @@ function DefaultUploadControl({
                 variant="outline"
               >
                 <UploadCloudIcon className="size-4" />
-                {hasFiles ? "Choose different image" : "Choose image"}
+                {hasFiles
+                  ? "Choose different image"
+                  : showsCurrent
+                    ? "Replace image"
+                    : "Choose image"}
               </Button>
             )}
           </div>
@@ -381,14 +422,18 @@ function DefaultUploadControl({
 }
 
 function PreviewThumbnail({
+  imageUrl,
   preview,
   size,
   theme,
 }: {
+  imageUrl?: string | null;
   preview?: ImagePreview;
   size: "default" | "compact";
   theme: Theme;
 }) {
+  const backgroundUrl = preview?.url ?? imageUrl ?? null;
+
   return (
     <div
       className={cn(
@@ -401,12 +446,12 @@ function PreviewThumbnail({
           : "h-32 rounded-lg sm:h-24 sm:rounded-2xl",
       )}
     >
-      {preview ? (
+      {backgroundUrl ? (
         <div
-          aria-label={`${preview.name} preview`}
+          aria-label={preview ? `${preview.name} preview` : "Current image preview"}
           className="absolute inset-0 bg-cover bg-center"
           role="img"
-          style={{ backgroundImage: `url(${preview.url})` }}
+          style={{ backgroundImage: `url(${backgroundUrl})` }}
         />
       ) : (
         <div

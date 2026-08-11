@@ -54,11 +54,11 @@ export function AccountPasscodeSection({
         </span>
         <div>
           <h2 className="text-xl font-semibold tracking-tight text-primary-foreground">
-            Approval Passcode
+            Security Passcode
           </h2>
           <p className="mt-0.5 text-sm text-primary-foreground/70">
             {isSetup
-              ? "Set a 4-digit passcode required when approving flight plans."
+              ? "Set a 4-digit passcode used to approve flight plans and commence or terminate flights."
               : isChanging
                 ? "Enter your account password to change your passcode."
                 : "Passcode is currently set."}

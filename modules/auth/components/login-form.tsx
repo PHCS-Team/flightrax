@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAction } from "next-safe-action/hooks";
 import { useForm } from "react-hook-form";
 
@@ -21,6 +22,7 @@ import {
 
 export function LoginForm({ role }: { role: ProfileRole }) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const modeConfig = AUTH_MODE_CONFIG[AUTH_MODE.LOGIN];
   const form = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
@@ -31,6 +33,7 @@ export function LoginForm({ role }: { role: ProfileRole }) {
       toastActionResult(data);
 
       if (data?.redirectTo) {
+        queryClient.clear();
         router.push(data.redirectTo);
       }
     },

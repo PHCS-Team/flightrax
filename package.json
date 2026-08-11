@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit",
-    "supabase:types": "npx supabase gen types typescript --project-id \"$SUPABASE_PROJECT_ID\" --schema public > shared/types/supabase.ts",
+    "supabase:types": "supabase gen types typescript --project-id \"$SUPABASE_PROJECT_ID\" --schema public > shared/types/supabase.ts",
     "supabase:types:local": "npx supabase gen types typescript --local --schema public > shared/types/supabase.ts",
     "supabase:migration:new": "npx supabase migration new"
   },
@@ -53,6 +53,7 @@
     "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.8.5",
     "prettier-plugin-tailwindcss": "^0.8.0",
+    "supabase": "^2.113.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

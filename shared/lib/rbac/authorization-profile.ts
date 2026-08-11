@@ -7,7 +7,7 @@ import type { Profile } from "@/shared/lib/rbac/types";
 import { createClient } from "@/shared/lib/supabase/server";
 
 const AUTHORIZATION_PROFILE_SELECT =
-  "*, student_profiles!student_profiles_profile_id_fkey(approval_status), admin_profiles!admin_profiles_profile_id_fkey(department), instructor_profiles!instructor_profiles_profile_id_fkey(passcode_hash)";
+  "*, account_requests!account_requests_profile_id_fkey(approval_status), admin_profiles!admin_profiles_profile_id_fkey(department)";
 
 const getCurrentUser = cache(async function getCurrentUser() {
   const supabase = await createClient();
@@ -38,7 +38,7 @@ export const getAuthorizationProfileByUserId = cache(
     }
 
     return normalizeProfile(data, {
-      includeStudentDocuments: false,
+      includeRequestDetails: false,
       profilePhotoUrl: null,
     });
   },

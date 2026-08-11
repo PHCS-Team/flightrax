@@ -1,0 +1,268 @@
+"use client";
+
+import {
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+  type ColumnDef,
+  type PaginationState,
+} from "@tanstack/react-table";
+import { useState } from "react";
+
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/shared/components/ui/avatar";
+import { Button } from "@/shared/components/ui/button";
+import { GlassSurface } from "@/shared/components/layout/glass-surface";
+import { Input } from "@/shared/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/shared/components/ui/table";
+import { getAvatarFallback } from "@/shared/lib/avatar-fallback";
+import { CertificateTags } from "@/shared/components/certificate-tags";
+import { CertificateDetailsDialog } from "@/shared/components/certificate-details-dialog";
+import { LicenseTags } from "@/shared/components/license-tags";
+import { LicenseDetailsDialog } from "@/shared/components/license-details-dialog";
+import type { CertificateSummary } from "@/shared/types/certificate-summary";
+import type { LicenseSummary } from "@/shared/types/license-summary";
+import type { ApprovedInstructor } from "@/modules/instructors/types/instructor";
+
+export function InstructorsTable({
+  instructors,
+  onPageChange,
+  onSearchChange,
+  page,
+  pageSize,
+  restrictPeerCredentials,
+  search,
+  totalCount,
+  totalPages,
+  viewerId,
+}: {
+  instructors: ApprovedInstructor[];
+  onPageChange: (page: number) => void;
+  onSearchChange: (search: string) => void;
+  page: number;
+  pageSize: number;
+  restrictPeerCredentials: boolean;
+  search: string;
+  totalCount: number;
+  totalPages: number;
+  viewerId: string | null;
+}) {
+  const [detailsLicense, setDetailsLicense] = useState<LicenseSummary | null>(
+    null,
+  );
+  const [detailsCertificate, setDetailsCertificate] =
+    useState<CertificateSummary | null>(null);
+
+  function canViewCredentials(instructor: ApprovedInstructor) {
+    return !restrictPeerCredentials || instructor.id === viewerId;
+  }
+
+  const columns = [
+    {
+      accessorKey: "fullName",
+      header: "Instructor Profile",
+      cell: ({ row }) => {
+        const instructor = row.original;
+
+        return (
+          <div className="flex min-w-64 items-center gap-3">
+            <Avatar className="size-11" size="lg">
+              {instructor.profilePhotoUrl && (
+                <AvatarImage
+                  alt={`${instructor.fullName} profile photo`}
+                  src={instructor.profilePhotoUrl}
+                />
+              )}
+              <AvatarFallback className="bg-primary-foreground/15 text-primary-foreground">
+                {getAvatarFallback(instructor.fullName)}
+              </AvatarFallback>
+            </Avatar>
+            <div className="min-w-0">
+              <p className="truncate font-semibold text-primary-foreground">
+                {instructor.fullName}
+              </p>
+              <p className="text-sm text-primary-foreground/65">
+                ID Number: {instructor.instructorIdNumber}
+              </p>
+            </div>
+          </div>
+        );
+      },
+    },
+    {
+      id: "licenses",
+      header: "Licenses",
+      cell: ({ row }) => (
+        <LicenseTags
+          licenses={row.original.licenses}
+          onLicenseClick={
+            canViewCredentials(row.original) ? setDetailsLicense : undefined
+          }
+        />
+      ),
+    },
+    {
+      id: "certificates",
+      header: "Certificates",
+      cell: ({ row }) => (
+        <CertificateTags
+          certificates={row.original.certificates}
+          onCertificateClick={
+            canViewCredentials(row.original)
+              ? setDetailsCertificate
+              : undefined
+          }
+        />
+      ),
+    },
+  ] satisfies ColumnDef<ApprovedInstructor>[];
+
+  const pagination: PaginationState = {
+    pageIndex: page - 1,
+    pageSize,
+  };
+
+  // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Table exposes non-memoizable table helpers by design.
+  const table = useReactTable({
+    columns,
+    data: instructors,
+    getCoreRowModel: getCoreRowModel(),
+    manualPagination: true,
+    pageCount: totalPages,
+    onPaginationChange: (updater) => {
+      const next =
+        typeof updater === "function" ? updater(pagination) : updater;
+      onPageChange(next.pageIndex + 1);
+    },
+    state: { pagination },
+  });
+
+  return (
+    <GlassSurface className="space-y-4 p-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <Input
+          className="max-w-sm border-primary-foreground/20 bg-primary-foreground/10 text-[#121212] placeholder:text-[#121212]/55 focus-visible:border-primary-foreground/45 focus-visible:ring-primary-foreground/20"
+          onChange={(event) => {
+            onSearchChange(event.target.value);
+          }}
+          placeholder="Search name, email, or instructor ID"
+          value={search}
+        />
+        <p className="text-sm text-primary-foreground/70">
+          {instructors.length} of {totalCount} instructors
+        </p>
+      </div>
+
+      <Table className="text-primary-foreground">
+        <TableHeader className="[&_tr]:border-primary-foreground/20">
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow
+              className="border-primary-foreground/20 hover:bg-primary-foreground/5"
+              key={headerGroup.id}
+            >
+              {headerGroup.headers.map((header) => (
+                <TableHead
+                  className="text-primary-foreground/75"
+                  key={header.id}
+                >
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
+                </TableHead>
+              ))}
+            </TableRow>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {table.getRowModel().rows.length > 0 ? (
+            table.getRowModel().rows.map((row) => (
+              <TableRow
+                className="border-primary-foreground/10 hover:bg-primary-foreground/10"
+                key={row.id}
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell className="text-primary-foreground" key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell
+                className="h-24 text-center text-primary-foreground/70"
+                colSpan={columns.length}
+              >
+                No instructors match your search.
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-sm text-primary-foreground/70">
+          Page {table.getState().pagination.pageIndex + 1} of{" "}
+          {table.getPageCount() || 1}
+        </p>
+        <div className="flex gap-2">
+          <Button
+            disabled={!table.getCanPreviousPage()}
+            onClick={() => table.previousPage()}
+            type="button"
+            variant="outline"
+            className="border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground disabled:border-primary-foreground/10 disabled:bg-primary-foreground/5 disabled:text-primary-foreground/50"
+          >
+            Previous
+          </Button>
+          <Button
+            disabled={!table.getCanNextPage()}
+            onClick={() => table.nextPage()}
+            type="button"
+            variant="outline"
+            className="border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground disabled:border-primary-foreground/10 disabled:bg-primary-foreground/5 disabled:text-primary-foreground/50"
+          >
+            Next
+          </Button>
+        </div>
+      </div>
+
+      {detailsLicense && (
+        <LicenseDetailsDialog
+          license={detailsLicense}
+          onOpenChange={(open) => {
+            if (!open) {
+              setDetailsLicense(null);
+            }
+          }}
+          open
+        />
+      )}
+
+      {detailsCertificate && (
+        <CertificateDetailsDialog
+          certificate={detailsCertificate}
+          onOpenChange={(open) => {
+            if (!open) {
+              setDetailsCertificate(null);
+            }
+          }}
+          open
+        />
+      )}
+    </GlassSurface>
+  );
+}

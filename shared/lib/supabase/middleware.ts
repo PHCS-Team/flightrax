@@ -17,16 +17,16 @@ import {
 import type { Database } from "@/shared/types/supabase";
 
 type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
-type StudentProfileRow = Database["public"]["Tables"]["student_profiles"]["Row"];
+type AccountRequestRow = Database["public"]["Tables"]["account_requests"]["Row"];
 type AdminProfileRow = Database["public"]["Tables"]["admin_profiles"]["Row"];
 
 type MiddlewareProfileRow = Pick<ProfileRow, "role"> & {
-  student_profiles: Pick<StudentProfileRow, "approval_status"> | null;
+  account_requests: Pick<AccountRequestRow, "approval_status"> | null;
   admin_profiles: Pick<AdminProfileRow, "department"> | null;
 };
 
 const MIDDLEWARE_PROFILE_SELECT =
-  "role, student_profiles!student_profiles_profile_id_fkey(approval_status), admin_profiles!admin_profiles_profile_id_fkey(department)";
+  "role, account_requests!account_requests_profile_id_fkey(approval_status), admin_profiles!admin_profiles_profile_id_fkey(department)";
 
 function toRouteAccessProfile(row: MiddlewareProfileRow): RouteAccessProfile {
   return {
@@ -37,7 +37,7 @@ function toRouteAccessProfile(row: MiddlewareProfileRow): RouteAccessProfile {
     ),
     approval_status: getEffectiveApprovalStatus(
       row.role,
-      row.student_profiles?.approval_status ?? null,
+      row.account_requests?.approval_status ?? null,
     ),
   };
 }

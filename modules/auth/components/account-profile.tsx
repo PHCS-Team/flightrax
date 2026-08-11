@@ -1,19 +1,17 @@
 import { MailIcon } from "lucide-react";
 
+import { AccountCertificateSection } from "@/modules/auth/components/account-certificate-section";
+import { AccountCredentialsSummary } from "@/modules/auth/components/account-credentials-summary";
 import { AccountLicenseSection } from "@/modules/auth/components/account-license-section";
 import { AccountLogSection } from "@/modules/auth/components/account-log-section";
 import { AccountPasscodeSection } from "@/modules/auth/components/account-passcode-section";
 import { AccountSignatureSection } from "@/modules/auth/components/account-signature-section";
 import { ProfilePhotoUploader } from "@/modules/auth/components/profile-photo-uploader";
 import { parseDisplayName } from "@/modules/auth/utils/display-name";
-import {
-  getAdminDepartmentLabel,
-  getProfileDetails,
-} from "@/modules/auth/utils/profile-utils";
+import { getAdminDepartmentLabel } from "@/modules/auth/utils/profile-utils";
 import { getAvatarFallback } from "@/shared/lib/avatar-fallback";
-import { hasMissingLicenseDetails } from "@/shared/lib/aviation/license-options";
 import { GlassSurface } from "@/shared/components/layout/glass-surface";
-import { ROLE } from "@/shared/lib/rbac/config";
+import { canManagePasscode, ROLE } from "@/shared/lib/rbac/config";
 import type { Profile } from "@/shared/lib/rbac/types";
 import {
   Tabs,
@@ -24,10 +22,6 @@ import {
 
 export function AccountProfile({ profile }: { profile: Profile }) {
   const displayName = parseDisplayName(profile.full_name);
-  const profileDetails = getProfileDetails(profile);
-  const canSetLicenseDetails =
-    (profile.role === ROLE.STUDENT || profile.role === ROLE.INSTRUCTOR) &&
-    hasMissingLicenseDetails(profile);
 
   return (
     <>
@@ -66,22 +60,32 @@ export function AccountProfile({ profile }: { profile: Profile }) {
           </p>
         </GlassSurface>
       ) : (
-        <Tabs defaultValue="profile" className="gap-0 sm:gap-3">
+        <Tabs defaultValue="profile" className="gap-0 sm:gap-4">
           <TabsList className="w-full justify-start border-x-0 md:w-fit md:border-x border-y border-primary-foreground/15 p-1.5">
             <TabsTrigger value="profile">Profile</TabsTrigger>
+            <TabsTrigger value="credentials">Documents</TabsTrigger>
             <TabsTrigger value="log">Log</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="profile" className="w-full space-y-6 sm:max-w-xl">
-            <AccountLicenseSection
-              canSetLicenseDetails={canSetLicenseDetails}
-              details={profileDetails}
-              role={profile.role}
-            />
-            <AccountSignatureSection profile={profile} />
-            {profile.role === ROLE.INSTRUCTOR && (
-              <AccountPasscodeSection passcodeHash={profile.passcode_hash} />
-            )}
+          <TabsContent
+            value="profile"
+            className="w-full space-y-1.5 sm:space-y-4"
+          >
+            <AccountCredentialsSummary />
+            <div className="grid gap-1.5 sm:gap-4 lg:grid-cols-2 lg:items-start">
+              <AccountSignatureSection profile={profile} />
+              {canManagePasscode(profile.role) && (
+                <AccountPasscodeSection passcodeHash={profile.passcode_hash} />
+              )}
+            </div>
+          </TabsContent>
+
+          <TabsContent
+            value="credentials"
+            className="w-full space-y-1.5 sm:space-y-4"
+          >
+            <AccountLicenseSection />
+            <AccountCertificateSection />
           </TabsContent>
 
           <TabsContent value="log">
