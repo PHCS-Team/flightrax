@@ -65,23 +65,6 @@ function AppInfoCard() {
             {appMetadata.credits}
           </span>
         </p>
-
-        {appMetadata.contact && (
-          <p className="text-xs leading-5 text-primary-foreground/60">
-            {appMetadata.contactHref ? (
-              <a
-                className="cursor-pointer wrap-break-word rounded-md font-medium text-primary-foreground/85 underline decoration-primary-foreground/25 underline-offset-4 transition hover:text-primary-foreground hover:decoration-primary-foreground/70 focus-visible:outline-1 focus-visible:outline-ring"
-                href={appMetadata.contactHref}
-              >
-                {appMetadata.contact}
-              </a>
-            ) : (
-              <span className="wrap-break-word font-medium text-primary-foreground/85">
-                {appMetadata.contact}
-              </span>
-            )}
-          </p>
-        )}
       </div>
     </div>
   );
