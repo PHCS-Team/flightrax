@@ -18,7 +18,7 @@ export function AuthShell({
   children: ReactNode;
   contentClassName?: string;
   eyebrow: string;
-  title: string;
+  title: ReactNode;
   description?: string;
   surface?: AuthShellSurface;
 }) {

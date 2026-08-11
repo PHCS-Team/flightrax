@@ -18,11 +18,10 @@ export const ROLE = {
 
 export const ROLES: ProfileRole[] = Object.values(ROLE);
 
-export const PUBLIC_AUTH_ROLES: ProfileRole[] = [
-  ROLE.STUDENT,
-  ROLE.INSTRUCTOR,
-  ROLE.ADMIN,
-];
+// Roles offered on the public login/register pickers. Admin access is
+// deliberately excluded — it lives on its own pages reached via the
+// hold-to-fly plane trigger, since admins skip the account review gate.
+export const PUBLIC_AUTH_ROLES: ProfileRole[] = [ROLE.STUDENT, ROLE.INSTRUCTOR];
 
 export const PASSCODE_ROLES: ProfileRole[] = [ROLE.STUDENT, ROLE.INSTRUCTOR];
 

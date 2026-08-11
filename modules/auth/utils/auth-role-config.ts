@@ -1,7 +1,7 @@
 import {
+  BookUserIcon,
   CrownIcon,
   GraduationCapIcon,
-  PlaneIcon,
   ShieldCheckIcon,
   type LucideIcon,
 } from "lucide-react";
@@ -68,7 +68,7 @@ export const AUTH_ROLE_CONFIG = {
   [ROLE.INSTRUCTOR]: {
     label: "Instructor",
     eyebrow: "Instructor Desk",
-    icon: PlaneIcon,
+    icon: BookUserIcon,
     title: {
       [AUTH_MODE.LOGIN]: "Instructor Sign In",
       [AUTH_MODE.REGISTER]: "Create Instructor Access",
