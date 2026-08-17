@@ -204,6 +204,7 @@ function WbSpecsForm({
           <Switch
             aria-label="Has baggage areas"
             checked={hasBaggage}
+            className="cursor-pointer data-disabled:cursor-not-allowed"
             disabled={isExecuting}
             onCheckedChange={handleBaggageToggle}
           />
