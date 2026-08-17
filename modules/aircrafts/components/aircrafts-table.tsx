@@ -14,6 +14,7 @@ import {
   CopyIcon,
   EyeIcon,
   ImageIcon,
+  InfoIcon,
   ListFilterIcon,
   PencilIcon,
   PlusIcon,
@@ -142,15 +143,6 @@ export function AircraftsTable({
         },
       },
       {
-        accessorKey: "colorMarkings",
-        header: "Color / Markings",
-        cell: ({ row }) => (
-          <p className="max-w-80 whitespace-normal text-sm text-primary-foreground/80 line-clamp-3">
-            {row.original.colorMarkings}
-          </p>
-        ),
-      },
-      {
         id: "weightBalance",
         header: () => (
           <span className="inline-flex items-center gap-1">
@@ -164,24 +156,27 @@ export function AircraftsTable({
                   <CircleHelpIcon className="size-3.5" />
                 </button>
               </PopoverTrigger>
-              <PopoverContent align="start" className="w-72 p-3" side="bottom">
-                <div className="space-y-3">
+              <PopoverContent align="start" className="w-80 p-3" side="bottom">
+                <div className="max-h-72 space-y-3 overflow-y-auto pr-1">
                   <div className="rounded-lg border bg-muted/30 p-2.5">
                     <p className="text-sm font-medium text-foreground/90">
                       Basic empty weight{" "}
                       <span className="text-foreground/50">(lbs)</span>
                       <span className="mx-1 text-foreground/30">&times;</span>
-                      Arm <span className="text-foreground/50">(in)</span>
+                      ARM <span className="text-foreground/50">(in)</span>
                     </p>
                     <p className="mt-1 text-xs text-foreground/60">
                       Moment{" "}
                       <span className="text-foreground/40">(lbs-in)</span>
                     </p>
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-2 rounded-lg border bg-muted/30 p-2.5">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                      Basic Empty Weight
+                    </p>
                     <div>
                       <p className="text-xs font-medium text-foreground/80">
-                        Basic empty weight
+                        Weight
                       </p>
                       <p className="text-xs leading-relaxed text-muted-foreground">
                         Aircraft standard weight without payload or fuel.
@@ -189,7 +184,7 @@ export function AircraftsTable({
                     </div>
                     <div>
                       <p className="text-xs font-medium text-foreground/80">
-                        Arm
+                        ARM
                       </p>
                       <p className="text-xs leading-relaxed text-muted-foreground">
                         Horizontal distance from datum in inches.
@@ -200,7 +195,47 @@ export function AircraftsTable({
                         Moment
                       </p>
                       <p className="text-xs leading-relaxed text-muted-foreground">
-                        Weight × arm in pound-inches.
+                        Weight × ARM in pound-inches.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="space-y-2 rounded-lg border bg-muted/30 p-2.5">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                      Additional Configuration
+                    </p>
+                    <div>
+                      <p className="text-xs font-medium text-foreground/80">
+                        Fuel ARM
+                      </p>
+                      <p className="text-xs leading-relaxed text-muted-foreground">
+                        ARM of the usable fuel load in inches.
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-foreground/80">
+                        FI + Student ARM
+                      </p>
+                      <p className="text-xs leading-relaxed text-muted-foreground">
+                        ARM of the flight instructor and student seats in
+                        inches.
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-foreground/80">
+                        Baggage 1 / 2
+                      </p>
+                      <p className="text-xs leading-relaxed text-muted-foreground">
+                        ARMs of the primary and secondary baggage areas in
+                        inches. Optional &mdash; 0 when not applicable.
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-foreground/80">
+                        MTOW
+                      </p>
+                      <p className="text-xs leading-relaxed text-muted-foreground">
+                        Maximum takeoff weight &mdash; heaviest allowed weight
+                        at the start of the takeoff run, in pounds.
                       </p>
                     </div>
                   </div>
@@ -209,11 +244,7 @@ export function AircraftsTable({
             </Popover>
           </span>
         ),
-        cell: ({ row }) => (
-          <div className="max-w-80">
-            <AircraftWeightBalanceCell aircraft={row.original} />
-          </div>
-        ),
+        cell: ({ row }) => <AircraftWeightBalanceCell aircraft={row.original} />,
       },
       {
         id: "status",
@@ -388,6 +419,16 @@ export function AircraftsTable({
             </Button>
           </div>
         </div>
+
+        <p className="flex items-center gap-1.5 rounded-lg border border-primary-foreground/15 bg-primary-foreground/5 px-3 py-2 text-xs text-primary-foreground/70">
+          <InfoIcon className="size-3.5 shrink-0" />
+          <span>
+            To view color / markings, remarks, and other aircraft details,
+            click the{" "}
+            <EyeIcon className="inline size-3.5 align-text-bottom text-primary-foreground/90" />{" "}
+            eye icon under Actions.
+          </span>
+        </p>
 
         <Table className="text-primary-foreground">
           <TableHeader className="[&_tr]:border-primary-foreground/20">

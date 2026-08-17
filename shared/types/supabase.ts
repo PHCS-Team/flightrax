@@ -146,30 +146,45 @@ export type Database = {
       aircraft_weight_balance_configs: {
         Row: {
           aircraft_id: string
-          arm: number
           basic_empty_weight: number
+          basic_empty_weight_arm: number
+          basic_empty_weight_moment: number
           created_at: string
+          fi_and_student_arm: number
           id: string
-          moment: number
+          maximum_takeoff_weight: number
+          primary_baggage_area_arm: number
+          secondary_baggage_area_arm: number
           updated_at: string
+          usable_fuel_arm: number
         }
         Insert: {
           aircraft_id: string
-          arm: number
           basic_empty_weight: number
+          basic_empty_weight_arm: number
+          basic_empty_weight_moment: number
           created_at?: string
+          fi_and_student_arm: number
           id?: string
-          moment: number
+          maximum_takeoff_weight: number
+          primary_baggage_area_arm?: number
+          secondary_baggage_area_arm?: number
           updated_at?: string
+          usable_fuel_arm: number
         }
         Update: {
           aircraft_id?: string
-          arm?: number
           basic_empty_weight?: number
+          basic_empty_weight_arm?: number
+          basic_empty_weight_moment?: number
           created_at?: string
+          fi_and_student_arm?: number
           id?: string
-          moment?: number
+          maximum_takeoff_weight?: number
+          primary_baggage_area_arm?: number
+          secondary_baggage_area_arm?: number
           updated_at?: string
+          usable_fuel_arm?: number
         }
         Relationships: [
           {

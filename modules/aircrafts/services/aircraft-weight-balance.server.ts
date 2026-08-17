@@ -8,7 +8,7 @@ import { isApproved } from "@/shared/lib/rbac/guards";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 
 const WEIGHT_BALANCE_SELECT =
-  "id, aircraft_id, basic_empty_weight, arm, moment";
+  "id, aircraft_id, basic_empty_weight, basic_empty_weight_arm, basic_empty_weight_moment, usable_fuel_arm, fi_and_student_arm, primary_baggage_area_arm, secondary_baggage_area_arm, maximum_takeoff_weight";
 
 export async function getAircraftWeightBalance(
   aircraftId: string,
@@ -42,7 +42,12 @@ export async function getAircraftWeightBalance(
     id: data.id,
     aircraftId: data.aircraft_id,
     basicEmptyWeight: Number(data.basic_empty_weight),
-    arm: Number(data.arm),
-    moment: Number(data.moment),
+    basicEmptyWeightArm: Number(data.basic_empty_weight_arm),
+    basicEmptyWeightMoment: Number(data.basic_empty_weight_moment),
+    usableFuelArm: Number(data.usable_fuel_arm),
+    fiAndStudentArm: Number(data.fi_and_student_arm),
+    primaryBaggageAreaArm: Number(data.primary_baggage_area_arm),
+    secondaryBaggageAreaArm: Number(data.secondary_baggage_area_arm),
+    maximumTakeoffWeight: Number(data.maximum_takeoff_weight),
   };
 }

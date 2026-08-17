@@ -36,8 +36,13 @@ export const setAircraftWeightBalanceAction = actionClient
 
     const config = {
       basic_empty_weight: parsedInput.basicEmptyWeight,
-      arm: parsedInput.arm,
-      moment: parsedInput.moment,
+      basic_empty_weight_arm: parsedInput.basicEmptyWeightArm,
+      basic_empty_weight_moment: parsedInput.basicEmptyWeightMoment,
+      usable_fuel_arm: parsedInput.usableFuelArm,
+      fi_and_student_arm: parsedInput.fiAndStudentArm,
+      primary_baggage_area_arm: parsedInput.primaryBaggageAreaArm,
+      secondary_baggage_area_arm: parsedInput.secondaryBaggageAreaArm,
+      maximum_takeoff_weight: parsedInput.maximumTakeoffWeight,
     };
 
     const { data: existing, error: fetchError } = await supabase
