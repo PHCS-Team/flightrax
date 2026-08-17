@@ -9,6 +9,7 @@ import {
   type PaginationState,
 } from "@tanstack/react-table";
 import {
+  BriefcaseIcon,
   CheckIcon,
   CircleHelpIcon,
   CopyIcon,
@@ -27,6 +28,7 @@ import { AircraftFormDialog } from "@/modules/aircrafts/components/aircraft-form
 import { AircraftDetailsDialog } from "@/modules/aircrafts/components/aircraft-details-dialog";
 import { AircraftStatusPill } from "@/modules/aircrafts/components/aircraft-status-pill";
 import { AircraftTypeManager } from "@/modules/aircrafts/components/aircraft-type-manager";
+import { AircraftTypeSpecsCell } from "@/modules/aircrafts/components/aircraft-type-specs-cell";
 import { AircraftWeightBalanceCell } from "@/modules/aircrafts/components/aircraft-weight-balance-cell";
 import { useAircraftTypes } from "@/modules/aircrafts/hooks/use-aircraft-types.query";
 import { useUpdateAircraftStatus } from "@/modules/aircrafts/hooks/use-update-aircraft-status.action";
@@ -143,10 +145,97 @@ export function AircraftsTable({
         },
       },
       {
+        id: "typeSpecs",
+        header: () => (
+          <span className="inline-flex items-center gap-1">
+            Aircraft Type Configuration
+            <Popover>
+              <PopoverTrigger asChild>
+                <button
+                  className="-m-0.5 inline-flex cursor-pointer items-center justify-center rounded-full p-0.5 text-primary-foreground/50 transition hover:bg-primary-foreground/10 hover:text-primary-foreground"
+                  type="button"
+                >
+                  <CircleHelpIcon className="size-3.5" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent align="start" className="w-80 p-3" side="bottom">
+                <div className="max-h-72 space-y-3 overflow-y-auto pr-1">
+                  <div className="space-y-2 rounded-lg border bg-muted/30 p-2.5">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                      Aircraft Type Configurations
+                    </p>
+                    <p className="text-xs leading-relaxed text-muted-foreground">
+                      Inherited from the aircraft type &mdash; fixed by the
+                      model and shared by every aircraft of the same type.
+                      Managed under Types.
+                    </p>
+                    <div>
+                      <p className="text-xs font-medium text-foreground/80">
+                        Fuel ARM
+                      </p>
+                      <p className="text-xs leading-relaxed text-muted-foreground">
+                        ARM of the usable fuel load in inches.
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-foreground/80">
+                        FI + Student ARM
+                      </p>
+                      <p className="text-xs leading-relaxed text-muted-foreground">
+                        ARM of the flight instructor and student seats in
+                        inches.
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-foreground/80">
+                        MTOW
+                      </p>
+                      <p className="text-xs leading-relaxed text-muted-foreground">
+                        Maximum takeoff weight &mdash; heaviest allowed weight
+                        at the start of the takeoff run, in pounds.
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-foreground/80">
+                        MBW
+                      </p>
+                      <p className="text-xs leading-relaxed text-muted-foreground">
+                        Max baggage weight &mdash; heaviest combined baggage
+                        load allowed, in pounds. Not set when the type has no
+                        baggage areas. Click the{" "}
+                        <BriefcaseIcon className="inline size-3 align-text-bottom text-foreground/70" />{" "}
+                        briefcase icon beside MBW to view the baggage area ARMs.
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-foreground/80">
+                        Baggage Area ARMs
+                      </p>
+                      <p className="text-xs leading-relaxed text-muted-foreground">
+                        ARMs of the type&apos;s baggage compartments in inches,
+                        viewable through the{" "}
+                        <BriefcaseIcon className="inline size-3 align-text-bottom text-foreground/70" />{" "}
+                        icon in the MBW stat.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
+          </span>
+        ),
+        cell: ({ row }) => (
+          <AircraftTypeSpecsCell
+            typeKey={row.original.aircraftType}
+            typeSpecs={row.original.typeWbSpecs}
+          />
+        ),
+      },
+      {
         id: "weightBalance",
         header: () => (
           <span className="inline-flex items-center gap-1">
-            Weight & Balance
+            Basic Empty Weight
             <Popover>
               <PopoverTrigger asChild>
                 <button
@@ -196,46 +285,6 @@ export function AircraftsTable({
                       </p>
                       <p className="text-xs leading-relaxed text-muted-foreground">
                         Weight × ARM in pound-inches.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="space-y-2 rounded-lg border bg-muted/30 p-2.5">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                      Additional Configuration
-                    </p>
-                    <div>
-                      <p className="text-xs font-medium text-foreground/80">
-                        Fuel ARM
-                      </p>
-                      <p className="text-xs leading-relaxed text-muted-foreground">
-                        ARM of the usable fuel load in inches.
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs font-medium text-foreground/80">
-                        FI + Student ARM
-                      </p>
-                      <p className="text-xs leading-relaxed text-muted-foreground">
-                        ARM of the flight instructor and student seats in
-                        inches.
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs font-medium text-foreground/80">
-                        Baggage 1 / 2
-                      </p>
-                      <p className="text-xs leading-relaxed text-muted-foreground">
-                        ARMs of the primary and secondary baggage areas in
-                        inches. Optional &mdash; 0 when not applicable.
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs font-medium text-foreground/80">
-                        MTOW
-                      </p>
-                      <p className="text-xs leading-relaxed text-muted-foreground">
-                        Maximum takeoff weight &mdash; heaviest allowed weight
-                        at the start of the takeoff run, in pounds.
                       </p>
                     </div>
                   </div>

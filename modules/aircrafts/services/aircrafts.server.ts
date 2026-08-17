@@ -10,7 +10,7 @@ import { AIRCRAFT_PHOTOS_BUCKET } from "@/shared/lib/storage/buckets";
 import type { PaginatedResponse } from "@/shared/types/pagination";
 
 const AIRCRAFT_SELECT =
-  "aircraft_identification, aircraft_type, aircraft_types!inner(type), color_markings, created_at, id, model, photo_path, remarks, serial_number, status, updated_at, aircraft_weight_balance_configs(id, basic_empty_weight, basic_empty_weight_arm, basic_empty_weight_moment, usable_fuel_arm, fi_and_student_arm, primary_baggage_area_arm, secondary_baggage_area_arm, maximum_takeoff_weight)" as const;
+  "aircraft_identification, aircraft_type, aircraft_types!inner(type, usable_fuel_arm, fi_and_student_arm, maximum_takeoff_weight, baggage_area_max_weight), color_markings, created_at, id, model, photo_path, remarks, serial_number, status, updated_at, aircraft_weight_balance_configs(id, basic_empty_weight, basic_empty_weight_arm, basic_empty_weight_moment)" as const;
 
 async function getMatchingAircraftTypes(
   supabase: ReturnType<typeof createAdminClient>,
@@ -108,6 +108,12 @@ export async function getAircraftsPage(
       serialNumber: row.serial_number,
       status: row.status,
       typeName: row.aircraft_types.type,
+      typeWbSpecs: {
+        usableFuelArm: row.aircraft_types.usable_fuel_arm,
+        fiAndStudentArm: row.aircraft_types.fi_and_student_arm,
+        maximumTakeoffWeight: row.aircraft_types.maximum_takeoff_weight,
+        baggageAreaMaxWeight: Number(row.aircraft_types.baggage_area_max_weight),
+      },
       updatedAt: row.updated_at,
       weightBalance: wb
         ? {
@@ -116,11 +122,6 @@ export async function getAircraftsPage(
             basicEmptyWeight: wb.basic_empty_weight,
             basicEmptyWeightArm: wb.basic_empty_weight_arm,
             basicEmptyWeightMoment: wb.basic_empty_weight_moment,
-            usableFuelArm: wb.usable_fuel_arm,
-            fiAndStudentArm: wb.fi_and_student_arm,
-            primaryBaggageAreaArm: wb.primary_baggage_area_arm,
-            secondaryBaggageAreaArm: wb.secondary_baggage_area_arm,
-            maximumTakeoffWeight: wb.maximum_takeoff_weight,
           }
         : null,
     };

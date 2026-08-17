@@ -46,7 +46,7 @@ export function AircraftWeightBalanceCell({
   return (
     <>
       <div
-        className="group flex cursor-pointer items-center gap-3 py-1"
+        className="group flex cursor-pointer items-center gap-3 py-1 mr-2"
         onClick={() => setWbDialogOpen(true)}
         role="button"
         tabIndex={0}
@@ -56,7 +56,7 @@ export function AircraftWeightBalanceCell({
           }
         }}
       >
-        <div className="w-30 shrink-0">
+        <div className="shrink-0">
           <p className="text-xs font-bold text-primary-foreground/80 mb-1">
             Basic Empty Weight
           </p>
@@ -75,42 +75,6 @@ export function AircraftWeightBalanceCell({
 
         <div className="h-10 w-px rounded-full shrink-0 bg-primary-foreground/20" />
         <div className="shrink-0">
-          <p className="text-xs font-bold text-primary-foreground/80 mb-1">
-            ARM Configuration
-          </p>
-          <div className="mt-1 flex items-center gap-4">
-            <WbStat
-              label="Usable Fuel"
-              unit="in"
-              value={wbConfig.usableFuelArm}
-            />
-            <WbStat
-              label="FI + Student"
-              unit="in"
-              value={wbConfig.fiAndStudentArm}
-            />
-            <WbStat
-              label="Baggage 1 / 2"
-              unit="in"
-              value={`${wbConfig.primaryBaggageAreaArm} / ${wbConfig.secondaryBaggageAreaArm}`}
-            />
-          </div>
-        </div>
-
-        <div className="h-10 w-px rounded-full shrink-0 bg-primary-foreground/20" />
-        <div className="shrink-0">
-          <p className="text-xs font-bold text-primary-foreground/80 mb-1">
-            Weight Limits
-          </p>
-          <WbStat
-            label="MTOW"
-            unit="lbs"
-            value={wbConfig.maximumTakeoffWeight.toLocaleString()}
-          />
-        </div>
-
-        <div className="h-10 w-px rounded-full shrink-0 bg-primary-foreground/20" />
-        <div className="shrink-0 mr-3">
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -125,7 +89,7 @@ export function AircraftWeightBalanceCell({
               </Button>
             </TooltipTrigger>
             <TooltipContent side="top">
-              <p>Reconfigure W&B</p>
+              <p>Reconfigure</p>
             </TooltipContent>
           </Tooltip>
         </div>
@@ -138,27 +102,5 @@ export function AircraftWeightBalanceCell({
         open={wbDialogOpen}
       />
     </>
-  );
-}
-
-function WbStat({
-  label,
-  unit,
-  value,
-}: {
-  label: string;
-  unit: string;
-  value: number | string;
-}) {
-  return (
-    <div>
-      <p className="text-xs font-medium leading-4 text-primary-foreground/70">
-        {label}
-      </p>
-      <p className="mt-0.5 text-sm font-semibold leading-5 text-primary-foreground">
-        {value}{" "}
-        <span className="font-normal text-primary-foreground/60">{unit}</span>
-      </p>
-    </div>
   );
 }

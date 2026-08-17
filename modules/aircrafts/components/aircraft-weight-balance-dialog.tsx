@@ -31,24 +31,6 @@ const weightBalanceFormSchema = z.object({
     .string()
     .min(1, "Enter basic moment.")
     .regex(/^\d+(\.\d+)?$/, "Enter a valid number."),
-  usableFuelArm: z
-    .string()
-    .min(1, "Enter usable fuel ARM.")
-    .regex(/^\d+(\.\d+)?$/, "Enter a valid number."),
-  fiAndStudentArm: z
-    .string()
-    .min(1, "Enter FI + student ARM.")
-    .regex(/^\d+(\.\d+)?$/, "Enter a valid number."),
-  primaryBaggageAreaArm: z
-    .string()
-    .regex(/^(\d+(\.\d+)?)?$/, "Enter a valid number."),
-  secondaryBaggageAreaArm: z
-    .string()
-    .regex(/^(\d+(\.\d+)?)?$/, "Enter a valid number."),
-  maximumTakeoffWeight: z
-    .string()
-    .min(1, "Enter maximum takeoff weight.")
-    .regex(/^\d+(\.\d+)?$/, "Enter a valid number."),
 });
 
 type WeightBalanceFormValues = z.infer<typeof weightBalanceFormSchema>;
@@ -65,17 +47,6 @@ function toFormValues(
       : "",
     basicEmptyWeightMoment: initialValues
       ? String(initialValues.basicEmptyWeightMoment)
-      : "",
-    usableFuelArm: initialValues ? String(initialValues.usableFuelArm) : "",
-    fiAndStudentArm: initialValues ? String(initialValues.fiAndStudentArm) : "",
-    primaryBaggageAreaArm: initialValues
-      ? String(initialValues.primaryBaggageAreaArm)
-      : "",
-    secondaryBaggageAreaArm: initialValues
-      ? String(initialValues.secondaryBaggageAreaArm)
-      : "",
-    maximumTakeoffWeight: initialValues
-      ? String(initialValues.maximumTakeoffWeight)
       : "",
   };
 }
@@ -152,24 +123,15 @@ export function AircraftWeightBalanceDialog({
       basicEmptyWeight: Number(values.basicEmptyWeight),
       basicEmptyWeightArm: Number(values.basicEmptyWeightArm),
       basicEmptyWeightMoment: Number(values.basicEmptyWeightMoment),
-      usableFuelArm: Number(values.usableFuelArm),
-      fiAndStudentArm: Number(values.fiAndStudentArm),
-      primaryBaggageAreaArm: values.primaryBaggageAreaArm
-        ? Number(values.primaryBaggageAreaArm)
-        : 0,
-      secondaryBaggageAreaArm: values.secondaryBaggageAreaArm
-        ? Number(values.secondaryBaggageAreaArm)
-        : 0,
-      maximumTakeoffWeight: Number(values.maximumTakeoffWeight),
     });
   }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
-      <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto p-6 sm:max-w-2xl">
+      <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto p-6 sm:max-w-md">
         <DialogSectionHeader
-          description={`Set weight and balance configuration for ${aircraftLabel}.`}
+          description={`Set weight and balance configurations for ${aircraftLabel}.`}
           icon={ScaleIcon}
           title="Weight & Balance"
         />
@@ -233,62 +195,6 @@ export function AircraftWeightBalanceDialog({
             </p>
           </div>
 
-          <h3 className="-mb-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
-            Additional ARM Information
-          </h3>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <WbField
-              error={errors.usableFuelArm?.message}
-              hint="in"
-              id="usable-fuel-arm"
-              label="Usable Fuel ARM"
-              register={form.register("usableFuelArm")}
-              required
-            />
-            <WbField
-              error={errors.fiAndStudentArm?.message}
-              hint="in"
-              id="fi-and-student-arm"
-              label="FI + Student ARM"
-              register={form.register("fiAndStudentArm")}
-              required
-            />
-          </div>
-
-          <h3 className="-mb-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
-            Baggage Area
-          </h3>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <WbField
-              error={errors.primaryBaggageAreaArm?.message}
-              hint="in"
-              id="primary-baggage-area-arm"
-              label="Primary ARM"
-              register={form.register("primaryBaggageAreaArm")}
-            />
-            <WbField
-              error={errors.secondaryBaggageAreaArm?.message}
-              hint="in"
-              id="secondary-baggage-area-arm"
-              label="Secondary ARM"
-              register={form.register("secondaryBaggageAreaArm")}
-            />
-          </div>
-
-          <h3 className="-mb-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
-            Weight Limits
-          </h3>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <WbField
-              error={errors.maximumTakeoffWeight?.message}
-              hint="lbs"
-              id="maximum-takeoff-weight"
-              label="MTOW"
-              register={form.register("maximumTakeoffWeight")}
-              required
-            />
-          </div>
-
           <DialogFooter className="-mx-6 -mb-6 mt-1 sm:justify-end">
             <Button
               disabled={isExecuting}
@@ -299,7 +205,7 @@ export function AircraftWeightBalanceDialog({
               Cancel
             </Button>
             <Button disabled={isExecuting} type="submit">
-              {isExecuting ? "Saving..." : "Save configuration"}
+              {isExecuting ? "Saving..." : "Save configurations"}
             </Button>
           </DialogFooter>
         </form>

@@ -13,20 +13,10 @@ export type AircraftWeightBalance = {
   basicEmptyWeight: number;
   basicEmptyWeightArm: number;
   basicEmptyWeightMoment: number;
-  usableFuelArm: number;
-  fiAndStudentArm: number;
-  primaryBaggageAreaArm: number;
-  secondaryBaggageAreaArm: number;
-  maximumTakeoffWeight: number;
 };
 
 export type AircraftWeightBalanceFormInput = {
   basicEmptyWeight: number;
   basicEmptyWeightArm: number;
   basicEmptyWeightMoment: number;
-  usableFuelArm: number;
-  fiAndStudentArm: number;
-  primaryBaggageAreaArm: number;
-  secondaryBaggageAreaArm: number;
-  maximumTakeoffWeight: number;
 };

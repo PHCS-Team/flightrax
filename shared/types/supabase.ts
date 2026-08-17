@@ -122,24 +122,71 @@ export type Database = {
           },
         ]
       }
-      aircraft_types: {
+      aircraft_type_baggage_areas: {
         Row: {
+          aircraft_type_key: string
+          arm: number
           created_at: string
-          type: string
-          type_key: string
+          id: string
+          position: number
           updated_at: string
         }
         Insert: {
+          aircraft_type_key: string
+          arm: number
           created_at?: string
-          type: string
-          type_key: string
+          id?: string
+          position: number
           updated_at?: string
         }
         Update: {
+          aircraft_type_key?: string
+          arm?: number
           created_at?: string
+          id?: string
+          position?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "aircraft_type_baggage_areas_aircraft_type_key_fkey"
+            columns: ["aircraft_type_key"]
+            isOneToOne: false
+            referencedRelation: "aircraft_types"
+            referencedColumns: ["type_key"]
+          },
+        ]
+      }
+      aircraft_types: {
+        Row: {
+          baggage_area_max_weight: number
+          created_at: string
+          fi_and_student_arm: number | null
+          maximum_takeoff_weight: number | null
+          type: string
+          type_key: string
+          updated_at: string
+          usable_fuel_arm: number | null
+        }
+        Insert: {
+          baggage_area_max_weight?: number
+          created_at?: string
+          fi_and_student_arm?: number | null
+          maximum_takeoff_weight?: number | null
+          type: string
+          type_key: string
+          updated_at?: string
+          usable_fuel_arm?: number | null
+        }
+        Update: {
+          baggage_area_max_weight?: number
+          created_at?: string
+          fi_and_student_arm?: number | null
+          maximum_takeoff_weight?: number | null
           type?: string
           type_key?: string
           updated_at?: string
+          usable_fuel_arm?: number | null
         }
         Relationships: []
       }
@@ -150,13 +197,8 @@ export type Database = {
           basic_empty_weight_arm: number
           basic_empty_weight_moment: number
           created_at: string
-          fi_and_student_arm: number
           id: string
-          maximum_takeoff_weight: number
-          primary_baggage_area_arm: number
-          secondary_baggage_area_arm: number
           updated_at: string
-          usable_fuel_arm: number
         }
         Insert: {
           aircraft_id: string
@@ -164,13 +206,8 @@ export type Database = {
           basic_empty_weight_arm: number
           basic_empty_weight_moment: number
           created_at?: string
-          fi_and_student_arm: number
           id?: string
-          maximum_takeoff_weight: number
-          primary_baggage_area_arm?: number
-          secondary_baggage_area_arm?: number
           updated_at?: string
-          usable_fuel_arm: number
         }
         Update: {
           aircraft_id?: string
@@ -178,13 +215,8 @@ export type Database = {
           basic_empty_weight_arm?: number
           basic_empty_weight_moment?: number
           created_at?: string
-          fi_and_student_arm?: number
           id?: string
-          maximum_takeoff_weight?: number
-          primary_baggage_area_arm?: number
-          secondary_baggage_area_arm?: number
           updated_at?: string
-          usable_fuel_arm?: number
         }
         Relationships: [
           {
