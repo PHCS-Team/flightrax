@@ -244,7 +244,9 @@ export function AircraftsTable({
             </Popover>
           </span>
         ),
-        cell: ({ row }) => <AircraftWeightBalanceCell aircraft={row.original} />,
+        cell: ({ row }) => (
+          <AircraftWeightBalanceCell aircraft={row.original} />
+        ),
       },
       {
         id: "status",
@@ -423,8 +425,8 @@ export function AircraftsTable({
         <p className="flex items-center gap-1.5 rounded-lg border border-primary-foreground/15 bg-primary-foreground/5 px-3 py-2 text-xs text-primary-foreground/70">
           <InfoIcon className="size-3.5 shrink-0" />
           <span>
-            To view color / markings, remarks, and other aircraft details,
-            click the{" "}
+            To view color / markings, remarks, and other aircraft details, click
+            the{" "}
             <EyeIcon className="inline size-3.5 align-text-bottom text-primary-foreground/90" />{" "}
             eye icon under Actions.
           </span>

@@ -57,7 +57,7 @@ export function AircraftWeightBalanceCell({
         }}
       >
         <div className="w-30 shrink-0">
-          <p className="text-xs font-medium text-primary-foreground/70">
+          <p className="text-xs font-bold text-primary-foreground/80 mb-1">
             Basic Empty Weight
           </p>
           <p className="text-xs font-semibold text-primary-foreground">
@@ -72,28 +72,44 @@ export function AircraftWeightBalanceCell({
             <span className="text-primary-foreground/60">lbs-in</span>
           </p>
         </div>
-        <div className="h-10 w-px shrink-0 bg-primary-foreground/20" />
-        <div className="flex shrink-0 items-center gap-4">
-          <WbStat label="Fuel ARM" unit="in" value={wbConfig.usableFuelArm} />
+
+        <div className="h-10 w-px rounded-full shrink-0 bg-primary-foreground/20" />
+        <div className="shrink-0">
+          <p className="text-xs font-bold text-primary-foreground/80 mb-1">
+            ARM Configuration
+          </p>
+          <div className="mt-1 flex items-center gap-4">
+            <WbStat
+              label="Usable Fuel"
+              unit="in"
+              value={wbConfig.usableFuelArm}
+            />
+            <WbStat
+              label="FI + Student"
+              unit="in"
+              value={wbConfig.fiAndStudentArm}
+            />
+            <WbStat
+              label="Baggage 1 / 2"
+              unit="in"
+              value={`${wbConfig.primaryBaggageAreaArm} / ${wbConfig.secondaryBaggageAreaArm}`}
+            />
+          </div>
+        </div>
+
+        <div className="h-10 w-px rounded-full shrink-0 bg-primary-foreground/20" />
+        <div className="shrink-0">
+          <p className="text-xs font-bold text-primary-foreground/80 mb-1">
+            Weight Limits
+          </p>
           <WbStat
-            label="FI + Student ARM"
-            unit="in"
-            value={wbConfig.fiAndStudentArm}
-          />
-          <WbStat
-            label="Baggage 1 / 2 ARM"
-            unit="in"
-            value={`${wbConfig.primaryBaggageAreaArm} / ${wbConfig.secondaryBaggageAreaArm}`}
+            label="MTOW"
+            unit="lbs"
+            value={wbConfig.maximumTakeoffWeight.toLocaleString()}
           />
         </div>
-        <div className="h-10 w-px shrink-0 bg-primary-foreground/20" />
 
-        <WbStat
-          label="MTOW"
-          unit="lbs"
-          value={wbConfig.maximumTakeoffWeight.toLocaleString()}
-        />
-        <div className="h-10 w-px shrink-0 bg-primary-foreground/20" />
+        <div className="h-10 w-px rounded-full shrink-0 bg-primary-foreground/20" />
         <div className="shrink-0 mr-3">
           <Tooltip>
             <TooltipTrigger asChild>
