@@ -122,53 +122,100 @@ export type Database = {
           },
         ]
       }
-      aircraft_types: {
+      aircraft_type_baggage_areas: {
         Row: {
+          aircraft_type_key: string
+          arm: number
           created_at: string
-          type: string
-          type_key: string
+          id: string
+          position: number
           updated_at: string
         }
         Insert: {
+          aircraft_type_key: string
+          arm: number
           created_at?: string
-          type: string
-          type_key: string
+          id?: string
+          position: number
           updated_at?: string
         }
         Update: {
+          aircraft_type_key?: string
+          arm?: number
           created_at?: string
+          id?: string
+          position?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "aircraft_type_baggage_areas_aircraft_type_key_fkey"
+            columns: ["aircraft_type_key"]
+            isOneToOne: false
+            referencedRelation: "aircraft_types"
+            referencedColumns: ["type_key"]
+          },
+        ]
+      }
+      aircraft_types: {
+        Row: {
+          baggage_area_max_weight: number
+          created_at: string
+          fi_and_student_arm: number | null
+          maximum_takeoff_weight: number | null
+          type: string
+          type_key: string
+          updated_at: string
+          usable_fuel_arm: number | null
+        }
+        Insert: {
+          baggage_area_max_weight?: number
+          created_at?: string
+          fi_and_student_arm?: number | null
+          maximum_takeoff_weight?: number | null
+          type: string
+          type_key: string
+          updated_at?: string
+          usable_fuel_arm?: number | null
+        }
+        Update: {
+          baggage_area_max_weight?: number
+          created_at?: string
+          fi_and_student_arm?: number | null
+          maximum_takeoff_weight?: number | null
           type?: string
           type_key?: string
           updated_at?: string
+          usable_fuel_arm?: number | null
         }
         Relationships: []
       }
       aircraft_weight_balance_configs: {
         Row: {
           aircraft_id: string
-          arm: number
           basic_empty_weight: number
+          basic_empty_weight_arm: number
+          basic_empty_weight_moment: number
           created_at: string
           id: string
-          moment: number
           updated_at: string
         }
         Insert: {
           aircraft_id: string
-          arm: number
           basic_empty_weight: number
+          basic_empty_weight_arm: number
+          basic_empty_weight_moment: number
           created_at?: string
           id?: string
-          moment: number
           updated_at?: string
         }
         Update: {
           aircraft_id?: string
-          arm?: number
           basic_empty_weight?: number
+          basic_empty_weight_arm?: number
+          basic_empty_weight_moment?: number
           created_at?: string
           id?: string
-          moment?: number
           updated_at?: string
         }
         Relationships: [
@@ -289,6 +336,354 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      flight_journeys: {
+        Row: {
+          commenced_at: string | null
+          commenced_by: string | null
+          created_at: string
+          flight_request_id: string
+          id: string
+          status: Database["public"]["Enums"]["journey_status"]
+          terminated_at: string | null
+          terminated_by: string | null
+          updated_at: string
+        }
+        Insert: {
+          commenced_at?: string | null
+          commenced_by?: string | null
+          created_at?: string
+          flight_request_id: string
+          id?: string
+          status?: Database["public"]["Enums"]["journey_status"]
+          terminated_at?: string | null
+          terminated_by?: string | null
+          updated_at?: string
+        }
+        Update: {
+          commenced_at?: string | null
+          commenced_by?: string | null
+          created_at?: string
+          flight_request_id?: string
+          id?: string
+          status?: Database["public"]["Enums"]["journey_status"]
+          terminated_at?: string | null
+          terminated_by?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flight_journeys_commenced_by_fkey"
+            columns: ["commenced_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "flight_journeys_flight_request_id_fkey"
+            columns: ["flight_request_id"]
+            isOneToOne: true
+            referencedRelation: "flight_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "flight_journeys_terminated_by_fkey"
+            columns: ["terminated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      flight_plans: {
+        Row: {
+          addressee: string | null
+          aircraft_color_and_marking: string
+          aircraft_id: string | null
+          aircraft_identification: string
+          authorized_representative_id: string | null
+          authorized_representative_licenses: Json | null
+          authorized_representative_name: string | null
+          authorized_representative_signature: string | null
+          com_nav_equipment: string[]
+          created_at: string
+          created_by: string
+          cruising_level: string
+          cruising_speed: string
+          departure_aerodrome: string
+          departure_time_raw: string
+          departure_time_resolved: string
+          destination_aerodrome: string
+          dinghies_capacity: number | null
+          dinghies_color: string | null
+          dinghies_covered: boolean
+          dinghies_has_dinghy: boolean
+          dinghies_number: number | null
+          dof_raw: string
+          dof_resolved: string
+          emergency_radio_elt: boolean
+          emergency_radio_uhf: boolean
+          emergency_radio_vhf: boolean
+          endurance: string | null
+          filed_by_id: string
+          first_alternate_aerodrome: string | null
+          flight_rules: string
+          id: string
+          jacket_fluorescent: boolean
+          jacket_light: boolean
+          jacket_uhf: boolean
+          jacket_vhf: boolean
+          message_type: string
+          number_of_aircraft: number
+          originator: string | null
+          other_remarks: string | null
+          persons_on_board: string
+          pilot_in_command_id: string | null
+          pilot_in_command_name: string | null
+          pilot_licenses: Json
+          pilot_name: string
+          pilot_signature: string | null
+          remarks: string | null
+          route: string[]
+          second_alternate_aerodrome: string | null
+          surveillance_equipment: string[]
+          survival_desert: boolean
+          survival_jungle: boolean
+          survival_maritime: boolean
+          survival_polar: boolean
+          total_eet: string
+          type_of_aircraft: string
+          type_of_flight: string
+          updated_at: string
+          wake_turbulence_category: string
+        }
+        Insert: {
+          addressee?: string | null
+          aircraft_color_and_marking: string
+          aircraft_id?: string | null
+          aircraft_identification: string
+          authorized_representative_id?: string | null
+          authorized_representative_licenses?: Json | null
+          authorized_representative_name?: string | null
+          authorized_representative_signature?: string | null
+          com_nav_equipment?: string[]
+          created_at?: string
+          created_by: string
+          cruising_level: string
+          cruising_speed: string
+          departure_aerodrome?: string
+          departure_time_raw: string
+          departure_time_resolved: string
+          destination_aerodrome?: string
+          dinghies_capacity?: number | null
+          dinghies_color?: string | null
+          dinghies_covered?: boolean
+          dinghies_has_dinghy?: boolean
+          dinghies_number?: number | null
+          dof_raw: string
+          dof_resolved: string
+          emergency_radio_elt?: boolean
+          emergency_radio_uhf?: boolean
+          emergency_radio_vhf?: boolean
+          endurance?: string | null
+          filed_by_id: string
+          first_alternate_aerodrome?: string | null
+          flight_rules: string
+          id?: string
+          jacket_fluorescent?: boolean
+          jacket_light?: boolean
+          jacket_uhf?: boolean
+          jacket_vhf?: boolean
+          message_type?: string
+          number_of_aircraft?: number
+          originator?: string | null
+          other_remarks?: string | null
+          persons_on_board?: string
+          pilot_in_command_id?: string | null
+          pilot_in_command_name?: string | null
+          pilot_licenses?: Json
+          pilot_name: string
+          pilot_signature?: string | null
+          remarks?: string | null
+          route?: string[]
+          second_alternate_aerodrome?: string | null
+          surveillance_equipment?: string[]
+          survival_desert?: boolean
+          survival_jungle?: boolean
+          survival_maritime?: boolean
+          survival_polar?: boolean
+          total_eet: string
+          type_of_aircraft: string
+          type_of_flight: string
+          updated_at?: string
+          wake_turbulence_category: string
+        }
+        Update: {
+          addressee?: string | null
+          aircraft_color_and_marking?: string
+          aircraft_id?: string | null
+          aircraft_identification?: string
+          authorized_representative_id?: string | null
+          authorized_representative_licenses?: Json | null
+          authorized_representative_name?: string | null
+          authorized_representative_signature?: string | null
+          com_nav_equipment?: string[]
+          created_at?: string
+          created_by?: string
+          cruising_level?: string
+          cruising_speed?: string
+          departure_aerodrome?: string
+          departure_time_raw?: string
+          departure_time_resolved?: string
+          destination_aerodrome?: string
+          dinghies_capacity?: number | null
+          dinghies_color?: string | null
+          dinghies_covered?: boolean
+          dinghies_has_dinghy?: boolean
+          dinghies_number?: number | null
+          dof_raw?: string
+          dof_resolved?: string
+          emergency_radio_elt?: boolean
+          emergency_radio_uhf?: boolean
+          emergency_radio_vhf?: boolean
+          endurance?: string | null
+          filed_by_id?: string
+          first_alternate_aerodrome?: string | null
+          flight_rules?: string
+          id?: string
+          jacket_fluorescent?: boolean
+          jacket_light?: boolean
+          jacket_uhf?: boolean
+          jacket_vhf?: boolean
+          message_type?: string
+          number_of_aircraft?: number
+          originator?: string | null
+          other_remarks?: string | null
+          persons_on_board?: string
+          pilot_in_command_id?: string | null
+          pilot_in_command_name?: string | null
+          pilot_licenses?: Json
+          pilot_name?: string
+          pilot_signature?: string | null
+          remarks?: string | null
+          route?: string[]
+          second_alternate_aerodrome?: string | null
+          surveillance_equipment?: string[]
+          survival_desert?: boolean
+          survival_jungle?: boolean
+          survival_maritime?: boolean
+          survival_polar?: boolean
+          total_eet?: string
+          type_of_aircraft?: string
+          type_of_flight?: string
+          updated_at?: string
+          wake_turbulence_category?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flight_plans_aircraft_id_fkey"
+            columns: ["aircraft_id"]
+            isOneToOne: false
+            referencedRelation: "aircrafts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "flight_plans_authorized_representative_id_fkey"
+            columns: ["authorized_representative_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "flight_plans_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "flight_plans_filed_by_id_fkey"
+            columns: ["filed_by_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "flight_plans_pilot_in_command_id_fkey"
+            columns: ["pilot_in_command_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      flight_requests: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          created_at: string
+          flight_plan_id: string
+          id: string
+          rejected_reason: string | null
+          requested_by: string
+          status: string
+          updated_at: string
+          weight_balance_id: string | null
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          flight_plan_id: string
+          id?: string
+          rejected_reason?: string | null
+          requested_by: string
+          status?: string
+          updated_at?: string
+          weight_balance_id?: string | null
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          flight_plan_id?: string
+          id?: string
+          rejected_reason?: string | null
+          requested_by?: string
+          status?: string
+          updated_at?: string
+          weight_balance_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flight_requests_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "flight_requests_flight_plan_id_fkey"
+            columns: ["flight_plan_id"]
+            isOneToOne: true
+            referencedRelation: "flight_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "flight_requests_requested_by_fkey"
+            columns: ["requested_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "flight_requests_weight_balance_id_fkey"
+            columns: ["weight_balance_id"]
+            isOneToOne: true
+            referencedRelation: "weight_balances"
             referencedColumns: ["id"]
           },
         ]
@@ -494,6 +889,166 @@ export type Database = {
           },
         ]
       }
+      weight_balance_baggage_entries: {
+        Row: {
+          arm: number | null
+          created_at: string
+          id: string
+          moment: number | null
+          position: number
+          updated_at: string
+          weight: number
+          weight_balance_id: string
+        }
+        Insert: {
+          arm?: number | null
+          created_at?: string
+          id?: string
+          moment?: number | null
+          position: number
+          updated_at?: string
+          weight?: number
+          weight_balance_id: string
+        }
+        Update: {
+          arm?: number | null
+          created_at?: string
+          id?: string
+          moment?: number | null
+          position?: number
+          updated_at?: string
+          weight?: number
+          weight_balance_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "weight_balance_baggage_entries_weight_balance_id_fkey"
+            columns: ["weight_balance_id"]
+            isOneToOne: false
+            referencedRelation: "weight_balances"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      weight_balances: {
+        Row: {
+          aircraft_id: string | null
+          balance_status: string | null
+          basic_empty_weight: number | null
+          basic_empty_weight_arm: number | null
+          basic_empty_weight_moment: number | null
+          created_at: string
+          created_by: string
+          fi_and_student_arm: number | null
+          fi_and_student_moment: number | null
+          fi_and_student_weight: number | null
+          id: string
+          max_baggage_weight: number
+          maximum_takeoff_weight: number | null
+          prepared_by_id: string
+          prepared_by_name: string
+          prepared_by_signature: string | null
+          total_cg: number | null
+          total_moment: number | null
+          total_weight: number | null
+          updated_at: string
+          usable_fuel_arm: number | null
+          usable_fuel_moment: number | null
+          usable_fuel_weight: number | null
+          verified_by_id: string | null
+          verified_by_name: string | null
+          verified_by_signature: string | null
+          weight_status: string | null
+        }
+        Insert: {
+          aircraft_id?: string | null
+          balance_status?: string | null
+          basic_empty_weight?: number | null
+          basic_empty_weight_arm?: number | null
+          basic_empty_weight_moment?: number | null
+          created_at?: string
+          created_by: string
+          fi_and_student_arm?: number | null
+          fi_and_student_moment?: number | null
+          fi_and_student_weight?: number | null
+          id?: string
+          max_baggage_weight?: number
+          maximum_takeoff_weight?: number | null
+          prepared_by_id: string
+          prepared_by_name: string
+          prepared_by_signature?: string | null
+          total_cg?: number | null
+          total_moment?: number | null
+          total_weight?: number | null
+          updated_at?: string
+          usable_fuel_arm?: number | null
+          usable_fuel_moment?: number | null
+          usable_fuel_weight?: number | null
+          verified_by_id?: string | null
+          verified_by_name?: string | null
+          verified_by_signature?: string | null
+          weight_status?: string | null
+        }
+        Update: {
+          aircraft_id?: string | null
+          balance_status?: string | null
+          basic_empty_weight?: number | null
+          basic_empty_weight_arm?: number | null
+          basic_empty_weight_moment?: number | null
+          created_at?: string
+          created_by?: string
+          fi_and_student_arm?: number | null
+          fi_and_student_moment?: number | null
+          fi_and_student_weight?: number | null
+          id?: string
+          max_baggage_weight?: number
+          maximum_takeoff_weight?: number | null
+          prepared_by_id?: string
+          prepared_by_name?: string
+          prepared_by_signature?: string | null
+          total_cg?: number | null
+          total_moment?: number | null
+          total_weight?: number | null
+          updated_at?: string
+          usable_fuel_arm?: number | null
+          usable_fuel_moment?: number | null
+          usable_fuel_weight?: number | null
+          verified_by_id?: string | null
+          verified_by_name?: string | null
+          verified_by_signature?: string | null
+          weight_status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "weight_balances_aircraft_id_fkey"
+            columns: ["aircraft_id"]
+            isOneToOne: false
+            referencedRelation: "aircrafts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "weight_balances_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "weight_balances_prepared_by_id_fkey"
+            columns: ["prepared_by_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "weight_balances_verified_by_id_fkey"
+            columns: ["verified_by_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -509,6 +1064,13 @@ export type Database = {
       aircraft_status: "active" | "maintenance" | "grounded" | "retired"
       app_role: "student" | "instructor" | "admin" | "superadmin"
       approval_status: "pending" | "approved" | "rejected"
+      journey_status:
+        | "scheduled"
+        | "active"
+        | "on_ground"
+        | "arrived"
+        | "terminated"
+        | "cancelled"
       license_status: "active" | "expired"
     }
     CompositeTypes: {
@@ -645,6 +1207,14 @@ export const Constants = {
       aircraft_status: ["active", "maintenance", "grounded", "retired"],
       app_role: ["student", "instructor", "admin", "superadmin"],
       approval_status: ["pending", "approved", "rejected"],
+      journey_status: [
+        "scheduled",
+        "active",
+        "on_ground",
+        "arrived",
+        "terminated",
+        "cancelled",
+      ],
       license_status: ["active", "expired"],
     },
   },

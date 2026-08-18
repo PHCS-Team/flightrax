@@ -28,6 +28,13 @@ export type AircraftListRow = Pick<
   | "updated_at"
 >;
 
+export type AircraftTypeWbSpecs = {
+  usableFuelArm: number | null;
+  fiAndStudentArm: number | null;
+  maximumTakeoffWeight: number | null;
+  baggageAreaMaxWeight: number;
+};
+
 export type Aircraft = {
   aircraftIdentification: string;
   aircraftType: string;
@@ -41,6 +48,7 @@ export type Aircraft = {
   serialNumber: string | null;
   status: AircraftStatus;
   typeName: string;
+  typeWbSpecs: AircraftTypeWbSpecs;
   updatedAt: string;
   weightBalance: AircraftWeightBalance | null;
 };

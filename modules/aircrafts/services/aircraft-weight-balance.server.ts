@@ -8,7 +8,7 @@ import { isApproved } from "@/shared/lib/rbac/guards";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 
 const WEIGHT_BALANCE_SELECT =
-  "id, aircraft_id, basic_empty_weight, arm, moment";
+  "id, aircraft_id, basic_empty_weight, basic_empty_weight_arm, basic_empty_weight_moment";
 
 export async function getAircraftWeightBalance(
   aircraftId: string,
@@ -42,7 +42,7 @@ export async function getAircraftWeightBalance(
     id: data.id,
     aircraftId: data.aircraft_id,
     basicEmptyWeight: Number(data.basic_empty_weight),
-    arm: Number(data.arm),
-    moment: Number(data.moment),
+    basicEmptyWeightArm: Number(data.basic_empty_weight_arm),
+    basicEmptyWeightMoment: Number(data.basic_empty_weight_moment),
   };
 }

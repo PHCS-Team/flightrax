@@ -43,7 +43,7 @@ export function AircraftDetailsDialog({
           <div className="rounded-xl border bg-muted/40 p-4 shadow-xs">
             <div className="mb-2 flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
               <StickyNoteIcon className="size-3.5" />
-              Note
+              Remarks
             </div>
             <div className="border-l-2 border-primary/25 pl-3">
               <p className="text-sm leading-relaxed text-foreground whitespace-pre-wrap">

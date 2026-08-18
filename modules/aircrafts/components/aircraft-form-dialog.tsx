@@ -13,6 +13,7 @@ import type {
   Aircraft,
   AircraftFormInput,
 } from "@/modules/aircrafts/types/aircraft";
+import type { AircraftType } from "@/modules/aircrafts/types/aircraft-type";
 import {
   AIRCRAFT_PHOTO_MAX_BYTES,
   AIRCRAFT_PHOTO_TYPES,
@@ -83,6 +84,9 @@ export function AircraftFormDialog({
     name: "aircraftType",
   });
   const selectedPhoto = useWatch({ control: form.control, name: "photo" });
+  const selectedType = aircraftTypes.find(
+    (type) => type.typeKey === selectedTypeKey,
+  );
   const isExecuting = createAircraft.isExecuting || updateAircraft.isExecuting;
 
   function handleSaved() {
@@ -192,6 +196,8 @@ export function AircraftFormDialog({
               required
             />
           </div>
+
+          {selectedType && <TypeWbSpecsPreview aircraftType={selectedType} />}
 
           <div className="grid gap-4 sm:grid-cols-2">
             <AircraftTextField
@@ -317,6 +323,90 @@ function AircraftTextField({
           {error}
         </p>
       )}
+    </div>
+  );
+}
+
+function TypeWbSpecsPreview({ aircraftType }: { aircraftType: AircraftType }) {
+  const hasSpecs =
+    aircraftType.usableFuelArm !== null ||
+    aircraftType.fiAndStudentArm !== null ||
+    aircraftType.maximumTakeoffWeight !== null ||
+    aircraftType.baggageAreas.length > 0;
+
+  return (
+    <div className="rounded-lg border bg-muted/30 px-3 py-2.5">
+      <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+        Inherited Configurations from Selected Aircraft Type
+      </p>
+      {hasSpecs ? (
+        <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-4">
+          <TypeSpecPreviewStat
+            label="Usable Fuel ARM"
+            unit="in"
+            value={aircraftType.usableFuelArm}
+          />
+          <TypeSpecPreviewStat
+            label="FI + Student ARM"
+            unit="in"
+            value={aircraftType.fiAndStudentArm}
+          />
+          <TypeSpecPreviewStat
+            label="MTOW"
+            unit="lbs"
+            value={aircraftType.maximumTakeoffWeight?.toLocaleString() ?? null}
+          />
+          <TypeSpecPreviewStat
+            label="MBW"
+            unit="lbs"
+            value={
+              aircraftType.baggageAreaMaxWeight > 0
+                ? aircraftType.baggageAreaMaxWeight.toLocaleString()
+                : null
+            }
+          />
+          <TypeSpecPreviewStat
+            label="Baggage Area ARM"
+            unit="in"
+            value={
+              aircraftType.baggageAreas.length > 0
+                ? aircraftType.baggageAreas.map((area) => area.arm).join(" / ")
+                : null
+            }
+          />
+        </div>
+      ) : (
+        <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+          This type has no W&B configurations yet. Aircraft of this type inherit
+          them once set under Types on the fleet page.
+        </p>
+      )}
+    </div>
+  );
+}
+
+function TypeSpecPreviewStat({
+  label,
+  unit,
+  value,
+}: {
+  label: string;
+  unit: string;
+  value: number | string | null;
+}) {
+  return (
+    <div>
+      <p className="text-xs font-medium text-muted-foreground">{label}</p>
+      <p className="mt-0.5 text-sm font-semibold text-foreground">
+        {value === null ? (
+          <span className="font-normal text-muted-foreground">Not set</span>
+        ) : (
+          <>
+            {value}{" "}
+            <span className="font-normal text-muted-foreground">{unit}</span>
+          </>
+        )}
+      </p>
     </div>
   );
 }

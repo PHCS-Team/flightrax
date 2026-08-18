@@ -11,12 +11,12 @@ export type AircraftWeightBalance = {
   id: string;
   aircraftId: string;
   basicEmptyWeight: number;
-  arm: number;
-  moment: number;
+  basicEmptyWeightArm: number;
+  basicEmptyWeightMoment: number;
 };
 
 export type AircraftWeightBalanceFormInput = {
   basicEmptyWeight: number;
-  arm: number;
-  moment: number;
+  basicEmptyWeightArm: number;
+  basicEmptyWeightMoment: number;
 };

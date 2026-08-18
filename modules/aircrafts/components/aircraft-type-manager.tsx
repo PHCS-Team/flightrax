@@ -4,12 +4,15 @@ import {
   InfoIcon,
   PencilIcon,
   PlusIcon,
+  ScaleIcon,
   SearchIcon,
   SearchXIcon,
   Trash2Icon,
 } from "lucide-react";
 import { useState } from "react";
 
+import { AircraftTypeWbSpecsDialog } from "@/modules/aircrafts/components/aircraft-type-wb-specs-dialog";
+import type { AircraftType } from "@/modules/aircrafts/types/aircraft-type";
 import { useAircraftTypes } from "@/modules/aircrafts/hooks/use-aircraft-types.query";
 import { useCreateAircraftType } from "@/modules/aircrafts/hooks/use-create-aircraft-type.action";
 import { useDeleteAircraftType } from "@/modules/aircrafts/hooks/use-delete-aircraft-type.action";
@@ -136,20 +139,45 @@ function AircraftTypeList() {
               </div>
             ) : (
               <div className="grid gap-2 pb-1">
-                {filteredTypes.map((type) => (
-                  <div
-                    className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2"
-                    key={type.typeKey}
-                  >
-                    <span className="flex-1 text-sm font-medium text-foreground">
-                      {type.type}
-                    </span>
-                    <span className="mr-2 hidden text-xs text-muted-foreground/60 sm:inline">
-                      {type.typeKey}
-                    </span>
-                    <DeleteTypeButton typeKey={type.typeKey} />
-                  </div>
-                ))}
+                {filteredTypes.map((type) => {
+                  const specChips = getWbSpecChips(type);
+
+                  return (
+                    <div
+                      className="rounded-lg border border-border bg-muted/30 px-3 py-2"
+                      key={type.typeKey}
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className="min-w-0 flex-1">
+                          <span className="block truncate text-sm font-medium text-foreground">
+                            {type.type}
+                          </span>
+                          <span className="block truncate text-xs text-muted-foreground/60">
+                            {type.typeKey}
+                          </span>
+                        </div>
+                        <WbSpecsButton aircraftType={type} />
+                        <DeleteTypeButton typeKey={type.typeKey} />
+                      </div>
+                      {specChips.length > 0 ? (
+                        <div className="mt-2 flex flex-wrap gap-1">
+                          {specChips.map((chip) => (
+                            <span
+                              className="inline-flex items-center rounded-full border border-border bg-background/60 px-2 py-0.5 text-[10px] font-medium text-muted-foreground"
+                              key={chip}
+                            >
+                              {chip}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="mt-2 text-xs text-muted-foreground">
+                          W&B specs not set
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
@@ -201,6 +229,58 @@ function CreateTypeRow() {
         Types cannot be edited after creation. Double-check before adding.
       </p>
     </div>
+  );
+}
+
+function getWbSpecChips(aircraftType: AircraftType) {
+  if (
+    aircraftType.usableFuelArm === null &&
+    aircraftType.fiAndStudentArm === null &&
+    aircraftType.maximumTakeoffWeight === null &&
+    aircraftType.baggageAreas.length === 0
+  ) {
+    return [];
+  }
+
+  const chips = [
+    `Fuel ${aircraftType.usableFuelArm ?? "—"} in`,
+    `FI+S ${aircraftType.fiAndStudentArm ?? "—"} in`,
+    `MTOW ${aircraftType.maximumTakeoffWeight?.toLocaleString() ?? "—"} lbs`,
+  ];
+
+  if (aircraftType.baggageAreas.length > 0) {
+    chips.push(
+      `Bag ${aircraftType.baggageAreas.map((area) => area.arm).join(" / ")} in`,
+      `MBW ${aircraftType.baggageAreaMaxWeight.toLocaleString()} lbs`,
+    );
+  } else {
+    chips.push("No baggage");
+  }
+
+  return chips;
+}
+
+function WbSpecsButton({ aircraftType }: { aircraftType: AircraftType }) {
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  return (
+    <>
+      <Button
+        aria-label={`Manage W&B configurations for ${aircraftType.type}`}
+        className="size-8"
+        onClick={() => setDialogOpen(true)}
+        size="icon"
+        type="button"
+        variant="outline"
+      >
+        <ScaleIcon className="size-3.5" />
+      </Button>
+      <AircraftTypeWbSpecsDialog
+        aircraftType={aircraftType}
+        onOpenChange={setDialogOpen}
+        open={dialogOpen}
+      />
+    </>
   );
 }
 

@@ -9,11 +9,13 @@ import {
   type PaginationState,
 } from "@tanstack/react-table";
 import {
+  BriefcaseIcon,
   CheckIcon,
   CircleHelpIcon,
   CopyIcon,
   EyeIcon,
   ImageIcon,
+  InfoIcon,
   ListFilterIcon,
   PencilIcon,
   PlusIcon,
@@ -26,6 +28,7 @@ import { AircraftFormDialog } from "@/modules/aircrafts/components/aircraft-form
 import { AircraftDetailsDialog } from "@/modules/aircrafts/components/aircraft-details-dialog";
 import { AircraftStatusPill } from "@/modules/aircrafts/components/aircraft-status-pill";
 import { AircraftTypeManager } from "@/modules/aircrafts/components/aircraft-type-manager";
+import { AircraftTypeSpecsCell } from "@/modules/aircrafts/components/aircraft-type-specs-cell";
 import { AircraftWeightBalanceCell } from "@/modules/aircrafts/components/aircraft-weight-balance-cell";
 import { useAircraftTypes } from "@/modules/aircrafts/hooks/use-aircraft-types.query";
 import { useUpdateAircraftStatus } from "@/modules/aircrafts/hooks/use-update-aircraft-status.action";
@@ -142,19 +145,10 @@ export function AircraftsTable({
         },
       },
       {
-        accessorKey: "colorMarkings",
-        header: "Color / Markings",
-        cell: ({ row }) => (
-          <p className="max-w-80 whitespace-normal text-sm text-primary-foreground/80 line-clamp-3">
-            {row.original.colorMarkings}
-          </p>
-        ),
-      },
-      {
-        id: "weightBalance",
+        id: "typeSpecs",
         header: () => (
           <span className="inline-flex items-center gap-1">
-            Weight & Balance
+            Aircraft Type Configuration
             <Popover>
               <PopoverTrigger asChild>
                 <button
@@ -164,24 +158,114 @@ export function AircraftsTable({
                   <CircleHelpIcon className="size-3.5" />
                 </button>
               </PopoverTrigger>
-              <PopoverContent align="start" className="w-72 p-3" side="bottom">
-                <div className="space-y-3">
+              <PopoverContent align="start" className="w-80 p-3" side="bottom">
+                <div className="max-h-72 space-y-3 overflow-y-auto pr-1">
+                  <div className="space-y-2 rounded-lg border bg-muted/30 p-2.5">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                      Aircraft Type Configurations
+                    </p>
+                    <p className="text-xs leading-relaxed text-muted-foreground">
+                      Inherited from the aircraft type &mdash; fixed by the
+                      model and shared by every aircraft of the same type.
+                      Managed under Types.
+                    </p>
+                    <div>
+                      <p className="text-xs font-medium text-foreground/80">
+                        Fuel ARM
+                      </p>
+                      <p className="text-xs leading-relaxed text-muted-foreground">
+                        ARM of the usable fuel load in inches.
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-foreground/80">
+                        FI + Student ARM
+                      </p>
+                      <p className="text-xs leading-relaxed text-muted-foreground">
+                        ARM of the flight instructor and student seats in
+                        inches.
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-foreground/80">
+                        MTOW
+                      </p>
+                      <p className="text-xs leading-relaxed text-muted-foreground">
+                        Maximum takeoff weight &mdash; heaviest allowed weight
+                        at the start of the takeoff run, in pounds.
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-foreground/80">
+                        MBW
+                      </p>
+                      <p className="text-xs leading-relaxed text-muted-foreground">
+                        Max baggage weight &mdash; heaviest combined baggage
+                        load allowed, in pounds. Not set when the type has no
+                        baggage areas. Click the{" "}
+                        <BriefcaseIcon className="inline size-3 align-text-bottom text-foreground/70" />{" "}
+                        briefcase icon beside MBW to view the baggage area ARMs.
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-foreground/80">
+                        Baggage Area ARMs
+                      </p>
+                      <p className="text-xs leading-relaxed text-muted-foreground">
+                        ARMs of the type&apos;s baggage compartments in inches,
+                        viewable through the{" "}
+                        <BriefcaseIcon className="inline size-3 align-text-bottom text-foreground/70" />{" "}
+                        icon in the MBW stat.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
+          </span>
+        ),
+        cell: ({ row }) => (
+          <AircraftTypeSpecsCell
+            typeKey={row.original.aircraftType}
+            typeSpecs={row.original.typeWbSpecs}
+          />
+        ),
+      },
+      {
+        id: "weightBalance",
+        header: () => (
+          <span className="inline-flex items-center gap-1">
+            Basic Empty Weight
+            <Popover>
+              <PopoverTrigger asChild>
+                <button
+                  className="-m-0.5 inline-flex cursor-pointer items-center justify-center rounded-full p-0.5 text-primary-foreground/50 transition hover:bg-primary-foreground/10 hover:text-primary-foreground"
+                  type="button"
+                >
+                  <CircleHelpIcon className="size-3.5" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent align="start" className="w-80 p-3" side="bottom">
+                <div className="max-h-72 space-y-3 overflow-y-auto pr-1">
                   <div className="rounded-lg border bg-muted/30 p-2.5">
                     <p className="text-sm font-medium text-foreground/90">
                       Basic empty weight{" "}
                       <span className="text-foreground/50">(lbs)</span>
                       <span className="mx-1 text-foreground/30">&times;</span>
-                      Arm <span className="text-foreground/50">(in)</span>
+                      ARM <span className="text-foreground/50">(in)</span>
                     </p>
                     <p className="mt-1 text-xs text-foreground/60">
                       Moment{" "}
                       <span className="text-foreground/40">(lbs-in)</span>
                     </p>
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-2 rounded-lg border bg-muted/30 p-2.5">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                      Basic Empty Weight
+                    </p>
                     <div>
                       <p className="text-xs font-medium text-foreground/80">
-                        Basic empty weight
+                        Weight
                       </p>
                       <p className="text-xs leading-relaxed text-muted-foreground">
                         Aircraft standard weight without payload or fuel.
@@ -189,7 +273,7 @@ export function AircraftsTable({
                     </div>
                     <div>
                       <p className="text-xs font-medium text-foreground/80">
-                        Arm
+                        ARM
                       </p>
                       <p className="text-xs leading-relaxed text-muted-foreground">
                         Horizontal distance from datum in inches.
@@ -200,7 +284,7 @@ export function AircraftsTable({
                         Moment
                       </p>
                       <p className="text-xs leading-relaxed text-muted-foreground">
-                        Weight × arm in pound-inches.
+                        Weight × ARM in pound-inches.
                       </p>
                     </div>
                   </div>
@@ -210,9 +294,7 @@ export function AircraftsTable({
           </span>
         ),
         cell: ({ row }) => (
-          <div className="max-w-80">
-            <AircraftWeightBalanceCell aircraft={row.original} />
-          </div>
+          <AircraftWeightBalanceCell aircraft={row.original} />
         ),
       },
       {
@@ -388,6 +470,16 @@ export function AircraftsTable({
             </Button>
           </div>
         </div>
+
+        <p className="flex items-center gap-1.5 rounded-lg border border-primary-foreground/15 bg-primary-foreground/5 px-3 py-2 text-xs text-primary-foreground/70">
+          <InfoIcon className="size-3.5 shrink-0" />
+          <span>
+            To view color / markings, remarks, and other aircraft details, click
+            the{" "}
+            <EyeIcon className="inline size-3.5 align-text-bottom text-primary-foreground/90" />{" "}
+            eye icon under Actions.
+          </span>
+        </p>
 
         <Table className="text-primary-foreground">
           <TableHeader className="[&_tr]:border-primary-foreground/20">

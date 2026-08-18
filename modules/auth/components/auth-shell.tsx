@@ -44,7 +44,7 @@ export function AuthShell({
             <p className="text-sm uppercase tracking-[0.3em] text-primary-foreground/75">
               {eyebrow}
             </p>
-            <h1 className="mt-2 sm:mt-5 text-4xl font-semibold tracking-tight sm:text-6xl">
+            <h1 className="mt-2 sm:mt-5 text-4xl font-semibold leading-17.5 tracking-tight sm:text-6xl">
               {title}
             </h1>
             <p className="mt-5 hidden sm:block text-lg leading-8 text-primary-foreground/80">

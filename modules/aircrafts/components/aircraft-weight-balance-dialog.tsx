@@ -21,17 +21,35 @@ import { Input } from "@/shared/components/ui/input";
 const weightBalanceFormSchema = z.object({
   basicEmptyWeight: z
     .string()
-    .min(1, "Enter basic empty weight.")
+    .min(1, "Enter basic weight.")
     .regex(/^\d+(\.\d+)?$/, "Enter a valid number."),
-  arm: z
+  basicEmptyWeightArm: z
     .string()
-    .min(1, "Enter arm.")
+    .min(1, "Enter basic ARM.")
     .regex(/^\d+(\.\d+)?$/, "Enter a valid number."),
-  moment: z
+  basicEmptyWeightMoment: z
     .string()
-    .min(1, "Enter moment.")
+    .min(1, "Enter basic moment.")
     .regex(/^\d+(\.\d+)?$/, "Enter a valid number."),
 });
+
+type WeightBalanceFormValues = z.infer<typeof weightBalanceFormSchema>;
+
+function toFormValues(
+  initialValues?: AircraftWeightBalance,
+): WeightBalanceFormValues {
+  return {
+    basicEmptyWeight: initialValues
+      ? String(initialValues.basicEmptyWeight)
+      : "",
+    basicEmptyWeightArm: initialValues
+      ? String(initialValues.basicEmptyWeightArm)
+      : "",
+    basicEmptyWeightMoment: initialValues
+      ? String(initialValues.basicEmptyWeightMoment)
+      : "",
+  };
+}
 
 export function AircraftWeightBalanceDialog({
   aircraftId,
@@ -53,13 +71,7 @@ export function AircraftWeightBalanceDialog({
   });
   const form = useForm({
     resolver: zodResolver(weightBalanceFormSchema),
-    defaultValues: {
-      basicEmptyWeight: initialValues
-        ? String(initialValues.basicEmptyWeight)
-        : "",
-      arm: initialValues ? String(initialValues.arm) : "",
-      moment: initialValues ? String(initialValues.moment) : "",
-    },
+    defaultValues: toFormValues(initialValues),
   });
   const errors = form.formState.errors;
   const isExecuting = setWeightBalance.isExecuting;
@@ -68,7 +80,10 @@ export function AircraftWeightBalanceDialog({
     control: form.control,
     name: "basicEmptyWeight",
   });
-  const watchedArm = useWatch({ control: form.control, name: "arm" });
+  const watchedArm = useWatch({
+    control: form.control,
+    name: "basicEmptyWeightArm",
+  });
 
   useEffect(() => {
     if (momentLocked) return;
@@ -77,7 +92,7 @@ export function AircraftWeightBalanceDialog({
     const arm = Number(watchedArm);
 
     if (!isNaN(weight) && !isNaN(arm) && weight > 0 && arm > 0) {
-      form.setValue("moment", (weight * arm).toFixed(2), {
+      form.setValue("basicEmptyWeightMoment", (weight * arm).toFixed(2), {
         shouldValidate: true,
       });
     }
@@ -86,10 +101,10 @@ export function AircraftWeightBalanceDialog({
   function reenableMomentAutoCalc() {
     setMomentLocked(false);
     const weight = Number(form.getValues("basicEmptyWeight"));
-    const arm = Number(form.getValues("arm"));
+    const arm = Number(form.getValues("basicEmptyWeightArm"));
 
     if (!isNaN(weight) && !isNaN(arm) && weight > 0 && arm > 0) {
-      form.setValue("moment", (weight * arm).toFixed(2), {
+      form.setValue("basicEmptyWeightMoment", (weight * arm).toFixed(2), {
         shouldValidate: true,
       });
     }
@@ -98,26 +113,16 @@ export function AircraftWeightBalanceDialog({
   useEffect(() => {
     if (open) {
       setTimeout(() => setMomentLocked(false), 0);
-      form.reset({
-        basicEmptyWeight: initialValues
-          ? String(initialValues.basicEmptyWeight)
-          : "",
-        arm: initialValues ? String(initialValues.arm) : "",
-        moment: initialValues ? String(initialValues.moment) : "",
-      });
+      form.reset(toFormValues(initialValues));
     }
   }, [open, form, initialValues]);
 
-  function handleSubmit(values: {
-    basicEmptyWeight: string;
-    arm: string;
-    moment: string;
-  }) {
+  function handleSubmit(values: WeightBalanceFormValues) {
     setWeightBalance.execute({
       aircraftId,
       basicEmptyWeight: Number(values.basicEmptyWeight),
-      arm: Number(values.arm),
-      moment: Number(values.moment),
+      basicEmptyWeightArm: Number(values.basicEmptyWeightArm),
+      basicEmptyWeightMoment: Number(values.basicEmptyWeightMoment),
     });
   }
 
@@ -126,33 +131,36 @@ export function AircraftWeightBalanceDialog({
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto p-6 sm:max-w-md">
         <DialogSectionHeader
-          description={`Set weight and balance configuration for ${aircraftLabel}.`}
+          description={`Set weight and balance configurations for ${aircraftLabel}.`}
           icon={ScaleIcon}
           title="Weight & Balance"
         />
 
         <form className="grid gap-5" onSubmit={form.handleSubmit(handleSubmit)}>
-          <div className="grid gap-4">
-            <div className="grid grid-cols-2 gap-4">
-              <WbField
-                error={errors.basicEmptyWeight?.message}
-                hint="lbs"
-                id="basic-empty-weight"
-                label="Basic Empty Weight"
-                register={form.register("basicEmptyWeight")}
-              />
-              <WbField
-                error={errors.arm?.message}
-                hint="in"
-                id="arm"
-                label="Arm"
-                register={form.register("arm")}
-              />
-            </div>
+          <h3 className="-mb-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
+            Basic Empty Weight
+          </h3>
+          <div className="grid gap-4 sm:grid-cols-3">
             <WbField
-              error={errors.moment?.message}
+              error={errors.basicEmptyWeight?.message}
+              hint="lbs"
+              id="basic-empty-weight"
+              label="Weight"
+              register={form.register("basicEmptyWeight")}
+              required
+            />
+            <WbField
+              error={errors.basicEmptyWeightArm?.message}
+              hint="in"
+              id="basic-empty-weight-arm"
+              label="ARM"
+              register={form.register("basicEmptyWeightArm")}
+              required
+            />
+            <WbField
+              error={errors.basicEmptyWeightMoment?.message}
               hint="lbs-in"
-              id="moment"
+              id="basic-empty-weight-moment"
               label="Moment"
               labelAction={
                 momentLocked ? (
@@ -166,20 +174,20 @@ export function AircraftWeightBalanceDialog({
                   </button>
                 ) : undefined
               }
-              register={form.register("moment", {
+              register={form.register("basicEmptyWeightMoment", {
                 onChange: () => {
                   setMomentLocked(true);
                 },
               })}
+              required
             />
           </div>
-
           <div className="rounded-lg border bg-muted/30 px-3 py-2 text-xs leading-relaxed text-muted-foreground">
             <p>
               <span className="font-medium text-foreground/80">Moment</span>{" "}
               auto-calculates as{" "}
               <span className="font-medium text-foreground/80">
-                Basic Empty Weight &times; Arm
+                Weight &times; ARM
               </span>
               . Typing in Moment manually stops auto-calculation &mdash; click
               the <RotateCwIcon className="inline size-2.5 align-middle" /> icon
@@ -197,7 +205,7 @@ export function AircraftWeightBalanceDialog({
               Cancel
             </Button>
             <Button disabled={isExecuting} type="submit">
-              {isExecuting ? "Saving..." : "Save configuration"}
+              {isExecuting ? "Saving..." : "Save configurations"}
             </Button>
           </DialogFooter>
         </form>
@@ -213,6 +221,7 @@ function WbField({
   label,
   labelAction,
   register,
+  required = false,
 }: {
   error?: string;
   hint: string;
@@ -220,6 +229,7 @@ function WbField({
   label: string;
   labelAction?: ReactNode;
   register: ReturnType<ReturnType<typeof useForm>["register"]>;
+  required?: boolean;
 }) {
   const errorId = error ? `${id}-error` : undefined;
 
@@ -231,14 +241,20 @@ function WbField({
           <span className="ml-0.5 text-xs font-normal text-muted-foreground">
             ({hint})
           </span>
-          <span className="ml-1 text-secondary">*</span>
+          {required ? (
+            <span className="ml-1 text-secondary">*</span>
+          ) : (
+            <span className="ml-1 text-xs font-normal text-muted-foreground">
+              (optional)
+            </span>
+          )}
         </label>
         {labelAction}
       </div>
       <Input
         aria-describedby={errorId}
         aria-invalid={Boolean(error)}
-        aria-required="true"
+        aria-required={required || undefined}
         id={id}
         min={0}
         placeholder="0.00"

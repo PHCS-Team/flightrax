@@ -14,7 +14,8 @@ export const setAircraftWeightBalanceAction = actionClient
     if (!canManageAircrafts(actor)) {
       return {
         ok: false,
-        message: "You do not have permission to manage aircraft weight and balance.",
+        message:
+          "You do not have permission to manage aircraft weight and balance.",
       };
     }
 
@@ -36,8 +37,8 @@ export const setAircraftWeightBalanceAction = actionClient
 
     const config = {
       basic_empty_weight: parsedInput.basicEmptyWeight,
-      arm: parsedInput.arm,
-      moment: parsedInput.moment,
+      basic_empty_weight_arm: parsedInput.basicEmptyWeightArm,
+      basic_empty_weight_moment: parsedInput.basicEmptyWeightMoment,
     };
 
     const { data: existing, error: fetchError } = await supabase
@@ -71,5 +72,5 @@ export const setAircraftWeightBalanceAction = actionClient
       return { ok: false, message: error.message };
     }
 
-    return { ok: true, message: "Weight and balance configuration saved." };
+    return { ok: true, message: "Weight and balance configurations saved." };
   });
