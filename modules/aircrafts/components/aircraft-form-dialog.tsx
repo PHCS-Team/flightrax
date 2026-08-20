@@ -337,7 +337,7 @@ function TypeWbSpecsPreview({ aircraftType }: { aircraftType: AircraftType }) {
   return (
     <div className="rounded-lg border bg-muted/30 px-3 py-2.5">
       <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-        Inherited Configurations from Selected Aircraft Type
+        Inherited Specifications from Selected Aircraft Type
       </p>
       {hasSpecs ? (
         <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-4">
@@ -377,7 +377,7 @@ function TypeWbSpecsPreview({ aircraftType }: { aircraftType: AircraftType }) {
         </div>
       ) : (
         <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-          This type has no W&B configurations yet. Aircraft of this type inherit
+          This type has no W&B specifications yet. Aircraft of this type inherit
           them once set under Types on the fleet page.
         </p>
       )}

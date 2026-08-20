@@ -4,6 +4,7 @@ import { PlusIcon, ScaleIcon, Trash2Icon } from "lucide-react";
 import { useState } from "react";
 
 import { useSetAircraftTypeWbSpecs } from "@/modules/aircrafts/hooks/use-set-aircraft-type-wb-specs.action";
+import { WB_NUMBER_PATTERN } from "@/modules/aircrafts/utils/wb-validation";
 import type { AircraftType } from "@/modules/aircrafts/types/aircraft-type";
 import { ConfirmationDialog } from "@/shared/components/layout/confirmation-dialog";
 import { DialogSectionHeader } from "@/shared/components/layout/dialog-section-header";
@@ -17,7 +18,6 @@ import { Input } from "@/shared/components/ui/input";
 import { Switch } from "@/shared/components/ui/switch";
 
 const MAX_BAGGAGE_AREAS = 6;
-const NUMBER_PATTERN = /^\d+(\.\d+)?$/;
 
 export function AircraftTypeWbSpecsDialog({
   aircraftType,
@@ -32,9 +32,9 @@ export function AircraftTypeWbSpecsDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto p-6 sm:max-w-md">
         <DialogSectionHeader
-          description={`Define the weight and balance configurations for ${aircraftType.type}. Every aircraft of this type shares these values.`}
+          description={`Define the weight and balance specifications for ${aircraftType.type}. Every aircraft of this type shares these values.`}
           icon={ScaleIcon}
-          title="W&B Configurations"
+          title="W&B Specifications"
         />
         <WbSpecsForm aircraftType={aircraftType} onOpenChange={onOpenChange} />
       </DialogContent>
@@ -120,7 +120,7 @@ function WbSpecsForm({
 
     if (
       scalars.some(
-        (value) => !NUMBER_PATTERN.test(value.trim()) || Number(value) <= 0,
+        (value) => !WB_NUMBER_PATTERN.test(value.trim()) || Number(value) <= 0,
       )
     ) {
       setError(
@@ -135,12 +135,12 @@ function WbSpecsForm({
         return;
       }
 
-      if (areas.some((arm) => !NUMBER_PATTERN.test(arm) || Number(arm) <= 0)) {
+      if (areas.some((arm) => !WB_NUMBER_PATTERN.test(arm) || Number(arm) <= 0)) {
         setError("Enter a valid positive ARM for every baggage area.");
         return;
       }
 
-      if (!NUMBER_PATTERN.test(baggageAreaMaxWeight.trim())) {
+      if (!WB_NUMBER_PATTERN.test(baggageAreaMaxWeight.trim())) {
         setError("Enter a valid baggage area max weight.");
         return;
       }
@@ -162,7 +162,7 @@ function WbSpecsForm({
   return (
     <form className="grid gap-5" onSubmit={handleSubmit}>
       <h3 className="-mb-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
-        ARM Configurations
+        ARM Specifications
       </h3>
       <div className="grid gap-4 sm:grid-cols-2">
         <SpecField
@@ -295,14 +295,14 @@ function WbSpecsForm({
           Cancel
         </Button>
         <Button disabled={isExecuting} type="submit">
-          {isExecuting ? "Saving..." : "Save configurations"}
+          {isExecuting ? "Saving..." : "Save specifications"}
         </Button>
       </DialogFooter>
 
       <ConfirmationDialog
         confirmLabel="Clear baggage data"
         confirmingLabel="Clearing..."
-        description="Turning this off clears every baggage area ARM and resets the baggage area max weight to 0. Nothing is deleted until you save the configurations."
+        description="Turning this off clears every baggage area ARM and resets the baggage area max weight to 0. Nothing is deleted until you save the specifications."
         icon={Trash2Icon}
         isConfirming={false}
         onConfirm={clearBaggage}

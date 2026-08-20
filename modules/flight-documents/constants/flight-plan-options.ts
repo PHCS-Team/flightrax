@@ -7,36 +7,38 @@ export const FLIGHT_PLAN_MESSAGE_TYPE = "FPL";
 export const DEFAULT_AERODROME_CODE = "ZZZZ";
 
 export const FLIGHT_RULES_OPTIONS = [
-  { value: "I", label: "IFR" },
-  { value: "V", label: "VFR" },
-  { value: "Y", label: "IFR then VFR (Y)" },
-  { value: "Z", label: "VFR then IFR (Z)" },
+  { value: "I", label: "I — IFR" },
+  { value: "V", label: "V — VFR" },
+  { value: "Y", label: "Y — IFR then VFR" },
+  { value: "Z", label: "Z — VFR then IFR" },
 ] as const;
 
 export const TYPE_OF_FLIGHT_OPTIONS = [
-  { value: "S", label: "Scheduled" },
-  { value: "N", label: "Non-scheduled" },
-  { value: "G", label: "General aviation" },
-  { value: "M", label: "Military" },
-  { value: "X", label: "Other" },
+  { value: "S", label: "S — Scheduled" },
+  { value: "N", label: "N — Non-scheduled" },
+  { value: "G", label: "G — General aviation" },
+  { value: "M", label: "M — Military" },
+  { value: "X", label: "X — Other" },
 ] as const;
 
 export const WAKE_TURBULENCE_CATEGORY_OPTIONS = [
-  { value: "H", label: "Heavy" },
-  { value: "M", label: "Medium" },
-  { value: "L", label: "Light" },
+  { value: "L", label: "L — Light" },
+  { value: "M", label: "M — Medium" },
+  { value: "H", label: "H — Heavy" },
 ] as const;
 
 export const COM_NAV_EQUIPMENT_OPTIONS = [
-  { value: "N", label: "No COM/NAV/approach aid equipment" },
-  { value: "S", label: "Standard COM/NAV/approach aid equipment" },
+  { value: "N", label: "N — None" },
+  { value: "S", label: "S — Standard COM/NAV/approach aid equipment" },
 ] as const;
 
 export const SURVEILLANCE_EQUIPMENT_OPTIONS = [
-  { value: "N", label: "No surveillance equipment" },
-  { value: "A", label: "Transponder Mode A" },
-  { value: "C", label: "Transponder Mode A + altitude (Mode C)" },
+  { value: "N", label: "N — None" },
+  { value: "A", label: "A — Transponder Mode A" },
+  { value: "C", label: "C — Transponder Mode A & C" },
 ] as const;
+
+export const DEFAULT_DEPARTURE_POINT_REMARK = "RPT-20 BINALONAN";
 
 export const MAX_NUMBER_OF_AIRCRAFT = 999;
 
@@ -58,7 +60,6 @@ export const CRUISING_LEVEL_VFR = "VFR";
 // Persons on board: 3 digits, or TBN (to be notified).
 export const PERSONS_ON_BOARD_PATTERN = /^\d{3}$/;
 export const PERSONS_ON_BOARD_TBN = "TBN";
-export const DEFAULT_PERSONS_ON_BOARD = "000";
 
 export const MAX_DINGHIES_NUMBER = 99;
 export const MAX_DINGHIES_CAPACITY = 999;

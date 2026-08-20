@@ -8,6 +8,7 @@ import { z } from "zod";
 
 import type { AircraftWeightBalance } from "@/modules/aircrafts/types/aircraft-weight-balance";
 import { useSetAircraftWeightBalance } from "@/modules/aircrafts/hooks/use-set-aircraft-weight-balance.action";
+import { WB_NUMBER_PATTERN } from "@/modules/aircrafts/utils/wb-validation";
 import { DialogSectionHeader } from "@/shared/components/layout/dialog-section-header";
 import { Button } from "@/shared/components/ui/button";
 import {
@@ -22,15 +23,15 @@ const weightBalanceFormSchema = z.object({
   basicEmptyWeight: z
     .string()
     .min(1, "Enter basic weight.")
-    .regex(/^\d+(\.\d+)?$/, "Enter a valid number."),
+    .regex(WB_NUMBER_PATTERN, "Enter a valid number."),
   basicEmptyWeightArm: z
     .string()
     .min(1, "Enter basic ARM.")
-    .regex(/^\d+(\.\d+)?$/, "Enter a valid number."),
+    .regex(WB_NUMBER_PATTERN, "Enter a valid number."),
   basicEmptyWeightMoment: z
     .string()
     .min(1, "Enter basic moment.")
-    .regex(/^\d+(\.\d+)?$/, "Enter a valid number."),
+    .regex(WB_NUMBER_PATTERN, "Enter a valid number."),
 });
 
 type WeightBalanceFormValues = z.infer<typeof weightBalanceFormSchema>;

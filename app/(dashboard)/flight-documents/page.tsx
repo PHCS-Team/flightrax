@@ -1,5 +1,5 @@
-import { FlightDocumentsPage } from "@/modules/flight-documents/components/flight-documents-page";
+import { FlightDocumentsRoute } from "@/modules/flight-documents/components/flight-documents-route";
 
-export default function Page() {
-  return <FlightDocumentsPage />;
+export default async function Page() {
+  return <FlightDocumentsRoute />;
 }

@@ -65,5 +65,5 @@ export const setAircraftTypeWbSpecsAction = actionClient
       }
     }
 
-    return { ok: true, message: "Weight and balance configurations saved." };
+    return { ok: true, message: "Weight and balance specifications saved." };
   });
