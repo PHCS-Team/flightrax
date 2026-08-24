@@ -26,6 +26,7 @@ export type FlightRequestListItem = {
   id: string;
   flightPlanId: string;
   status: FlightRequestStatus;
+  rejectedReason: string | null;
   aircraftIdentification: string;
   typeOfAircraft: string;
   aircraftPhotoUrl: string | null;

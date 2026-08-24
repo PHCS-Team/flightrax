@@ -26,3 +26,18 @@ export function hhmmToTime(hhmm: string): string {
 export function hhmmToInterval(hhmm: string): string {
   return `${hhmm.slice(0, 2)}:${hhmm.slice(2, 4)}:00`;
 }
+
+// Postgres interval (returned as HH:MM:SS text) → HHMM form value.
+export function intervalToHhmm(value: unknown): string {
+  if (typeof value !== "string") {
+    return "";
+  }
+
+  const match = value.match(/^(\d+):(\d{2})/);
+
+  if (!match) {
+    return "";
+  }
+
+  return `${match[1].padStart(2, "0")}${match[2]}`;
+}

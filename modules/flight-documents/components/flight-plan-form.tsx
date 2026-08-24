@@ -118,7 +118,11 @@ export function FlightPlanForm({
   const isSelfPic = Boolean(
     filerContext && pilotInCommandId === filerContext.profile.id,
   );
-  const [otherInfoEdited, setOtherInfoEdited] = useState(false);
+  // In edit mode a saved Other Information value must never be overwritten
+  // by the auto-fill — treat it as already user-edited from the start.
+  const [otherInfoEdited, setOtherInfoEdited] = useState(() =>
+    Boolean(defaultValues?.otherRemarks?.trim()),
+  );
 
   // Keep Other Information auto-filled from the DOF, any ZZZZ aerodromes
   // (DEP// DEST// ALTN/ lines), and the filer's licenses until the user

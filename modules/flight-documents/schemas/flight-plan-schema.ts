@@ -140,3 +140,11 @@ export type FlightPlanFormValues = z.infer<typeof flightPlanFormSchema>;
 export const createFlightPlanSchema = flightPlanFormSchema.extend({
   aircraftId: z.string().uuid(),
 });
+
+export const updateFlightPlanSchema = flightPlanFormSchema.extend({
+  flightPlanId: z.string().uuid(),
+});
+
+export const deleteFlightPlanSchema = z.object({
+  flightPlanId: z.string().uuid(),
+});

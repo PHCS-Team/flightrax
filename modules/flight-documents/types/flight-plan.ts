@@ -5,6 +5,9 @@ import type {
   TYPE_OF_FLIGHT_OPTIONS,
   WAKE_TURBULENCE_CATEGORY_OPTIONS,
 } from "@/modules/flight-documents/constants/flight-plan-options";
+import type { FlightPlanFormValues } from "@/modules/flight-documents/schemas/flight-plan-schema";
+import type { FlightPlanAircraftOption } from "@/modules/flight-documents/types/aircraft-option";
+import type { FlightRequestStatus } from "@/modules/flight-documents/types/flight-request";
 import type { Database } from "@/shared/types/supabase";
 
 export type FlightPlanRow = Database["public"]["Tables"]["flight_plans"]["Row"];
@@ -44,6 +47,18 @@ export type DinghiesInfo = {
   capacity: number | null;
   covered: boolean;
   color: string | null;
+};
+
+// A flight plan loaded for editing: form values plus everything the edit
+// surface needs to gate and render (request status, rejection reason, and
+// the aircraft header info).
+export type FlightPlanForEdit = {
+  flightPlanId: string;
+  aircraftId: string | null;
+  requestStatus: FlightRequestStatus;
+  rejectedReason: string | null;
+  aircraft: FlightPlanAircraftOption;
+  values: FlightPlanFormValues;
 };
 
 // Shape of one snapshotted license row stored in

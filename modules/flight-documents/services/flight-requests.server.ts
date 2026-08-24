@@ -11,7 +11,7 @@ import { createAdminClient } from "@/shared/lib/supabase/admin";
 import type { PaginatedResponse } from "@/shared/types/pagination";
 
 const FLIGHT_REQUEST_LIST_SELECT =
-  "id, status, flight_plan_id, created_at, updated_at, flight_plans!inner(aircraft_identification, type_of_aircraft, departure_aerodrome, destination_aerodrome, dof_raw, dof_resolved, departure_time_raw, aircrafts(photo_path))";
+  "id, status, rejected_reason, flight_plan_id, created_at, updated_at, flight_plans!inner(aircraft_identification, type_of_aircraft, departure_aerodrome, destination_aerodrome, dof_raw, dof_resolved, departure_time_raw, aircrafts(photo_path))";
 
 export async function getOwnFlightRequestsPage(
   page: number,
@@ -58,6 +58,7 @@ export async function getOwnFlightRequestsPage(
       id: row.id,
       flightPlanId: row.flight_plan_id,
       status: row.status as FlightRequestStatus,
+      rejectedReason: row.rejected_reason,
       aircraftIdentification: row.flight_plans.aircraft_identification,
       typeOfAircraft: row.flight_plans.type_of_aircraft,
       aircraftPhotoUrl: row.flight_plans.aircrafts?.photo_path
