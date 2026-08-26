@@ -55,6 +55,7 @@ export type DinghiesInfo = {
 export type FlightPlanForEdit = {
   flightPlanId: string;
   aircraftId: string | null;
+  isOwner: boolean;
   requestStatus: FlightRequestStatus;
   rejectedReason: string | null;
   aircraft: FlightPlanAircraftOption;

@@ -244,7 +244,7 @@ export function FlightPlanForm({
         </div>
 
         <SectionHeading title="Section 2 — Flight Information" />
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-4">
           <FpSelectField
             control={form.control}
             error={errors.flightRules?.message}
@@ -267,8 +267,6 @@ export function FlightPlanForm({
             register={form.register("numberOfAircraft")}
             required
           />
-        </div>
-        <div className="grid gap-4 sm:grid-cols-3">
           <FpSelectField
             control={form.control}
             error={errors.wakeTurbulenceCategory?.message}
@@ -276,7 +274,9 @@ export function FlightPlanForm({
             name="wakeTurbulenceCategory"
             options={WAKE_TURBULENCE_CATEGORY_OPTIONS}
           />
-          <div className="grid content-start gap-2 sm:col-span-2">
+        </div>
+        <div className="grid gap-4">
+          <div className="grid content-start gap-2">
             <p className="text-sm font-semibold text-foreground">Equipment</p>
             <div className="grid gap-3 rounded-lg border border-primary-foreground/15 bg-primary-foreground/5 p-3 sm:grid-cols-2">
               <FormRadioGroup

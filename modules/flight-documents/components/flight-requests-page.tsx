@@ -1,10 +1,6 @@
-import { ClipboardCheckIcon } from "lucide-react";
-
-import { EmptyState } from "@/shared/components/layout/empty-state";
+import { FlightRequestsClientSurface } from "@/modules/flight-documents/components/flight-requests-client-surface";
 import { PageHeader } from "@/shared/components/layout/page-header";
 
-// Static placeholder — the instructor review flow (pending queue,
-// approve/reject actions) lands here in the next phase.
 export function FlightRequestsPage() {
   return (
     <section>
@@ -16,11 +12,7 @@ export function FlightRequestsPage() {
         title="Flight Requests"
       />
 
-      <EmptyState
-        description="Flight requests submitted for approval will appear here for review."
-        icon={<ClipboardCheckIcon className="size-7" />}
-        title="Flight Request Review"
-      />
+      <FlightRequestsClientSurface />
     </section>
   );
 }

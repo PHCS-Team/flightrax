@@ -136,7 +136,8 @@ const INSTRUCTOR_USERS_GROUP: DashboardNavigationGroup = {
 
 // Instructors both file their own flight plans and review other pilots'
 // requests, so their flight pages live under one "Flights" group.
-const INSTRUCTOR_FLIGHTS_GROUP: DashboardNavigationGroup = {
+// Superadmins can do everything, so they get the same grouping.
+const FLIGHTS_GROUP: DashboardNavigationGroup = {
   id: "flights",
   icon: PlaneTakeoffIcon,
   label: "Flights",
@@ -148,7 +149,7 @@ const INSTRUCTOR_FLIGHTS_GROUP: DashboardNavigationGroup = {
 
 const INSTRUCTOR_NAVIGATION: DashboardNavigation = [
   DASHBOARD_NAVIGATION_ITEMS.home,
-  INSTRUCTOR_FLIGHTS_GROUP,
+  FLIGHTS_GROUP,
   INSTRUCTOR_USERS_GROUP,
   DASHBOARD_NAVIGATION_ITEMS.schedule,
 ];
@@ -162,7 +163,7 @@ const ADMIN_NAVIGATION: DashboardNavigation = [
 
 const SUPERADMIN_NAVIGATION: DashboardNavigation = [
   DASHBOARD_NAVIGATION_ITEMS.home,
-  DASHBOARD_NAVIGATION_ITEMS.flightDocuments,
+  FLIGHTS_GROUP,
   DASHBOARD_NAVIGATION_ITEMS.schedule,
   USERS_GROUP,
   DASHBOARD_NAVIGATION_ITEMS.aircrafts,

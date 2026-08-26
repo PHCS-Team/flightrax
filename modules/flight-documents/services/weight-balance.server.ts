@@ -7,6 +7,7 @@ import type {
   WeightBalanceContext,
   WeightBalanceGivens,
 } from "@/modules/flight-documents/types/weight-balance";
+import { canReviewFlightRequests } from "@/modules/flight-documents/utils/can-review-flight-requests";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { isApproved } from "@/shared/lib/rbac/guards";
 import { AIRCRAFT_PHOTOS_BUCKET } from "@/shared/lib/storage/buckets";
@@ -29,7 +30,6 @@ export async function getWeightBalanceContext(
     .from("flight_plans")
     .select(WEIGHT_BALANCE_CONTEXT_SELECT)
     .eq("id", flightPlanId)
-    .eq("created_by", viewer.id)
     .maybeSingle();
 
   if (error) {
@@ -37,6 +37,12 @@ export async function getWeightBalanceContext(
   }
 
   if (!data || !data.flight_requests) {
+    return null;
+  }
+
+  const isOwner = data.created_by === viewer.id;
+
+  if (!isOwner && !canReviewFlightRequests(viewer)) {
     return null;
   }
 
@@ -116,9 +122,10 @@ export async function getWeightBalanceContext(
           return {
             position: area.position,
             weight: entry ? String(entry.weight) : "0",
-            moment: entry?.moment !== null && entry?.moment !== undefined
-              ? String(entry.moment)
-              : "0",
+            moment:
+              entry?.moment !== null && entry?.moment !== undefined
+                ? String(entry.moment)
+                : "0",
           };
         }),
         balanceStatus:
@@ -129,6 +136,7 @@ export async function getWeightBalanceContext(
 
   return {
     flightPlanId: data.id,
+    isOwner,
     requestId: data.flight_requests.id,
     requestStatus: data.flight_requests.status as FlightRequestStatus,
     weightBalanceId: data.flight_requests.weight_balance_id,

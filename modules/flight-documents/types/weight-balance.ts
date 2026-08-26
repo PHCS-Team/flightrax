@@ -39,6 +39,7 @@ export type WeightBalanceGivens = {
 
 // Everything the W&B page needs for one flight plan's request.
 export type WeightBalanceContext = {
+  isOwner: boolean;
   flightPlanId: string;
   requestId: string;
   requestStatus: FlightRequestStatus;

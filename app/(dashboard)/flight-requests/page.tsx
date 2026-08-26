@@ -1,5 +1,5 @@
-import { FlightRequestsPage } from "@/modules/flight-documents/components/flight-requests-page";
+import { FlightRequestsRoute } from "@/modules/flight-documents/components/flight-requests-route";
 
-export default function Page() {
-  return <FlightRequestsPage />;
+export default async function Page() {
+  return <FlightRequestsRoute />;
 }

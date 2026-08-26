@@ -65,12 +65,10 @@ export function WeightBalanceClientSurface({
     );
   }
 
-  // Any status outside the editable set (pending approval, approved,
-  // completed history) renders the same page as a read-only viewer.
   const isEditable = EDITABLE_FLIGHT_REQUEST_STATUSES.some(
     (status) => status === context.requestStatus,
   );
-  const readOnly = !isEditable;
+  const readOnly = !isEditable || !context.isOwner;
   const isPendingApproval = context.requestStatus === "pending_approval";
 
   if (!context.givens) {
@@ -95,7 +93,7 @@ export function WeightBalanceClientSurface({
     <div className="sm:space-y-4">
       <AircraftHeaderCard aircraft={context.aircraft} />
 
-      {isPendingApproval && (
+      {isPendingApproval && context.isOwner && (
         <div className="p-3 sm:p-0">
           <PendingApprovalAlert flightPlanId={flightPlanId} />
         </div>

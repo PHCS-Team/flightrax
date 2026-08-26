@@ -19,6 +19,7 @@ import { useDeleteFlightPlan } from "@/modules/flight-documents/hooks/use-delete
 import { useOwnFlightPlanForEdit } from "@/modules/flight-documents/hooks/use-flight-plan.query";
 import { useUpdateFlightPlan } from "@/modules/flight-documents/hooks/use-update-flight-plan.action";
 import { ConfirmationDialog } from "@/shared/components/layout/confirmation-dialog";
+import { PageHeader } from "@/shared/components/layout/page-header";
 import { FloatingActionButton } from "@/shared/components/layout/floating-action-button";
 import { DialogSectionHeader } from "@/shared/components/layout/dialog-section-header";
 import { EmptyState } from "@/shared/components/layout/empty-state";
@@ -36,8 +37,6 @@ export function FlightPlanEditClientSurface({
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const { flightPlan, error, isPending } =
     useOwnFlightPlanForEdit(flightPlanId);
-  // Saving is the only road to the Weight & Balance step — the plan must
-  // be persisted (changed or not) before moving on.
   const updateFlightPlan = useUpdateFlightPlan({
     onSaved: () =>
       router.push(
@@ -81,21 +80,36 @@ export function FlightPlanEditClientSurface({
   }
 
   // Any status outside the editable set (pending approval, approved,
-  // completed history) renders the same page as a read-only viewer.
+  // completed history) renders the same page as a read-only viewer — and
+  // so does someone else's plan opened by a reviewer, whatever its status.
   const isEditable = EDITABLE_FLIGHT_REQUEST_STATUSES.some(
     (status) => status === flightPlan.requestStatus,
   );
-  const readOnly = !isEditable;
+  const readOnly = !isEditable || !flightPlan.isOwner;
   const isPendingApproval = flightPlan.requestStatus === "pending_approval";
 
   const isRejected =
     flightPlan.requestStatus === "rejected" && flightPlan.rejectedReason;
 
+  const pageTitle = readOnly ? "View Flight Plan" : "Edit Flight Plan";
+
   return (
     <div className="sm:space-y-4">
+      <PageHeader
+        breadcrumbs={[
+          { href: "/dashboard", label: "Dashboard" },
+          { href: "/flight-documents", label: "Flight Documents" },
+          {
+            href: `/flight-documents/flight-plans/${flightPlanId}`,
+            label: pageTitle,
+          },
+        ]}
+        title={pageTitle}
+      />
+
       <AircraftHeaderCard aircraft={flightPlan.aircraft} />
 
-      {isPendingApproval && (
+      {isPendingApproval && flightPlan.isOwner && (
         <div className="p-3 sm:p-0">
           <PendingApprovalAlert flightPlanId={flightPlanId} />
         </div>
@@ -121,7 +135,7 @@ export function FlightPlanEditClientSurface({
         />
       </GlassSurface>
 
-      {isEditable && (
+      {isEditable && flightPlan.isOwner && (
         <div className="flex flex-col gap-2 border-t border-primary-foreground/15 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:border-0 sm:p-0">
           <p className="text-xs text-primary-foreground/60">
             No longer need this flight plan? Deleting removes it along with its

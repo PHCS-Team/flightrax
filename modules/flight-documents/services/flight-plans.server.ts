@@ -3,6 +3,7 @@ import "server-only";
 import type { FlightPlanForEdit } from "@/modules/flight-documents/types/flight-plan";
 import type { FlightRequestStatus } from "@/modules/flight-documents/types/flight-request";
 import { intervalToHhmm } from "@/modules/flight-documents/utils/flight-plan-time";
+import { canReviewFlightRequests } from "@/modules/flight-documents/utils/can-review-flight-requests";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { isApproved } from "@/shared/lib/rbac/guards";
 import { AIRCRAFT_PHOTOS_BUCKET } from "@/shared/lib/storage/buckets";
@@ -25,7 +26,6 @@ export async function getOwnFlightPlanForEdit(
     .from("flight_plans")
     .select(FLIGHT_PLAN_EDIT_SELECT)
     .eq("id", flightPlanId)
-    .eq("created_by", viewer.id)
     .maybeSingle();
 
   if (error) {
@@ -36,11 +36,18 @@ export async function getOwnFlightPlanForEdit(
     return null;
   }
 
+  const isOwner = data.created_by === viewer.id;
+
+  if (!isOwner && !canReviewFlightRequests(viewer)) {
+    return null;
+  }
+
   const storage = supabase.storage.from(AIRCRAFT_PHOTOS_BUCKET);
 
   return {
     flightPlanId: data.id,
     aircraftId: data.aircraft_id,
+    isOwner,
     requestStatus: data.flight_requests.status as FlightRequestStatus,
     rejectedReason: data.flight_requests.rejected_reason,
     aircraft: {
@@ -60,7 +67,8 @@ export async function getOwnFlightPlanForEdit(
       addressee: data.addressee ?? "",
       dofRaw: data.dof_raw,
       originator: data.originator ?? "",
-      flightRules: data.flight_rules as FlightPlanForEdit["values"]["flightRules"],
+      flightRules:
+        data.flight_rules as FlightPlanForEdit["values"]["flightRules"],
       typeOfFlight:
         data.type_of_flight as FlightPlanForEdit["values"]["typeOfFlight"],
       numberOfAircraft: String(data.number_of_aircraft),

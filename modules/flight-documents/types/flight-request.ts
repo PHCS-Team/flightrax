@@ -20,6 +20,8 @@ export type FlightRequestStatus =
 
 export type JourneyStatus = Database["public"]["Enums"]["journey_status"];
 
+export type FlightRequestReviewScope = "assigned" | "all";
+
 export type FlightRequestListItem = {
   id: string;
   flightPlanId: string;
@@ -36,4 +38,10 @@ export type FlightRequestListItem = {
   departureTimeRaw: string;
   createdAt: string;
   updatedAt: string;
+};
+
+export type FlightRequestReviewListItem = FlightRequestListItem & {
+  requestedByName: string;
+  pilotInCommandName: string;
+  hasWeightBalance: boolean;
 };

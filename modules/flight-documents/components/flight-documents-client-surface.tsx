@@ -93,28 +93,28 @@ export function FlightDocumentsClientSurface() {
         </TabsList>
       </Tabs>
 
-      <GlassSurface className="space-y-4 p-4">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="relative sm:max-w-sm sm:flex-1">
-            <SearchIcon className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#121212]/45" />
-            <Input
-              className="border-primary-foreground/20 bg-primary-foreground/10 pl-9 uppercase text-[#121212] placeholder:normal-case placeholder:text-[#121212]/55 focus-visible:border-primary-foreground/45 focus-visible:ring-primary-foreground/20"
-              onChange={(event) => setSearchInput(event.target.value)}
-              placeholder="Search flight plan code..."
-              value={searchInput}
-            />
-          </div>
-          <Button
-            className="hidden px-4 font-semibold disabled:cursor-default sm:inline-flex"
-            disabled={!canFile}
-            onClick={() => setAircraftDialogOpen(true)}
-            type="button"
-          >
-            <PlaneTakeoffIcon className="size-4" />
-            File flight plan
-          </Button>
+      <div className="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-0 sm:py-0">
+        <div className="relative w-full sm:max-w-sm">
+          <SearchIcon className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-primary-foreground/55" />
+          <Input
+            className="border-primary-foreground/20 bg-primary-foreground/10 pl-11 uppercase text-primary-foreground placeholder:normal-case placeholder:text-primary-foreground/55 focus-visible:border-primary-foreground/45 focus-visible:ring-primary-foreground/20"
+            onChange={(event) => setSearchInput(event.target.value)}
+            placeholder="Search flight plan code..."
+            value={searchInput}
+          />
         </div>
+        <Button
+          className="hidden px-4 font-semibold disabled:cursor-default sm:inline-flex"
+          disabled={!canFile}
+          onClick={() => setAircraftDialogOpen(true)}
+          type="button"
+        >
+          <PlaneTakeoffIcon className="size-4" />
+          File flight plan
+        </Button>
+      </div>
 
+      <GlassSurface className="space-y-4 p-4">
         {filerContext && !canFile && (
           <div className="flex flex-col gap-2 rounded-lg border border-primary-foreground/15 bg-primary-foreground/5 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-xs text-primary-foreground/80">
