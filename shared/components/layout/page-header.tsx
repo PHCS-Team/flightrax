@@ -23,7 +23,7 @@ export function PageHeader({
   return (
     <div
       className={cn(
-        "flex items-center justify-between gap-4 border-b border-primary-foreground/15 p-4 sm:border-none",
+        "flex items-center justify-between gap-4 border-b border-primary-foreground/15 py-1.5 px-3 sm:p-4 sm:border-none",
         className,
       )}
     >
@@ -56,7 +56,7 @@ export function PageHeader({
             </span>
           ))}
         </nav>
-        <h1 className="truncate text-2xl font-bold sm:font-semibold tracking-tight md:text-4xl py-1">
+        <h1 className="truncate text-xl sm:text-2xl font-bold sm:font-semibold tracking-tight md:text-4xl py-1">
           {title}
         </h1>
       </div>

@@ -381,7 +381,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
           </div>
         </aside>
 
-        <div className="min-w-0 flex-1 space-y-0 sm:space-y-6">
+        <div className="min-w-0 flex-1 space-y-0 sm:space-y-4">
           <header className="sticky top-0 z-20 border-b border-primary-foreground/15 bg-primary p-4 text-primary-foreground shadow-sm lg:top-4 lg:rounded-3xl lg:border lg:bg-primary/90 lg:backdrop-blur">
             <div className="flex items-center justify-between gap-3">
               <div className="flex min-w-0 items-center gap-3">

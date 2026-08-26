@@ -17,18 +17,14 @@ import { GlassSurface } from "@/shared/components/layout/glass-surface";
 import { LoadingScreen } from "@/shared/components/layout/loading-screen";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
+import { isLicenseExpired } from "@/shared/lib/aviation/license-validity";
 import { cn } from "@/shared/lib/utils";
 
 const DARK_OUTLINE_BUTTON_CLASS =
   "border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground";
 
 function getStatusDetails(license: License) {
-  const todayIso = new Date().toISOString().slice(0, 10);
-  const isExpired =
-    license.status === "expired" ||
-    (license.expiry_date !== null && license.expiry_date < todayIso);
-
-  return isExpired
+  return isLicenseExpired(license)
     ? {
         label: "Expired",
         className:

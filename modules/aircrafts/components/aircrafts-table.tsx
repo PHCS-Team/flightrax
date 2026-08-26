@@ -148,7 +148,7 @@ export function AircraftsTable({
         id: "typeSpecs",
         header: () => (
           <span className="inline-flex items-center gap-1">
-            Aircraft Type Configuration
+            Aircraft Type Specifications
             <Popover>
               <PopoverTrigger asChild>
                 <button
@@ -162,7 +162,7 @@ export function AircraftsTable({
                 <div className="max-h-72 space-y-3 overflow-y-auto pr-1">
                   <div className="space-y-2 rounded-lg border bg-muted/30 p-2.5">
                     <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                      Aircraft Type Configurations
+                      Aircraft Type Specifications
                     </p>
                     <p className="text-xs leading-relaxed text-muted-foreground">
                       Inherited from the aircraft type &mdash; fixed by the

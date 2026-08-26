@@ -408,7 +408,7 @@ export type Database = {
           authorized_representative_licenses: Json | null
           authorized_representative_name: string | null
           authorized_representative_signature: string | null
-          com_nav_equipment: string[]
+          com_nav_equipment: string
           created_at: string
           created_by: string
           cruising_level: string
@@ -446,10 +446,11 @@ export type Database = {
           pilot_licenses: Json
           pilot_name: string
           pilot_signature: string | null
+          plan_code: string
           remarks: string | null
           route: string[]
           second_alternate_aerodrome: string | null
-          surveillance_equipment: string[]
+          surveillance_equipment: string
           survival_desert: boolean
           survival_jungle: boolean
           survival_maritime: boolean
@@ -469,7 +470,7 @@ export type Database = {
           authorized_representative_licenses?: Json | null
           authorized_representative_name?: string | null
           authorized_representative_signature?: string | null
-          com_nav_equipment?: string[]
+          com_nav_equipment?: string
           created_at?: string
           created_by: string
           cruising_level: string
@@ -507,10 +508,11 @@ export type Database = {
           pilot_licenses?: Json
           pilot_name: string
           pilot_signature?: string | null
+          plan_code: string
           remarks?: string | null
           route?: string[]
           second_alternate_aerodrome?: string | null
-          surveillance_equipment?: string[]
+          surveillance_equipment?: string
           survival_desert?: boolean
           survival_jungle?: boolean
           survival_maritime?: boolean
@@ -530,7 +532,7 @@ export type Database = {
           authorized_representative_licenses?: Json | null
           authorized_representative_name?: string | null
           authorized_representative_signature?: string | null
-          com_nav_equipment?: string[]
+          com_nav_equipment?: string
           created_at?: string
           created_by?: string
           cruising_level?: string
@@ -568,10 +570,11 @@ export type Database = {
           pilot_licenses?: Json
           pilot_name?: string
           pilot_signature?: string | null
+          plan_code?: string
           remarks?: string | null
           route?: string[]
           second_alternate_aerodrome?: string | null
-          surveillance_equipment?: string[]
+          surveillance_equipment?: string
           survival_desert?: boolean
           survival_jungle?: boolean
           survival_maritime?: boolean
@@ -1054,7 +1057,28 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_flight_plan_aircraft_options: {
+        Args: {
+          p_page?: number
+          p_page_size?: number
+          p_search?: string
+          p_type_key?: string
+        }
+        Returns: {
+          aircraft_identification: string
+          color_markings: string
+          has_active_flight: boolean
+          has_type_specs: boolean
+          has_wb_config: boolean
+          id: string
+          is_available: boolean
+          model: string
+          photo_path: string
+          total_count: number
+          type_key: string
+          type_name: string
+        }[]
+      }
     }
     Enums: {
       admin_department:
