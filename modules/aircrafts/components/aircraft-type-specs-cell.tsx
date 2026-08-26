@@ -35,7 +35,7 @@ export function AircraftTypeSpecsCell({
     <div className="flex items-center gap-3 py-1">
       <div className="shrink-0">
         <p className="text-xs font-bold text-primary-foreground/80 mb-1">
-          ARM Configurations
+          ARM Specifications
         </p>
         <div className="flex items-center gap-4">
           <TypeSpecStat

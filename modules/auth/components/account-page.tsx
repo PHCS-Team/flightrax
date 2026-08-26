@@ -10,7 +10,7 @@ export function AccountPage() {
         action={
           <div className="flex items-center gap-2">
             <ChangePasswordDialog />
-            <LogoutConfirmationButton buttonClassName="rounded-lg sm:rounded-2xl" />
+            <LogoutConfirmationButton buttonClassName="rounded-lg sm:rounded-2xl h-7.5 sm:h-9" />
           </div>
         }
         breadcrumbs={[

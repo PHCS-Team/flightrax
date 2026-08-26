@@ -11,11 +11,7 @@ import { matchesReviewSearch } from "@/modules/account-review/utils/search";
 import { LoadingScreen } from "@/shared/components/layout/loading-screen";
 import { EmptyState } from "@/shared/components/layout/empty-state";
 import { Input } from "@/shared/components/ui/input";
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-} from "@/shared/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 import { ACCOUNT_REQUEST_ROLES, ROLE_LABELS } from "@/shared/lib/rbac/config";
 import type { AccountRequestRole } from "@/shared/lib/rbac/config";
 
@@ -34,21 +30,23 @@ export function AccountReviewClientSurface() {
   );
 
   return (
-    <div className="space-y-4 mt-6 sm:mt-0">
-      <Tabs
-        onValueChange={(value) => setType(value as AccountRequestRole)}
-        value={type}
-      >
-        <TabsList className="w-full justify-start border-x-0 md:w-fit md:border-x border-y border-primary-foreground/15 p-1.5">
-          {ACCOUNT_REQUEST_ROLES.map((role) => (
-            <TabsTrigger key={role} value={role}>
-              {ROLE_LABELS[role]}s
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </Tabs>
+    <div className="space-y-4">
+      <div className="sm:space-y-4">
+        <Tabs
+          onValueChange={(value) => setType(value as AccountRequestRole)}
+          value={type}
+        >
+          <TabsList className="w-full justify-start border-x-0 md:w-fit md:border-x border-y border-primary-foreground/15 p-1.5">
+            {ACCOUNT_REQUEST_ROLES.map((role) => (
+              <TabsTrigger key={role} value={role}>
+                {ROLE_LABELS[role]}s
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
 
-      <AccountReviewMetrics type={type} />
+        <AccountReviewMetrics type={type} />
+      </div>
 
       <div className="flex flex-col gap-3 px-4 sm:flex-row sm:items-center sm:justify-between sm:px-0">
         <div className="relative w-full max-w-xl">

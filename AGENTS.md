@@ -437,6 +437,15 @@ The `font-bold uppercase` classes may be added for visual styling, but the JSX s
 
 ---
 
+## Rule 18 — Responsive Controls & Dialog Actions
+
+- Form controls (inputs, selects, textareas, dropdown items — **not buttons**) must be slightly **smaller on mobile than on desktop**. The shared ui primitives encode this (`h-9 md:h-10` on Input and SelectTrigger); never override a control to be taller on mobile than on desktop. Keep `text-base` on mobile inputs — 16px font prevents iOS auto-zoom on focus.
+- **Dialog action buttons with short labels (Confirm/Cancel, Save/Cancel, Delete/Cancel) sit side by side on ALL viewports** — the shared `DialogFooter` encodes this. On mobile the side-by-side buttons stretch to fill the footer width equally (`*:flex-1`); on desktop they keep their natural width, right-aligned (`sm:*:flex-initial`). **Buttons with long labels (full-sentence actions like "Proceed to Weight & Balance") stack one per row instead** — side-by-side long labels look cramped and wrap badly. Pick per dialog based on label length, never mix.
+- **Forms must never scroll horizontally on mobile.** Restructure rows instead: stack the row label above the value cells and give each cell its own mobile mini-label (see `weight-balance-form.tsx`), rather than wrapping the form in `overflow-x-auto`.
+- Read-only value cells that sit next to inputs must match the input's radius and height (`rounded-lg sm:rounded-2xl`, `h-9 md:h-10`) so rows line up.
+
+---
+
 ## When Adding a New Module
 
 Every new feature module must have all of these subdirectories created before any code is written:

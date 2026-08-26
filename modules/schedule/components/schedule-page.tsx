@@ -1,5 +1,10 @@
 import { Badge } from "@/shared/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/shared/components/ui/card";
 import { PageHeader } from "@/shared/components/layout/page-header";
 
 const scheduleWindows = [
@@ -10,7 +15,7 @@ const scheduleWindows = [
 
 export function SchedulePage() {
   return (
-    <section className="space-y-6 py-2">
+    <section>
       <PageHeader
         breadcrumbs={[
           { href: "/dashboard", label: "Dashboard" },

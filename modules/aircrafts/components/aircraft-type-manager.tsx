@@ -266,7 +266,7 @@ function WbSpecsButton({ aircraftType }: { aircraftType: AircraftType }) {
   return (
     <>
       <Button
-        aria-label={`Manage W&B configurations for ${aircraftType.type}`}
+        aria-label={`Manage W&B specifications for ${aircraftType.type}`}
         className="size-8"
         onClick={() => setDialogOpen(true)}
         size="icon"
