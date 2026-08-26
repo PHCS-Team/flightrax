@@ -94,7 +94,7 @@ export function FlightPlanEditClientSurface({
   const pageTitle = readOnly ? "View Flight Plan" : "Edit Flight Plan";
 
   return (
-    <div className="space-y-1.5 sm:space-y-4">
+    <div className="sm:space-y-4">
       <PageHeader
         breadcrumbs={[
           { href: "/dashboard", label: "Dashboard" },
@@ -105,7 +105,6 @@ export function FlightPlanEditClientSurface({
           },
         ]}
         title={pageTitle}
-        className="mb-0"
       />
 
       <AircraftHeaderCard aircraft={flightPlan.aircraft} />

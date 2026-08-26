@@ -55,7 +55,7 @@ export function FlightRequestReviewClientSurface({
   }
 
   return (
-    <div className="space-y-1.5 sm:space-y-4">
+    <div className="sm:space-y-4">
       <AircraftHeaderCard aircraft={flightPlan.aircraft} />
 
       <FlightPlanReviewCard
@@ -63,7 +63,9 @@ export function FlightRequestReviewClientSurface({
         values={flightPlan.values}
       />
 
-      <WeightBalanceReviewCard context={weightBalanceQuery.context} />
+      <div className="mt-1.5 sm:mt-4">
+        <WeightBalanceReviewCard context={weightBalanceQuery.context} />
+      </div>
 
       <div className="flex flex-col-reverse gap-2 p-4 sm:flex-row sm:justify-end sm:p-0">
         <Button

@@ -90,7 +90,7 @@ export function WeightBalanceClientSurface({
   }
 
   return (
-    <div className="space-y-1.5 sm:space-y-4">
+    <div className="sm:space-y-4">
       <AircraftHeaderCard aircraft={context.aircraft} />
 
       {isPendingApproval && context.isOwner && (
