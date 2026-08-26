@@ -13,6 +13,7 @@ import { useEffect, useRef, useState } from "react";
 import { useAircraftOptionsRealtime } from "@/modules/flight-documents/hooks/use-aircraft-options-realtime";
 import { useFlightPlanAircraftOptions } from "@/modules/flight-documents/hooks/use-aircraft-options.query";
 import { useFlightPlanTypeOptions } from "@/modules/flight-documents/hooks/use-flight-plan-type-options.query";
+import { useInfiniteScrollSentinel } from "@/modules/flight-documents/hooks/use-infinite-scroll-sentinel";
 import { DialogSectionHeader } from "@/shared/components/layout/dialog-section-header";
 import { Button } from "@/shared/components/ui/button";
 import {
@@ -46,7 +47,6 @@ export function AircraftSelectDialog({
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
   const listRef = useRef<HTMLDivElement | null>(null);
-  const sentinelRef = useRef<HTMLDivElement | null>(null);
   const { typeOptions } = useFlightPlanTypeOptions({ enabled: open });
   const {
     aircraftOptions,
@@ -62,6 +62,16 @@ export function AircraftSelectDialog({
 
   useAircraftOptionsRealtime({ enabled: open });
 
+  const sentinelRef = useInfiniteScrollSentinel({
+    enabled: open,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isPending,
+    rootMargin: "120px",
+    rootRef: listRef,
+  });
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
@@ -69,27 +79,6 @@ export function AircraftSelectDialog({
 
     return () => clearTimeout(timer);
   }, [search]);
-
-  useEffect(() => {
-    const sentinel = sentinelRef.current;
-
-    if (!open || !sentinel) {
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0]?.isIntersecting && hasNextPage && !isFetchingNextPage) {
-          fetchNextPage();
-        }
-      },
-      { root: listRef.current, rootMargin: "120px" },
-    );
-
-    observer.observe(sentinel);
-
-    return () => observer.disconnect();
-  }, [open, hasNextPage, isFetchingNextPage, fetchNextPage, isPending]);
 
   function handleContinue() {
     if (!selectedId) {
