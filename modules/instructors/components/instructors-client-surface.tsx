@@ -16,9 +16,11 @@ const DEFAULT_PAGE_SIZE = 10;
 
 export function InstructorsClientSurface({
   restrictPeerCredentials,
+  showPeerPrivacyNote,
   viewerId,
 }: {
   restrictPeerCredentials: boolean;
+  showPeerPrivacyNote: boolean;
   viewerId: string | null;
 }) {
   const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
@@ -41,7 +43,7 @@ export function InstructorsClientSurface({
 
   return (
     <div className="space-y-1.5 sm:space-y-4">
-      {restrictPeerCredentials && (
+      {showPeerPrivacyNote && (
         <GlassSurface className="flex items-start gap-3 p-4">
           <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary-foreground/10 text-primary-foreground">
             <InfoIcon className="size-4.5" />

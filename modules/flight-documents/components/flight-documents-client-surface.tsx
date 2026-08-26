@@ -101,7 +101,7 @@ export function FlightDocumentsClientSurface() {
         </TabsList>
       </Tabs>
 
-      <div className="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-0 sm:py-0">
+      <div className="flex flex-col gap-3 px-4 pt-2.5 pb-3 sm:flex-row sm:items-center sm:justify-between sm:px-0 sm:py-0">
         <PlanCodeSearchInput onChange={setSearchInput} value={searchInput} />
         <Button
           className="hidden px-4 font-semibold disabled:cursor-default sm:inline-flex"

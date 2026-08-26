@@ -98,7 +98,7 @@ export function FlightPlanCreateClientSurface() {
 
   return (
     <TooltipProvider>
-      <div className="sm:space-y-4">
+      <div className="space-y-1.5 sm:space-y-4">
         <AircraftHeaderCard aircraft={aircraft} />
 
         <GlassSurface className="p-4 sm:p-6">

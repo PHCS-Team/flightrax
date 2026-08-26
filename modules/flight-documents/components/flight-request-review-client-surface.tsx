@@ -55,7 +55,7 @@ export function FlightRequestReviewClientSurface({
   }
 
   return (
-    <div className="sm:space-y-4">
+    <div className="space-y-1.5 sm:space-y-4">
       <AircraftHeaderCard aircraft={flightPlan.aircraft} />
 
       <FlightPlanReviewCard

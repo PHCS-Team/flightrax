@@ -118,9 +118,7 @@ export function InstructorsTable({
         <CertificateTags
           certificates={row.original.certificates}
           onCertificateClick={
-            canViewCredentials(row.original)
-              ? setDetailsCertificate
-              : undefined
+            canViewCredentials(row.original) ? setDetailsCertificate : undefined
           }
         />
       ),
@@ -148,7 +146,7 @@ export function InstructorsTable({
   });
 
   return (
-    <GlassSurface className="space-y-4 p-4">
+    <GlassSurface className="space-y-4 p-4 pt-3 sm:p-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <Input
           className="max-w-sm border-primary-foreground/20 bg-primary-foreground/10 text-[#121212] placeholder:text-[#121212]/55 focus-visible:border-primary-foreground/45 focus-visible:ring-primary-foreground/20"
@@ -158,7 +156,7 @@ export function InstructorsTable({
           placeholder="Search name, email, or instructor ID"
           value={search}
         />
-        <p className="text-sm text-primary-foreground/70">
+        <p className="hidden sm:block text-sm text-primary-foreground/70">
           {instructors.length} of {totalCount} instructors
         </p>
       </div>

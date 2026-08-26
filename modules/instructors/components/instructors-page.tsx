@@ -3,9 +3,11 @@ import { InstructorsClientSurface } from "@/modules/instructors/components/instr
 
 export function InstructorsPage({
   restrictPeerCredentials,
+  showPeerPrivacyNote,
   viewerId,
 }: {
   restrictPeerCredentials: boolean;
+  showPeerPrivacyNote: boolean;
   viewerId: string | null;
 }) {
   return (
@@ -20,6 +22,7 @@ export function InstructorsPage({
 
       <InstructorsClientSurface
         restrictPeerCredentials={restrictPeerCredentials}
+        showPeerPrivacyNote={showPeerPrivacyNote}
         viewerId={viewerId}
       />
     </section>

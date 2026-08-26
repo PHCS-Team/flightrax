@@ -82,7 +82,7 @@ export function FlightRequestsClientSurface() {
         </TabsList>
       </Tabs>
 
-      <div className="px-4 py-3 sm:px-0 sm:py-0">
+      <div className="px-4 pt-2.5 pb-3 sm:px-0 sm:py-0">
         <PlanCodeSearchInput onChange={setSearchInput} value={searchInput} />
       </div>
 

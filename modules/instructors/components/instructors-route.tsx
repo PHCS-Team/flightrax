@@ -20,7 +20,10 @@ export async function InstructorsRoute() {
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <InstructorsPage
-        restrictPeerCredentials={viewer?.role === ROLE.INSTRUCTOR}
+        restrictPeerCredentials={
+          viewer?.role === ROLE.INSTRUCTOR || viewer?.role === ROLE.STUDENT
+        }
+        showPeerPrivacyNote={viewer?.role === ROLE.INSTRUCTOR}
         viewerId={viewer?.id ?? null}
       />
     </HydrationBoundary>
