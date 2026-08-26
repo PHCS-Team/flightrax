@@ -4,12 +4,8 @@ import { CircleHelpIcon } from "lucide-react";
 import { useState } from "react";
 
 import { DialogSectionHeader } from "@/shared/components/layout/dialog-section-header";
+import { FloatingActionButton } from "@/shared/components/layout/floating-action-button";
 import { Dialog, DialogContent } from "@/shared/components/ui/dialog";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/shared/components/ui/tooltip";
 
 const HELP_SECTIONS = [
   {
@@ -118,21 +114,11 @@ export function FlightPlanHelp() {
 
   return (
     <>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <button
-            aria-label="How to fill up the flight plan"
-            className="fixed bottom-6 right-6 z-30 inline-flex size-12 cursor-pointer items-center justify-center rounded-full border border-primary-foreground/30 bg-primary text-primary-foreground shadow-lg transition hover:bg-primary/90 hover:shadow-xl"
-            onClick={() => setOpen(true)}
-            type="button"
-          >
-            <CircleHelpIcon className="size-5" />
-          </button>
-        </TooltipTrigger>
-        <TooltipContent side="left">
-          <p>How to Fill Up the Flight Plan</p>
-        </TooltipContent>
-      </Tooltip>
+      <FloatingActionButton
+        icon={CircleHelpIcon}
+        label="How to Fill Up the Flight Plan"
+        onClick={() => setOpen(true)}
+      />
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto p-6 sm:max-w-lg">

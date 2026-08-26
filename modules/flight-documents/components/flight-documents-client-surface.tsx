@@ -1,21 +1,29 @@
 "use client";
 
-import { FileTextIcon, PlaneTakeoffIcon, PlusIcon } from "lucide-react";
+import { FileTextIcon, PlaneTakeoffIcon, SearchIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { parseAsInteger, parseAsStringLiteral, useQueryState } from "nuqs";
-import { useState } from "react";
+import {
+  parseAsInteger,
+  parseAsString,
+  parseAsStringLiteral,
+  useQueryState,
+} from "nuqs";
+import { useEffect, useState } from "react";
 
 import { AircraftSelectDialog } from "@/modules/flight-documents/components/aircraft-select-dialog";
 import { useFlightPlanFilerContext } from "@/modules/flight-documents/hooks/use-filer-context.query";
 import { useOwnFlightRequests } from "@/modules/flight-documents/hooks/use-flight-requests.query";
 import { EmptyState } from "@/shared/components/layout/empty-state";
+import { FloatingActionButton } from "@/shared/components/layout/floating-action-button";
 import { GlassSurface } from "@/shared/components/layout/glass-surface";
 import { LoadingScreen } from "@/shared/components/layout/loading-screen";
 import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
+import { useDebouncedQueryState } from "@/shared/hooks/use-debounced-query-state";
 
 const PAGE_SIZE = 9;
-const STATUS_TABS = ["draft", "rejected"] as const;
+const STATUS_TABS = ["draft", "pending_approval", "rejected"] as const;
 
 export function FlightDocumentsClientSurface() {
   const router = useRouter();
@@ -24,10 +32,22 @@ export function FlightDocumentsClientSurface() {
     "status",
     parseAsStringLiteral(STATUS_TABS).withDefault("draft"),
   );
+  const [searchInput, setSearchInput, committedSearch] = useDebouncedQueryState(
+    "search",
+    parseAsString.withDefault(""),
+  );
   const [aircraftDialogOpen, setAircraftDialogOpen] = useState(false);
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
-  const { requests, totalCount, totalPages, error, isPending } =
-    useOwnFlightRequests(page, PAGE_SIZE, statusTab);
+  const { requests, totalPages, error, isPending } = useOwnFlightRequests(
+    page,
+    PAGE_SIZE,
+    statusTab,
+    committedSearch,
+  );
+
+  useEffect(() => {
+    setPage(1);
+  }, [committedSearch]); // eslint-disable-line react-hooks/exhaustive-deps
   const { filerContext } = useFlightPlanFilerContext();
   const canFile = Boolean(
     filerContext?.hasSignature && filerContext?.hasValidLicense,
@@ -37,8 +57,6 @@ export function FlightDocumentsClientSurface() {
     setHasLoadedOnce(true);
   }
 
-  // Full-screen loading only on the very first visit; tab and page
-  // switches keep the shell in place and swap the list for skeletons.
   if (isPending && !hasLoadedOnce) {
     return <LoadingScreen />;
   }
@@ -66,6 +84,9 @@ export function FlightDocumentsClientSurface() {
           <TabsTrigger className="cursor-pointer" value="draft">
             Drafts
           </TabsTrigger>
+          <TabsTrigger className="cursor-pointer" value="pending_approval">
+            Pending
+          </TabsTrigger>
           <TabsTrigger className="cursor-pointer" value="rejected">
             Rejected
           </TabsTrigger>
@@ -74,25 +95,22 @@ export function FlightDocumentsClientSurface() {
 
       <GlassSurface className="space-y-4 p-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 className="text-lg font-semibold text-primary-foreground">
-              Flight Plans
-            </h2>
-            <p className="text-sm text-primary-foreground/70">
-              {isPending
-                ? "Loading flight plans..."
-                : statusTab === "draft"
-                  ? `${totalCount} draft${totalCount !== 1 ? "s" : ""} — add the Weight & Balance to submit for approval.`
-                  : `${totalCount} rejected — review the reason, update the flight plan, and resubmit.`}
-            </p>
+          <div className="relative sm:max-w-sm sm:flex-1">
+            <SearchIcon className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#121212]/45" />
+            <Input
+              className="border-primary-foreground/20 bg-primary-foreground/10 pl-9 uppercase text-[#121212] placeholder:normal-case placeholder:text-[#121212]/55 focus-visible:border-primary-foreground/45 focus-visible:ring-primary-foreground/20"
+              onChange={(event) => setSearchInput(event.target.value)}
+              placeholder="Search flight plan code..."
+              value={searchInput}
+            />
           </div>
           <Button
-            className="px-4 font-semibold disabled:cursor-default"
+            className="hidden px-4 font-semibold disabled:cursor-default sm:inline-flex"
             disabled={!canFile}
             onClick={() => setAircraftDialogOpen(true)}
             type="button"
           >
-            <PlusIcon className="size-4" />
+            <PlaneTakeoffIcon className="size-4" />
             File flight plan
           </Button>
         </div>
@@ -129,14 +147,22 @@ export function FlightDocumentsClientSurface() {
           <div className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-primary-foreground/15 bg-primary-foreground/5 py-12 text-center">
             <FileTextIcon className="size-8 text-primary-foreground/40" />
             <p className="text-sm font-medium text-primary-foreground">
-              {statusTab === "draft"
-                ? "No draft flight plans yet"
-                : "No rejected flight plans"}
+              {committedSearch
+                ? "No matching flight plans"
+                : statusTab === "draft"
+                  ? "No draft flight plans yet"
+                  : statusTab === "pending_approval"
+                    ? "No pending flight plans"
+                    : "No rejected flight plans"}
             </p>
-            <p className="max-w-sm text-xs text-primary-foreground/60">
-              {statusTab === "draft"
-                ? "Start by filing a flight plan for your scheduled flight — it stays a draft until its Weight & Balance is added."
-                : "Rejected requests appear here with the reviewer's reason so you can update and resubmit them."}
+            <p className="max-w-xs sm:max-w-sm text-xs text-primary-foreground/60">
+              {committedSearch
+                ? "Try a different flight plan code or clear the search."
+                : statusTab === "draft"
+                  ? "Start by filing a flight plan for your scheduled flight — it stays a draft until its Weight & Balance is added."
+                  : statusTab === "pending_approval"
+                    ? "Submitted requests wait here while a reviewer approves or rejects them."
+                    : "Rejected requests appear here with the reviewer's reason so you can update and resubmit them."}
             </p>
           </div>
         ) : (
@@ -176,22 +202,28 @@ export function FlightDocumentsClientSurface() {
                 )}
                 <div className="absolute inset-0 bg-linear-to-t from-primary via-primary/60 to-primary/15" />
 
+                <span className="absolute left-2.5 top-2.5 inline-flex items-center rounded-full border border-primary-foreground/30 bg-primary/70 px-2 py-0.5 font-mono text-[10px] font-medium tracking-wide text-primary-foreground">
+                  {request.planCode}
+                </span>
                 <span
                   className={
                     request.status === "rejected"
                       ? "absolute right-2.5 top-2.5 inline-flex items-center rounded-full border border-destructive/50 bg-destructive/80 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-white"
-                      : "absolute right-2.5 top-2.5 inline-flex items-center rounded-full border border-primary-foreground/30 bg-primary/70 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-primary-foreground"
+                      : request.status === "pending_approval"
+                        ? "absolute right-2.5 top-2.5 inline-flex items-center rounded-full border border-amber-200/50 bg-amber-500/80 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-white"
+                        : "absolute right-2.5 top-2.5 inline-flex items-center rounded-full border border-primary-foreground/30 bg-primary/70 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-primary-foreground"
                   }
                 >
-                  {request.status === "rejected" ? "Rejected" : "Draft"}
+                  {request.status === "rejected"
+                    ? "Rejected"
+                    : request.status === "pending_approval"
+                      ? "Pending"
+                      : "Draft"}
                 </span>
 
                 <div className="absolute inset-x-0 bottom-0 p-3.5 text-primary-foreground">
                   <p className="truncate font-semibold">
                     {request.aircraftIdentification}
-                  </p>
-                  <p className="truncate text-xs text-primary-foreground/70">
-                    {request.typeOfAircraft}
                   </p>
                   <div className="mt-2 flex items-center gap-2 text-sm font-semibold">
                     <span>{request.departureAerodrome}</span>
@@ -252,6 +284,14 @@ export function FlightDocumentsClientSurface() {
           </div>
         )}
       </GlassSurface>
+
+      <FloatingActionButton
+        className="sm:hidden"
+        disabled={!canFile}
+        icon={PlaneTakeoffIcon}
+        label="File flight plan"
+        onClick={() => setAircraftDialogOpen(true)}
+      />
 
       <AircraftSelectDialog
         onOpenChange={setAircraftDialogOpen}

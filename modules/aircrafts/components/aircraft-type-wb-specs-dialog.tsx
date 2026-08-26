@@ -4,7 +4,7 @@ import { PlusIcon, ScaleIcon, Trash2Icon } from "lucide-react";
 import { useState } from "react";
 
 import { useSetAircraftTypeWbSpecs } from "@/modules/aircrafts/hooks/use-set-aircraft-type-wb-specs.action";
-import { WB_NUMBER_PATTERN } from "@/modules/aircrafts/utils/wb-validation";
+import { DECIMAL_NUMBER_PATTERN } from "@/shared/validations/number-patterns";
 import type { AircraftType } from "@/modules/aircrafts/types/aircraft-type";
 import { ConfirmationDialog } from "@/shared/components/layout/confirmation-dialog";
 import { DialogSectionHeader } from "@/shared/components/layout/dialog-section-header";
@@ -120,7 +120,7 @@ function WbSpecsForm({
 
     if (
       scalars.some(
-        (value) => !WB_NUMBER_PATTERN.test(value.trim()) || Number(value) <= 0,
+        (value) => !DECIMAL_NUMBER_PATTERN.test(value.trim()) || Number(value) <= 0,
       )
     ) {
       setError(
@@ -135,12 +135,12 @@ function WbSpecsForm({
         return;
       }
 
-      if (areas.some((arm) => !WB_NUMBER_PATTERN.test(arm) || Number(arm) <= 0)) {
+      if (areas.some((arm) => !DECIMAL_NUMBER_PATTERN.test(arm) || Number(arm) <= 0)) {
         setError("Enter a valid positive ARM for every baggage area.");
         return;
       }
 
-      if (!WB_NUMBER_PATTERN.test(baggageAreaMaxWeight.trim())) {
+      if (!DECIMAL_NUMBER_PATTERN.test(baggageAreaMaxWeight.trim())) {
         setError("Enter a valid baggage area max weight.");
         return;
       }

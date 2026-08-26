@@ -20,13 +20,12 @@ export type FlightRequestStatus =
 
 export type JourneyStatus = Database["public"]["Enums"]["journey_status"];
 
-// List item for the flight documents page: a request joined with the
-// plan fields the cards display.
 export type FlightRequestListItem = {
   id: string;
   flightPlanId: string;
   status: FlightRequestStatus;
   rejectedReason: string | null;
+  planCode: string;
   aircraftIdentification: string;
   typeOfAircraft: string;
   aircraftPhotoUrl: string | null;

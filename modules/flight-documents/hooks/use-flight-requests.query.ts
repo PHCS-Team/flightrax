@@ -9,8 +9,11 @@ export function useOwnFlightRequests(
   page: number,
   pageSize: number,
   status: FlightRequestStatus,
+  search: string,
 ) {
-  const query = useQuery(ownFlightRequestsQueryOptions(page, pageSize, status));
+  const query = useQuery(
+    ownFlightRequestsQueryOptions(page, pageSize, status, search),
+  );
 
   return {
     requests: query.data?.data ?? [],

@@ -2,10 +2,10 @@
 
 import {
   CheckIcon,
+  FilterIcon,
   ImageIcon,
   PlaneIcon,
   SearchIcon,
-  XIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -26,7 +26,6 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
 } from "@/shared/components/ui/select";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { cn } from "@/shared/lib/utils";
@@ -105,13 +104,13 @@ export function AircraftSelectDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-[calc(100vw-1rem)] flex-col overflow-hidden p-4 sm:w-full sm:max-w-lg sm:p-6">
         <DialogSectionHeader
-          description="Choose the aircraft for this flight plan — only active aircraft are listed."
+          description="Choose the aircraft for this flight plan."
           icon={PlaneIcon}
           title="Select Aircraft"
         />
 
-        <div className="mt-1 flex flex-col gap-2 sm:flex-row">
-          <div className="relative flex-1">
+        <div className="mt-1 flex gap-2">
+          <div className="relative min-w-0 flex-1">
             <SearchIcon className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground/50" />
             <Input
               className="border-border bg-muted/30 pl-9 text-[#121212] placeholder:text-muted-foreground/55"
@@ -129,11 +128,14 @@ export function AircraftSelectDialog({
             >
               <SelectTrigger
                 aria-label="Filter by type"
-                className="w-full border-border bg-muted/30 text-[#121212] sm:w-40"
+                className="aspect-square w-auto shrink-0 justify-center border-border bg-muted/30 px-0 text-[#121212] [&>svg:last-child]:hidden"
               >
-                <SelectValue placeholder="All types" />
+                <FilterIcon className="size-4" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent
+                align="end"
+                className="data-[position=popper]:w-auto data-[position=popper]:min-w-44"
+              >
                 <SelectItem value="__all">All types</SelectItem>
                 {typeOptions.map((type) => (
                   <SelectItem key={type.typeKey} value={type.typeKey}>
@@ -143,16 +145,7 @@ export function AircraftSelectDialog({
               </SelectContent>
             </Select>
             {typeFilter && (
-              <button
-                aria-label="Clear type filter"
-                className="absolute right-8 top-1/2 z-10 flex -translate-y-1/2 cursor-pointer items-center justify-center rounded-full text-muted-foreground/60 transition hover:text-foreground"
-                onClick={() => {
-                  setTypeFilter("");
-                }}
-                type="button"
-              >
-                <XIcon className="size-3.5" />
-              </button>
+              <span className="pointer-events-none absolute -right-0.5 -top-0.5 size-2.5 rounded-full border-2 border-popover bg-primary" />
             )}
           </div>
         </div>

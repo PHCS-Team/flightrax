@@ -9,12 +9,15 @@ export async function fetchOwnFlightRequestsPage(
   page: number,
   pageSize: number,
   status: FlightRequestStatus,
+  search: string,
 ) {
   const params = new URLSearchParams({
     page: String(page),
     pageSize: String(pageSize),
     status,
   });
+
+  if (search) params.set("search", search);
 
   const response = await fetch(`/api/flight-documents/requests?${params}`, {
     credentials: "same-origin",

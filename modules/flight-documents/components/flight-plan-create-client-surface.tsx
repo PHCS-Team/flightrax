@@ -23,6 +23,7 @@ export function FlightPlanCreateClientSurface() {
   const router = useRouter();
   const [aircraftId] = useQueryState("aircraft", parseAsString.withDefault(""));
   const [savedDialogOpen, setSavedDialogOpen] = useState(false);
+  const [savedPlanId, setSavedPlanId] = useState<string | null>(null);
   const { aircraft, error, isPending } = useFlightPlanAircraft(aircraftId);
   const {
     filerContext,
@@ -30,7 +31,10 @@ export function FlightPlanCreateClientSurface() {
     isPending: filerPending,
   } = useFlightPlanFilerContext();
   const createFlightPlan = useCreateFlightPlan({
-    onSaved: () => setSavedDialogOpen(true),
+    onSaved: (flightPlanId) => {
+      setSavedPlanId(flightPlanId ?? null);
+      setSavedDialogOpen(true);
+    },
   });
 
   if ((aircraftId && isPending) || filerPending) {
@@ -99,6 +103,7 @@ export function FlightPlanCreateClientSurface() {
 
         <GlassSurface className="p-4 sm:p-6">
           <FlightPlanForm
+            cancelLabel="Back to flight documents"
             isSubmitting={createFlightPlan.isExecuting}
             onCancel={() => router.push("/flight-documents")}
             onSubmit={(values) =>
@@ -115,6 +120,14 @@ export function FlightPlanCreateClientSurface() {
         <FlightPlanSavedDialog
           description="Your flight plan is saved as a draft. You can fill up the Weight & Balance form anytime the data is available — you can always come back to it from Flight Documents."
           onBackToList={() => router.push("/flight-documents")}
+          onProceedToWeightBalance={
+            savedPlanId
+              ? () =>
+                  router.push(
+                    `/flight-documents/flight-plans/${savedPlanId}/weight-balance`,
+                  )
+              : undefined
+          }
           open={savedDialogOpen}
         />
       </div>

@@ -8,13 +8,16 @@ export function ownFlightRequestsQueryOptions(
   page: number,
   pageSize: number,
   status: FlightRequestStatus,
+  search: string,
 ) {
-  // No placeholderData here on purpose: it would carry the previous
-  // tab's rows and counts into the new key, flashing stale data labeled
-  // with the wrong status while the real page loads.
   return queryOptions({
-    queryFn: () => fetchOwnFlightRequestsPage(page, pageSize, status),
-    queryKey: FLIGHT_DOCUMENTS_QUERY_KEYS.requests(page, pageSize, status),
+    queryFn: () => fetchOwnFlightRequestsPage(page, pageSize, status, search),
+    queryKey: FLIGHT_DOCUMENTS_QUERY_KEYS.requests(
+      page,
+      pageSize,
+      status,
+      search,
+    ),
     staleTime: 60 * 1000,
   });
 }

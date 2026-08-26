@@ -446,6 +446,7 @@ export type Database = {
           pilot_licenses: Json
           pilot_name: string
           pilot_signature: string | null
+          plan_code: string
           remarks: string | null
           route: string[]
           second_alternate_aerodrome: string | null
@@ -507,6 +508,7 @@ export type Database = {
           pilot_licenses?: Json
           pilot_name: string
           pilot_signature?: string | null
+          plan_code: string
           remarks?: string | null
           route?: string[]
           second_alternate_aerodrome?: string | null
@@ -568,6 +570,7 @@ export type Database = {
           pilot_licenses?: Json
           pilot_name?: string
           pilot_signature?: string | null
+          plan_code?: string
           remarks?: string | null
           route?: string[]
           second_alternate_aerodrome?: string | null

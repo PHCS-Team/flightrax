@@ -23,7 +23,9 @@ export async function GET(request: Request) {
       ? (statusParam as FlightRequestStatus)
       : "draft";
 
-    const result = await getOwnFlightRequestsPage(page, pageSize, status);
+    const search = searchParams.get("search") ?? "";
+
+    const result = await getOwnFlightRequestsPage(page, pageSize, status, search);
 
     return NextResponse.json(result);
   } catch (error) {
