@@ -38,10 +38,10 @@ export type FlightRequestListItem = {
   departureTimeRaw: string;
   createdAt: string;
   updatedAt: string;
+  hasWeightBalance: boolean;
 };
 
 export type FlightRequestReviewListItem = FlightRequestListItem & {
   requestedByName: string;
   pilotInCommandName: string;
-  hasWeightBalance: boolean;
 };

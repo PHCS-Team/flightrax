@@ -88,9 +88,7 @@ export function FlightRequestsClientSurface() {
   return (
     <div className="sm:space-y-4">
       <Tabs
-        onValueChange={(value) =>
-          setScope(value as FlightRequestReviewScope)
-        }
+        onValueChange={(value) => setScope(value as FlightRequestReviewScope)}
         value={scope}
       >
         <TabsList className="w-full justify-start border-x-0 border-y border-primary-foreground/15 p-1.5 md:w-fit md:border-x">
@@ -103,7 +101,7 @@ export function FlightRequestsClientSurface() {
         </TabsList>
       </Tabs>
 
-      <div className="px-4 py-3 sm:px-0 sm:py-0">
+      <div className="p-4 pt-3 sm:p-0">
         <div className="relative w-full sm:max-w-sm">
           <SearchIcon className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-primary-foreground/55" />
           <Input
@@ -118,7 +116,7 @@ export function FlightRequestsClientSurface() {
       {isPending ? (
         <LoadingScreen />
       ) : requests.length === 0 ? (
-        <div className="mx-3 flex flex-col items-center justify-center gap-2 rounded-2xl border border-primary-foreground/15 bg-primary-foreground/5 py-12 text-center sm:mx-0">
+        <div className="mx-4 flex flex-col items-center justify-center gap-2 rounded-2xl border border-primary-foreground/15 bg-primary-foreground/5 py-12 text-center sm:mx-0">
           <ClipboardCheckIcon className="size-8 text-primary-foreground/40" />
           <p className="text-sm font-medium text-primary-foreground">
             {committedSearch

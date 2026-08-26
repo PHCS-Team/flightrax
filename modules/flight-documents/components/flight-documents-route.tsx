@@ -8,9 +8,10 @@ import { getQueryClient } from "@/shared/lib/query-client";
 export async function FlightDocumentsRoute() {
   const queryClient = getQueryClient();
 
-  await queryClient.prefetchQuery({
-    queryKey: FLIGHT_DOCUMENTS_QUERY_KEYS.requests(1, 9, "draft", ""),
-    queryFn: () => getOwnFlightRequestsPage(1, 9, "draft", ""),
+  await queryClient.prefetchInfiniteQuery({
+    queryKey: FLIGHT_DOCUMENTS_QUERY_KEYS.requests(12, "draft", ""),
+    queryFn: () => getOwnFlightRequestsPage(1, 12, "draft", ""),
+    initialPageParam: 1,
   });
 
   return (

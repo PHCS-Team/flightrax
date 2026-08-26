@@ -1,4 +1,4 @@
-import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
+import { infiniteQueryOptions } from "@tanstack/react-query";
 
 import { FLIGHT_DOCUMENTS_QUERY_KEYS } from "@/modules/flight-documents/queries/query-keys";
 import {
@@ -10,20 +10,18 @@ import type {
   FlightRequestStatus,
 } from "@/modules/flight-documents/types/flight-request";
 
-export function ownFlightRequestsQueryOptions(
-  page: number,
+export function ownFlightRequestsInfiniteQueryOptions(
   pageSize: number,
   status: FlightRequestStatus,
   search: string,
 ) {
-  return queryOptions({
-    queryFn: () => fetchOwnFlightRequestsPage(page, pageSize, status, search),
-    queryKey: FLIGHT_DOCUMENTS_QUERY_KEYS.requests(
-      page,
-      pageSize,
-      status,
-      search,
-    ),
+  return infiniteQueryOptions({
+    queryFn: ({ pageParam }) =>
+      fetchOwnFlightRequestsPage(pageParam, pageSize, status, search),
+    queryKey: FLIGHT_DOCUMENTS_QUERY_KEYS.requests(pageSize, status, search),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) =>
+      lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
     staleTime: 60 * 1000,
   });
 }
