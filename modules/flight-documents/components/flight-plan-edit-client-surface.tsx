@@ -14,8 +14,10 @@ import { FlightPlanForm } from "@/modules/flight-documents/components/flight-pla
 import { FlightPlanHelp } from "@/modules/flight-documents/components/flight-plan-help-dialog";
 import { FlightPlanSavingDialog } from "@/modules/flight-documents/components/flight-plan-saving-dialog";
 import { PendingApprovalAlert } from "@/modules/flight-documents/components/pending-approval-alert";
+import { SelfApproveAction } from "@/modules/flight-documents/components/self-approve-action";
 import { EDITABLE_FLIGHT_REQUEST_STATUSES } from "@/modules/flight-documents/constants/flight-request-options";
 import { useDeleteFlightPlan } from "@/modules/flight-documents/hooks/use-delete-flight-plan.action";
+import { useFlightPlanFilerContext } from "@/modules/flight-documents/hooks/use-filer-context.query";
 import { useOwnFlightPlanForEdit } from "@/modules/flight-documents/hooks/use-flight-plan.query";
 import { useUpdateFlightPlan } from "@/modules/flight-documents/hooks/use-update-flight-plan.action";
 import { ConfirmationDialog } from "@/shared/components/layout/confirmation-dialog";
@@ -46,6 +48,7 @@ export function FlightPlanEditClientSurface({
   const deleteFlightPlan = useDeleteFlightPlan({
     onDeleted: () => router.push("/flight-documents"),
   });
+  const { filerContext } = useFlightPlanFilerContext();
 
   if (isPending) {
     return <LoadingScreen />;
@@ -110,8 +113,13 @@ export function FlightPlanEditClientSurface({
       <AircraftHeaderCard aircraft={flightPlan.aircraft} />
 
       {isPendingApproval && flightPlan.isOwner && (
-        <div className="p-3 sm:p-0">
+        <div className="grid gap-2.5 p-3 sm:gap-4 sm:p-0">
           <PendingApprovalAlert flightPlanId={flightPlanId} />
+          {filerContext &&
+            filerContext.hasValidLicense &&
+            flightPlan.values.pilotInCommandId === filerContext.profile.id && (
+              <SelfApproveAction flightPlanId={flightPlanId} />
+            )}
         </div>
       )}
 

@@ -14,7 +14,7 @@ import { AIRCRAFT_PHOTOS_BUCKET } from "@/shared/lib/storage/buckets";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 
 const WEIGHT_BALANCE_CONTEXT_SELECT =
-  "id, aircraft_id, aircraft_identification, type_of_aircraft, aircraft_color_and_marking, created_by, flight_requests(id, status, weight_balance_id), aircrafts(model, photo_path, aircraft_weight_balance_configs(basic_empty_weight, basic_empty_weight_arm, basic_empty_weight_moment), aircraft_types!inner(type, usable_fuel_arm, fi_and_student_arm, maximum_takeoff_weight, baggage_area_max_weight, aircraft_type_baggage_areas(position, arm)))";
+  "id, aircraft_id, aircraft_identification, type_of_aircraft, aircraft_color_and_marking, created_by, pilot_in_command_id, flight_requests(id, status, weight_balance_id), aircrafts(model, photo_path, aircraft_weight_balance_configs(basic_empty_weight, basic_empty_weight_arm, basic_empty_weight_moment), aircraft_types!inner(type, usable_fuel_arm, fi_and_student_arm, maximum_takeoff_weight, baggage_area_max_weight, aircraft_type_baggage_areas(position, arm)))";
 
 export async function getWeightBalanceContext(
   flightPlanId: string,
@@ -137,6 +137,7 @@ export async function getWeightBalanceContext(
   return {
     flightPlanId: data.id,
     isOwner,
+    pilotInCommandId: data.pilot_in_command_id,
     requestId: data.flight_requests.id,
     requestStatus: data.flight_requests.status as FlightRequestStatus,
     weightBalanceId: data.flight_requests.weight_balance_id,

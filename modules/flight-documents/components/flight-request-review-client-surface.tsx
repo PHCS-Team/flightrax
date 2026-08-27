@@ -1,11 +1,13 @@
 "use client";
 
-import { CheckIcon, ClipboardCheckIcon, XIcon } from "lucide-react";
+import { ClipboardCheckIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { AircraftHeaderCard } from "@/modules/flight-documents/components/aircraft-header-card";
 import { FlightPlanReviewCard } from "@/modules/flight-documents/components/flight-plan-review-card";
+import { FlightRequestReviewActions } from "@/modules/flight-documents/components/flight-request-review-actions";
 import { WeightBalanceReviewCard } from "@/modules/flight-documents/components/weight-balance-review-card";
+import { useFlightPlanFilerContext } from "@/modules/flight-documents/hooks/use-filer-context.query";
 import { useOwnFlightPlanForEdit } from "@/modules/flight-documents/hooks/use-flight-plan.query";
 import { useWeightBalanceContext } from "@/modules/flight-documents/hooks/use-weight-balance-context.query";
 import { EmptyState } from "@/shared/components/layout/empty-state";
@@ -20,6 +22,7 @@ export function FlightRequestReviewClientSurface({
   const router = useRouter();
   const flightPlanQuery = useOwnFlightPlanForEdit(flightPlanId);
   const weightBalanceQuery = useWeightBalanceContext(flightPlanId);
+  const { filerContext } = useFlightPlanFilerContext();
 
   if (flightPlanQuery.isPending || weightBalanceQuery.isPending) {
     return <LoadingScreen />;
@@ -67,20 +70,14 @@ export function FlightRequestReviewClientSurface({
         <WeightBalanceReviewCard context={weightBalanceQuery.context} />
       </div>
 
-      <div className="flex flex-col-reverse gap-2 p-4 sm:flex-row sm:justify-end sm:p-0">
-        <Button
-          className="border-red-200/25 bg-red-200/10 text-red-100 hover:bg-red-200/15 hover:text-red-50"
-          type="button"
-          variant="outline"
-        >
-          <XIcon className="size-4" />
-          Reject request
-        </Button>
-        <Button type="button">
-          <CheckIcon className="size-4" />
-          Approve request
-        </Button>
-      </div>
+      <FlightRequestReviewActions
+        flightPlanId={flightPlanId}
+        isPic={Boolean(
+          filerContext &&
+            flightPlan.values.pilotInCommandId === filerContext.profile.id,
+        )}
+        requestStatus={flightPlan.requestStatus}
+      />
     </div>
   );
 }

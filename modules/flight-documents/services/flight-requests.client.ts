@@ -2,7 +2,7 @@ import type {
   FlightRequestListItem,
   FlightRequestReviewListItem,
   FlightRequestReviewScope,
-  FlightRequestStatus,
+  FlightRequestStatusGroup,
 } from "@/modules/flight-documents/types/flight-request";
 import { getApiErrorMessage } from "@/shared/lib/api-error";
 import type { PaginatedResponse } from "@/shared/types/pagination";
@@ -10,13 +10,13 @@ import type { PaginatedResponse } from "@/shared/types/pagination";
 export async function fetchOwnFlightRequestsPage(
   page: number,
   pageSize: number,
-  status: FlightRequestStatus,
+  group: FlightRequestStatusGroup,
   search: string,
 ) {
   const params = new URLSearchParams({
     page: String(page),
     pageSize: String(pageSize),
-    status,
+    group,
   });
 
   if (search) params.set("search", search);

@@ -1,5 +1,6 @@
 "use client";
 
+import { TriangleAlertIcon } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useState } from "react";
 
@@ -15,6 +16,7 @@ import { Input } from "@/shared/components/ui/input";
 type ConfirmationDialogProps = {
   cancelLabel?: string;
   confirmLabel: string;
+  confirmVariant?: "default" | "destructive";
   confirmingLabel?: string;
   description: string;
   icon: LucideIcon;
@@ -24,11 +26,13 @@ type ConfirmationDialogProps = {
   open: boolean;
   title: string;
   typeToConfirm?: string;
+  warning?: string;
 };
 
 export function ConfirmationDialog({
   cancelLabel = "Cancel",
   confirmLabel,
+  confirmVariant = "destructive",
   confirmingLabel = confirmLabel,
   description,
   icon,
@@ -38,6 +42,7 @@ export function ConfirmationDialog({
   open,
   title,
   typeToConfirm,
+  warning,
 }: ConfirmationDialogProps) {
   const [challengeValue, setChallengeValue] = useState("");
   const isChallengePassed = !typeToConfirm || challengeValue === typeToConfirm;
@@ -55,6 +60,14 @@ export function ConfirmationDialog({
           icon={icon}
           title={title}
         />
+        {warning && (
+          <div className="flex items-start gap-2 rounded-lg border border-amber-500/50 bg-amber-500/10 px-3 py-2.5">
+            <TriangleAlertIcon className="mt-0.5 size-4 shrink-0 text-amber-600" />
+            <p className="text-sm font-medium leading-relaxed text-amber-800">
+              {warning}
+            </p>
+          </div>
+        )}
         {typeToConfirm && (
           <div className="grid gap-2">
             <p className="text-xs text-muted-foreground">
@@ -91,7 +104,7 @@ export function ConfirmationDialog({
             disabled={isConfirming || !isChallengePassed}
             onClick={onConfirm}
             type="button"
-            variant="destructive"
+            variant={confirmVariant}
           >
             {isConfirming ? confirmingLabel : confirmLabel}
           </Button>

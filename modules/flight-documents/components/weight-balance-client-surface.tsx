@@ -9,7 +9,9 @@ import { FlightPlanSavedDialog } from "@/modules/flight-documents/components/fli
 import { FlightPlanSavingDialog } from "@/modules/flight-documents/components/flight-plan-saving-dialog";
 import { WeightBalanceForm } from "@/modules/flight-documents/components/weight-balance-form";
 import { PendingApprovalAlert } from "@/modules/flight-documents/components/pending-approval-alert";
+import { SelfApproveAction } from "@/modules/flight-documents/components/self-approve-action";
 import { EDITABLE_FLIGHT_REQUEST_STATUSES } from "@/modules/flight-documents/constants/flight-request-options";
+import { useFlightPlanFilerContext } from "@/modules/flight-documents/hooks/use-filer-context.query";
 import { useSaveWeightBalance } from "@/modules/flight-documents/hooks/use-save-weight-balance.action";
 import { useSubmitFlightRequest } from "@/modules/flight-documents/hooks/use-submit-flight-request.action";
 import { useWeightBalanceContext } from "@/modules/flight-documents/hooks/use-weight-balance-context.query";
@@ -26,11 +28,21 @@ export function WeightBalanceClientSurface({
   const router = useRouter();
   const [savedDialogOpen, setSavedDialogOpen] = useState(false);
   const { context, error, isPending } = useWeightBalanceContext(flightPlanId);
+  const { filerContext } = useFlightPlanFilerContext();
+  const isSelfPic = Boolean(
+    context &&
+    filerContext &&
+    context.pilotInCommandId === filerContext.profile.id,
+  );
   const saveWeightBalance = useSaveWeightBalance({
     onSaved: () => setSavedDialogOpen(true),
   });
+
   const submitFlightRequest = useSubmitFlightRequest({
-    onSubmitted: () => router.push("/flight-documents"),
+    onSubmitted: () => {
+      setSavedDialogOpen(false);
+      router.push(`/flight-documents/flight-plans/${flightPlanId}`);
+    },
   });
 
   if (isPending) {
@@ -94,8 +106,11 @@ export function WeightBalanceClientSurface({
       <AircraftHeaderCard aircraft={context.aircraft} />
 
       {isPendingApproval && context.isOwner && (
-        <div className="p-3 sm:p-0">
+        <div className="grid gap-2 p-3 sm:gap-3 sm:p-0">
           <PendingApprovalAlert flightPlanId={flightPlanId} />
+          {isSelfPic && filerContext?.hasValidLicense && (
+            <SelfApproveAction flightPlanId={flightPlanId} />
+          )}
         </div>
       )}
 

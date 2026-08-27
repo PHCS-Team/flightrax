@@ -21,7 +21,6 @@ import {
 } from "@/modules/flight-documents/constants/flight-plan-options";
 import { FormRadioGroup } from "@/modules/flight-documents/components/form-radio-group";
 import { FLIGHT_PLAN_FORM_DEFAULTS } from "@/modules/flight-documents/constants/flight-plan-form-defaults";
-import { READ_ONLY_FIELDSET_CLASS } from "@/modules/flight-documents/constants/read-only-form";
 import { useFlightPlanFilerContext } from "@/modules/flight-documents/hooks/use-filer-context.query";
 import { useFlightPlanPicOptions } from "@/modules/flight-documents/hooks/use-pic-options.query";
 import {
@@ -41,7 +40,6 @@ import {
 } from "@/shared/components/ui/select";
 import { Switch } from "@/shared/components/ui/switch";
 import { Textarea } from "@/shared/components/ui/textarea";
-import { cn } from "@/shared/lib/utils";
 
 // Everything typed on the flight plan is uppercase — displayed via CSS
 // here and enforced server-side on save.
@@ -198,10 +196,7 @@ export function FlightPlanForm({
 
   return (
     <form className="grid gap-6" onSubmit={form.handleSubmit(onSubmit)}>
-      <fieldset
-        className={cn("contents", readOnly && READ_ONLY_FIELDSET_CLASS)}
-        disabled={readOnly}
-      >
+      <fieldset className="contents" disabled={readOnly}>
         <div className="flex items-start gap-1.5 rounded-lg border border-primary-foreground/15 bg-primary-foreground/5 px-3 py-2 text-xs text-muted-foreground">
           <InfoIcon className="mt-0.5 size-3.5 shrink-0" />
           <p>

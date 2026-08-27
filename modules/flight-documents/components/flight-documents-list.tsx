@@ -8,6 +8,7 @@ import {
   FlightRequestRowCard,
   WeightBalanceBadge,
 } from "@/modules/flight-documents/components/flight-request-row-card";
+import { EDITABLE_FLIGHT_REQUEST_STATUSES } from "@/modules/flight-documents/constants/flight-request-options";
 import type { FlightRequestListItem } from "@/modules/flight-documents/types/flight-request";
 
 export function FlightDocumentsList({
@@ -26,9 +27,11 @@ export function FlightDocumentsList({
       {requests.map((request) => (
         <FlightRequestRowCard
           actionLabel={
-            request.status === "pending_approval"
-              ? "Click to view"
-              : "Click to open"
+            EDITABLE_FLIGHT_REQUEST_STATUSES.some(
+              (status) => status === request.status,
+            )
+              ? "Click to open"
+              : "Click to view"
           }
           aircraftIdentification={request.aircraftIdentification}
           aircraftPhotoUrl={request.aircraftPhotoUrl}
@@ -40,6 +43,7 @@ export function FlightDocumentsList({
           }
           pill={FLIGHT_REQUEST_STATUS_PILLS[request.status]}
           planCode={request.planCode}
+          tone={request.status === "rejected" ? "destructive" : "default"}
         >
           <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-primary-foreground/70">
             <span>
@@ -57,11 +61,6 @@ export function FlightDocumentsList({
             </span>
             <WeightBalanceBadge hasWeightBalance={request.hasWeightBalance} />
           </div>
-          {request.status === "rejected" && request.rejectedReason && (
-            <p className="mt-1 truncate text-xs font-medium text-red-200">
-              {request.rejectedReason}
-            </p>
-          )}
         </FlightRequestRowCard>
       ))}
 

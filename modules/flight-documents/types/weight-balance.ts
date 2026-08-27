@@ -41,11 +41,11 @@ export type WeightBalanceGivens = {
 export type WeightBalanceContext = {
   isOwner: boolean;
   flightPlanId: string;
+  pilotInCommandId: string | null;
   requestId: string;
   requestStatus: FlightRequestStatus;
   weightBalanceId: string | null;
   aircraft: FlightPlanAircraftOption;
-  // Null when the aircraft's W&B config or type specs are missing.
   givens: WeightBalanceGivens | null;
   existing: WeightBalanceFormValues | null;
 };

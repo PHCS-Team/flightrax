@@ -7,18 +7,18 @@ import {
 } from "@/modules/flight-documents/services/flight-requests.client";
 import type {
   FlightRequestReviewScope,
-  FlightRequestStatus,
+  FlightRequestStatusGroup,
 } from "@/modules/flight-documents/types/flight-request";
 
 export function ownFlightRequestsInfiniteQueryOptions(
   pageSize: number,
-  status: FlightRequestStatus,
+  group: FlightRequestStatusGroup,
   search: string,
 ) {
   return infiniteQueryOptions({
     queryFn: ({ pageParam }) =>
-      fetchOwnFlightRequestsPage(pageParam, pageSize, status, search),
-    queryKey: FLIGHT_DOCUMENTS_QUERY_KEYS.requests(pageSize, status, search),
+      fetchOwnFlightRequestsPage(pageParam, pageSize, group, search),
+    queryKey: FLIGHT_DOCUMENTS_QUERY_KEYS.requests(pageSize, group, search),
     initialPageParam: 1,
     getNextPageParam: (lastPage) =>
       lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,

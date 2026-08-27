@@ -23,14 +23,11 @@ export const FLIGHT_REQUEST_STATUS_PILLS: Record<
     label: "Approved",
   },
   rejected: {
-    className: "border-destructive/50 bg-destructive/80 text-white",
+    className: "border-red-200/40 bg-red-700/70 text-red-50",
     label: "Rejected",
   },
 };
 
-// Row card shared by the flight documents and flight requests lists:
-// aircraft photo background, plan code + status chips, and the
-// identification/route line. Page-specific meta lines come as children.
 export function FlightRequestRowCard({
   actionLabel,
   aircraftIdentification,
@@ -41,6 +38,7 @@ export function FlightRequestRowCard({
   onOpen,
   pill,
   planCode,
+  tone = "default",
 }: {
   actionLabel: string;
   aircraftIdentification: string;
@@ -51,6 +49,7 @@ export function FlightRequestRowCard({
   onOpen: () => void;
   pill: { className: string; label: string };
   planCode: string;
+  tone?: "default" | "destructive";
 }) {
   return (
     <article
@@ -71,11 +70,25 @@ export function FlightRequestRowCard({
           style={{ backgroundImage: `url(${aircraftPhotoUrl})` }}
         />
       )}
-      <div className="absolute inset-0 -z-10 bg-linear-to-r from-primary/85 via-primary/50 to-primary/15" />
+      <div
+        className={cn(
+          "absolute inset-0 -z-10 bg-linear-to-r",
+          tone === "destructive"
+            ? "from-red-800/75 via-red-700/45 to-red-700/15"
+            : "from-primary/85 via-primary/50 to-primary/15",
+        )}
+      />
 
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-1.5">
-          <span className="inline-flex h-5 items-center rounded-full border border-primary-foreground/30 bg-primary/70 px-2 font-mono text-[10px] font-medium tracking-wide">
+          <span
+            className={cn(
+              "inline-flex h-5 items-center rounded-full border px-2 font-mono text-[10px] font-medium tracking-wide",
+              tone === "destructive"
+                ? "border-red-200/40 bg-red-700/70 text-red-50"
+                : "border-primary-foreground/30 bg-primary/70",
+            )}
+          >
             {planCode}
           </span>
           <span

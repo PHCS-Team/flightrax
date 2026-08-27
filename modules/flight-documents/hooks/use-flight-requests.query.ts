@@ -3,15 +3,15 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 
 import { ownFlightRequestsInfiniteQueryOptions } from "@/modules/flight-documents/queries/flight-requests";
-import type { FlightRequestStatus } from "@/modules/flight-documents/types/flight-request";
+import type { FlightRequestStatusGroup } from "@/modules/flight-documents/types/flight-request";
 
 export function useOwnFlightRequests(
   pageSize: number,
-  status: FlightRequestStatus,
+  group: FlightRequestStatusGroup,
   search: string,
 ) {
   const query = useInfiniteQuery(
-    ownFlightRequestsInfiniteQueryOptions(pageSize, status, search),
+    ownFlightRequestsInfiniteQueryOptions(pageSize, group, search),
   );
   const pages = query.data?.pages ?? [];
 

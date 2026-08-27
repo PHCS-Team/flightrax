@@ -1,10 +1,12 @@
 import "server-only";
 
+import { FLIGHT_REQUEST_STATUS_GROUPS } from "@/modules/flight-documents/constants/flight-request-options";
 import type {
   FlightRequestListItem,
   FlightRequestReviewListItem,
   FlightRequestReviewScope,
   FlightRequestStatus,
+  FlightRequestStatusGroup,
 } from "@/modules/flight-documents/types/flight-request";
 import { canReviewFlightRequests } from "@/modules/flight-documents/utils/can-review-flight-requests";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
@@ -19,7 +21,7 @@ const FLIGHT_REQUEST_LIST_SELECT =
 export async function getOwnFlightRequestsPage(
   page: number,
   pageSize: number,
-  status: FlightRequestStatus,
+  group: FlightRequestStatusGroup,
   search: string,
 ): Promise<PaginatedResponse<FlightRequestListItem>> {
   const viewer = await getCurrentAuthorizationProfile();
@@ -32,12 +34,13 @@ export async function getOwnFlightRequestsPage(
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
   const codeSearch = search.trim().replace(/[%_]/g, "\\$&");
+  const statuses = [...FLIGHT_REQUEST_STATUS_GROUPS[group]];
 
   let countQuery = supabase
     .from("flight_requests")
     .select("flight_plans!inner(plan_code)", { count: "exact", head: true })
     .eq("requested_by", viewer.id)
-    .eq("status", status);
+    .in("status", statuses);
 
   if (codeSearch) {
     countQuery = countQuery.ilike("flight_plans.plan_code", `%${codeSearch}%`);
@@ -53,7 +56,7 @@ export async function getOwnFlightRequestsPage(
     .from("flight_requests")
     .select(FLIGHT_REQUEST_LIST_SELECT)
     .eq("requested_by", viewer.id)
-    .eq("status", status);
+    .in("status", statuses);
 
   if (codeSearch) {
     listQuery = listQuery.ilike("flight_plans.plan_code", `%${codeSearch}%`);

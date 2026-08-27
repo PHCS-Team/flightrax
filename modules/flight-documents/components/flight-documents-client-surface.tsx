@@ -19,33 +19,33 @@ import { Tabs, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 import { useDebouncedQueryState } from "@/shared/hooks/use-debounced-query-state";
 
 const PAGE_SIZE = 12;
-const STATUS_TABS = ["draft", "pending_approval", "rejected"] as const;
+const STATUS_TABS = ["in_progress", "pending_approval", "approved"] as const;
 
 const EMPTY_STATE_COPY: Record<
   (typeof STATUS_TABS)[number],
   { description: string; title: string }
 > = {
-  draft: {
+  in_progress: {
     description:
-      "Start by filing a flight plan for your scheduled flight — it stays a draft until its Weight & Balance is added.",
-    title: "No Draft Flight Plans Yet",
+      "Drafts and rejected requests you can still edit appear here. Start by filing a flight plan for your scheduled flight.",
+    title: "No Flight Plans in Progress",
   },
   pending_approval: {
     description:
       "Submitted requests wait here while a reviewer approves or rejects them.",
     title: "No Pending Flight Plans",
   },
-  rejected: {
+  approved: {
     description:
-      "Rejected requests appear here with the reviewer's reason so you can update and resubmit them.",
-    title: "No Rejected Flight Plans",
+      "Approved flight plans appear here, ready for the flight itself.",
+    title: "No Approved Flight Plans",
   },
 };
 
 export function FlightDocumentsClientSurface() {
   const [statusTab, setStatusTab] = useQueryState(
     "status",
-    parseAsStringLiteral(STATUS_TABS).withDefault("draft"),
+    parseAsStringLiteral(STATUS_TABS).withDefault("in_progress"),
   );
   const [searchInput, setSearchInput, committedSearch] = useDebouncedQueryState(
     "search",
@@ -89,14 +89,14 @@ export function FlightDocumentsClientSurface() {
         value={statusTab}
       >
         <TabsList className="w-full justify-start border-x-0 border-y border-primary-foreground/15 p-1.5 md:w-fit md:border-x">
-          <TabsTrigger className="cursor-pointer" value="draft">
-            Drafts
+          <TabsTrigger className="cursor-pointer" value="in_progress">
+            In Progress
           </TabsTrigger>
           <TabsTrigger className="cursor-pointer" value="pending_approval">
             Pending
           </TabsTrigger>
-          <TabsTrigger className="cursor-pointer" value="rejected">
-            Rejected
+          <TabsTrigger className="cursor-pointer" value="approved">
+            Approved
           </TabsTrigger>
         </TabsList>
       </Tabs>
