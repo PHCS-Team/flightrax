@@ -14,15 +14,15 @@ import {
   CircleHelpIcon,
   CopyIcon,
   EyeIcon,
+  FilterIcon,
   ImageIcon,
   InfoIcon,
-  ListFilterIcon,
   PencilIcon,
   PlusIcon,
   Trash2Icon,
-  XIcon,
 } from "lucide-react";
 
+import { AircraftActionsDialog } from "@/modules/aircrafts/components/aircraft-actions-dialog";
 import { AircraftDeleteConfirmation } from "@/modules/aircrafts/components/aircraft-delete-confirmation";
 import { AircraftFormDialog } from "@/modules/aircrafts/components/aircraft-form-dialog";
 import { AircraftDetailsDialog } from "@/modules/aircrafts/components/aircraft-details-dialog";
@@ -37,10 +37,11 @@ import type {
   AircraftStatus,
 } from "@/modules/aircrafts/types/aircraft";
 import { useCopyToClipboard } from "@/shared/hooks/use-copy-to-clipboard";
+import { cn } from "@/shared/lib/utils";
 import { toast } from "sonner";
+import { FloatingActionButton } from "@/shared/components/layout/floating-action-button";
 import { GlassSurface } from "@/shared/components/layout/glass-surface";
 import { Button } from "@/shared/components/ui/button";
-import { cn } from "@/shared/lib/utils";
 import { Input } from "@/shared/components/ui/input";
 import {
   Popover,
@@ -52,7 +53,6 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
 } from "@/shared/components/ui/select";
 import {
   Table,
@@ -97,6 +97,7 @@ export function AircraftsTable({
   const [aircraftPendingDelete, setAircraftPendingDelete] =
     useState<Aircraft | null>(null);
   const [typeManagerOpen, setTypeManagerOpen] = useState(false);
+  const [actionsDialogOpen, setActionsDialogOpen] = useState(false);
   const [remarksAircraft, setRemarksAircraft] = useState<Aircraft | null>(null);
   const { aircraftTypes } = useAircraftTypes();
   const columns = useMemo<ColumnDef<Aircraft>[]>(
@@ -387,17 +388,19 @@ export function AircraftsTable({
 
   return (
     <TooltipProvider>
-      <GlassSurface className="space-y-4 p-4">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:flex-1">
-            <Input
-              className="sm:max-w-sm border-primary-foreground/20 bg-primary-foreground/10 text-[#121212] placeholder:text-[#121212]/55 focus-visible:border-primary-foreground/45 focus-visible:ring-primary-foreground/20"
-              onChange={(event) => {
-                onSearchChange(event.target.value);
-              }}
-              placeholder="Search aircraft identification, model, or serial number"
-              value={search}
-            />
+      <GlassSurface className="space-y-4 py-3 sm:py-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-2.5 sm:px-4">
+          <div className="flex gap-2 sm:flex-1 sm:items-center">
+            <div className="min-w-0 flex-1 sm:max-w-sm">
+              <Input
+                className="border-primary-foreground/20 bg-primary-foreground/10 text-[#121212] placeholder:text-[#121212]/55 focus-visible:border-primary-foreground/45 focus-visible:ring-primary-foreground/20"
+                onChange={(event) => {
+                  onSearchChange(event.target.value);
+                }}
+                placeholder="Search aircraft identification, model, or serial number"
+                value={search}
+              />
+            </div>
             <div className="relative">
               <Select
                 onValueChange={(value) =>
@@ -407,24 +410,14 @@ export function AircraftsTable({
               >
                 <SelectTrigger
                   aria-label="Filter by type"
-                  className={cn(
-                    "h-10 w-full gap-1.5 border bg-primary-foreground/10 pl-2.5 pr-8 text-left text-sm font-medium capitalize transition hover:bg-primary-foreground/15 sm:w-36 *:data-[slot=select-value]:line-clamp-none",
-                    typeFilter
-                      ? "border-primary-foreground/30 text-[#121212]"
-                      : "border-primary-foreground/15 text-[#121212]/70",
-                  )}
+                  className="aspect-square w-auto shrink-0 justify-center border-primary-foreground/20 px-0 [&>svg:last-child]:hidden"
                 >
-                  <ListFilterIcon
-                    className={cn(
-                      "size-4 shrink-0",
-                      typeFilter
-                        ? "text-primary-foreground"
-                        : "text-primary-foreground/50",
-                    )}
-                  />
-                  <SelectValue placeholder="All types" />
+                  <FilterIcon className="size-4" />
                 </SelectTrigger>
-                <SelectContent className="capitalize">
+                <SelectContent
+                  align="end"
+                  className="capitalize data-[position=popper]:w-auto data-[position=popper]:min-w-44"
+                >
                   <SelectItem value="__all">All types</SelectItem>
                   {aircraftTypes.map((type) => (
                     <SelectItem key={type.typeKey} value={type.typeKey}>
@@ -434,44 +427,40 @@ export function AircraftsTable({
                 </SelectContent>
               </Select>
               {typeFilter && (
-                <button
-                  aria-label="Clear type filter"
-                  className="absolute right-2 top-1/2 z-10 flex -translate-y-1/2 cursor-pointer items-center justify-center rounded-full text-primary-foreground/50 transition hover:bg-primary-foreground/15 hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-                  onClick={() => onTypeFilterChange("")}
-                  type="button"
-                >
-                  <XIcon className="size-3.5" />
-                </button>
+                <span className="pointer-events-none absolute -right-0.5 -top-0.5 size-2.5 rounded-full border-2 border-primary bg-secondary" />
               )}
             </div>
           </div>
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-            <p className="text-sm text-primary-foreground/70">
+            <p className="hidden sm:block text-sm text-primary-foreground/70">
               {aircrafts.length} of {totalCount} aircraft
             </p>
             <AircraftFormDialog
               onOpenChange={setCreateDialogOpen}
               open={createDialogOpen}
               trigger={
-                <Button className="px-4 font-semibold" type="button">
+                <Button
+                  className="hidden px-4 font-semibold sm:inline-flex"
+                  type="button"
+                >
                   <PlusIcon className="size-4" />
                   Add aircraft
                 </Button>
               }
             />
             <Button
-              className="border-primary-foreground/20 bg-primary-foreground/10 px-4 font-semibold text-primary-foreground hover:bg-primary-foreground/15"
+              className="hidden border-primary-foreground/20 bg-primary-foreground/10 px-4 font-semibold text-primary-foreground hover:bg-primary-foreground/15 sm:inline-flex"
               onClick={() => setTypeManagerOpen(true)}
               type="button"
               variant="outline"
             >
               <PencilIcon className="size-4" />
-              Types
+              Manage aircraft types
             </Button>
           </div>
         </div>
 
-        <p className="flex items-center gap-1.5 rounded-lg border border-primary-foreground/15 bg-primary-foreground/5 px-3 py-2 text-xs text-primary-foreground/70">
+        <p className="flex items-center gap-1.5 rounded-lg border border-primary-foreground/15 bg-primary-foreground/5 px-3 py-2 text-xs text-primary-foreground/70 mx-2.5 sm:mx-4">
           <InfoIcon className="size-3.5 shrink-0" />
           <span>
             To view color / markings, remarks, and other aircraft details, click
@@ -488,9 +477,14 @@ export function AircraftsTable({
                 className="border-primary-foreground/20 hover:bg-primary-foreground/5"
                 key={headerGroup.id}
               >
-                {headerGroup.headers.map((header) => (
+                {headerGroup.headers.map((header, index) => (
                   <TableHead
-                    className="text-primary-foreground/75"
+                    className={cn(
+                      "text-primary-foreground/75",
+                      index === 0 && "pl-4 sm:pl-6",
+                      index === headerGroup.headers.length - 1 &&
+                        "pr-4 sm:pr-6",
+                    )}
                     key={header.id}
                   >
                     {header.isPlaceholder
@@ -511,9 +505,14 @@ export function AircraftsTable({
                   className="border-primary-foreground/10 hover:bg-primary-foreground/10"
                   key={row.id}
                 >
-                  {row.getVisibleCells().map((cell) => (
+                  {row.getVisibleCells().map((cell, index) => (
                     <TableCell
-                      className="text-primary-foreground"
+                      className={cn(
+                        "text-primary-foreground",
+                        index === 0 && "pl-4 sm:pl-6",
+                        index === row.getVisibleCells().length - 1 &&
+                          "pr-4 sm:pr-6",
+                      )}
                       key={cell.id}
                     >
                       {flexRender(
@@ -537,8 +536,8 @@ export function AircraftsTable({
           </TableBody>
         </Table>
 
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-primary-foreground/70">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between px-2.5 sm:px-4">
+          <p className="hidden sm:block text-sm text-primary-foreground/70">
             Page {table.getState().pagination.pageIndex + 1} of{" "}
             {table.getPageCount() || 1}
           </p>
@@ -604,6 +603,26 @@ export function AircraftsTable({
       <AircraftTypeManager
         onOpenChange={setTypeManagerOpen}
         open={typeManagerOpen}
+      />
+
+      <FloatingActionButton
+        className="sm:hidden"
+        icon={PlusIcon}
+        label="Add or manage aircraft"
+        onClick={() => setActionsDialogOpen(true)}
+      />
+
+      <AircraftActionsDialog
+        onAddAircraft={() => {
+          setActionsDialogOpen(false);
+          setCreateDialogOpen(true);
+        }}
+        onManageTypes={() => {
+          setActionsDialogOpen(false);
+          setTypeManagerOpen(true);
+        }}
+        onOpenChange={setActionsDialogOpen}
+        open={actionsDialogOpen}
       />
     </TooltipProvider>
   );

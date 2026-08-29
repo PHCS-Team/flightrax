@@ -12,8 +12,16 @@ export const FLIGHT_DOCUMENTS_QUERY_KEYS = {
   typeOptions: ["flight-documents", "type-options"] as const,
   filerContext: ["flight-documents", "filer-context"] as const,
   picOptions: ["flight-documents", "pic-options"] as const,
-  requests: (page: number, pageSize: number, status: string, search: string) =>
-    ["flight-documents", "requests", { page, pageSize, status, search }] as const,
+  requests: (pageSize: number, group: string, search: string) =>
+    ["flight-documents", "requests", { pageSize, group, search }] as const,
+  requestsAll: ["flight-documents", "requests"] as const,
+  reviewRequestsAll: ["flight-documents", "review-requests"] as const,
+  reviewRequests: (pageSize: number, scope: string, search: string) =>
+    [
+      "flight-documents",
+      "review-requests",
+      { pageSize, scope, search },
+    ] as const,
   flightPlan: (flightPlanId: string) =>
     ["flight-documents", "flight-plan", flightPlanId] as const,
   weightBalance: (flightPlanId: string) =>

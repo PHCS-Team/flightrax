@@ -717,6 +717,51 @@ export type Database = {
           },
         ]
       }
+      instructor_unavailabilities: {
+        Row: {
+          created_at: string
+          created_by: string
+          ends_on: string
+          id: string
+          instructor_profile_id: string
+          starts_on: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          ends_on: string
+          id?: string
+          instructor_profile_id: string
+          starts_on: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          ends_on?: string
+          id?: string
+          instructor_profile_id?: string
+          starts_on?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "instructor_unavailabilities_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "instructor_unavailabilities_instructor_profile_id_fkey"
+            columns: ["instructor_profile_id"]
+            isOneToOne: false
+            referencedRelation: "instructor_profiles"
+            referencedColumns: ["profile_id"]
+          },
+        ]
+      }
       licenses: {
         Row: {
           created_at: string

@@ -1,12 +1,9 @@
 import { z } from "zod";
 
-const passcodeField = z
-  .string()
-  .length(4, "Passcode must be exactly 4 digits.")
-  .regex(/^\d{4}$/, "Passcode must be exactly 4 digits.");
+import { passcodeFieldSchema } from "@/shared/validations/passcode";
 
 export const passcodeSchema = z.object({
-  passcode: passcodeField,
+  passcode: passcodeFieldSchema,
   currentPassword: z.string().optional(),
 });
 

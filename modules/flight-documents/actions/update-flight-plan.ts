@@ -9,6 +9,7 @@ import {
 } from "@/modules/flight-documents/utils/flight-plan-time";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { isApproved } from "@/shared/lib/rbac/guards";
+import { getPicUnavailabilityEndsOn } from "@/modules/flight-documents/services/flight-plan-filer.server";
 import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 
@@ -52,6 +53,24 @@ export const updateFlightPlanAction = actionClient
         ok: false,
         message: "Only draft or rejected flight plans can be edited.",
       };
+    }
+
+    // The chosen PIC must be available on the flight's zulu date — the
+    // filer may always name themselves, even while marked unavailable.
+    if (parsedInput.pilotInCommandId !== actor.id) {
+      const dofDate = resolveDof(parsedInput.dofRaw).slice(0, 10);
+      const unavailableUntil = await getPicUnavailabilityEndsOn(
+        parsedInput.pilotInCommandId,
+        dofDate,
+      );
+
+      if (unavailableUntil) {
+        return {
+          ok: false,
+          message:
+            "The selected pilot in command is unavailable on the date of flight — choose another PIC.",
+        };
+      }
     }
 
     // Aircraft, filer, and license snapshots stay as filed — edits only
@@ -124,9 +143,7 @@ export const updateFlightPlanAction = actionClient
           parsedInput.dinghiesHasDinghy && parsedInput.dinghiesColor
             ? parsedInput.dinghiesColor.toUpperCase()
             : null,
-        remarks: parsedInput.remarks
-          ? parsedInput.remarks.toUpperCase()
-          : null,
+        remarks: parsedInput.remarks ? parsedInput.remarks.toUpperCase() : null,
         pilot_in_command_id: parsedInput.pilotInCommandId,
         pilot_in_command_name: parsedInput.pilotInCommandName.toUpperCase(),
       })

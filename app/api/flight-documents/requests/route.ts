@@ -1,14 +1,12 @@
 import { NextResponse } from "next/server";
 
+import { FLIGHT_REQUEST_STATUS_GROUPS } from "@/modules/flight-documents/constants/flight-request-options";
 import { getOwnFlightRequestsPage } from "@/modules/flight-documents/services/flight-requests.server";
-import type { FlightRequestStatus } from "@/modules/flight-documents/types/flight-request";
+import type { FlightRequestStatusGroup } from "@/modules/flight-documents/types/flight-request";
 
-const VALID_STATUSES: FlightRequestStatus[] = [
-  "draft",
-  "pending_approval",
-  "approved",
-  "rejected",
-];
+const VALID_GROUPS = Object.keys(
+  FLIGHT_REQUEST_STATUS_GROUPS,
+) as FlightRequestStatusGroup[];
 
 export async function GET(request: Request) {
   try {
@@ -18,14 +16,13 @@ export async function GET(request: Request) {
       50,
       Math.max(1, Number(searchParams.get("pageSize")) || 10),
     );
-    const statusParam = searchParams.get("status") ?? "draft";
-    const status = VALID_STATUSES.includes(statusParam as FlightRequestStatus)
-      ? (statusParam as FlightRequestStatus)
-      : "draft";
-
+    const groupParam = searchParams.get("group") ?? "in_progress";
+    const group = VALID_GROUPS.includes(groupParam as FlightRequestStatusGroup)
+      ? (groupParam as FlightRequestStatusGroup)
+      : "in_progress";
     const search = searchParams.get("search") ?? "";
 
-    const result = await getOwnFlightRequestsPage(page, pageSize, status, search);
+    const result = await getOwnFlightRequestsPage(page, pageSize, group, search);
 
     return NextResponse.json(result);
   } catch (error) {

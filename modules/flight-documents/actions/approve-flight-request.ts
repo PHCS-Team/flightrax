@@ -1,0 +1,158 @@
+"use server";
+
+import { approveFlightRequestSchema } from "@/modules/flight-documents/schemas/flight-request-schema";
+import { isLicenseValid } from "@/shared/lib/aviation/license-validity";
+import { verifyProfilePasscode } from "@/shared/lib/passcode";
+import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
+import { isApproved } from "@/shared/lib/rbac/guards";
+import { actionClient } from "@/shared/lib/safe-action";
+import { createAdminClient } from "@/shared/lib/supabase/admin";
+
+export const approveFlightRequestAction = actionClient
+  .inputSchema(approveFlightRequestSchema)
+  .action(async ({ parsedInput }) => {
+    const actor = await getCurrentAuthorizationProfile();
+
+    if (!actor || !isApproved(actor)) {
+      return {
+        ok: false,
+        message: "You do not have permission to approve flight requests.",
+      };
+    }
+
+    const supabase = createAdminClient();
+
+    const { data: flightPlan, error: planError } = await supabase
+      .from("flight_plans")
+      .select(
+        "id, pilot_in_command_id, flight_requests(id, status, weight_balance_id)",
+      )
+      .eq("id", parsedInput.flightPlanId)
+      .maybeSingle();
+
+    if (planError) {
+      return { ok: false, message: planError.message };
+    }
+
+    const request = flightPlan?.flight_requests;
+
+    if (!flightPlan || !request) {
+      return { ok: false, message: "Flight plan not found." };
+    }
+
+    if (flightPlan.pilot_in_command_id !== actor.id) {
+      return {
+        ok: false,
+        message: "Only the assigned pilot in command can approve this request.",
+      };
+    }
+
+    if (request.status !== "pending_approval") {
+      return {
+        ok: false,
+        message: "Only requests pending approval can be approved.",
+      };
+    }
+
+    const passcodeCheck = await verifyProfilePasscode(
+      actor.id,
+      parsedInput.passcode,
+    );
+
+    if (!passcodeCheck.ok) {
+      return passcodeCheck;
+    }
+
+    const { data: approverProfile, error: profileError } = await supabase
+      .from("profiles")
+      .select("id, full_name, signature_svg")
+      .eq("id", actor.id)
+      .maybeSingle();
+
+    if (profileError || !approverProfile) {
+      return { ok: false, message: "Your profile could not be loaded." };
+    }
+
+    if (!approverProfile.signature_svg?.trim()) {
+      return {
+        ok: false,
+        message:
+          "Approving requires your signature — add it in account settings first.",
+      };
+    }
+
+    const { data: licenses, error: licensesError } = await supabase
+      .from("licenses")
+      .select(
+        "license_type, license_number, ratings, expiry_date, has_no_expiry, status",
+      )
+      .eq("user_id", actor.id);
+
+    if (licensesError) {
+      return { ok: false, message: licensesError.message };
+    }
+
+    if (!(licenses ?? []).some((license) => isLicenseValid(license))) {
+      return {
+        ok: false,
+        message:
+          "Approving requires an active, non-expired license on your account.",
+      };
+    }
+
+    const approverLicenses = (licenses ?? []).map((license) => ({
+      licenseType: license.license_type,
+      licenseNumber: license.license_number,
+      ratings: license.ratings,
+      expiryDate: license.expiry_date,
+      hasNoExpiry: license.has_no_expiry,
+      status: license.status,
+    }));
+
+    // Snapshot the approver on the flight plan as its authorized
+    // representative...
+    const { error: planUpdateError } = await supabase
+      .from("flight_plans")
+      .update({
+        authorized_representative_id: approverProfile.id,
+        authorized_representative_name: approverProfile.full_name,
+        authorized_representative_signature: approverProfile.signature_svg,
+        authorized_representative_licenses: approverLicenses,
+      })
+      .eq("id", flightPlan.id);
+
+    if (planUpdateError) {
+      return { ok: false, message: planUpdateError.message };
+    }
+
+    if (request.weight_balance_id) {
+      const { error: wbUpdateError } = await supabase
+        .from("weight_balances")
+        .update({
+          verified_by_id: approverProfile.id,
+          verified_by_name: approverProfile.full_name,
+          verified_by_signature: approverProfile.signature_svg,
+        })
+        .eq("id", request.weight_balance_id);
+
+      if (wbUpdateError) {
+        return { ok: false, message: wbUpdateError.message };
+      }
+    }
+
+    const { error: updateError } = await supabase
+      .from("flight_requests")
+      .update({
+        status: "approved",
+        approved_by: actor.id,
+        approved_at: new Date().toISOString(),
+        rejected_reason: null,
+      })
+      .eq("id", request.id);
+
+    if (updateError) {
+      return { ok: false, message: updateError.message };
+    }
+
+    return { ok: true, message: "Flight request approved." };
+  });

@@ -28,8 +28,14 @@ export type FlightPlanFilerContext = {
   canSetSelfAsPic: boolean;
 };
 
+export type PicUnavailability = {
+  startsOn: string;
+  endsOn: string;
+};
+
 // Approved flight instructor selectable as pilot in command.
 export type FlightPlanPicOption = {
   id: string;
   fullName: string;
+  unavailabilities: PicUnavailability[];
 };

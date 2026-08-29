@@ -26,6 +26,7 @@ import {
   TableRow,
 } from "@/shared/components/ui/table";
 import { getAvatarFallback } from "@/shared/lib/avatar-fallback";
+import { cn } from "@/shared/lib/utils";
 import { CertificateTags } from "@/shared/components/certificate-tags";
 import { CertificateDetailsDialog } from "@/shared/components/certificate-details-dialog";
 import { LicenseTags } from "@/shared/components/license-tags";
@@ -133,8 +134,8 @@ export function StudentsTable({
   });
 
   return (
-    <GlassSurface className="space-y-4 p-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <GlassSurface className="space-y-4 py-3 sm:py-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between px-2.5 sm:px-4">
         <Input
           className="max-w-sm border-primary-foreground/20 bg-primary-foreground/10 text-[#121212] placeholder:text-[#121212]/55 focus-visible:border-primary-foreground/45 focus-visible:ring-primary-foreground/20"
           onChange={(event) => {
@@ -143,7 +144,7 @@ export function StudentsTable({
           placeholder="Search name, email, or student ID"
           value={search}
         />
-        <p className="text-sm text-primary-foreground/70">
+        <p className="hidden sm:block text-sm text-primary-foreground/70">
           {students.length} of {totalCount} students
         </p>
       </div>
@@ -155,9 +156,13 @@ export function StudentsTable({
               className="border-primary-foreground/20 hover:bg-primary-foreground/5"
               key={headerGroup.id}
             >
-              {headerGroup.headers.map((header) => (
+              {headerGroup.headers.map((header, index) => (
                 <TableHead
-                  className="text-primary-foreground/75"
+                  className={cn(
+                    "text-primary-foreground/75",
+                    index === 0 && "pl-4 sm:pl-6",
+                    index === headerGroup.headers.length - 1 && "pr-4 sm:pr-6",
+                  )}
                   key={header.id}
                 >
                   {header.isPlaceholder
@@ -178,8 +183,16 @@ export function StudentsTable({
                 className="border-primary-foreground/10 hover:bg-primary-foreground/10"
                 key={row.id}
               >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell className="text-primary-foreground" key={cell.id}>
+                {row.getVisibleCells().map((cell, index) => (
+                  <TableCell
+                    className={cn(
+                      "text-primary-foreground",
+                      index === 0 && "pl-4 sm:pl-6",
+                      index === row.getVisibleCells().length - 1 &&
+                        "pr-4 sm:pr-6",
+                    )}
+                    key={cell.id}
+                  >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}
@@ -198,8 +211,8 @@ export function StudentsTable({
         </TableBody>
       </Table>
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm text-primary-foreground/70">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between px-2.5 sm:px-4">
+        <p className="hidden sm:block text-sm text-primary-foreground/70">
           Page {table.getState().pagination.pageIndex + 1} of{" "}
           {table.getPageCount() || 1}
         </p>

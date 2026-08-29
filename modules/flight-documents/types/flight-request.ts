@@ -1,4 +1,7 @@
-import type { FLIGHT_REQUEST_STATUS_OPTIONS } from "@/modules/flight-documents/constants/flight-request-options";
+import type {
+  FLIGHT_REQUEST_STATUS_GROUPS,
+  FLIGHT_REQUEST_STATUS_OPTIONS,
+} from "@/modules/flight-documents/constants/flight-request-options";
 import type { Database } from "@/shared/types/supabase";
 
 export type FlightRequestRow =
@@ -20,6 +23,11 @@ export type FlightRequestStatus =
 
 export type JourneyStatus = Database["public"]["Enums"]["journey_status"];
 
+export type FlightRequestReviewScope = "assigned" | "all";
+
+export type FlightRequestStatusGroup =
+  keyof typeof FLIGHT_REQUEST_STATUS_GROUPS;
+
 export type FlightRequestListItem = {
   id: string;
   flightPlanId: string;
@@ -36,4 +44,10 @@ export type FlightRequestListItem = {
   departureTimeRaw: string;
   createdAt: string;
   updatedAt: string;
+  hasWeightBalance: boolean;
+};
+
+export type FlightRequestReviewListItem = FlightRequestListItem & {
+  requestedByName: string;
+  pilotInCommandName: string;
 };

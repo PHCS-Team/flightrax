@@ -8,8 +8,12 @@ import { AircraftHeaderCard } from "@/modules/flight-documents/components/aircra
 import { FlightPlanSavedDialog } from "@/modules/flight-documents/components/flight-plan-saved-dialog";
 import { FlightPlanSavingDialog } from "@/modules/flight-documents/components/flight-plan-saving-dialog";
 import { WeightBalanceForm } from "@/modules/flight-documents/components/weight-balance-form";
+import { WeightBalanceHelp } from "@/modules/flight-documents/components/weight-balance-help-dialog";
 import { PendingApprovalAlert } from "@/modules/flight-documents/components/pending-approval-alert";
+import { RejectionReasonAction } from "@/modules/flight-documents/components/rejection-reason-action";
+import { SelfApproveAction } from "@/modules/flight-documents/components/self-approve-action";
 import { EDITABLE_FLIGHT_REQUEST_STATUSES } from "@/modules/flight-documents/constants/flight-request-options";
+import { useFlightPlanFilerContext } from "@/modules/flight-documents/hooks/use-filer-context.query";
 import { useSaveWeightBalance } from "@/modules/flight-documents/hooks/use-save-weight-balance.action";
 import { useSubmitFlightRequest } from "@/modules/flight-documents/hooks/use-submit-flight-request.action";
 import { useWeightBalanceContext } from "@/modules/flight-documents/hooks/use-weight-balance-context.query";
@@ -26,11 +30,21 @@ export function WeightBalanceClientSurface({
   const router = useRouter();
   const [savedDialogOpen, setSavedDialogOpen] = useState(false);
   const { context, error, isPending } = useWeightBalanceContext(flightPlanId);
+  const { filerContext } = useFlightPlanFilerContext();
+  const isSelfPic = Boolean(
+    context &&
+    filerContext &&
+    context.pilotInCommandId === filerContext.profile.id,
+  );
   const saveWeightBalance = useSaveWeightBalance({
     onSaved: () => setSavedDialogOpen(true),
   });
+
   const submitFlightRequest = useSubmitFlightRequest({
-    onSubmitted: () => router.push("/flight-documents"),
+    onSubmitted: () => {
+      setSavedDialogOpen(false);
+      router.push(`/flight-documents/flight-plans/${flightPlanId}`);
+    },
   });
 
   if (isPending) {
@@ -65,12 +79,10 @@ export function WeightBalanceClientSurface({
     );
   }
 
-  // Any status outside the editable set (pending approval, approved,
-  // completed history) renders the same page as a read-only viewer.
   const isEditable = EDITABLE_FLIGHT_REQUEST_STATUSES.some(
     (status) => status === context.requestStatus,
   );
-  const readOnly = !isEditable;
+  const readOnly = !isEditable || !context.isOwner;
   const isPendingApproval = context.requestStatus === "pending_approval";
 
   if (!context.givens) {
@@ -93,11 +105,17 @@ export function WeightBalanceClientSurface({
 
   return (
     <div className="sm:space-y-4">
-      <AircraftHeaderCard aircraft={context.aircraft} />
+      <AircraftHeaderCard
+        aircraft={context.aircraft}
+        status={context.requestStatus}
+      />
 
-      {isPendingApproval && (
-        <div className="p-3 sm:p-0">
+      {isPendingApproval && context.isOwner && (
+        <div className="grid gap-2 p-3 sm:gap-3 sm:p-0">
           <PendingApprovalAlert flightPlanId={flightPlanId} />
+          {isSelfPic && filerContext?.hasValidLicense && (
+            <SelfApproveAction flightPlanId={flightPlanId} />
+          )}
         </div>
       )}
 
@@ -120,6 +138,15 @@ export function WeightBalanceClientSurface({
         />
       </GlassSurface>
 
+      {!readOnly && <WeightBalanceHelp />}
+
+      {context.requestStatus === "rejected" && context.rejectedReason && (
+        <RejectionReasonAction
+          className="bottom-24"
+          reason={context.rejectedReason}
+        />
+      )}
+
       <FlightPlanSavingDialog
         message="Saving your weight and balance..."
         open={saveWeightBalance.isExecuting}
@@ -134,6 +161,11 @@ export function WeightBalanceClientSurface({
         }
         open={savedDialogOpen}
         showProceed={false}
+        submitForApprovalLabel={
+          context.requestStatus === "rejected"
+            ? "Resubmit request for approval"
+            : "Submit request for approval"
+        }
         title="Weight & Balance Saved"
       />
     </div>

@@ -1,10 +1,12 @@
 import {
   BellIcon,
   CalendarClockIcon,
+  ClipboardCheckIcon,
   FileTextIcon,
   GaugeIcon,
   GraduationCapIcon,
   PlaneIcon,
+  PlaneTakeoffIcon,
   UserCheckIcon,
   UsersIcon,
   UsersRoundIcon,
@@ -17,6 +19,7 @@ import type { Profile } from "@/shared/lib/rbac/types";
 export type DashboardNavigationItemId =
   | "home"
   | "flightDocuments"
+  | "flightRequests"
   | "instructors"
   | "schedule"
   | "students"
@@ -31,7 +34,7 @@ export type DashboardNavigationItem = {
   label: string;
 };
 
-export type DashboardNavigationGroupId = "users";
+export type DashboardNavigationGroupId = "users" | "flights";
 
 export type DashboardNavigationGroup = {
   icon: LucideIcon;
@@ -58,6 +61,12 @@ const DASHBOARD_NAVIGATION_ITEMS = {
     icon: FileTextIcon,
     id: "flightDocuments",
     label: "Flight Documents",
+  },
+  flightRequests: {
+    href: "/flight-requests",
+    icon: ClipboardCheckIcon,
+    id: "flightRequests",
+    label: "Flight Requests",
   },
   instructors: {
     href: "/instructors",
@@ -125,9 +134,22 @@ const INSTRUCTOR_USERS_GROUP: DashboardNavigationGroup = {
   ],
 };
 
+// Instructors both file their own flight plans and review other pilots'
+// requests, so their flight pages live under one "Flights" group.
+// Superadmins can do everything, so they get the same grouping.
+const FLIGHTS_GROUP: DashboardNavigationGroup = {
+  id: "flights",
+  icon: PlaneTakeoffIcon,
+  label: "Flights",
+  items: [
+    DASHBOARD_NAVIGATION_ITEMS.flightDocuments,
+    DASHBOARD_NAVIGATION_ITEMS.flightRequests,
+  ],
+};
+
 const INSTRUCTOR_NAVIGATION: DashboardNavigation = [
   DASHBOARD_NAVIGATION_ITEMS.home,
-  DASHBOARD_NAVIGATION_ITEMS.flightDocuments,
+  FLIGHTS_GROUP,
   INSTRUCTOR_USERS_GROUP,
   DASHBOARD_NAVIGATION_ITEMS.schedule,
 ];
@@ -141,7 +163,7 @@ const ADMIN_NAVIGATION: DashboardNavigation = [
 
 const SUPERADMIN_NAVIGATION: DashboardNavigation = [
   DASHBOARD_NAVIGATION_ITEMS.home,
-  DASHBOARD_NAVIGATION_ITEMS.flightDocuments,
+  FLIGHTS_GROUP,
   DASHBOARD_NAVIGATION_ITEMS.schedule,
   USERS_GROUP,
   DASHBOARD_NAVIGATION_ITEMS.aircrafts,

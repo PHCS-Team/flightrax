@@ -10,9 +10,13 @@ export const FLIGHT_REQUEST_STATUS_OPTIONS = [
   { value: "rejected", label: "Rejected" },
 ] as const;
 
-// A flight plan stays editable only while its request is in one of these
-// statuses.
 export const EDITABLE_FLIGHT_REQUEST_STATUSES = ["draft", "rejected"] as const;
+
+export const FLIGHT_REQUEST_STATUS_GROUPS = {
+  in_progress: ["draft", "rejected"],
+  pending_approval: ["pending_approval"],
+  approved: ["approved"],
+} as const;
 
 export const JOURNEY_STATUS_OPTIONS = [
   { value: "scheduled", label: "Scheduled" },

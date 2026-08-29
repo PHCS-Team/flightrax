@@ -48,7 +48,7 @@ export function AccountReviewClientSurface() {
         <AccountReviewMetrics type={type} />
       </div>
 
-      <div className="flex flex-col gap-3 px-4 sm:flex-row sm:items-center sm:justify-between sm:px-0">
+      <div className="flex flex-col gap-3 px-2.5 -mt-1 mb-3 sm:flex-row sm:items-center sm:justify-between sm:px-0">
         <div className="relative w-full max-w-xl">
           <SearchIcon className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-primary-foreground/55" />
           <Input
@@ -59,7 +59,7 @@ export function AccountReviewClientSurface() {
           />
         </div>
         {!isPending && !error && (
-          <p className="text-sm text-primary-foreground/70">
+          <p className="hidden sm:block text-sm text-primary-foreground/70">
             {filteredRequests.length} of {requests.length} requests
           </p>
         )}

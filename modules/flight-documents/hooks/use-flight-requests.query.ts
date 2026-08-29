@@ -1,25 +1,27 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 
-import { ownFlightRequestsQueryOptions } from "@/modules/flight-documents/queries/flight-requests";
-import type { FlightRequestStatus } from "@/modules/flight-documents/types/flight-request";
+import { ownFlightRequestsInfiniteQueryOptions } from "@/modules/flight-documents/queries/flight-requests";
+import type { FlightRequestStatusGroup } from "@/modules/flight-documents/types/flight-request";
 
 export function useOwnFlightRequests(
-  page: number,
   pageSize: number,
-  status: FlightRequestStatus,
+  group: FlightRequestStatusGroup,
   search: string,
 ) {
-  const query = useQuery(
-    ownFlightRequestsQueryOptions(page, pageSize, status, search),
+  const query = useInfiniteQuery(
+    ownFlightRequestsInfiniteQueryOptions(pageSize, group, search),
   );
+  const pages = query.data?.pages ?? [];
 
   return {
-    requests: query.data?.data ?? [],
-    totalCount: query.data?.totalCount ?? 0,
-    totalPages: query.data?.totalPages ?? 1,
+    requests: pages.flatMap((page) => page.data),
+    totalCount: pages[0]?.totalCount ?? 0,
     error: query.error,
     isPending: query.isPending,
+    fetchNextPage: query.fetchNextPage,
+    hasNextPage: query.hasNextPage,
+    isFetchingNextPage: query.isFetchingNextPage,
   };
 }

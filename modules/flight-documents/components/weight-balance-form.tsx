@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { InfoIcon, PenLineIcon, RotateCwIcon } from "lucide-react";
+import { PenLineIcon, RotateCwIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
   useForm,
@@ -12,7 +12,6 @@ import {
 
 import { FormRadioGroup } from "@/modules/flight-documents/components/form-radio-group";
 import { BALANCE_STATUS_OPTIONS } from "@/modules/flight-documents/constants/flight-request-options";
-import { READ_ONLY_FIELDSET_CLASS } from "@/modules/flight-documents/constants/read-only-form";
 import {
   weightBalanceFormSchema,
   type WeightBalanceFormValues,
@@ -24,11 +23,6 @@ import { cn } from "@/shared/lib/utils";
 
 const INPUT_TEXT_CLASS = "text-[#121212]";
 
-// Row template: Load | Weight | ARM | Moment on sm+; on mobile the load
-// label spans a full line and the three value cells sit below it with
-// their own mini labels — no horizontal scrolling.
-// Weight and Moment get twice the width of ARM — they hold the values
-// users type and read; ARM is a short given number.
 const ROW_GRID_CLASS =
   "grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,2fr)] gap-2 sm:grid-cols-[minmax(8rem,1.2fr)_minmax(0,2fr)_minmax(0,1fr)_minmax(0,2fr)] sm:items-center";
 const ROW_LABEL_SPAN_CLASS = "col-span-3 sm:col-span-1";
@@ -105,24 +99,7 @@ export function WeightBalanceForm({
 
   return (
     <form className="grid gap-6" onSubmit={form.handleSubmit(onSubmit)}>
-      <fieldset
-        className={cn("contents", readOnly && READ_ONLY_FIELDSET_CLASS)}
-        disabled={readOnly}
-      >
-        {!readOnly && (
-          <div className="flex items-start gap-1.5 rounded-lg border border-primary-foreground/15 bg-primary-foreground/5 px-3 py-2 text-xs text-muted-foreground">
-            <InfoIcon className="mt-0.5 size-3.5 shrink-0" />
-            <p>
-              Shaded values are given from the aircraft&apos;s configuration —
-              Basic Empty Weight and all ARMs are preset. Fill in the weights;
-              each Moment auto-calculates as Weight &times; ARM. Typing a Moment
-              manually stops auto-calculation — click the{" "}
-              <RotateCwIcon className="inline size-2.5 align-middle" /> icon to
-              re-enable it.
-            </p>
-          </div>
-        )}
-
+      <fieldset className="contents" disabled={readOnly}>
         <div className="space-y-3 sm:space-y-2">
           <div className={cn(ROW_GRID_CLASS, "hidden sm:grid")}>
             <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">

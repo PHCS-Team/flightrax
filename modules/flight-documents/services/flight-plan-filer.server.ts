@@ -81,10 +81,59 @@ export async function getFlightPlanPicOptions(): Promise<
     throw new Error(error.message);
   }
 
+  const instructorIds = (data ?? []).map((row) => row.profiles.id);
+  const today = new Date().toISOString().slice(0, 10);
+  const { data: unavailabilityRows, error: unavailabilityError } =
+    instructorIds.length > 0
+      ? await supabase
+          .from("instructor_unavailabilities")
+          .select("instructor_profile_id, starts_on, ends_on")
+          .in("instructor_profile_id", instructorIds)
+          .gte("ends_on", today)
+          .order("starts_on", { ascending: true })
+      : { data: [], error: null };
+
+  if (unavailabilityError) {
+    throw new Error(unavailabilityError.message);
+  }
+
+  const unavailabilitiesByProfile = new Map<
+    string,
+    { startsOn: string; endsOn: string }[]
+  >();
+
+  for (const row of unavailabilityRows ?? []) {
+    const entries =
+      unavailabilitiesByProfile.get(row.instructor_profile_id) ?? [];
+    entries.push({ startsOn: row.starts_on, endsOn: row.ends_on });
+    unavailabilitiesByProfile.set(row.instructor_profile_id, entries);
+  }
+
   return (data ?? [])
     .map((row) => ({
       id: row.profiles.id,
       fullName: row.profiles.full_name,
+      unavailabilities: unavailabilitiesByProfile.get(row.profiles.id) ?? [],
     }))
     .sort((a, b) => a.fullName.localeCompare(b.fullName));
+}
+
+export async function getPicUnavailabilityEndsOn(
+  picId: string,
+  zuluDate: string,
+): Promise<string | null> {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("instructor_unavailabilities")
+    .select("ends_on")
+    .eq("instructor_profile_id", picId)
+    .lte("starts_on", zuluDate)
+    .gte("ends_on", zuluDate)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data?.ends_on ?? null;
 }

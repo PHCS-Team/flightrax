@@ -2,10 +2,14 @@ import { PageHeader } from "@/shared/components/layout/page-header";
 import { InstructorsClientSurface } from "@/modules/instructors/components/instructors-client-surface";
 
 export function InstructorsPage({
+  canManageAvailability,
   restrictPeerCredentials,
+  showPeerPrivacyNote,
   viewerId,
 }: {
+  canManageAvailability: boolean;
   restrictPeerCredentials: boolean;
+  showPeerPrivacyNote: boolean;
   viewerId: string | null;
 }) {
   return (
@@ -19,7 +23,9 @@ export function InstructorsPage({
       />
 
       <InstructorsClientSurface
+        canManageAvailability={canManageAvailability}
         restrictPeerCredentials={restrictPeerCredentials}
+        showPeerPrivacyNote={showPeerPrivacyNote}
         viewerId={viewerId}
       />
     </section>

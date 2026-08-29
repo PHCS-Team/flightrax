@@ -13,6 +13,7 @@ export function FlightPlanSavedDialog({
   onSubmitForApproval,
   open,
   showProceed = true,
+  submitForApprovalLabel = "Submit request for approval",
   title = "Flight Plan Saved",
 }: {
   description: string;
@@ -22,6 +23,7 @@ export function FlightPlanSavedDialog({
   onSubmitForApproval?: () => void;
   open: boolean;
   showProceed?: boolean;
+  submitForApprovalLabel?: string;
   title?: string;
 }) {
   return (
@@ -48,7 +50,7 @@ export function FlightPlanSavedDialog({
             >
               {isSubmittingForApproval
                 ? "Submitting..."
-                : "Submit request for approval"}
+                : submitForApprovalLabel}
             </Button>
           )}
           {showProceed && (
