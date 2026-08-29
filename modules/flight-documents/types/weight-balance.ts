@@ -42,6 +42,7 @@ export type WeightBalanceContext = {
   isOwner: boolean;
   flightPlanId: string;
   pilotInCommandId: string | null;
+  rejectedReason: string | null;
   requestId: string;
   requestStatus: FlightRequestStatus;
   weightBalanceId: string | null;

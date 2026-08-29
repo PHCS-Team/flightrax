@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { InfoIcon, PenLineIcon, RotateCwIcon } from "lucide-react";
+import { PenLineIcon, RotateCwIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
   useForm,
@@ -100,20 +100,6 @@ export function WeightBalanceForm({
   return (
     <form className="grid gap-6" onSubmit={form.handleSubmit(onSubmit)}>
       <fieldset className="contents" disabled={readOnly}>
-        {!readOnly && (
-          <div className="flex items-start gap-1.5 rounded-lg border border-primary-foreground/15 bg-primary-foreground/5 px-3 py-2 text-xs text-muted-foreground">
-            <InfoIcon className="mt-0.5 size-3.5 shrink-0" />
-            <p>
-              Shaded values are given from the aircraft&apos;s configuration —
-              Basic Empty Weight and all ARMs are preset. Fill in the weights;
-              each Moment auto-calculates as Weight &times; ARM. Typing a Moment
-              manually stops auto-calculation — click the{" "}
-              <RotateCwIcon className="inline size-2.5 align-middle" /> icon to
-              re-enable it.
-            </p>
-          </div>
-        )}
-
         <div className="space-y-3 sm:space-y-2">
           <div className={cn(ROW_GRID_CLASS, "hidden sm:grid")}>
             <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">

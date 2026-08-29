@@ -2,15 +2,33 @@
 
 import { ImageIcon } from "lucide-react";
 
+import { FLIGHT_REQUEST_STATUS_PILLS } from "@/modules/flight-documents/components/flight-request-row-card";
 import type { FlightPlanAircraftOption } from "@/modules/flight-documents/types/aircraft-option";
+import type { FlightRequestStatus } from "@/modules/flight-documents/types/flight-request";
+import { cn } from "@/shared/lib/utils";
 
 export function AircraftHeaderCard({
   aircraft,
+  status,
 }: {
   aircraft: FlightPlanAircraftOption;
+  status?: FlightRequestStatus;
 }) {
+  const pill = status ? FLIGHT_REQUEST_STATUS_PILLS[status] : null;
+  const isRejected = status === "rejected";
+  const isApproved = status === "approved";
+
   return (
-    <div className="relative h-44 overflow-hidden border-y border-primary-foreground/20 bg-primary shadow-sm sm:h-56 sm:rounded-3xl sm:border">
+    <div
+      className={cn(
+        "relative h-44 overflow-hidden border-y border-primary-foreground/20 shadow-sm sm:h-56 sm:rounded-3xl sm:border",
+        isRejected
+          ? "bg-red-900"
+          : isApproved
+            ? "bg-emerald-900"
+            : "bg-primary",
+      )}
+    >
       {aircraft.photoUrl ? (
         <div
           aria-label={`${aircraft.aircraftIdentification} aircraft image`}
@@ -23,7 +41,26 @@ export function AircraftHeaderCard({
           <ImageIcon className="size-10 text-primary-foreground/30" />
         </div>
       )}
-      <div className="absolute inset-0 bg-linear-to-t from-primary via-primary/50 to-primary/10" />
+      <div
+        className={cn(
+          "absolute inset-0 bg-linear-to-t",
+          isRejected
+            ? "from-red-900 via-red-800/50 to-red-800/10"
+            : isApproved
+              ? "from-emerald-900 via-emerald-800/50 to-emerald-800/10"
+              : "from-primary via-primary/50 to-primary/10",
+        )}
+      />
+      {pill && (
+        <span
+          className={cn(
+            "absolute right-3 top-3 inline-flex h-6 items-center rounded-full border px-2.5 text-xs font-medium uppercase tracking-wide text-primary-foreground sm:right-4 sm:top-4",
+            pill.className,
+          )}
+        >
+          {pill.label}
+        </span>
+      )}
       <div className="absolute inset-x-0 bottom-0 p-4 text-primary-foreground sm:p-6">
         <div className="flex items-center gap-2">
           <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">

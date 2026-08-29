@@ -9,6 +9,7 @@ import type { PaginatedResponse } from "@/shared/types/pagination";
 import type {
   ApprovedInstructor,
   ApprovedInstructorRow,
+  InstructorUnavailability,
 } from "@/modules/instructors/types/instructor";
 
 async function getMatchingProfileIds(
@@ -94,6 +95,38 @@ async function getCertificatesByProfileIds(
   return certificatesByProfile;
 }
 
+async function getUnavailabilitiesByProfileIds(
+  supabase: ReturnType<typeof createAdminClient>,
+  profileIds: string[],
+): Promise<Map<string, InstructorUnavailability[]>> {
+  if (profileIds.length === 0) {
+    return new Map();
+  }
+
+  // All dates are zulu — "today" is the current UTC date.
+  const today = new Date().toISOString().slice(0, 10);
+  const { data, error } = await supabase
+    .from("instructor_unavailabilities")
+    .select("id, instructor_profile_id, starts_on, ends_on")
+    .in("instructor_profile_id", profileIds)
+    .gte("ends_on", today)
+    .order("starts_on", { ascending: true });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  const byProfile = new Map<string, InstructorUnavailability[]>();
+
+  for (const row of data ?? []) {
+    const entries = byProfile.get(row.instructor_profile_id) ?? [];
+    entries.push({ id: row.id, startsOn: row.starts_on, endsOn: row.ends_on });
+    byProfile.set(row.instructor_profile_id, entries);
+  }
+
+  return byProfile;
+}
+
 export async function getApprovedInstructorsPage(
   page: number,
   pageSize: number,
@@ -136,10 +169,12 @@ export async function getApprovedInstructorsPage(
     (row) => row.profiles?.role === ROLE.INSTRUCTOR,
   );
   const instructorIds = instructors.map((instructor) => instructor.profile_id);
-  const [licensesByProfile, certificatesByProfile] = await Promise.all([
-    getLicensesByProfileIds(supabase, instructorIds),
-    getCertificatesByProfileIds(supabase, instructorIds),
-  ]);
+  const [licensesByProfile, certificatesByProfile, unavailabilitiesByProfile] =
+    await Promise.all([
+      getLicensesByProfileIds(supabase, instructorIds),
+      getCertificatesByProfileIds(supabase, instructorIds),
+      getUnavailabilitiesByProfileIds(supabase, instructorIds),
+    ]);
   const { storage } = supabase;
 
   return {
@@ -155,6 +190,7 @@ export async function getApprovedInstructorsPage(
         : null,
       licenses: licensesByProfile.get(row.profile_id) ?? [],
       certificates: certificatesByProfile.get(row.profile_id) ?? [],
+      unavailabilities: unavailabilitiesByProfile.get(row.profile_id) ?? [],
     })),
     totalCount: total,
     page,

@@ -51,7 +51,7 @@ export function RejectRequestDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="w-[calc(100vw-1rem)] max-w-[calc(100vw-1rem)] p-6 sm:w-full sm:max-w-md">
+      <DialogContent className="max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-[calc(100vw-1rem)] overflow-y-auto p-6 sm:w-full sm:max-w-md">
         <DialogSectionHeader
           description="The pilot sees this reason — explain what needs to be fixed before resubmitting."
           icon={MessageSquareWarningIcon}
@@ -63,7 +63,7 @@ export function RejectRequestDialog({
         >
           <Textarea
             autoFocus
-            className="min-h-28 border-border bg-muted/30 text-[#121212] placeholder:text-muted-foreground/55"
+            className="h-36 field-sizing-fixed resize-none overflow-y-auto border-border bg-muted/30 text-[#121212] placeholder:text-muted-foreground/55"
             placeholder="Enter the rejection reason"
             {...form.register("reason")}
           />

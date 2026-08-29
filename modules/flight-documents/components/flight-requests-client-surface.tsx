@@ -7,6 +7,7 @@ import { useState } from "react";
 import { FlightRequestsReviewList } from "@/modules/flight-documents/components/flight-requests-review-list";
 import { PlanCodeSearchInput } from "@/modules/flight-documents/components/plan-code-search-input";
 import { useInfiniteScrollSentinel } from "@/modules/flight-documents/hooks/use-infinite-scroll-sentinel";
+import { useFlightRequestsRealtime } from "@/modules/flight-documents/hooks/use-flight-requests-realtime";
 import { useReviewFlightRequests } from "@/modules/flight-documents/hooks/use-review-flight-requests.query";
 import type { FlightRequestReviewScope } from "@/modules/flight-documents/types/flight-request";
 import { EmptyState } from "@/shared/components/layout/empty-state";
@@ -44,6 +45,7 @@ export function FlightRequestsClientSurface() {
   );
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
   const list = useReviewFlightRequests(PAGE_SIZE, scope, committedSearch);
+  useFlightRequestsRealtime();
   const sentinelRef = useInfiniteScrollSentinel(list);
 
   if (!list.isPending && !hasLoadedOnce) {
@@ -82,7 +84,7 @@ export function FlightRequestsClientSurface() {
         </TabsList>
       </Tabs>
 
-      <div className="px-4 pt-2.5 pb-3 sm:px-0 sm:py-0">
+      <div className="px-2.5 pt-2.5 pb-3 sm:px-0 sm:py-0">
         <PlanCodeSearchInput onChange={setSearchInput} value={searchInput} />
       </div>
 

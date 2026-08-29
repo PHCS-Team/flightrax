@@ -20,6 +20,9 @@ export async function InstructorsRoute() {
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <InstructorsPage
+        canManageAvailability={
+          viewer?.role === ROLE.ADMIN || viewer?.role === ROLE.SUPERADMIN
+        }
         restrictPeerCredentials={
           viewer?.role === ROLE.INSTRUCTOR || viewer?.role === ROLE.STUDENT
         }

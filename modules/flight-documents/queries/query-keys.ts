@@ -14,6 +14,7 @@ export const FLIGHT_DOCUMENTS_QUERY_KEYS = {
   picOptions: ["flight-documents", "pic-options"] as const,
   requests: (pageSize: number, group: string, search: string) =>
     ["flight-documents", "requests", { pageSize, group, search }] as const,
+  requestsAll: ["flight-documents", "requests"] as const,
   reviewRequestsAll: ["flight-documents", "review-requests"] as const,
   reviewRequests: (pageSize: number, scope: string, search: string) =>
     [

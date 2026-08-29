@@ -9,6 +9,7 @@ import { FlightDocumentsList } from "@/modules/flight-documents/components/fligh
 import { FlightPlanFilerNotice } from "@/modules/flight-documents/components/flight-plan-filer-notice";
 import { PlanCodeSearchInput } from "@/modules/flight-documents/components/plan-code-search-input";
 import { useFlightPlanFilerContext } from "@/modules/flight-documents/hooks/use-filer-context.query";
+import { useFlightRequestsRealtime } from "@/modules/flight-documents/hooks/use-flight-requests-realtime";
 import { useOwnFlightRequests } from "@/modules/flight-documents/hooks/use-flight-requests.query";
 import { useInfiniteScrollSentinel } from "@/modules/flight-documents/hooks/use-infinite-scroll-sentinel";
 import { EmptyState } from "@/shared/components/layout/empty-state";
@@ -54,6 +55,7 @@ export function FlightDocumentsClientSurface() {
   const [aircraftDialogOpen, setAircraftDialogOpen] = useState(false);
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
   const list = useOwnFlightRequests(PAGE_SIZE, statusTab, committedSearch);
+  useFlightRequestsRealtime();
   const sentinelRef = useInfiniteScrollSentinel(list);
   const { filerContext } = useFlightPlanFilerContext();
   const canFile = Boolean(
@@ -101,7 +103,7 @@ export function FlightDocumentsClientSurface() {
         </TabsList>
       </Tabs>
 
-      <div className="flex flex-col gap-3 px-4 pt-2.5 pb-3 sm:flex-row sm:items-center sm:justify-between sm:px-0 sm:py-0">
+      <div className="flex flex-col gap-3 px-2.5 pt-2.5 pb-3 sm:flex-row sm:items-center sm:justify-between sm:px-0 sm:py-0">
         <PlanCodeSearchInput onChange={setSearchInput} value={searchInput} />
         <Button
           className="hidden px-4 font-semibold disabled:cursor-default sm:inline-flex"

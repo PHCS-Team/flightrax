@@ -59,10 +59,14 @@ export function FlightRequestReviewClientSurface({
 
   return (
     <div className="sm:space-y-4">
-      <AircraftHeaderCard aircraft={flightPlan.aircraft} />
+      <AircraftHeaderCard
+        aircraft={flightPlan.aircraft}
+        status={flightPlan.requestStatus}
+      />
 
       <FlightPlanReviewCard
         aircraft={flightPlan.aircraft}
+        filedByName={flightPlan.filedByName}
         values={flightPlan.values}
       />
 

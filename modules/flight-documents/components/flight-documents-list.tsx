@@ -43,7 +43,13 @@ export function FlightDocumentsList({
           }
           pill={FLIGHT_REQUEST_STATUS_PILLS[request.status]}
           planCode={request.planCode}
-          tone={request.status === "rejected" ? "destructive" : "default"}
+          tone={
+            request.status === "rejected"
+              ? "destructive"
+              : request.status === "approved"
+                ? "success"
+                : "default"
+          }
         >
           <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-primary-foreground/70">
             <span>

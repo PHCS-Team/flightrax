@@ -26,9 +26,11 @@ import { GlassSurface } from "@/shared/components/layout/glass-surface";
 // auto-populates.
 export function FlightPlanReviewCard({
   aircraft,
+  filedByName,
   values,
 }: {
   aircraft: FlightPlanAircraftOption;
+  filedByName: string;
   values: FlightPlanFormValues;
 }) {
   return (
@@ -38,6 +40,16 @@ export function FlightPlanReviewCard({
         icon={FileTextIcon}
         title="Flight Plan"
       />
+
+      <ReviewSection title="Pilots">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <ReviewField label="Filed By" value={filedByName} />
+          <ReviewField
+            label="Pilot in Command"
+            value={values.pilotInCommandName}
+          />
+        </div>
+      </ReviewSection>
 
       <ReviewSection title="Aircraft">
         <div className="grid gap-4 sm:grid-cols-3">
@@ -207,10 +219,6 @@ export function FlightPlanReviewCard({
             <ReviewField label="Dinghies" value="None" />
           )}
           <ReviewField label="Remarks" multiline value={values.remarks} />
-          <ReviewField
-            label="Pilot in Command"
-            value={values.pilotInCommandName}
-          />
         </div>
       </ReviewSection>
     </GlassSurface>

@@ -37,6 +37,7 @@ import type {
   AircraftStatus,
 } from "@/modules/aircrafts/types/aircraft";
 import { useCopyToClipboard } from "@/shared/hooks/use-copy-to-clipboard";
+import { cn } from "@/shared/lib/utils";
 import { toast } from "sonner";
 import { FloatingActionButton } from "@/shared/components/layout/floating-action-button";
 import { GlassSurface } from "@/shared/components/layout/glass-surface";
@@ -387,8 +388,8 @@ export function AircraftsTable({
 
   return (
     <TooltipProvider>
-      <GlassSurface className="space-y-4 p-4 pt-3 sm:p-4">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+      <GlassSurface className="space-y-4 py-3 sm:py-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-2.5 sm:px-4">
           <div className="flex gap-2 sm:flex-1 sm:items-center">
             <div className="min-w-0 flex-1 sm:max-w-sm">
               <Input
@@ -459,7 +460,7 @@ export function AircraftsTable({
           </div>
         </div>
 
-        <p className="flex items-center gap-1.5 rounded-lg border border-primary-foreground/15 bg-primary-foreground/5 px-3 py-2 text-xs text-primary-foreground/70">
+        <p className="flex items-center gap-1.5 rounded-lg border border-primary-foreground/15 bg-primary-foreground/5 px-3 py-2 text-xs text-primary-foreground/70 mx-2.5 sm:mx-4">
           <InfoIcon className="size-3.5 shrink-0" />
           <span>
             To view color / markings, remarks, and other aircraft details, click
@@ -476,9 +477,14 @@ export function AircraftsTable({
                 className="border-primary-foreground/20 hover:bg-primary-foreground/5"
                 key={headerGroup.id}
               >
-                {headerGroup.headers.map((header) => (
+                {headerGroup.headers.map((header, index) => (
                   <TableHead
-                    className="text-primary-foreground/75"
+                    className={cn(
+                      "text-primary-foreground/75",
+                      index === 0 && "pl-4 sm:pl-6",
+                      index === headerGroup.headers.length - 1 &&
+                        "pr-4 sm:pr-6",
+                    )}
                     key={header.id}
                   >
                     {header.isPlaceholder
@@ -499,9 +505,14 @@ export function AircraftsTable({
                   className="border-primary-foreground/10 hover:bg-primary-foreground/10"
                   key={row.id}
                 >
-                  {row.getVisibleCells().map((cell) => (
+                  {row.getVisibleCells().map((cell, index) => (
                     <TableCell
-                      className="text-primary-foreground"
+                      className={cn(
+                        "text-primary-foreground",
+                        index === 0 && "pl-4 sm:pl-6",
+                        index === row.getVisibleCells().length - 1 &&
+                          "pr-4 sm:pr-6",
+                      )}
                       key={cell.id}
                     >
                       {flexRender(
@@ -525,8 +536,8 @@ export function AircraftsTable({
           </TableBody>
         </Table>
 
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-primary-foreground/70">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between px-2.5 sm:px-4">
+          <p className="hidden sm:block text-sm text-primary-foreground/70">
             Page {table.getState().pagination.pageIndex + 1} of{" "}
             {table.getPageCount() || 1}
           </p>

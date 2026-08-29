@@ -277,6 +277,7 @@ Key rules:
 - Use `placeholderData: (previousData) => previousData` to keep the previous page visible while the next loads.
 - Use `nuqs` `useQueryState("page", parseAsInteger.withDefault(1))` for pagination state — never `useState`.
 - Table component uses `manualPagination: true` and `pageCount` from the query response. Do NOT use `getPaginationRowModel`.
+- **Edge gutters**: table rows run to the card edges, so the first column always gets `pl-4 sm:pl-6` and the last column `pr-4 sm:pr-6` — on BOTH the header and body cells (apply via the column index in the render loops; see `students-table.tsx`).
 - Mutations that change listed data must invalidate the parent query key, not a specific page key.
 
 ```ts
@@ -443,6 +444,23 @@ The `font-bold uppercase` classes may be added for visual styling, but the JSX s
 - **Dialog action buttons with short labels (Confirm/Cancel, Save/Cancel, Delete/Cancel) sit side by side on ALL viewports** — the shared `DialogFooter` encodes this. On mobile the side-by-side buttons stretch to fill the footer width equally (`*:flex-1`); on desktop they keep their natural width, right-aligned (`sm:*:flex-initial`). **Buttons with long labels (full-sentence actions like "Proceed to Weight & Balance") stack one per row instead** — side-by-side long labels look cramped and wrap badly. Pick per dialog based on label length, never mix.
 - **Forms must never scroll horizontally on mobile.** Restructure rows instead: stack the row label above the value cells and give each cell its own mobile mini-label (see `weight-balance-form.tsx`), rather than wrapping the form in `overflow-x-auto`.
 - Read-only value cells that sit next to inputs must match the input's radius and height (`rounded-lg sm:rounded-2xl`, `h-9 md:h-10`) so rows line up.
+
+---
+
+## Rule 19 — Supabase Realtime Budget
+
+The project must stay within the Supabase **free tier**: ~**200 concurrent realtime connections** and ~**2M realtime messages/month**. Every delivered event counts per subscriber-copy. Usage is mobile-app-like (one tab per user), so connections ≈ concurrent active users — the budget is real but finite. Realtime is never applied by default; it must be justified against this budget.
+
+Rules when adding realtime to a surface:
+
+- **Justify it first.** Only add realtime where another user's action must appear without a refresh (e.g. flight request review queues, notifications). Admin-only or single-actor data does not need realtime.
+- **Always use the shared hook** `shared/hooks/use-supabase-table-changes.ts`. It handles JWT attach + re-auth on token refresh, per-mount unique topics, dev status logging, and the 15s polling fallback. Never hand-roll a channel.
+- **One subscription per table per page.** Two components on the same page needing the same table must share one hook mount (lift it to the surface). Duplicate subscriptions double the message count.
+- **Publish tables via migration.** Add the table with `alter publication supabase_realtime add table public.<table>;` in a migration, and confirm the existing RLS policies shape delivery correctly — realtime respects RLS with the subscriber's JWT, so policies decide who receives each event.
+- **Prefer per-user filters for per-user data.** For tables like notifications, subscribe with `filter: "user_id=eq.<uid>"` so each event is one delivery to one client instead of a fan-out that every client discards.
+- **Events trigger invalidation, never carry data.** On event, invalidate the affected TanStack Query keys (list prefixes + point keys from the payload) and let the normal query flow refetch. Do not render payload contents directly.
+- **Estimate before adding**: events/day × subscribed clients per event = deliveries/day. Keep the monthly total comfortably under the quota; a chatty machine-written table is a red flag for realtime.
+- **Watch the dashboard** (Supabase → Realtime) after launching a new realtime surface to confirm connection and message counts match the estimate.
 
 ---
 

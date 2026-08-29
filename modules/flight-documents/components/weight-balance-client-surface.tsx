@@ -8,7 +8,9 @@ import { AircraftHeaderCard } from "@/modules/flight-documents/components/aircra
 import { FlightPlanSavedDialog } from "@/modules/flight-documents/components/flight-plan-saved-dialog";
 import { FlightPlanSavingDialog } from "@/modules/flight-documents/components/flight-plan-saving-dialog";
 import { WeightBalanceForm } from "@/modules/flight-documents/components/weight-balance-form";
+import { WeightBalanceHelp } from "@/modules/flight-documents/components/weight-balance-help-dialog";
 import { PendingApprovalAlert } from "@/modules/flight-documents/components/pending-approval-alert";
+import { RejectionReasonAction } from "@/modules/flight-documents/components/rejection-reason-action";
 import { SelfApproveAction } from "@/modules/flight-documents/components/self-approve-action";
 import { EDITABLE_FLIGHT_REQUEST_STATUSES } from "@/modules/flight-documents/constants/flight-request-options";
 import { useFlightPlanFilerContext } from "@/modules/flight-documents/hooks/use-filer-context.query";
@@ -103,7 +105,10 @@ export function WeightBalanceClientSurface({
 
   return (
     <div className="sm:space-y-4">
-      <AircraftHeaderCard aircraft={context.aircraft} />
+      <AircraftHeaderCard
+        aircraft={context.aircraft}
+        status={context.requestStatus}
+      />
 
       {isPendingApproval && context.isOwner && (
         <div className="grid gap-2 p-3 sm:gap-3 sm:p-0">
@@ -133,6 +138,15 @@ export function WeightBalanceClientSurface({
         />
       </GlassSurface>
 
+      {!readOnly && <WeightBalanceHelp />}
+
+      {context.requestStatus === "rejected" && context.rejectedReason && (
+        <RejectionReasonAction
+          className="bottom-24"
+          reason={context.rejectedReason}
+        />
+      )}
+
       <FlightPlanSavingDialog
         message="Saving your weight and balance..."
         open={saveWeightBalance.isExecuting}
@@ -147,6 +161,11 @@ export function WeightBalanceClientSurface({
         }
         open={savedDialogOpen}
         showProceed={false}
+        submitForApprovalLabel={
+          context.requestStatus === "rejected"
+            ? "Resubmit request for approval"
+            : "Submit request for approval"
+        }
         title="Weight & Balance Saved"
       />
     </div>

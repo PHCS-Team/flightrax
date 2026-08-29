@@ -15,10 +15,12 @@ import { LoadingScreen } from "@/shared/components/layout/loading-screen";
 const DEFAULT_PAGE_SIZE = 10;
 
 export function InstructorsClientSurface({
+  canManageAvailability,
   restrictPeerCredentials,
   showPeerPrivacyNote,
   viewerId,
 }: {
+  canManageAvailability: boolean;
   restrictPeerCredentials: boolean;
   showPeerPrivacyNote: boolean;
   viewerId: string | null;
@@ -71,6 +73,7 @@ export function InstructorsClientSurface({
         />
       ) : (
         <InstructorsTable
+          canManageAvailability={canManageAvailability}
           instructors={instructors}
           onPageChange={setPage}
           onSearchChange={setSearchInput}

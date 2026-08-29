@@ -1,8 +1,9 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { format, parseISO } from "date-fns";
 import { InfoIcon, PenLineIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   useController,
   useForm,
@@ -18,6 +19,7 @@ import {
   SURVEILLANCE_EQUIPMENT_OPTIONS,
   TYPE_OF_FLIGHT_OPTIONS,
   WAKE_TURBULENCE_CATEGORY_OPTIONS,
+  DOF_PATTERN,
 } from "@/modules/flight-documents/constants/flight-plan-options";
 import { FormRadioGroup } from "@/modules/flight-documents/components/form-radio-group";
 import { FLIGHT_PLAN_FORM_DEFAULTS } from "@/modules/flight-documents/constants/flight-plan-form-defaults";
@@ -28,6 +30,7 @@ import {
   type FlightPlanFormValues,
 } from "@/modules/flight-documents/schemas/flight-plan-schema";
 import { buildOtherInformation } from "@/modules/flight-documents/utils/build-other-information";
+import { resolveDof } from "@/modules/flight-documents/utils/flight-plan-time";
 import { Button } from "@/shared/components/ui/button";
 import { Checkbox } from "@/shared/components/ui/checkbox";
 import { Input } from "@/shared/components/ui/input";
@@ -165,6 +168,25 @@ export function FlightPlanForm({
     otherInfoEdited,
   ]);
 
+  // Changing the DOF invalidates the PIC choice — availability is
+  // per-date, so a PIC picked for the old date may be unavailable on the
+  // new one. Clear the selection on every DOF change (create and edit
+  // alike); the initial value never triggers a clear.
+  const previousDofRef = useRef(defaultValues?.dofRaw ?? "");
+
+  useEffect(() => {
+    if (previousDofRef.current === dofRaw) {
+      return;
+    }
+
+    previousDofRef.current = dofRaw;
+
+    if (form.getValues("pilotInCommandId")) {
+      form.setValue("pilotInCommandId", "", { shouldDirty: true });
+      form.setValue("pilotInCommandName", "", { shouldDirty: true });
+    }
+  }, [dofRaw, form]);
+
   function handleSelfPicToggle(enabled: boolean) {
     if (!filerContext) {
       return;
@@ -183,6 +205,28 @@ export function FlightPlanForm({
 
     form.setValue("pilotInCommandId", "", { shouldDirty: true });
     form.setValue("pilotInCommandName", "", { shouldDirty: true });
+  }
+
+  // PIC availability is judged against the flight's zulu date — the
+  // UTC date of the resolved DOF, not the day the plan is filed.
+  const dofDate = DOF_PATTERN.test(dofRaw ?? "")
+    ? resolveDof(dofRaw).slice(0, 10)
+    : null;
+
+  function getPicUnavailability(optionId: string) {
+    if (!dofDate || optionId === filerContext?.profile.id) {
+      // The filer may always pick themselves, even while marked
+      // unavailable.
+      return null;
+    }
+
+    const option = picOptions.find((candidate) => candidate.id === optionId);
+
+    return (
+      option?.unavailabilities.find(
+        (period) => period.startsOn <= dofDate && dofDate <= period.endsOn,
+      ) ?? null
+    );
   }
 
   function handlePicSelect(picId: string) {
@@ -548,6 +592,7 @@ export function FlightPlanForm({
             />
           ) : (
             <Select
+              disabled={!dofDate}
               onValueChange={handlePicSelect}
               value={pilotInCommandId || undefined}
             >
@@ -559,13 +604,38 @@ export function FlightPlanForm({
                 <SelectValue placeholder="Choose a flight instructor" />
               </SelectTrigger>
               <SelectContent>
-                {picOptions.map((option) => (
-                  <SelectItem key={option.id} value={option.id}>
-                    {option.fullName}
-                  </SelectItem>
-                ))}
+                {picOptions.map((option) => {
+                  const unavailability = getPicUnavailability(option.id);
+
+                  return (
+                    <SelectItem
+                      disabled={Boolean(unavailability)}
+                      key={option.id}
+                      value={option.id}
+                    >
+                      <span className="flex items-center gap-2">
+                        {option.fullName}
+                        {unavailability && (
+                          <span className="text-xs text-muted-foreground">
+                            Unavailable until{" "}
+                            {format(
+                              parseISO(unavailability.endsOn),
+                              "MMM d, yyyy",
+                            )}
+                          </span>
+                        )}
+                      </span>
+                    </SelectItem>
+                  );
+                })}
               </SelectContent>
             </Select>
+          )}
+          {!dofDate && !isSelfPic && (
+            <p className="text-xs text-muted-foreground">
+              Enter the Date of Filing first — pilot availability depends on
+              the flight date.
+            </p>
           )}
           {errors.pilotInCommandId && (
             <p className="text-sm text-destructive">

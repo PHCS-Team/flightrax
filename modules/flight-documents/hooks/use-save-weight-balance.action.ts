@@ -16,10 +16,11 @@ export function useSaveWeightBalance({
     onSuccess: ({ data }) => {
       toastActionResult(data);
 
+      queryClient.invalidateQueries({
+        queryKey: FLIGHT_DOCUMENTS_QUERY_KEYS.all,
+      });
+
       if (data?.ok) {
-        queryClient.invalidateQueries({
-          queryKey: FLIGHT_DOCUMENTS_QUERY_KEYS.all,
-        });
         onSaved?.();
       }
     },

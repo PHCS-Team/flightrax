@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  FileTextIcon,
-  MessageSquareWarningIcon,
-  ScaleIcon,
-  Trash2Icon,
-} from "lucide-react";
+import { FileTextIcon, ScaleIcon, Trash2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -14,6 +9,7 @@ import { FlightPlanForm } from "@/modules/flight-documents/components/flight-pla
 import { FlightPlanHelp } from "@/modules/flight-documents/components/flight-plan-help-dialog";
 import { FlightPlanSavingDialog } from "@/modules/flight-documents/components/flight-plan-saving-dialog";
 import { PendingApprovalAlert } from "@/modules/flight-documents/components/pending-approval-alert";
+import { RejectionReasonAction } from "@/modules/flight-documents/components/rejection-reason-action";
 import { SelfApproveAction } from "@/modules/flight-documents/components/self-approve-action";
 import { EDITABLE_FLIGHT_REQUEST_STATUSES } from "@/modules/flight-documents/constants/flight-request-options";
 import { useDeleteFlightPlan } from "@/modules/flight-documents/hooks/use-delete-flight-plan.action";
@@ -23,12 +19,10 @@ import { useUpdateFlightPlan } from "@/modules/flight-documents/hooks/use-update
 import { ConfirmationDialog } from "@/shared/components/layout/confirmation-dialog";
 import { PageHeader } from "@/shared/components/layout/page-header";
 import { FloatingActionButton } from "@/shared/components/layout/floating-action-button";
-import { DialogSectionHeader } from "@/shared/components/layout/dialog-section-header";
 import { EmptyState } from "@/shared/components/layout/empty-state";
 import { GlassSurface } from "@/shared/components/layout/glass-surface";
 import { LoadingScreen } from "@/shared/components/layout/loading-screen";
 import { Button } from "@/shared/components/ui/button";
-import { Dialog, DialogContent } from "@/shared/components/ui/dialog";
 
 export function FlightPlanEditClientSurface({
   flightPlanId,
@@ -110,7 +104,10 @@ export function FlightPlanEditClientSurface({
         title={pageTitle}
       />
 
-      <AircraftHeaderCard aircraft={flightPlan.aircraft} />
+      <AircraftHeaderCard
+        aircraft={flightPlan.aircraft}
+        status={flightPlan.requestStatus}
+      />
 
       {isPendingApproval && flightPlan.isOwner && (
         <div className="grid gap-2.5 p-3 sm:gap-4 sm:p-0">
@@ -178,7 +175,10 @@ export function FlightPlanEditClientSurface({
       )}
 
       {isRejected && (
-        <RejectionReasonAction reason={flightPlan.rejectedReason ?? ""} />
+        <RejectionReasonAction
+          className="bottom-19 sm:bottom-24"
+          reason={flightPlan.rejectedReason ?? ""}
+        />
       )}
 
       <FlightPlanSavingDialog open={updateFlightPlan.isExecuting} />
@@ -196,36 +196,5 @@ export function FlightPlanEditClientSurface({
         typeToConfirm="DELETE THIS!"
       />
     </div>
-  );
-}
-
-function RejectionReasonAction({ reason }: { reason: string }) {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <>
-      <FloatingActionButton
-        className="bottom-20"
-        icon={MessageSquareWarningIcon}
-        label="View Rejection Reason"
-        onClick={() => setOpen(true)}
-        variant="destructive"
-      />
-
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto p-6 sm:max-w-md">
-          <DialogSectionHeader
-            description="Fix the issues below, then save to resubmit your flight plan."
-            icon={MessageSquareWarningIcon}
-            title="Rejection Reason"
-          />
-          <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2.5">
-            <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
-              {reason}
-            </p>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </>
   );
 }

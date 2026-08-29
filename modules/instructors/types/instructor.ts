@@ -6,6 +6,12 @@ type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
 type AccountRequestRow =
   Database["public"]["Tables"]["account_requests"]["Row"];
 
+export type InstructorUnavailability = {
+  id: string;
+  startsOn: string;
+  endsOn: string;
+};
+
 export type ApprovedInstructor = {
   id: string;
   email: string;
@@ -14,6 +20,7 @@ export type ApprovedInstructor = {
   profilePhotoUrl: string | null;
   licenses: LicenseSummary[];
   certificates: CertificateSummary[];
+  unavailabilities: InstructorUnavailability[];
 };
 
 export type ApprovedInstructorRow = Pick<

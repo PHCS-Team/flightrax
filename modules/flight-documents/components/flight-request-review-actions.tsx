@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckIcon, XIcon } from "lucide-react";
+import { ArrowLeftIcon, CheckIcon, XIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -43,7 +43,19 @@ export function FlightRequestReviewActions({
   });
 
   if (requestStatus !== "pending_approval") {
-    return null;
+    return (
+      <div className="flex flex-col-reverse gap-2 p-4 sm:flex-row sm:justify-end sm:p-0">
+        <Button
+          className="border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground"
+          onClick={() => router.push("/flight-requests")}
+          type="button"
+          variant="outline"
+        >
+          <ArrowLeftIcon className="size-4" />
+          Back to flight requests
+        </Button>
+      </div>
+    );
   }
 
   function startFlow(nextFlow: "approve" | "reject") {
