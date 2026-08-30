@@ -21,6 +21,7 @@ import {
   WAKE_TURBULENCE_CATEGORY_OPTIONS,
   DOF_PATTERN,
 } from "@/modules/flight-documents/constants/flight-plan-options";
+import { AerodromeSelectField } from "@/modules/flight-documents/components/aerodrome-select-field";
 import { FormRadioGroup } from "@/modules/flight-documents/components/form-radio-group";
 import { FLIGHT_PLAN_FORM_DEFAULTS } from "@/modules/flight-documents/constants/flight-plan-form-defaults";
 import { useFlightPlanFilerContext } from "@/modules/flight-documents/hooks/use-filer-context.query";
@@ -29,7 +30,10 @@ import {
   flightPlanFormSchema,
   type FlightPlanFormValues,
 } from "@/modules/flight-documents/schemas/flight-plan-schema";
-import { buildOtherInformation } from "@/modules/flight-documents/utils/build-other-information";
+import {
+  buildOtherInformation,
+  syncAerodromeLines,
+} from "@/modules/flight-documents/utils/build-other-information";
 import { resolveDof } from "@/modules/flight-documents/utils/flight-plan-time";
 import { Button } from "@/shared/components/ui/button";
 import { Checkbox } from "@/shared/components/ui/checkbox";
@@ -166,6 +170,51 @@ export function FlightPlanForm({
     filerContext,
     form,
     otherInfoEdited,
+  ]);
+
+  // Aerodrome changes always reconcile the DEP//DEST//ALTN/ lines of
+  // Other Information — in edit mode and after user edits too. Only
+  // those lines are added/removed; everything else in the text stays.
+  const previousAerodromesRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const aerodromesKey = [
+      departureAerodrome,
+      destinationAerodrome,
+      firstAlternateAerodrome,
+      secondAlternateAerodrome,
+    ].join("|");
+
+    // Skip the initial mount so saved text is never rewritten on load.
+    if (previousAerodromesRef.current === null) {
+      previousAerodromesRef.current = aerodromesKey;
+
+      return;
+    }
+
+    if (previousAerodromesRef.current === aerodromesKey) {
+      return;
+    }
+
+    previousAerodromesRef.current = aerodromesKey;
+
+    const currentText = form.getValues("otherRemarks");
+    const syncedText = syncAerodromeLines(currentText, {
+      departureAerodrome,
+      destinationAerodrome,
+      firstAlternateAerodrome,
+      secondAlternateAerodrome,
+    });
+
+    if (syncedText !== currentText) {
+      form.setValue("otherRemarks", syncedText, { shouldDirty: true });
+    }
+  }, [
+    departureAerodrome,
+    destinationAerodrome,
+    firstAlternateAerodrome,
+    secondAlternateAerodrome,
+    form,
   ]);
 
   // Changing the DOF invalidates the PIC choice — availability is
@@ -336,14 +385,12 @@ export function FlightPlanForm({
           </div>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
-          <FpTextField
+          <AerodromeSelectField
+            control={form.control}
             error={errors.departureAerodrome?.message}
-            helper="ICAO code — if ZZZZ, add DEP/ location in Other Information"
-            id="fp-departure-aerodrome"
-            maxLength={4}
+            helper="If not listed, choose ZZZZ and add a DEP/ location in Other Information"
             label="Departure Aerodrome"
-            placeholder="ZZZZ"
-            register={form.register("departureAerodrome")}
+            name="departureAerodrome"
             required
           />
           <FpTextField
@@ -387,14 +434,12 @@ export function FlightPlanForm({
           register={form.register("route")}
         />
         <div className="grid gap-4 sm:grid-cols-2">
-          <FpTextField
+          <AerodromeSelectField
+            control={form.control}
             error={errors.destinationAerodrome?.message}
-            helper="ICAO code — if ZZZZ, add DEST/ location in Other Information"
-            id="fp-destination-aerodrome"
-            maxLength={4}
+            helper="If not listed, choose ZZZZ and add a DEST/ location in Other Information"
             label="Destination Aerodrome"
-            placeholder="ZZZZ"
-            register={form.register("destinationAerodrome")}
+            name="destinationAerodrome"
             required
           />
           <FpTextField
@@ -409,25 +454,23 @@ export function FlightPlanForm({
           />
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
-          <FpTextField
+          <AerodromeSelectField
+            allowNone
+            control={form.control}
             error={errors.firstAlternateAerodrome?.message}
-            helper="ICAO code — if ZZZZ, add ALTN/ location in Other Information"
-            id="fp-first-alternate"
+            helper="If not listed, choose ZZZZ and add an ALTN/ location in Other Information"
             label="First Alternate Aerodrome"
-            maxLength={4}
+            name="firstAlternateAerodrome"
             optional
-            placeholder="ICAO code"
-            register={form.register("firstAlternateAerodrome")}
           />
-          <FpTextField
+          <AerodromeSelectField
+            allowNone
+            control={form.control}
             error={errors.secondAlternateAerodrome?.message}
-            helper="ICAO code — if ZZZZ, add ALTN/ location in Other Information"
-            id="fp-second-alternate"
+            helper="If not listed, choose ZZZZ and add an ALTN/ location in Other Information"
             label="Second Alternate Aerodrome"
-            maxLength={4}
+            name="secondAlternateAerodrome"
             optional
-            placeholder="ICAO code"
-            register={form.register("secondAlternateAerodrome")}
           />
         </div>
         <FpTextareaField
