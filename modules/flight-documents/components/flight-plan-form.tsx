@@ -33,6 +33,7 @@ import {
 import {
   buildOtherInformation,
   syncAerodromeLines,
+  syncDofLine,
 } from "@/modules/flight-documents/utils/build-other-information";
 import { resolveDof } from "@/modules/flight-documents/utils/flight-plan-time";
 import { Button } from "@/shared/components/ui/button";
@@ -217,10 +218,13 @@ export function FlightPlanForm({
     form,
   ]);
 
-  // Changing the DOF invalidates the PIC choice — availability is
-  // per-date, so a PIC picked for the old date may be unavailable on the
-  // new one. Clear the selection on every DOF change (create and edit
-  // alike); the initial value never triggers a clear.
+  // The DOF is the source of truth — every change updates its
+  // dependents (create and edit alike); each stays manually editable
+  // until the next DOF change. The initial value never triggers this.
+  // 1. The PIC choice is cleared: availability is per-date, so a PIC
+  //    picked for the old date may be unavailable on the new one.
+  // 2. Departure time takes the DOF's HHMM.
+  // 3. The DOF/ line in Other Information is rewritten in place.
   const previousDofRef = useRef(defaultValues?.dofRaw ?? "");
 
   useEffect(() => {
@@ -233,6 +237,23 @@ export function FlightPlanForm({
     if (form.getValues("pilotInCommandId")) {
       form.setValue("pilotInCommandId", "", { shouldDirty: true });
       form.setValue("pilotInCommandName", "", { shouldDirty: true });
+    }
+
+    if (!DOF_PATTERN.test(dofRaw ?? "")) {
+      return;
+    }
+
+    if (form.getValues("departureTimeRaw") !== dofRaw.slice(2, 6)) {
+      form.setValue("departureTimeRaw", dofRaw.slice(2, 6), {
+        shouldDirty: true,
+      });
+    }
+
+    const currentText = form.getValues("otherRemarks");
+    const syncedText = syncDofLine(currentText, dofRaw);
+
+    if (syncedText !== currentText) {
+      form.setValue("otherRemarks", syncedText, { shouldDirty: true });
     }
   }, [dofRaw, form]);
 
@@ -395,7 +416,7 @@ export function FlightPlanForm({
           />
           <FpTextField
             error={errors.departureTimeRaw?.message}
-            helper="HHMM in zulu"
+            helper="HHMM in zulu — auto-filled from the DOF, edit if it differs"
             id="fp-departure-time"
             maxLength={4}
             label="Departure Time"

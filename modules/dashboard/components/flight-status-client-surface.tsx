@@ -5,15 +5,19 @@ import {
   ChevronRightIcon,
   InfoIcon,
   RadarIcon,
+  TowerControlIcon,
   XIcon,
 } from "lucide-react";
 import { parseAsInteger, useQueryState } from "nuqs";
+import { useState } from "react";
 
+import { TodaysFlightsDrawer } from "@/modules/dashboard/components/todays-flights-drawer";
 import { FlightStatusBoard } from "@/modules/dashboard/components/flight-status-board";
 import { useDashboardFlightStatus } from "@/modules/dashboard/hooks/use-flight-status.query";
 import { useExpandHint } from "@/modules/dashboard/hooks/use-expand-hint";
 import { useFlightStatusRealtime } from "@/modules/dashboard/hooks/use-flight-status-realtime";
 import { EmptyState } from "@/shared/components/layout/empty-state";
+import { FloatingActionButton } from "@/shared/components/layout/floating-action-button";
 import { LoadingScreen } from "@/shared/components/layout/loading-screen";
 import { PageHeader } from "@/shared/components/layout/page-header";
 import { Button } from "@/shared/components/ui/button";
@@ -30,6 +34,7 @@ export function FlightStatusClientSurface() {
     parseAsInteger.withDefault(DEFAULT_PAGE_SIZE),
   );
   const expandHint = useExpandHint();
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const { error, isPending, rows, totalPages } = useDashboardFlightStatus(
     page,
@@ -64,6 +69,19 @@ export function FlightStatusClientSurface() {
               variant="outline"
             >
               <ChevronRightIcon className="size-4 sm:size-5" />
+            </Button>
+            <span
+              aria-hidden
+              className="mx-1.5 hidden h-6 w-0.5 self-center rounded-full bg-primary-foreground/25 sm:block"
+            />
+            <Button
+              className="hidden h-10 border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground sm:inline-flex"
+              onClick={() => setDrawerOpen(true)}
+              type="button"
+              variant="outline"
+            >
+              <TowerControlIcon className="size-4" />
+              Today&apos;s flights
             </Button>
           </div>
         }
@@ -109,6 +127,15 @@ export function FlightStatusClientSurface() {
           />
         </div>
       )}
+
+      <FloatingActionButton
+        className="sm:hidden"
+        icon={TowerControlIcon}
+        label="Today's Flights"
+        onClick={() => setDrawerOpen(true)}
+      />
+
+      <TodaysFlightsDrawer onOpenChange={setDrawerOpen} open={drawerOpen} />
     </section>
   );
 }

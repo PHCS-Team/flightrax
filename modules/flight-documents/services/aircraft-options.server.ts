@@ -10,15 +10,13 @@ import { AIRCRAFT_PHOTOS_BUCKET } from "@/shared/lib/storage/buckets";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 import type { PaginatedResponse } from "@/shared/types/pagination";
 
+// An active flight never blocks filing — drafts are unrestricted; the
+// guards live at submit and approval. Only real filing blockers
+// (missing W&B config or type specs) make an aircraft unavailable.
 function getUnavailableReason(row: {
   has_wb_config: boolean;
   has_type_specs: boolean;
-  has_active_flight: boolean;
 }): string | null {
-  if (row.has_active_flight) {
-    return "In flight";
-  }
-
   if (!row.has_wb_config || !row.has_type_specs) {
     return "Needs admin setup";
   }

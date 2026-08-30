@@ -45,9 +45,9 @@ export function AircraftHeaderCard({
         className={cn(
           "absolute inset-0 bg-linear-to-t",
           isRejected
-            ? "from-red-900 via-red-800/50 to-red-800/10"
+            ? "from-red-900 via-red-800/50 to-transparent"
             : isApproved
-              ? "from-emerald-900 via-emerald-800/50 to-emerald-800/10"
+              ? "from-emerald-900 via-emerald-800/50 to-transparent"
               : "from-primary via-primary/50 to-primary/10",
         )}
       />

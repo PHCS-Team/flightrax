@@ -16,6 +16,7 @@ export type DashboardBoardStatus =
 export type DashboardFlightJourney = {
   status: JourneyStatus;
   commencedAt: string | null;
+  terminatedAt: string | null;
   departureAerodrome: string;
   destinationAerodrome: string;
   departureTimeRaw: string;

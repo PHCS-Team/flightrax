@@ -17,6 +17,7 @@ import type {
 import {
   formatElapsedHm,
   formatShortPersonName,
+  formatTimeOfDay,
   formatZuluTimeToLocal,
 } from "@/modules/dashboard/utils/format";
 import { GlassSurface } from "@/shared/components/layout/glass-surface";
@@ -30,30 +31,42 @@ import {
 } from "@/shared/components/ui/table";
 import { cn } from "@/shared/lib/utils";
 
+// Pills follow the FLIGHT_REQUEST_STATUS_PILLS recipe; each row also
+// carries a subtle status wash — slightly darker on the left, fading
+// to clear.
 const BOARD_STATUS_META: Record<
   DashboardBoardStatus,
-  { label: string; className: string }
+  { label: string; className: string; rowClassName: string }
 > = {
   active: {
     label: "Active",
     className: "border-emerald-200/50 bg-emerald-600/80 text-white",
+    rowClassName:
+      "bg-linear-to-r from-emerald-700/60 via-emerald-600/20 to-transparent",
   },
   scheduled: {
     label: "Scheduled",
     className: "border-orange-200/50 bg-orange-500/80 text-white",
+    rowClassName:
+      "bg-linear-to-r from-orange-700/60 via-orange-600/20 to-transparent",
   },
   arrived: {
     label: "Arrived",
     className: "border-yellow-200/60 bg-yellow-500/80 text-white",
+    rowClassName:
+      "bg-linear-to-r from-yellow-600/50 via-yellow-500/15 to-transparent",
   },
   standby: {
     label: "Standby",
     className:
       "border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground/60",
+    rowClassName: "",
   },
   on_ground: {
     label: "On Ground",
     className: "border-red-200/40 bg-red-700/70 text-red-50",
+    rowClassName:
+      "bg-linear-to-r from-red-700/60 via-red-600/20 to-transparent",
   },
 };
 
@@ -195,7 +208,10 @@ export function FlightStatusBoard({
             table.getRowModel().rows.map((row) => (
               <Fragment key={row.id}>
                 <TableRow
-                  className="cursor-pointer border-primary-foreground/10 hover:bg-primary-foreground/10"
+                  className={cn(
+                    "cursor-pointer border-primary-foreground/10 hover:bg-primary-foreground/10",
+                    BOARD_STATUS_META[row.original.boardStatus].rowClassName,
+                  )}
                   onClick={() =>
                     setExpandedAircraftId((current) =>
                       current === row.original.aircraftId
@@ -221,13 +237,29 @@ export function FlightStatusBoard({
                     </TableCell>
                   ))}
                 </TableRow>
-                {expandedAircraftId === row.original.aircraftId && (
-                  <TableRow className="border-primary-foreground/10 hover:bg-transparent">
-                    <TableCell className="p-0" colSpan={columns.length}>
-                      <FlightStatusDetails row={row.original} />
-                    </TableCell>
-                  </TableRow>
-                )}
+                <TableRow
+                  className={cn(
+                    "hover:bg-transparent",
+                    expandedAircraftId === row.original.aircraftId
+                      ? "border-primary-foreground/10"
+                      : "border-0",
+                  )}
+                >
+                  <TableCell className="p-0" colSpan={columns.length}>
+                    <div
+                      className={cn(
+                        "grid transition-[grid-template-rows] duration-300 ease-in-out",
+                        expandedAircraftId === row.original.aircraftId
+                          ? "grid-rows-[1fr]"
+                          : "grid-rows-[0fr]",
+                      )}
+                    >
+                      <div className="overflow-hidden">
+                        <FlightStatusDetails row={row.original} />
+                      </div>
+                    </div>
+                  </TableCell>
+                </TableRow>
               </Fragment>
             ))
           ) : (
@@ -263,15 +295,24 @@ function FlightStatusDetails({ row }: { row: DashboardFlightStatusRow }) {
   const journey = row.journey;
 
   const statusLine = journey
-    ? journey.commencedAt
-      ? `Departed: ${formatElapsedHm(journey.commencedAt)} ago`
-      : `Will depart at ${formatZuluTimeToLocal(journey.departureTimeRaw)}`
+    ? journey.status === "arrived" && journey.terminatedAt
+      ? `Arrived at ${formatTimeOfDay(journey.terminatedAt)}`
+      : journey.commencedAt
+        ? `Departed: ${formatElapsedHm(journey.commencedAt)} ago`
+        : `Will depart at ${formatZuluTimeToLocal(journey.departureTimeRaw)}`
     : row.boardStatus === "on_ground"
-      ? "Unavailable — this aircraft is on ground."
+      ? row.aircraftStatus === "maintenance"
+        ? "Under maintenance."
+        : "Grounded."
       : "Available for scheduling.";
 
   return (
-    <div className="grid grid-cols-2 items-stretch gap-3 bg-primary-foreground/5 p-3 sm:grid-cols-[minmax(0,1fr)_14rem] sm:gap-4 sm:p-4">
+    <div
+      className={cn(
+        "grid grid-cols-2 items-stretch gap-3 bg-primary-foreground/5 p-3 sm:grid-cols-[minmax(0,1fr)_14rem] sm:gap-4 sm:p-4",
+        BOARD_STATUS_META[row.boardStatus].rowClassName,
+      )}
+    >
       <div className="flex min-w-0 flex-col gap-1.5 sm:justify-center sm:gap-2.5">
         <div className="flex items-center gap-2">
           <PlaneIcon

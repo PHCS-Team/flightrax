@@ -10,10 +10,6 @@ import {
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { isApproved } from "@/shared/lib/rbac/guards";
 import { getPicUnavailabilityEndsOn } from "@/modules/flight-documents/services/flight-plan-filer.server";
-import {
-  buildAircraftDofConflictMessage,
-  getAircraftDofConflict,
-} from "@/modules/flight-documents/services/journey-conflicts.server";
 import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 
@@ -78,27 +74,8 @@ export const updateFlightPlanAction = actionClient
       }
     }
 
-    // An edit can move the DOF onto a date where the aircraft is
-    // already booked — same rule as filing: one live journey per
-    // aircraft per zulu DOF date. The plan's own request is excluded.
-    if (flightPlan.aircraft_id) {
-      const dofConflict = await getAircraftDofConflict(
-        flightPlan.aircraft_id,
-        dofDate,
-        flightPlan.flight_requests?.id,
-      );
-
-      if (dofConflict) {
-        return {
-          ok: false,
-          message: buildAircraftDofConflictMessage(
-            dofDate,
-            dofConflict.pilotInCommandName,
-          ),
-        };
-      }
-    }
-
+    // No aircraft-conflict guard here: drafts may freely target any
+    // aircraft/DOF — the conflict rules apply at submit and approval.
     // Aircraft, filer, and license snapshots stay as filed — edits only
     // touch the form fields. Free text is stored uppercase.
     const { error: updateError } = await supabase

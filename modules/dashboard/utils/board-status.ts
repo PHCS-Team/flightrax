@@ -20,7 +20,8 @@ export function deriveBoardStatus(
     return "scheduled";
   }
 
-  if (journeyStatus === "arrived" || journeyStatus === "terminated") {
+  // standby journeys never reach the board — its query excludes them.
+  if (journeyStatus === "arrived") {
     return "arrived";
   }
 

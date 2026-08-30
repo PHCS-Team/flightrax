@@ -153,6 +153,22 @@ export function syncAerodromeLines(
   return lines.join("\n");
 }
 
+// Rewrites the DOF/ line of Other Information with the current raw DOF,
+// inserting it at the top when missing. Every other line stays.
+export function syncDofLine(text: string, dofRaw: string): string {
+  const lines = text ? text.split("\n") : [];
+  const index = lines.findIndex((line) => /^\s*DOF\//i.test(line));
+  const dofLine = `DOF/ ${dofRaw}`;
+
+  if (index !== -1) {
+    lines[index] = dofLine;
+  } else {
+    lines.unshift(dofLine);
+  }
+
+  return lines.join("\n");
+}
+
 // Default Item 18 (Other Information) text, one item per line, per the
 // client's format: DOF/, then DEP/ and DEST/ (always present with the
 // selected location — the school's home field when ZZZZ), ALTN/ and

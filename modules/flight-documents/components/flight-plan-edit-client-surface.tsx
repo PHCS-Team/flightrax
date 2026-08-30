@@ -7,6 +7,7 @@ import { useState } from "react";
 import { AircraftHeaderCard } from "@/modules/flight-documents/components/aircraft-header-card";
 import { FlightPlanForm } from "@/modules/flight-documents/components/flight-plan-form";
 import { FlightPlanHelp } from "@/modules/flight-documents/components/flight-plan-help-dialog";
+import { FlightPlanSavedDialog } from "@/modules/flight-documents/components/flight-plan-saved-dialog";
 import { FlightPlanSavingDialog } from "@/modules/flight-documents/components/flight-plan-saving-dialog";
 import { PendingApprovalAlert } from "@/modules/flight-documents/components/pending-approval-alert";
 import { RejectionReasonAction } from "@/modules/flight-documents/components/rejection-reason-action";
@@ -31,13 +32,11 @@ export function FlightPlanEditClientSurface({
 }) {
   const router = useRouter();
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [savedDialogOpen, setSavedDialogOpen] = useState(false);
   const { flightPlan, error, isPending } =
     useOwnFlightPlanForEdit(flightPlanId);
   const updateFlightPlan = useUpdateFlightPlan({
-    onSaved: () =>
-      router.push(
-        `/flight-documents/flight-plans/${flightPlanId}/weight-balance`,
-      ),
+    onSaved: () => setSavedDialogOpen(true),
   });
   const deleteFlightPlan = useDeleteFlightPlan({
     onDeleted: () => router.push("/flight-documents"),
@@ -182,6 +181,19 @@ export function FlightPlanEditClientSurface({
       )}
 
       <FlightPlanSavingDialog open={updateFlightPlan.isExecuting} />
+
+      <FlightPlanSavedDialog
+        description="Your changes are saved. Continue to the Weight & Balance when you are ready — closing this keeps you on the flight plan."
+        onBackToList={() => router.push("/flight-documents")}
+        onClose={() => setSavedDialogOpen(false)}
+        onProceedToWeightBalance={() =>
+          router.push(
+            `/flight-documents/flight-plans/${flightPlanId}/weight-balance`,
+          )
+        }
+        open={savedDialogOpen}
+        title="Flight Plan Updated"
+      />
 
       <ConfirmationDialog
         confirmLabel="Delete flight plan"

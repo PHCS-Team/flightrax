@@ -12,10 +12,6 @@ import { isLicenseValid } from "@/shared/lib/aviation/license-validity";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { isApproved } from "@/shared/lib/rbac/guards";
 import { getPicUnavailabilityEndsOn } from "@/modules/flight-documents/services/flight-plan-filer.server";
-import {
-  buildAircraftDofConflictMessage,
-  getAircraftDofConflict,
-} from "@/modules/flight-documents/services/journey-conflicts.server";
 import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 
@@ -123,18 +119,10 @@ export const createFlightPlanAction = actionClient
       }
     }
 
-    const dofConflict = await getAircraftDofConflict(aircraft.id, dofDate);
-
-    if (dofConflict) {
-      return {
-        ok: false,
-        message: buildAircraftDofConflictMessage(
-          dofDate,
-          dofConflict.pilotInCommandName,
-        ),
-      };
-    }
-
+    // No aircraft-conflict guard here: drafts may freely target any
+    // aircraft/DOF. The conflict rules apply when submitting for
+    // approval (no active flight on the aircraft) and at approval time
+    // (one live journey per aircraft per DOF date).
     const flightPlanRow = {
       // Every free-text field is stored uppercase — form convention.
       addressee: parsedInput.addressee

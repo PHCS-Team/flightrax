@@ -21,9 +21,8 @@ export const FLIGHT_REQUEST_STATUS_GROUPS = {
 export const JOURNEY_STATUS_OPTIONS = [
   { value: "scheduled", label: "Scheduled" },
   { value: "active", label: "Active" },
-  { value: "on_ground", label: "On Ground" },
   { value: "arrived", label: "Arrived" },
-  { value: "terminated", label: "Terminated" },
+  { value: "standby", label: "Standby" },
   { value: "cancelled", label: "Cancelled" },
 ] as const;
 

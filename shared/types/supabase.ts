@@ -343,6 +343,8 @@ export type Database = {
       flight_journeys: {
         Row: {
           aircraft_id: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
           commenced_at: string | null
           commenced_by: string | null
           created_at: string
@@ -356,6 +358,8 @@ export type Database = {
         }
         Insert: {
           aircraft_id?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
           commenced_at?: string | null
           commenced_by?: string | null
           created_at?: string
@@ -369,6 +373,8 @@ export type Database = {
         }
         Update: {
           aircraft_id?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
           commenced_at?: string | null
           commenced_by?: string | null
           created_at?: string
@@ -386,6 +392,13 @@ export type Database = {
             columns: ["aircraft_id"]
             isOneToOne: false
             referencedRelation: "aircrafts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "flight_journeys_cancelled_by_fkey"
+            columns: ["cancelled_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {
@@ -1136,6 +1149,7 @@ export type Database = {
           model: string
           photo_path: string
           pilot_in_command_name: string
+          terminated_at: string
           total_count: number
           total_eet: string
           trainee_name: string
@@ -1165,6 +1179,29 @@ export type Database = {
           type_name: string
         }[]
       }
+      get_todays_flights: {
+        Args: {
+          p_page?: number
+          p_page_size?: number
+          p_requested_by?: string
+          p_search?: string
+        }
+        Returns: {
+          aircraft_identification: string
+          commenced_at: string
+          departure_aerodrome: string
+          departure_time_raw: string
+          destination_aerodrome: string
+          flight_plan_id: string
+          flight_request_id: string
+          journey_id: string
+          journey_status: Database["public"]["Enums"]["journey_status"]
+          pilot_in_command_name: string
+          requested_by: string
+          total_count: number
+          trainee_name: string
+        }[]
+      }
     }
     Enums: {
       admin_department:
@@ -1178,7 +1215,7 @@ export type Database = {
         | "scheduled"
         | "active"
         | "arrived"
-        | "terminated"
+        | "standby"
         | "cancelled"
       license_status: "active" | "expired"
     }
@@ -1320,7 +1357,7 @@ export const Constants = {
         "scheduled",
         "active",
         "arrived",
-        "terminated",
+        "standby",
         "cancelled",
       ],
       license_status: ["active", "expired"],

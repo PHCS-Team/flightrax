@@ -74,9 +74,9 @@ export function FlightRequestRowCard({
         className={cn(
           "absolute inset-0 -z-10 bg-linear-to-r",
           tone === "destructive"
-            ? "from-red-800/75 via-red-700/45 to-red-700/15"
+            ? "from-red-800/75 via-red-700/35 to-transparent"
             : tone === "success"
-              ? "from-emerald-800/75 via-emerald-700/45 to-emerald-700/15"
+              ? "from-emerald-800/75 via-emerald-700/35 to-transparent"
               : "from-primary/85 via-primary/50 to-primary/15",
         )}
       />
@@ -87,9 +87,9 @@ export function FlightRequestRowCard({
             className={cn(
               "inline-flex h-5 items-center rounded-full border px-2 font-mono text-[10px] font-medium tracking-wide",
               tone === "destructive"
-                ? "border-red-200/40 bg-red-700/70 text-red-50"
+                ? "border-red-200/40 bg-red-600/70 text-red-50"
                 : tone === "success"
-                  ? "border-emerald-200/40 bg-emerald-700/70 text-emerald-50"
+                  ? "border-emerald-200/40 bg-emerald-600/70 text-emerald-50"
                   : "border-primary-foreground/30 bg-primary/70",
             )}
           >

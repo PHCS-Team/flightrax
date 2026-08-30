@@ -50,6 +50,7 @@ export async function getDashboardFlightStatusPage(
           ? {
               status: row.journey_status,
               commencedAt: row.commenced_at,
+              terminatedAt: row.terminated_at,
               departureAerodrome: row.departure_aerodrome ?? "",
               destinationAerodrome: row.destination_aerodrome ?? "",
               departureTimeRaw: row.departure_time_raw ?? "",

@@ -77,6 +77,11 @@ export function formatZuluTimeToLocal(hhmm: string): string {
   return format(date, "h:mm a");
 }
 
+// ISO timestamp → the viewer's local time of day, e.g. "3:45 PM".
+export function formatTimeOfDay(iso: string): string {
+  return format(new Date(iso), "h:mm a");
+}
+
 // Elapsed time since an ISO timestamp as H:MM, e.g. "1:03".
 export function formatElapsedHm(fromIso: string): string {
   const elapsedMs = Math.max(0, Date.now() - new Date(fromIso).getTime());

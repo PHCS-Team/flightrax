@@ -120,6 +120,14 @@ export function FlightPlanCreateClientSurface() {
         <FlightPlanSavedDialog
           description="Your flight plan is saved as a draft. You can fill up the Weight & Balance form anytime the data is available — you can always come back to it from Flight Documents."
           onBackToList={() => router.push("/flight-documents")}
+          onClose={() => {
+            setSavedDialogOpen(false);
+
+            // Closing lands on the saved plan's form, not the list.
+            if (savedPlanId) {
+              router.push(`/flight-documents/flight-plans/${savedPlanId}`);
+            }
+          }}
           onProceedToWeightBalance={
             savedPlanId
               ? () =>
