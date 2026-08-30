@@ -140,6 +140,17 @@ export const approveFlightRequestAction = actionClient
       }
     }
 
+    const { error: journeyError } = await supabase
+      .from("flight_journeys")
+      .upsert(
+        { flight_request_id: request.id, status: "scheduled" },
+        { onConflict: "flight_request_id", ignoreDuplicates: true },
+      );
+
+    if (journeyError) {
+      return { ok: false, message: journeyError.message };
+    }
+
     const { error: updateError } = await supabase
       .from("flight_requests")
       .update({
