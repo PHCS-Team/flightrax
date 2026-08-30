@@ -342,9 +342,11 @@ export type Database = {
       }
       flight_journeys: {
         Row: {
+          aircraft_id: string | null
           commenced_at: string | null
           commenced_by: string | null
           created_at: string
+          dof_date: string | null
           flight_request_id: string
           id: string
           status: Database["public"]["Enums"]["journey_status"]
@@ -353,9 +355,11 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          aircraft_id?: string | null
           commenced_at?: string | null
           commenced_by?: string | null
           created_at?: string
+          dof_date?: string | null
           flight_request_id: string
           id?: string
           status?: Database["public"]["Enums"]["journey_status"]
@@ -364,9 +368,11 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          aircraft_id?: string | null
           commenced_at?: string | null
           commenced_by?: string | null
           created_at?: string
+          dof_date?: string | null
           flight_request_id?: string
           id?: string
           status?: Database["public"]["Enums"]["journey_status"]
@@ -375,6 +381,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "flight_journeys_aircraft_id_fkey"
+            columns: ["aircraft_id"]
+            isOneToOne: false
+            referencedRelation: "aircrafts"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "flight_journeys_commenced_by_fkey"
             columns: ["commenced_by"]
@@ -1102,6 +1115,34 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_dashboard_flight_status: {
+        Args: {
+          p_include_on_ground?: boolean
+          p_page?: number
+          p_page_size?: number
+        }
+        Returns: {
+          aircraft_identification: string
+          aircraft_status: Database["public"]["Enums"]["aircraft_status"]
+          commenced_at: string
+          cruising_level: string
+          cruising_speed: string
+          departure_aerodrome: string
+          departure_time_raw: string
+          destination_aerodrome: string
+          id: string
+          journey_id: string
+          journey_status: Database["public"]["Enums"]["journey_status"]
+          model: string
+          photo_path: string
+          pilot_in_command_name: string
+          total_count: number
+          total_eet: string
+          trainee_name: string
+          type_key: string
+          type_name: string
+        }[]
+      }
       get_flight_plan_aircraft_options: {
         Args: {
           p_page?: number
@@ -1136,7 +1177,6 @@ export type Database = {
       journey_status:
         | "scheduled"
         | "active"
-        | "on_ground"
         | "arrived"
         | "terminated"
         | "cancelled"
@@ -1279,7 +1319,6 @@ export const Constants = {
       journey_status: [
         "scheduled",
         "active",
-        "on_ground",
         "arrived",
         "terminated",
         "cancelled",

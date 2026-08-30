@@ -12,6 +12,10 @@ import { isLicenseValid } from "@/shared/lib/aviation/license-validity";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { isApproved } from "@/shared/lib/rbac/guards";
 import { getPicUnavailabilityEndsOn } from "@/modules/flight-documents/services/flight-plan-filer.server";
+import {
+  buildAircraftDofConflictMessage,
+  getAircraftDofConflict,
+} from "@/modules/flight-documents/services/journey-conflicts.server";
 import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 
@@ -100,10 +104,11 @@ export const createFlightPlanAction = actionClient
       status: license.status,
     }));
 
+    const dofDate = resolveDof(parsedInput.dofRaw).slice(0, 10);
+
     // The chosen PIC must be available on the flight's zulu date — the
     // filer may always name themselves, even while marked unavailable.
     if (parsedInput.pilotInCommandId !== actor.id) {
-      const dofDate = resolveDof(parsedInput.dofRaw).slice(0, 10);
       const unavailableUntil = await getPicUnavailabilityEndsOn(
         parsedInput.pilotInCommandId,
         dofDate,
@@ -116,6 +121,18 @@ export const createFlightPlanAction = actionClient
             "The selected pilot in command is unavailable on the date of flight — choose another PIC.",
         };
       }
+    }
+
+    const dofConflict = await getAircraftDofConflict(aircraft.id, dofDate);
+
+    if (dofConflict) {
+      return {
+        ok: false,
+        message: buildAircraftDofConflictMessage(
+          dofDate,
+          dofConflict.pilotInCommandName,
+        ),
+      };
     }
 
     const flightPlanRow = {

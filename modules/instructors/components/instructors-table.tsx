@@ -253,13 +253,13 @@ export function InstructorsTable({
           <TableHeader className="[&_tr]:border-primary-foreground/20">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow
-                className="border-primary-foreground/20 hover:bg-primary-foreground/5"
+                className="border-primary-foreground/20 hover:bg-primary"
                 key={headerGroup.id}
               >
                 {headerGroup.headers.map((header, index) => (
                   <TableHead
                     className={cn(
-                      "text-primary-foreground/75",
+                      "bg-primary font-semibold text-primary-foreground",
                       index === 0 && "pl-4 sm:pl-6",
                       index === headerGroup.headers.length - 1 &&
                         "pr-4 sm:pr-6",
