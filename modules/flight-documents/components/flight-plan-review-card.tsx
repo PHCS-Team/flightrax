@@ -27,19 +27,23 @@ import { GlassSurface } from "@/shared/components/layout/glass-surface";
 export function FlightPlanReviewCard({
   aircraft,
   filedByName,
+  showHeading = true,
   values,
 }: {
   aircraft: FlightPlanAircraftOption;
   filedByName: string;
+  showHeading?: boolean;
   values: FlightPlanFormValues;
 }) {
   return (
     <GlassSurface className="grid gap-6 p-4 sm:p-6">
-      <ReviewCardHeading
-        description="As filed on CAAP Form ATS 2019-1."
-        icon={FileTextIcon}
-        title="Flight Plan"
-      />
+      {showHeading && (
+        <ReviewCardHeading
+          description="As filed on CAAP Form ATS 2019-1."
+          icon={FileTextIcon}
+          title="Flight Plan"
+        />
+      )}
 
       <ReviewSection title="Pilots">
         <div className="grid gap-4 sm:grid-cols-2">

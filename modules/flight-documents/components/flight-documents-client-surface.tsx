@@ -11,7 +11,7 @@ import { PlanCodeSearchInput } from "@/modules/flight-documents/components/plan-
 import { useFlightPlanFilerContext } from "@/modules/flight-documents/hooks/use-filer-context.query";
 import { useFlightRequestsRealtime } from "@/modules/flight-documents/hooks/use-flight-requests-realtime";
 import { useOwnFlightRequests } from "@/modules/flight-documents/hooks/use-flight-requests.query";
-import { useInfiniteScrollSentinel } from "@/modules/flight-documents/hooks/use-infinite-scroll-sentinel";
+import { useInfiniteScrollSentinel } from "@/shared/hooks/use-infinite-scroll-sentinel";
 import { EmptyState } from "@/shared/components/layout/empty-state";
 import { FloatingActionButton } from "@/shared/components/layout/floating-action-button";
 import { LoadingScreen } from "@/shared/components/layout/loading-screen";

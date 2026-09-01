@@ -30,8 +30,10 @@ const SHEET_GRID_CLASS =
 // Read-only display of the load sheet submitted with a flight plan.
 export function WeightBalanceReviewCard({
   context,
+  showHeading = true,
 }: {
   context: WeightBalanceContext | null;
+  showHeading?: boolean;
 }) {
   const hasSheet = Boolean(
     context?.givens && context.existing && context.weightBalanceId,
@@ -39,11 +41,13 @@ export function WeightBalanceReviewCard({
 
   return (
     <GlassSurface className="grid gap-5 p-4 sm:p-6">
-      <ReviewCardHeading
-        description="Load sheet submitted with this flight plan."
-        icon={ScaleIcon}
-        title="Weight & Balance"
-      />
+      {showHeading && (
+        <ReviewCardHeading
+          description="Load sheet submitted with this flight plan."
+          icon={ScaleIcon}
+          title="Weight & Balance"
+        />
+      )}
 
       {hasSheet && context ? (
         <WeightBalanceSheet context={context} />

@@ -26,4 +26,6 @@ export const FLIGHT_DOCUMENTS_QUERY_KEYS = {
     ["flight-documents", "flight-plan", flightPlanId] as const,
   weightBalance: (flightPlanId: string) =>
     ["flight-documents", "weight-balance", flightPlanId] as const,
+  journey: (flightPlanId: string) =>
+    ["flight-documents", "journey", flightPlanId] as const,
 };
