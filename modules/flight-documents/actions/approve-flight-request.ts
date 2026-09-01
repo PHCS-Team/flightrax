@@ -4,6 +4,7 @@ import { approveFlightRequestSchema } from "@/modules/flight-documents/schemas/f
 import {
   buildAircraftDofConflictMessage,
   getAircraftDofConflict,
+  getAircraftStatusBlock,
 } from "@/modules/flight-documents/services/journey-conflicts.server";
 import { isLicenseValid } from "@/shared/lib/aviation/license-validity";
 import { verifyProfilePasscode } from "@/shared/lib/passcode";
@@ -148,6 +149,16 @@ export const approveFlightRequestAction = actionClient
       ? flightPlan.dof_resolved.slice(0, 10)
       : null;
 
+    if (flightPlan.aircraft_id) {
+      // The aircraft itself must be operationally active — maintenance,
+      // grounded, or retired aircraft cannot be approved to fly.
+      const statusBlock = await getAircraftStatusBlock(flightPlan.aircraft_id);
+
+      if (statusBlock) {
+        return { ok: false, message: statusBlock };
+      }
+    }
+
     if (flightPlan.aircraft_id && dofDate) {
       const dofConflict = await getAircraftDofConflict(
         flightPlan.aircraft_id,
@@ -160,7 +171,7 @@ export const approveFlightRequestAction = actionClient
           ok: false,
           message: buildAircraftDofConflictMessage(
             dofDate,
-            dofConflict.pilotInCommandName,
+            dofConflict.filedByName,
           ),
         };
       }

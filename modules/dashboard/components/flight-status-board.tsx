@@ -7,7 +7,13 @@ import {
   type ColumnDef,
   type PaginationState,
 } from "@tanstack/react-table";
-import { ImageIcon, PlaneIcon } from "lucide-react";
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ImageIcon,
+  PlaneIcon,
+  RadarIcon,
+} from "lucide-react";
 import { Fragment, useEffect, useState } from "react";
 
 import type {
@@ -21,6 +27,7 @@ import {
   formatZuluTimeToLocal,
 } from "@/modules/dashboard/utils/format";
 import { GlassSurface } from "@/shared/components/layout/glass-surface";
+import { Button } from "@/shared/components/ui/button";
 import {
   Table,
   TableBody,
@@ -70,12 +77,17 @@ const BOARD_STATUS_META: Record<
   },
 };
 
+const PAGINATION_BUTTON_CLASS =
+  "size-8 border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground disabled:border-primary-foreground/10 disabled:bg-primary-foreground/5 disabled:text-primary-foreground/50";
+
 export function FlightStatusBoard({
+  onPageChange,
   page,
   pageSize,
   rows,
   totalPages,
 }: {
+  onPageChange: (page: number) => void;
   page: number;
   pageSize: number;
   rows: DashboardFlightStatusRow[];
@@ -170,11 +182,47 @@ export function FlightStatusBoard({
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
     pageCount: totalPages,
+    onPaginationChange: (updater) => {
+      const next =
+        typeof updater === "function" ? updater(pagination) : updater;
+      onPageChange(next.pageIndex + 1);
+    },
     state: { pagination },
   });
 
   return (
     <GlassSurface className="overflow-hidden">
+      <div className="flex items-center justify-between gap-3 py-2 pl-4 pr-3 sm:py-2.5 sm:pl-6 sm:pr-4">
+        <h2 className="flex items-center gap-2 text-base font-semibold tracking-tight text-primary-foreground">
+          <RadarIcon className="size-4.5 text-primary-foreground/70" />
+          Flight Status
+        </h2>
+        <div className="flex items-center gap-1.5">
+          <Button
+            aria-label="Previous page"
+            className={PAGINATION_BUTTON_CLASS}
+            disabled={!table.getCanPreviousPage()}
+            onClick={() => table.previousPage()}
+            size="icon"
+            type="button"
+            variant="outline"
+          >
+            <ChevronLeftIcon className="size-4" />
+          </Button>
+          <Button
+            aria-label="Next page"
+            className={PAGINATION_BUTTON_CLASS}
+            disabled={!table.getCanNextPage()}
+            onClick={() => table.nextPage()}
+            size="icon"
+            type="button"
+            variant="outline"
+          >
+            <ChevronRightIcon className="size-4" />
+          </Button>
+        </div>
+      </div>
+
       <Table className="table-fixed text-primary-foreground">
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
