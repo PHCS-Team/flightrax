@@ -1136,6 +1136,7 @@ export type Database = {
           p_include_on_ground?: boolean
           p_page?: number
           p_page_size?: number
+          p_status_group?: string
         }
         Returns: {
           aircraft_identification: string

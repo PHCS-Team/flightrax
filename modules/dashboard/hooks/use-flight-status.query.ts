@@ -3,9 +3,14 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { dashboardFlightStatusQueryOptions } from "@/modules/dashboard/queries/flight-status";
+import type { DashboardStatusGroup } from "@/modules/dashboard/types/flight-status";
 
-export function useDashboardFlightStatus(page: number, pageSize: number) {
-  const query = useQuery(dashboardFlightStatusQueryOptions(page, pageSize));
+export function useDashboardFlightStatus(
+  page: number,
+  pageSize: number,
+  group: DashboardStatusGroup = "all",
+) {
+  const query = useQuery(dashboardFlightStatusQueryOptions(page, pageSize, group));
 
   return {
     ...query,

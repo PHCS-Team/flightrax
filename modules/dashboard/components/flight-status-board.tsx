@@ -13,6 +13,7 @@ import {
   ImageIcon,
   PlaneIcon,
   RadarIcon,
+  type LucideIcon,
 } from "lucide-react";
 import { Fragment, useEffect, useState } from "react";
 
@@ -38,10 +39,7 @@ import {
 } from "@/shared/components/ui/table";
 import { cn } from "@/shared/lib/utils";
 
-// Pills follow the FLIGHT_REQUEST_STATUS_PILLS recipe; each row also
-// carries a subtle status wash — slightly darker on the left, fading
-// to clear.
-const BOARD_STATUS_META: Record<
+export const BOARD_STATUS_META: Record<
   DashboardBoardStatus,
   { label: string; className: string; rowClassName: string }
 > = {
@@ -81,24 +79,28 @@ const PAGINATION_BUTTON_CLASS =
   "size-8 border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground disabled:border-primary-foreground/10 disabled:bg-primary-foreground/5 disabled:text-primary-foreground/50";
 
 export function FlightStatusBoard({
+  emptyMessage = "No flights or maintenance to monitor today.",
+  icon: Icon = RadarIcon,
   onPageChange,
   page,
   pageSize,
   rows,
+  title = "Flight Status",
   totalPages,
 }: {
+  emptyMessage?: string;
+  icon?: LucideIcon;
   onPageChange: (page: number) => void;
   page: number;
   pageSize: number;
   rows: DashboardFlightStatusRow[];
+  title?: string;
   totalPages: number;
 }) {
   const [expandedAircraftId, setExpandedAircraftId] = useState<string | null>(
     null,
   );
 
-  // Warm the browser cache for row photos so an opened accordion shows
-  // its image immediately instead of popping in after load.
   useEffect(() => {
     for (const row of rows) {
       if (row.photoUrl) {
@@ -194,8 +196,8 @@ export function FlightStatusBoard({
     <GlassSurface className="overflow-hidden">
       <div className="flex items-center justify-between gap-3 py-2 pl-4 pr-3 sm:py-2.5 sm:pl-6 sm:pr-4">
         <h2 className="flex items-center gap-2 text-base font-semibold tracking-tight text-primary-foreground">
-          <RadarIcon className="size-4.5 text-primary-foreground/70" />
-          Flight Status
+          <Icon className="size-4.5 text-primary-foreground/70" />
+          {title}
         </h2>
         <div className="flex items-center gap-1.5">
           <Button
@@ -316,7 +318,7 @@ export function FlightStatusBoard({
                 className="h-24 text-center text-primary-foreground/70"
                 colSpan={columns.length}
               >
-                No flights or maintenance to monitor today.
+                {emptyMessage}
               </TableCell>
             </TableRow>
           )}

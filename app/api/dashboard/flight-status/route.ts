@@ -10,7 +10,9 @@ export async function GET(request: Request) {
       50,
       Math.max(1, Number(searchParams.get("pageSize")) || 10),
     );
-    const result = await getDashboardFlightStatusPage(page, pageSize);
+    const group = searchParams.get("group") ?? "all";
+
+    const result = await getDashboardFlightStatusPage(page, pageSize, group);
 
     return NextResponse.json(result);
   } catch (error) {

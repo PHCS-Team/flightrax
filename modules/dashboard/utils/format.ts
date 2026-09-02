@@ -77,6 +77,25 @@ export function formatZuluTimeToLocal(hhmm: string): string {
   return format(date, "h:mm a");
 }
 
+// Elapsed span between two ISO timestamps, e.g. "1h 24m".
+export function formatDurationBetween(
+  startIso: string | null,
+  endIso: string | null,
+): string | null {
+  if (!startIso || !endIso) {
+    return null;
+  }
+
+  const totalMinutes = Math.max(
+    0,
+    Math.floor(
+      (new Date(endIso).getTime() - new Date(startIso).getTime()) / 60000,
+    ),
+  );
+
+  return `${Math.floor(totalMinutes / 60)}h ${totalMinutes % 60}m`;
+}
+
 // ISO timestamp → the viewer's local time of day, e.g. "3:45 PM".
 export function formatTimeOfDay(iso: string): string {
   return format(new Date(iso), "h:mm a");

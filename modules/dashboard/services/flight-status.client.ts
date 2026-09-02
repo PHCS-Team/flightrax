@@ -5,11 +5,16 @@ import type { PaginatedResponse } from "@/shared/types/pagination";
 export async function fetchDashboardFlightStatusPage(
   page: number,
   pageSize: number,
+  group: string,
 ) {
   const params = new URLSearchParams({
     page: String(page),
     pageSize: String(pageSize),
   });
+
+  if (group !== "all") {
+    params.set("group", group);
+  }
 
   const response = await fetch(`/api/dashboard/flight-status?${params}`, {
     credentials: "same-origin",

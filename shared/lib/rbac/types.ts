@@ -5,6 +5,13 @@ import { AIRCRAFTS_VIEW } from "@/modules/aircrafts/constants/permissions";
 import { ACCOUNT_REVIEW } from "@/modules/account-review/constants/permissions";
 import { INSTRUCTORS_VIEW } from "@/modules/instructors/constants/permissions";
 import { STUDENTS_VIEW } from "@/modules/students/constants/permissions";
+import { DASHBOARD_VIEW } from "@/modules/dashboard/constants/permissions";
+import {
+  FLIGHT_DOCUMENTS_VIEW,
+  FLIGHT_REQUESTS_VIEW,
+} from "@/modules/flight-documents/constants/permissions";
+import { SCHEDULE_VIEW } from "@/modules/schedule/constants/permissions";
+import { NOTAMS_VIEW } from "@/modules/notams/constants/permissions";
 
 export type ProfileRole = Database["public"]["Enums"]["app_role"];
 export type AdminDepartment = Database["public"]["Enums"]["admin_department"];
@@ -30,12 +37,13 @@ export type Profile = BaseProfile & {
 
 export type Permission =
   | typeof ACCOUNT_VIEW
-  | "dashboard.view"
-  | "flight_documents.view"
+  | typeof DASHBOARD_VIEW
+  | typeof FLIGHT_DOCUMENTS_VIEW
+  | typeof FLIGHT_REQUESTS_VIEW
   | typeof INSTRUCTORS_VIEW
-  | "schedule.view"
+  | typeof SCHEDULE_VIEW
   | typeof AIRCRAFTS_VIEW
-  | "notams.view"
+  | typeof NOTAMS_VIEW
   | typeof STUDENTS_VIEW
   | typeof ACCOUNT_REVIEW
   | "admin.flight_operations_personnel"

@@ -155,6 +155,7 @@ const INSTRUCTOR_NAVIGATION: DashboardNavigation = [
 ];
 
 const ADMIN_NAVIGATION: DashboardNavigation = [
+  DASHBOARD_NAVIGATION_ITEMS.home,
   DASHBOARD_NAVIGATION_ITEMS.schedule,
   USERS_GROUP,
   DASHBOARD_NAVIGATION_ITEMS.aircrafts,

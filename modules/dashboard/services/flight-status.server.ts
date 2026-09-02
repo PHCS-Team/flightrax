@@ -9,9 +9,12 @@ import { AIRCRAFT_PHOTOS_BUCKET } from "@/shared/lib/storage/buckets";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 import type { PaginatedResponse } from "@/shared/types/pagination";
 
+const STATUS_GROUPS = ["active", "arrived", "on_ground"] as const;
+
 export async function getDashboardFlightStatusPage(
   page: number,
   pageSize: number,
+  group: string,
 ): Promise<PaginatedResponse<DashboardFlightStatusRow>> {
   const viewer = await getCurrentAuthorizationProfile();
 
@@ -19,11 +22,14 @@ export async function getDashboardFlightStatusPage(
     throw new Error("You do not have permission to view flight status.");
   }
 
+  const statusGroup = STATUS_GROUPS.find((candidate) => candidate === group);
+
   const supabase = createAdminClient();
   const { data, error } = await supabase.rpc("get_dashboard_flight_status", {
     p_include_on_ground: true,
     p_page: page,
     p_page_size: pageSize,
+    ...(statusGroup ? { p_status_group: statusGroup } : {}),
   });
 
   if (error) {

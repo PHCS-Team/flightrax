@@ -3,6 +3,13 @@ import { AIRCRAFTS_VIEW } from "@/modules/aircrafts/constants/permissions";
 import { ACCOUNT_REVIEW } from "@/modules/account-review/constants/permissions";
 import { INSTRUCTORS_VIEW } from "@/modules/instructors/constants/permissions";
 import { STUDENTS_VIEW } from "@/modules/students/constants/permissions";
+import { DASHBOARD_VIEW } from "@/modules/dashboard/constants/permissions";
+import {
+  FLIGHT_DOCUMENTS_VIEW,
+  FLIGHT_REQUESTS_VIEW,
+} from "@/modules/flight-documents/constants/permissions";
+import { SCHEDULE_VIEW } from "@/modules/schedule/constants/permissions";
+import { NOTAMS_VIEW } from "@/modules/notams/constants/permissions";
 import type {
   AdminDepartment,
   ApprovalStatus,
@@ -61,17 +68,18 @@ export const APPROVAL_STATUSES: ApprovalStatus[] =
 const ROLE_PERMISSIONS = {
   [ROLE.STUDENT]: [
     ACCOUNT_VIEW,
-    "dashboard.view",
-    "flight_documents.view",
+    DASHBOARD_VIEW,
+    FLIGHT_DOCUMENTS_VIEW,
     INSTRUCTORS_VIEW,
-    "schedule.view",
+    SCHEDULE_VIEW,
   ],
   [ROLE.INSTRUCTOR]: [
     ACCOUNT_VIEW,
-    "dashboard.view",
-    "flight_documents.view",
+    DASHBOARD_VIEW,
+    FLIGHT_DOCUMENTS_VIEW,
+    FLIGHT_REQUESTS_VIEW,
     INSTRUCTORS_VIEW,
-    "schedule.view",
+    SCHEDULE_VIEW,
     STUDENTS_VIEW,
   ],
   [ROLE.ADMIN]: [
@@ -79,8 +87,9 @@ const ROLE_PERMISSIONS = {
     AIRCRAFTS_VIEW,
     STUDENTS_VIEW,
     ACCOUNT_REVIEW,
-    "notams.view",
-    "schedule.view",
+    DASHBOARD_VIEW,
+    NOTAMS_VIEW,
+    SCHEDULE_VIEW,
     INSTRUCTORS_VIEW,
   ],
   [ROLE.SUPERADMIN]: ["system.manage"],
@@ -90,22 +99,22 @@ const ADMIN_DEPARTMENT_PERMISSIONS = {
   [ADMIN_DEPARTMENT.FLIGHT_OPERATIONS_PERSONNEL]: [
     "admin.flight_operations_personnel",
     AIRCRAFTS_VIEW,
-    "notams.view",
-    "schedule.view",
+    NOTAMS_VIEW,
+    SCHEDULE_VIEW,
     INSTRUCTORS_VIEW,
   ],
   [ADMIN_DEPARTMENT.AIR_TRAFFIC_CONTROLLER]: [
     "admin.air_traffic_controller",
     AIRCRAFTS_VIEW,
-    "notams.view",
-    "schedule.view",
+    NOTAMS_VIEW,
+    SCHEDULE_VIEW,
     INSTRUCTORS_VIEW,
   ],
   [ADMIN_DEPARTMENT.SAFETY_PERSONNEL]: [
     "admin.safety_personnel",
     AIRCRAFTS_VIEW,
-    "notams.view",
-    "schedule.view",
+    NOTAMS_VIEW,
+    SCHEDULE_VIEW,
     INSTRUCTORS_VIEW,
   ],
 } satisfies Record<AdminDepartment, Permission[]>;

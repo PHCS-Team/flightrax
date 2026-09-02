@@ -6,6 +6,8 @@ export type JourneyStatus = Database["public"]["Enums"]["journey_status"];
 export type DashboardFlightStatusRpcRow =
   Database["public"]["Functions"]["get_dashboard_flight_status"]["Returns"][number];
 
+export type DashboardStatusGroup = "all" | "active" | "arrived" | "on_ground";
+
 export type DashboardBoardStatus =
   | "active"
   | "scheduled"
