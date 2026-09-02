@@ -15,6 +15,7 @@ import { useFlightStatusRealtime } from "@/modules/dashboard/hooks/use-flight-st
 import { EmptyState } from "@/shared/components/layout/empty-state";
 import { LoadingScreen } from "@/shared/components/layout/loading-screen";
 import { PageHeader } from "@/shared/components/layout/page-header";
+import { NotamsSection } from "@/modules/dashboard/components/notams-section";
 
 const PAGE_SIZE = 10;
 
@@ -59,40 +60,44 @@ export function OrganizedFlightStatusClientSurface() {
           title="Flight status could not be loaded"
         />
       ) : (
-        <OrganizedFlightStatusBoard
-          groups={[
-            {
-              id: "departed",
-              title: "Departed",
-              icon: PlaneTakeoffIcon,
-              emptyMessage: "No departed flights right now.",
-              rows: departed.rows,
-              page: departedPage,
-              totalPages: departed.totalPages,
-              onPageChange: setDepartedPage,
-            },
-            {
-              id: "arrived",
-              title: "Arrived",
-              icon: PlaneLandingIcon,
-              emptyMessage: "No arrived flights today.",
-              rows: arrived.rows,
-              page: arrivedPage,
-              totalPages: arrived.totalPages,
-              onPageChange: setArrivedPage,
-            },
-            {
-              id: "on-ground",
-              title: "On Ground",
-              icon: WrenchIcon,
-              emptyMessage: "No aircraft on ground.",
-              rows: onGround.rows,
-              page: groundPage,
-              totalPages: onGround.totalPages,
-              onPageChange: setGroundPage,
-            },
-          ]}
-        />
+        <div className="sm:space-y-4">
+          <NotamsSection />
+
+          <OrganizedFlightStatusBoard
+            groups={[
+              {
+                id: "departed",
+                title: "Departed",
+                icon: PlaneTakeoffIcon,
+                emptyMessage: "No departed flights right now.",
+                rows: departed.rows,
+                page: departedPage,
+                totalPages: departed.totalPages,
+                onPageChange: setDepartedPage,
+              },
+              {
+                id: "arrived",
+                title: "Arrived",
+                icon: PlaneLandingIcon,
+                emptyMessage: "No arrived flights today.",
+                rows: arrived.rows,
+                page: arrivedPage,
+                totalPages: arrived.totalPages,
+                onPageChange: setArrivedPage,
+              },
+              {
+                id: "on-ground",
+                title: "On Ground",
+                icon: WrenchIcon,
+                emptyMessage: "No aircraft on ground.",
+                rows: onGround.rows,
+                page: groundPage,
+                totalPages: onGround.totalPages,
+                onPageChange: setGroundPage,
+              },
+            ]}
+          />
+        </div>
       )}
     </section>
   );
