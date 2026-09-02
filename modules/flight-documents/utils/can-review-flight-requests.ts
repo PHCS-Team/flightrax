@@ -11,3 +11,12 @@ export function canReviewFlightRequests(
     profile?.role === ROLE.INSTRUCTOR || profile?.role === ROLE.SUPERADMIN
   );
 }
+
+// Admins may READ any flight record for auditing (plans, W&B,
+// journeys) but never take part in reviewing — reviewing stays with
+// instructors and superadmins.
+export function canViewFlightDocumentRecords(
+  profile: Pick<Profile, "role"> | null,
+): boolean {
+  return canReviewFlightRequests(profile) || profile?.role === ROLE.ADMIN;
+}

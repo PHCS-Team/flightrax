@@ -6,6 +6,7 @@ import { STUDENTS_VIEW } from "@/modules/students/constants/permissions";
 import { DASHBOARD_VIEW } from "@/modules/dashboard/constants/permissions";
 import {
   FLIGHT_DOCUMENTS_VIEW,
+  FLIGHT_PLANS_VIEW,
   FLIGHT_REQUESTS_VIEW,
 } from "@/modules/flight-documents/constants/permissions";
 import { SCHEDULE_VIEW } from "@/modules/schedule/constants/permissions";
@@ -88,6 +89,7 @@ const ROLE_PERMISSIONS = {
     STUDENTS_VIEW,
     ACCOUNT_REVIEW,
     DASHBOARD_VIEW,
+    FLIGHT_PLANS_VIEW,
     NOTAMS_VIEW,
     SCHEDULE_VIEW,
     INSTRUCTORS_VIEW,

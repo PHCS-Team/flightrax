@@ -1,7 +1,8 @@
-// One entry on the account Logs tab — a flight that reached the end of
-// its lifecycle: completed (arrived, or already swept to standby) or
-// cancelled. Both are log history.
-export type AccountFlightLog = {
+// One flight-history entry — a journey that reached the end of its
+// lifecycle: completed (arrived, or already swept to standby) or
+// cancelled. Rendered by the account Logs tab and the admin Flight
+// Plans audit list.
+export type FlightLogEntry = {
   journeyId: string;
   flightPlanId: string;
   journeyStatus: "arrived" | "standby" | "cancelled";

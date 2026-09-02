@@ -6,6 +6,7 @@ import { STUDENTS_VIEW } from "@/modules/students/constants/permissions";
 import { DASHBOARD_VIEW } from "@/modules/dashboard/constants/permissions";
 import {
   FLIGHT_DOCUMENTS_VIEW,
+  FLIGHT_PLANS_VIEW,
   FLIGHT_REQUESTS_VIEW,
 } from "@/modules/flight-documents/constants/permissions";
 import { SCHEDULE_VIEW } from "@/modules/schedule/constants/permissions";
@@ -23,6 +24,7 @@ const PROTECTED_ROUTES: Array<{ prefix: string; permission: Permission }> = [
   { prefix: "/dashboard", permission: DASHBOARD_VIEW },
   { prefix: "/flight-documents", permission: FLIGHT_DOCUMENTS_VIEW },
   { prefix: "/flight-requests", permission: FLIGHT_REQUESTS_VIEW },
+  { prefix: "/flight-plans", permission: FLIGHT_PLANS_VIEW },
   { prefix: "/instructors", permission: INSTRUCTORS_VIEW },
   { prefix: "/schedule", permission: SCHEDULE_VIEW },
   { prefix: "/aircrafts", permission: AIRCRAFTS_VIEW },

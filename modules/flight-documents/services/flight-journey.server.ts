@@ -4,7 +4,7 @@ import type {
   FlightJourneyDetails,
   JourneyStatus,
 } from "@/modules/flight-documents/types/flight-request";
-import { canReviewFlightRequests } from "@/modules/flight-documents/utils/can-review-flight-requests";
+import { canViewFlightDocumentRecords } from "@/modules/flight-documents/utils/can-review-flight-requests";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { isApproved } from "@/shared/lib/rbac/guards";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
@@ -40,7 +40,7 @@ export async function getFlightJourneyDetails(
 
   const isOwner = data.flight_requests.requested_by === viewer.id;
 
-  if (!isOwner && !canReviewFlightRequests(viewer)) {
+  if (!isOwner && !canViewFlightDocumentRecords(viewer)) {
     return null;
   }
 

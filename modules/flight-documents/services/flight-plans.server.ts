@@ -3,7 +3,7 @@ import "server-only";
 import type { FlightPlanForEdit } from "@/modules/flight-documents/types/flight-plan";
 import type { FlightRequestStatus } from "@/modules/flight-documents/types/flight-request";
 import { intervalToHhmm } from "@/modules/flight-documents/utils/flight-plan-time";
-import { canReviewFlightRequests } from "@/modules/flight-documents/utils/can-review-flight-requests";
+import { canViewFlightDocumentRecords } from "@/modules/flight-documents/utils/can-review-flight-requests";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { isApproved } from "@/shared/lib/rbac/guards";
 import { AIRCRAFT_PHOTOS_BUCKET } from "@/shared/lib/storage/buckets";
@@ -38,7 +38,7 @@ export async function getOwnFlightPlanForEdit(
 
   const isOwner = data.created_by === viewer.id;
 
-  if (!isOwner && !canReviewFlightRequests(viewer)) {
+  if (!isOwner && !canViewFlightDocumentRecords(viewer)) {
     return null;
   }
 

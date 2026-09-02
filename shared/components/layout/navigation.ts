@@ -5,6 +5,7 @@ import {
   FileTextIcon,
   GaugeIcon,
   GraduationCapIcon,
+  NotebookTextIcon,
   PlaneIcon,
   PlaneTakeoffIcon,
   UserCheckIcon,
@@ -19,6 +20,7 @@ import type { Profile } from "@/shared/lib/rbac/types";
 export type DashboardNavigationItemId =
   | "home"
   | "flightDocuments"
+  | "flightPlans"
   | "flightRequests"
   | "instructors"
   | "schedule"
@@ -61,6 +63,12 @@ const DASHBOARD_NAVIGATION_ITEMS = {
     icon: FileTextIcon,
     id: "flightDocuments",
     label: "Flight Documents",
+  },
+  flightPlans: {
+    href: "/flight-plans",
+    icon: NotebookTextIcon,
+    id: "flightPlans",
+    label: "Flight Plans",
   },
   flightRequests: {
     href: "/flight-requests",
@@ -156,6 +164,7 @@ const INSTRUCTOR_NAVIGATION: DashboardNavigation = [
 
 const ADMIN_NAVIGATION: DashboardNavigation = [
   DASHBOARD_NAVIGATION_ITEMS.home,
+  DASHBOARD_NAVIGATION_ITEMS.flightPlans,
   DASHBOARD_NAVIGATION_ITEMS.schedule,
   USERS_GROUP,
   DASHBOARD_NAVIGATION_ITEMS.aircrafts,
@@ -165,6 +174,7 @@ const ADMIN_NAVIGATION: DashboardNavigation = [
 const SUPERADMIN_NAVIGATION: DashboardNavigation = [
   DASHBOARD_NAVIGATION_ITEMS.home,
   FLIGHTS_GROUP,
+  DASHBOARD_NAVIGATION_ITEMS.flightPlans,
   DASHBOARD_NAVIGATION_ITEMS.schedule,
   USERS_GROUP,
   DASHBOARD_NAVIGATION_ITEMS.aircrafts,

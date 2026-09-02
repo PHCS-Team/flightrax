@@ -7,7 +7,7 @@ import type {
   WeightBalanceContext,
   WeightBalanceGivens,
 } from "@/modules/flight-documents/types/weight-balance";
-import { canReviewFlightRequests } from "@/modules/flight-documents/utils/can-review-flight-requests";
+import { canViewFlightDocumentRecords } from "@/modules/flight-documents/utils/can-review-flight-requests";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { isApproved } from "@/shared/lib/rbac/guards";
 import { AIRCRAFT_PHOTOS_BUCKET } from "@/shared/lib/storage/buckets";
@@ -42,7 +42,7 @@ export async function getWeightBalanceContext(
 
   const isOwner = data.created_by === viewer.id;
 
-  if (!isOwner && !canReviewFlightRequests(viewer)) {
+  if (!isOwner && !canViewFlightDocumentRecords(viewer)) {
     return null;
   }
 

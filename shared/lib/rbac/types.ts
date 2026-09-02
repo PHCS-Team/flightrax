@@ -8,6 +8,7 @@ import { STUDENTS_VIEW } from "@/modules/students/constants/permissions";
 import { DASHBOARD_VIEW } from "@/modules/dashboard/constants/permissions";
 import {
   FLIGHT_DOCUMENTS_VIEW,
+  FLIGHT_PLANS_VIEW,
   FLIGHT_REQUESTS_VIEW,
 } from "@/modules/flight-documents/constants/permissions";
 import { SCHEDULE_VIEW } from "@/modules/schedule/constants/permissions";
@@ -39,6 +40,7 @@ export type Permission =
   | typeof ACCOUNT_VIEW
   | typeof DASHBOARD_VIEW
   | typeof FLIGHT_DOCUMENTS_VIEW
+  | typeof FLIGHT_PLANS_VIEW
   | typeof FLIGHT_REQUESTS_VIEW
   | typeof INSTRUCTORS_VIEW
   | typeof SCHEDULE_VIEW
