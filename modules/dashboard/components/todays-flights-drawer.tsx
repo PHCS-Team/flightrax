@@ -1,20 +1,28 @@
 "use client";
 
+import { format } from "date-fns";
 import {
   BanIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   PlaneIcon,
   TowerControlIcon,
+  TriangleAlertIcon,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { useCancelFlight } from "@/modules/dashboard/hooks/use-cancel-flight.action";
 import { useCommenceFlight } from "@/modules/dashboard/hooks/use-commence-flight.action";
+import { useNowMs } from "@/modules/dashboard/hooks/use-now";
 import { useTerminateFlight } from "@/modules/dashboard/hooks/use-terminate-flight.action";
 import { useTodaysFlights } from "@/modules/dashboard/hooks/use-todays-flights.query";
 import type { JourneyStatus } from "@/modules/dashboard/types/flight-status";
-import type { TodaysFlightRow } from "@/modules/dashboard/types/todays-flight";
+import type {
+  EarlierScheduledFlight,
+  TodaysFlightRow,
+} from "@/modules/dashboard/types/todays-flight";
+import { DialogSectionHeader } from "@/shared/components/layout/dialog-section-header";
+import { Dialog, DialogContent } from "@/shared/components/ui/dialog";
 import {
   formatElapsedHm,
   formatShortPersonName,
@@ -87,8 +95,13 @@ export function TodaysFlightsDrawer({
   const [cancelConfirm, setCancelConfirm] = useState<
     (PendingAction & { passcode: string }) | null
   >(null);
+  const [earlierBlock, setEarlierBlock] =
+    useState<EarlierScheduledFlight | null>(null);
+  const nowMs = useNowMs();
   const verifyPasscode = useVerifyPasscode();
-  const commenceFlight = useCommenceFlight();
+  const commenceFlight = useCommenceFlight({
+    onBlockedByEarlier: setEarlierBlock,
+  });
   const terminateFlight = useTerminateFlight();
   const cancelFlight = useCancelFlight({
     onDone: () => setCancelConfirm(null),
@@ -145,12 +158,12 @@ export function TodaysFlightsDrawer({
           onEscapeKeyDown={(event) => {
             // The passcode/confirmation dialogs are portaled outside the
             // sheet — while one is open, the sheet must not react.
-            if (pendingAction || cancelConfirm) {
+            if (pendingAction || cancelConfirm || earlierBlock) {
               event.preventDefault();
             }
           }}
           onInteractOutside={(event) => {
-            if (pendingAction || cancelConfirm) {
+            if (pendingAction || cancelConfirm || earlierBlock) {
               event.preventDefault();
             }
           }}
@@ -220,6 +233,7 @@ export function TodaysFlightsDrawer({
                     terminateFlight.isExecuting ||
                     cancelFlight.isExecuting
                   }
+                  nowMs={nowMs}
                   key={row.journeyId}
                   onAct={(type) =>
                     setPendingAction({
@@ -255,6 +269,69 @@ export function TodaysFlightsDrawer({
         }}
       />
 
+      <Dialog
+        onOpenChange={(nextOpen) => {
+          if (!nextOpen) {
+            setEarlierBlock(null);
+          }
+        }}
+        open={Boolean(earlierBlock)}
+      >
+        <DialogContent className="p-6 sm:max-w-md">
+          <DialogSectionHeader
+            description="An earlier flight on this aircraft is still scheduled — it must commence or be cancelled before this flight can start."
+            icon={TriangleAlertIcon}
+            title="Earlier Flight Still Scheduled"
+          />
+          {earlierBlock && (
+            <>
+              <div className="grid gap-1 rounded-lg border border-border bg-muted/30 p-3">
+                <p className="font-semibold text-foreground">
+                  {earlierBlock.aircraftIdentification}
+                  {earlierBlock.dofAt &&
+                    ` · ${format(new Date(earlierBlock.dofAt), "h:mm a")}`}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Trainee: {formatShortPersonName(earlierBlock.traineeName)}
+                </p>
+              </div>
+              {!earlierBlock.canCancel && (
+                <p className="text-xs text-muted-foreground">
+                  This flight belongs to another pilot — ask an instructor to
+                  cancel it if it will not fly.
+                </p>
+              )}
+              <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                <Button
+                  onClick={() => setEarlierBlock(null)}
+                  type="button"
+                  variant="outline"
+                >
+                  Close
+                </Button>
+                {earlierBlock.canCancel && (
+                  <Button
+                    onClick={() => {
+                      setPendingAction({
+                        type: "cancel",
+                        flightRequestId: earlierBlock.flightRequestId,
+                        aircraftIdentification:
+                          earlierBlock.aircraftIdentification,
+                      });
+                      setEarlierBlock(null);
+                    }}
+                    type="button"
+                    variant="destructive"
+                  >
+                    Cancel that flight
+                  </Button>
+                )}
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+
       <ConfirmationDialog
         confirmLabel="Cancel flight"
         confirmingLabel="Cancelling..."
@@ -284,14 +361,21 @@ export function TodaysFlightsDrawer({
 
 function TodaysFlightCard({
   isActing,
+  nowMs,
   onAct,
   row,
 }: {
   isActing: boolean;
+  nowMs: number;
   onAct: (type: FlightActionType) => void;
   row: TodaysFlightRow;
 }) {
   const pill = JOURNEY_STATUS_PILLS[row.journeyStatus];
+  const isOverdue =
+    row.journeyStatus === "scheduled" &&
+    nowMs > 0 &&
+    Boolean(row.dofAt) &&
+    new Date(row.dofAt ?? 0).getTime() < nowMs;
 
   const timeLine = row.commencedAt
     ? `Departed: ${formatElapsedHm(row.commencedAt)} ago`
@@ -303,16 +387,23 @@ function TodaysFlightCard({
         <p className="truncate text-sm font-semibold text-foreground sm:text-base">
           {row.aircraftIdentification}
         </p>
-        {pill && (
-          <span
-            className={cn(
-              "inline-flex shrink-0 items-center whitespace-nowrap rounded-full border px-2 py-0.5 text-[10px] font-semibold",
-              pill.className,
-            )}
-          >
-            {pill.label}
-          </span>
-        )}
+        <span className="flex shrink-0 items-center gap-1.5">
+          {isOverdue && (
+            <span className="inline-flex items-center whitespace-nowrap rounded-full border border-red-200/40 bg-red-700/70 px-2 py-0.5 text-[10px] font-semibold text-red-50">
+              Overdue
+            </span>
+          )}
+          {pill && (
+            <span
+              className={cn(
+                "inline-flex items-center whitespace-nowrap rounded-full border px-2 py-0.5 text-[10px] font-semibold",
+                pill.className,
+              )}
+            >
+              {pill.label}
+            </span>
+          )}
+        </span>
       </div>
 
       <p className="flex min-w-0 items-center gap-1.5 text-sm font-medium text-foreground">

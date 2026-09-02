@@ -348,6 +348,7 @@ export type Database = {
           commenced_at: string | null
           commenced_by: string | null
           created_at: string
+          dof_at: string | null
           dof_date: string | null
           flight_request_id: string
           id: string
@@ -363,6 +364,7 @@ export type Database = {
           commenced_at?: string | null
           commenced_by?: string | null
           created_at?: string
+          dof_at?: string | null
           dof_date?: string | null
           flight_request_id: string
           id?: string
@@ -378,6 +380,7 @@ export type Database = {
           commenced_at?: string | null
           commenced_by?: string | null
           created_at?: string
+          dof_at?: string | null
           dof_date?: string | null
           flight_request_id?: string
           id?: string
@@ -1192,6 +1195,7 @@ export type Database = {
           departure_aerodrome: string
           departure_time_raw: string
           destination_aerodrome: string
+          dof_at: string
           flight_plan_id: string
           flight_request_id: string
           journey_id: string

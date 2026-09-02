@@ -14,7 +14,16 @@ export type TodaysFlightRow = {
   departureAerodrome: string;
   destinationAerodrome: string;
   departureTimeRaw: string;
+  dofAt: string | null;
   commencedAt: string | null;
   traineeName: string;
   pilotInCommandName: string;
+};
+
+export type EarlierScheduledFlight = {
+  flightRequestId: string;
+  aircraftIdentification: string;
+  dofAt: string | null;
+  traineeName: string;
+  canCancel: boolean;
 };

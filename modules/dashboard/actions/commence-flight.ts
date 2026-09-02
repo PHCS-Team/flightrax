@@ -24,7 +24,9 @@ export const commenceFlightAction = actionClient
 
     const { data: journey, error: journeyError } = await supabase
       .from("flight_journeys")
-      .select("id, status, aircraft_id, flight_requests!inner(requested_by)")
+      .select(
+        "id, status, aircraft_id, dof_date, dof_at, flight_requests!inner(requested_by, flight_plans!inner(pilot_name, pilot_in_command_id, pilot_in_command_name, aircraft_identification))",
+      )
       .eq("flight_request_id", parsedInput.flightRequestId)
       .maybeSingle();
 
@@ -36,8 +38,8 @@ export const commenceFlightAction = actionClient
       return { ok: false, message: "Flight journey not found." };
     }
 
-    // Requesters commence their own flights; instructors and
-    // superadmins can commence any.
+    const plan = journey.flight_requests.flight_plans;
+
     const canManageAll =
       actor.role === ROLE.INSTRUCTOR || actor.role === ROLE.SUPERADMIN;
 
@@ -55,28 +57,91 @@ export const commenceFlightAction = actionClient
       };
     }
 
-    // One aircraft, one flight in the air — a lingering active journey
-    // (e.g. a forgotten flight from yesterday) must be terminated
-    // before this one can commence, whatever its DOF date.
-    if (journey.aircraft_id) {
-      const { data: activeJourney, error: activeError } = await supabase
+    const { data: activeJourneys, error: activeError } = await supabase
+      .from("flight_journeys")
+      .select(
+        "id, aircraft_id, flight_requests!inner(requested_by, flight_plans!inner(pilot_in_command_id, aircraft_identification))",
+      )
+      .eq("status", "active")
+      .neq("id", journey.id);
+
+    if (activeError) {
+      return { ok: false, message: activeError.message };
+    }
+
+    const aircraftActive = (activeJourneys ?? []).find(
+      (active) => active.aircraft_id === journey.aircraft_id,
+    );
+
+    if (aircraftActive) {
+      return {
+        ok: false,
+        message: `Aircraft ${plan.aircraft_identification} is still on an active flight — wait for it to arrive before commencing this one.`,
+      };
+    }
+
+    const ourRequester = journey.flight_requests.requested_by;
+    const ourPic = plan.pilot_in_command_id;
+    const busyJourney = (activeJourneys ?? []).find((active) => {
+      const theirPersons = [
+        active.flight_requests.requested_by,
+        active.flight_requests.flight_plans.pilot_in_command_id,
+      ].filter(Boolean);
+
+      return (
+        theirPersons.includes(ourRequester) ||
+        (ourPic ? theirPersons.includes(ourPic) : false)
+      );
+    });
+
+    if (busyJourney) {
+      const theirPersons = [
+        busyJourney.flight_requests.requested_by,
+        busyJourney.flight_requests.flight_plans.pilot_in_command_id,
+      ];
+      const busyName = theirPersons.includes(ourRequester)
+        ? plan.pilot_name
+        : plan.pilot_in_command_name;
+
+      return {
+        ok: false,
+        message: `${busyName ?? "A pilot on this flight"} still has an active flight — it must arrive before another of their flights can commence.`,
+      };
+    }
+
+    if (journey.dof_at) {
+      const { data: earlier, error: earlierError } = await supabase
         .from("flight_journeys")
-        .select("id")
-        .eq("aircraft_id", journey.aircraft_id)
-        .eq("status", "active")
-        .neq("id", journey.id)
+        .select(
+          "id, dof_at, flight_request_id, flight_requests!inner(requested_by, flight_plans!inner(aircraft_identification, pilot_name))",
+        )
+        .eq("aircraft_id", journey.aircraft_id ?? "")
+        .eq("dof_date", journey.dof_date ?? "")
+        .eq("status", "scheduled")
+        .lt("dof_at", journey.dof_at)
+        .order("dof_at", { ascending: true })
         .limit(1)
         .maybeSingle();
 
-      if (activeError) {
-        return { ok: false, message: activeError.message };
+      if (earlierError) {
+        return { ok: false, message: earlierError.message };
       }
 
-      if (activeJourney) {
+      if (earlier) {
         return {
           ok: false,
+          code: "EARLIER_SCHEDULED" as const,
           message:
-            "This aircraft is still on an active flight — terminate that flight first before commencing this one.",
+            "An earlier flight on this aircraft is still scheduled — it must commence or be cancelled before this one starts.",
+          earlierFlight: {
+            flightRequestId: earlier.flight_request_id,
+            aircraftIdentification:
+              earlier.flight_requests.flight_plans.aircraft_identification,
+            dofAt: earlier.dof_at,
+            traineeName: earlier.flight_requests.flight_plans.pilot_name ?? "",
+            canCancel:
+              canManageAll || earlier.flight_requests.requested_by === actor.id,
+          },
         };
       }
     }
@@ -90,8 +155,6 @@ export const commenceFlightAction = actionClient
       return passcodeCheck;
     }
 
-    // The status filter makes concurrent commences race-safe: the
-    // second update matches no row.
     const { data: updated, error: updateError } = await supabase
       .from("flight_journeys")
       .update({
@@ -105,6 +168,13 @@ export const commenceFlightAction = actionClient
       .maybeSingle();
 
     if (updateError) {
+      if (updateError.code === "23505") {
+        return {
+          ok: false,
+          message: `Aircraft ${plan.aircraft_identification} just went on an active flight — wait for it to arrive before commencing this one.`,
+        };
+      }
+
       return { ok: false, message: updateError.message };
     }
 

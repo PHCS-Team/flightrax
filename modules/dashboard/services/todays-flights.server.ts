@@ -49,6 +49,7 @@ export async function getTodaysFlightsPage(
       departureAerodrome: row.departure_aerodrome ?? "",
       destinationAerodrome: row.destination_aerodrome ?? "",
       departureTimeRaw: row.departure_time_raw ?? "",
+      dofAt: row.dof_at,
       commencedAt: row.commenced_at,
       traineeName: row.trainee_name ?? "",
       pilotInCommandName: row.pilot_in_command_name ?? "",

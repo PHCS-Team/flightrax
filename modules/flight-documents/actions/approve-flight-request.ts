@@ -150,8 +150,6 @@ export const approveFlightRequestAction = actionClient
       : null;
 
     if (flightPlan.aircraft_id) {
-      // The aircraft itself must be operationally active — maintenance,
-      // grounded, or retired aircraft cannot be approved to fly.
       const statusBlock = await getAircraftStatusBlock(flightPlan.aircraft_id);
 
       if (statusBlock) {
@@ -159,10 +157,10 @@ export const approveFlightRequestAction = actionClient
       }
     }
 
-    if (flightPlan.aircraft_id && dofDate) {
+    if (flightPlan.aircraft_id && flightPlan.dof_resolved) {
       const dofConflict = await getAircraftDofConflict(
         flightPlan.aircraft_id,
-        dofDate,
+        flightPlan.dof_resolved,
         request.id,
       );
 
@@ -170,7 +168,7 @@ export const approveFlightRequestAction = actionClient
         return {
           ok: false,
           message: buildAircraftDofConflictMessage(
-            dofDate,
+            flightPlan.dof_resolved,
             dofConflict.filedByName,
           ),
         };
@@ -185,6 +183,7 @@ export const approveFlightRequestAction = actionClient
           status: "scheduled",
           aircraft_id: flightPlan.aircraft_id,
           dof_date: dofDate,
+          dof_at: flightPlan.dof_resolved,
         },
         { onConflict: "flight_request_id" },
       );
@@ -194,7 +193,7 @@ export const approveFlightRequestAction = actionClient
         return {
           ok: false,
           message:
-            "This aircraft was just scheduled for the same date of flight by another request — it is no longer available.",
+            "This aircraft was just scheduled for the exact same date and time of flight by another request — it is no longer available.",
         };
       }
 

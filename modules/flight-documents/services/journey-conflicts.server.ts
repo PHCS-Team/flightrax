@@ -50,7 +50,7 @@ export async function getAircraftStatusBlock(
 
 export async function getAircraftDofConflict(
   aircraftId: string,
-  dofDate: string,
+  dofAt: string,
   excludeFlightRequestId?: string,
 ): Promise<{ filedByName: string } | null> {
   const supabase = createAdminClient();
@@ -61,7 +61,7 @@ export async function getAircraftDofConflict(
       "flight_request_id, flight_requests!inner(flight_plans!inner(pilot_name))",
     )
     .eq("aircraft_id", aircraftId)
-    .eq("dof_date", dofDate)
+    .eq("dof_at", dofAt)
     .in("status", ["scheduled", "active"])
     .limit(1);
 
@@ -79,8 +79,6 @@ export async function getAircraftDofConflict(
     return null;
   }
 
-  // The name shown is the FILER of the conflicting plan (pilot_name),
-  // not its PIC — "scheduled by" means who booked the aircraft.
   return {
     filedByName:
       data.flight_requests.flight_plans.pilot_name ?? "another pilot",
@@ -88,10 +86,14 @@ export async function getAircraftDofConflict(
 }
 
 export function buildAircraftDofConflictMessage(
-  dofDate: string,
+  dofAt: string,
   filedByName: string,
 ): string {
-  const dateLabel = format(new Date(`${dofDate}T00:00:00`), "MMM d, yyyy");
+  const dateLabel = format(
+    new Date(`${dofAt.slice(0, 10)}T00:00:00`),
+    "MMM d, yyyy",
+  );
+  const timeLabel = `${dofAt.slice(11, 16).replace(":", "")}Z`;
 
-  return `This aircraft is already scheduled for the ${dateLabel} (zulu) flight by ${filedByName}. Wait for that flight to arrive or be cancelled and resubmit, change your date of flight, or delete this flight plan and file a new one with another aircraft.`;
+  return `This aircraft is already scheduled for the exact same date and time of flight (${dateLabel} · ${timeLabel}) by ${filedByName}. Change your DOF time, wait for that flight to conclude and resubmit, or file a new flight plan with another aircraft.`;
 }
