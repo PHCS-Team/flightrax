@@ -23,13 +23,9 @@ export function NotamDeleteConfirmation({
     <ConfirmationDialog
       confirmLabel="Delete NOTAM"
       confirmingLabel="Deleting..."
-      description={
-        notam
-          ? `${notam.title} will be permanently removed.`
-          : "Remove this NOTAM."
-      }
+      description="This notice will disappear from every pilot's dashboard immediately. Post a new one if it still applies."
       icon={Trash2Icon}
-      isConfirming={deleteNotam.isPending}
+      isConfirming={deleteNotam.isExecuting}
       onConfirm={() => {
         if (notam) {
           deleteNotam.execute({ id: notam.id });

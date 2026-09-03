@@ -1,176 +1,77 @@
 "use client";
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { MegaphoneIcon } from "lucide-react";
 
-import { Button } from "@/shared/components/ui/button";
-import { Input } from "@/shared/components/ui/input";
+import { NotamForm } from "@/modules/notams/components/notam-form";
+import { DialogSectionHeader } from "@/shared/components/layout/dialog-section-header";
+import { Dialog, DialogContent } from "@/shared/components/ui/dialog";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/shared/components/ui/select";
-import { Textarea } from "@/shared/components/ui/textarea";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/shared/components/ui/dialog";
-import { cn } from "@/shared/lib/utils";
-import { createNotamSchema, type CreateNotamInput } from "@/modules/notams/schemas/notam-schema";
-import { useCreateNotam } from "@/modules/notams/hooks/use-create-notam.action";
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/shared/components/ui/sheet";
+import { useIsMobile } from "@/shared/hooks/use-mobile";
 
-interface NotamFormDialogProps {
-  onSuccess?: () => void;
-}
+const TITLE = "Post NOTAM";
+const DESCRIPTION =
+  "Publish a notice to airmen. It shows on every dashboard until it expires.";
 
-export function NotamFormDialog({ onSuccess }: NotamFormDialogProps) {
-  const [open, setOpen] = useState(false);
-  const createNotam = useCreateNotam({ onSaved: onSuccess });
+export function NotamFormDialog({
+  onOpenChange,
+  open,
+}: {
+  onOpenChange: (open: boolean) => void;
+  open: boolean;
+}) {
+  const isMobile = useIsMobile();
 
-  const form = useForm<CreateNotamInput>({
-    resolver: zodResolver(createNotamSchema),
-    defaultValues: {
-      title: "",
-      description: "",
-      severity: "advisory",
-      expiresAt: null,
-    },
-  });
-
-  const onSubmit = (values: CreateNotamInput) => {
-    createNotam.execute(values);
-  };
+  if (isMobile) {
+    return (
+      <Sheet onOpenChange={onOpenChange} open={open}>
+        <SheetContent
+          className="max-h-[calc(100dvh-2rem)] gap-0 overflow-y-auto rounded-t-3xl p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]"
+          side="bottom"
+        >
+          <SheetHeader className="p-0 text-left">
+            <div className="flex items-start gap-3.5">
+              <span className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary ring-1 ring-primary/15">
+                <MegaphoneIcon className="size-4.5" />
+              </span>
+              <div className="min-w-0">
+                <SheetTitle className="text-lg font-semibold leading-6 tracking-tight text-foreground">
+                  {TITLE}
+                </SheetTitle>
+                <SheetDescription className="leading-6 text-muted-foreground">
+                  {DESCRIPTION}
+                </SheetDescription>
+              </div>
+            </div>
+          </SheetHeader>
+          <div className="mt-5">
+            <NotamForm
+              onCancel={() => onOpenChange(false)}
+              onPosted={() => onOpenChange(false)}
+            />
+          </div>
+        </SheetContent>
+      </Sheet>
+    );
+  }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button>Create NOTAM</Button>
-      </DialogTrigger>
-
-      <DialogContent className="max-w-lg">
-        <DialogHeader>
-          <DialogTitle>Create NOTAM</DialogTitle>
-        </DialogHeader>
-
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <div className="space-y-2">
-            <label
-              htmlFor="title"
-              className={cn(
-                "flex items-center gap-1.5 text-sm font-semibold text-primary-foreground/90",
-              )}
-            >
-              Title
-            </label>
-            <Input
-              id="title"
-              placeholder="Enter NOTAM title"
-              {...form.register("title")}
-              disabled={createNotam.isPending}
-            />
-            {form.formState.errors.title && (
-              <p className="text-sm text-destructive">{form.formState.errors.title.message}</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <label
-              htmlFor="severity"
-              className={cn(
-                "flex items-center gap-1.5 text-sm font-semibold text-primary-foreground/90",
-              )}
-            >
-              Severity
-            </label>
-            <Select
-              onValueChange={(value) => form.setValue("severity", value as "advisory" | "warning" | "alert")}
-              defaultValue={form.getValues("severity")}
-              disabled={createNotam.isPending}
-            >
-              <SelectTrigger id="severity">
-                <SelectValue placeholder="Select severity" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="advisory">Advisory</SelectItem>
-                <SelectItem value="warning">Warning</SelectItem>
-                <SelectItem value="alert">Alert</SelectItem>
-              </SelectContent>
-            </Select>
-            {form.formState.errors.severity && (
-              <p className="text-sm text-destructive">{form.formState.errors.severity.message}</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <label
-              htmlFor="expiresAt"
-              className={cn(
-                "flex items-center gap-1.5 text-sm font-semibold text-primary-foreground/90",
-              )}
-            >
-              Expires At (optional)
-            </label>
-            <Input
-              id="expiresAt"
-              type="date"
-              placeholder="YYYY-MM-DD"
-              {...form.register("expiresAt", {
-                valueAsDate: false,
-                setValueAs: (value: string) => value || null,
-              })}
-              disabled={createNotam.isPending}
-            />
-            <p className="text-xs text-muted-foreground">Leave empty for no expiration</p>
-            {form.formState.errors.expiresAt && (
-              <p className="text-sm text-destructive">{form.formState.errors.expiresAt.message}</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <label
-              htmlFor="description"
-              className={cn(
-                "flex items-center gap-1.5 text-sm font-semibold text-primary-foreground/90",
-              )}
-            >
-              Description
-            </label>
-            <Textarea
-              id="description"
-              placeholder="Enter NOTAM description"
-              rows={4}
-              {...form.register("description")}
-              disabled={createNotam.isPending}
-            />
-            {form.formState.errors.description && (
-              <p className="text-sm text-destructive">{form.formState.errors.description.message}</p>
-            )}
-          </div>
-
-          <DialogFooter className="gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                form.reset();
-                setOpen(false);
-              }}
-              disabled={createNotam.isPending}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={createNotam.isPending}>
-              {createNotam.isPending ? "Creating..." : "Create"}
-            </Button>
-          </DialogFooter>
-        </form>
+    <Dialog onOpenChange={onOpenChange} open={open}>
+      <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto p-6 sm:max-w-lg">
+        <DialogSectionHeader
+          description={DESCRIPTION}
+          icon={MegaphoneIcon}
+          title={TITLE}
+        />
+        <NotamForm
+          onCancel={() => onOpenChange(false)}
+          onPosted={() => onOpenChange(false)}
+        />
       </DialogContent>
     </Dialog>
   );

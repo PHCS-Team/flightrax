@@ -1,23 +1,54 @@
-import { getNotamsPage } from "@/modules/notams/services/notams.server";
+import { NextResponse } from "next/server";
 
-type SeverityFilter = "" | "advisory" | "warning" | "alert";
-type ExpiryFilter = "" | "active" | "expired" | "no_expiry";
+import { NOTAMS_VIEW } from "@/modules/notams/constants/permissions";
+import { getNotamsPage } from "@/modules/notams/services/notams.server";
+import {
+  NOTAM_SEVERITY_FILTERS,
+  NOTAM_STATUS_FILTERS,
+} from "@/modules/notams/constants/notam-options";
+import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
+import { hasPermission } from "@/shared/lib/rbac/config";
+import { isApproved } from "@/shared/lib/rbac/guards";
 
 export async function GET(request: Request) {
+  const viewer = await getCurrentAuthorizationProfile();
+
+  if (
+    !viewer ||
+    !isApproved(viewer) ||
+    !hasPermission(viewer.role, NOTAMS_VIEW, viewer.admin_department)
+  ) {
+    return NextResponse.json(
+      { message: "You do not have permission to view NOTAMs." },
+      { status: 403 },
+    );
+  }
+
   const { searchParams } = new URL(request.url);
   const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
-  const pageSize = Math.min(100, Math.max(1, parseInt(searchParams.get("pageSize") ?? "20", 10)));
+  const pageSize = Math.min(
+    100,
+    Math.max(1, parseInt(searchParams.get("pageSize") ?? "12", 10)),
+  );
   const search = searchParams.get("search") ?? "";
-  const severity = (searchParams.get("severity") ?? "") as SeverityFilter;
-  const expiry = (searchParams.get("expiry") ?? "") as ExpiryFilter;
+  const requestedStatus = searchParams.get("status");
+  const status =
+    NOTAM_STATUS_FILTERS.find((candidate) => candidate === requestedStatus) ??
+    "active";
+  const requestedSeverity = searchParams.get("severity");
+  const severity =
+    NOTAM_SEVERITY_FILTERS.find(
+      (candidate) => candidate === requestedSeverity,
+    ) ?? "all";
 
   try {
-    const data = await getNotamsPage(page, pageSize, search, severity, expiry);
-    return Response.json(data);
+    const result = await getNotamsPage(page, pageSize, search, status, severity);
+
+    return NextResponse.json(result);
   } catch (error) {
-    return Response.json(
-      { message: error instanceof Error ? error.message : "Failed to fetch NOTAMs" },
-      { status: 500 },
-    );
+    const message =
+      error instanceof Error ? error.message : "Unable to load NOTAMs.";
+
+    return NextResponse.json({ message }, { status: 500 });
   }
 }

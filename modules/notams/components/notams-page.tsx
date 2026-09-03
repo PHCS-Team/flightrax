@@ -1,10 +1,13 @@
-"use client";
-
-import { NotamForm } from "@/modules/notams/components/notam-form";
 import { NotamsClientSurface } from "@/modules/notams/components/notams-client-surface";
 import { PageHeader } from "@/shared/components/layout/page-header";
 
-export function NotamsPage() {
+export function NotamsPage({
+  canDeleteAny,
+  viewerId,
+}: {
+  canDeleteAny: boolean;
+  viewerId: string | null;
+}) {
   return (
     <section>
       <PageHeader
@@ -15,10 +18,7 @@ export function NotamsPage() {
         title="NOTAMs"
       />
 
-      <div className="space-y-6">
-        <NotamForm onSuccess={() => window.location.reload()} />
-        <NotamsClientSurface />
-      </div>
+      <NotamsClientSurface canDeleteAny={canDeleteAny} viewerId={viewerId} />
     </section>
   );
 }

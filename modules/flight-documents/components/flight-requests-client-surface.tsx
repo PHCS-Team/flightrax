@@ -52,8 +52,6 @@ export function FlightRequestsClientSurface() {
     setHasLoadedOnce(true);
   }
 
-  // Full-screen loading only on the very first visit; tab and search
-  // changes keep the shell in place and swap the list content.
   if (list.isPending && !hasLoadedOnce) {
     return <LoadingScreen />;
   }

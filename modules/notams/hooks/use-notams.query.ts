@@ -1,26 +1,31 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 
-import { notamsQueryOptions } from "@/modules/notams/queries/notams";
-
-type SeverityFilter = "" | "advisory" | "warning" | "alert";
+import { notamsInfiniteQueryOptions } from "@/modules/notams/queries/notams";
+import type {
+  NotamSeverityFilter,
+  NotamStatusFilter,
+} from "@/modules/notams/types/notam";
 
 export function useNotams(
-  page: number,
   pageSize: number,
   search: string,
-  severity: SeverityFilter,
-  expiry: string,
+  status: NotamStatusFilter,
+  severity: NotamSeverityFilter,
 ) {
-  const { data, ...rest } = useQuery(
-    notamsQueryOptions(page, pageSize, search, severity, expiry),
+  const query = useInfiniteQuery(
+    notamsInfiniteQueryOptions(pageSize, search, status, severity),
   );
+  const pages = query.data?.pages ?? [];
 
   return {
-    ...rest,
-    notams: data?.data ?? [],
-    totalCount: data?.totalCount ?? 0,
-    totalPages: data?.totalPages ?? 1,
+    notams: pages.flatMap((page) => page.data),
+    totalCount: pages[0]?.totalCount ?? 0,
+    error: query.error,
+    isPending: query.isPending,
+    fetchNextPage: query.fetchNextPage,
+    hasNextPage: query.hasNextPage,
+    isFetchingNextPage: query.isFetchingNextPage,
   };
 }

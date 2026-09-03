@@ -19,9 +19,11 @@ export function useFlightStatusRealtime() {
     channelName: "dashboard-flight-status-changes",
     tables: ["flight_journeys", "aircrafts"],
     onChange: () => {
-      // Board and today's-flights drawer both derive from journeys.
       queryClient.invalidateQueries({
-        queryKey: DASHBOARD_QUERY_KEYS.all,
+        queryKey: DASHBOARD_QUERY_KEYS.flightStatusAll,
+      });
+      queryClient.invalidateQueries({
+        queryKey: DASHBOARD_QUERY_KEYS.todaysFlightsAll,
       });
     },
   });

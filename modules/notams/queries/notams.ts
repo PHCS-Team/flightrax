@@ -1,23 +1,27 @@
-import { queryOptions } from "@tanstack/react-query";
+import { infiniteQueryOptions } from "@tanstack/react-query";
 
 import { NOTAMS_QUERY_KEYS } from "@/modules/notams/queries/query-keys";
 import { fetchNotamsPage } from "@/modules/notams/services/notams.client";
+import type {
+  NotamSeverityFilter,
+  NotamStatusFilter,
+} from "@/modules/notams/types/notam";
 
 export { NOTAMS_QUERY_KEYS };
 
-type SeverityFilter = "" | "advisory" | "warning" | "alert";
-
-export function notamsQueryOptions(
-  page: number,
+export function notamsInfiniteQueryOptions(
   pageSize: number,
   search: string,
-  severity: SeverityFilter,
-  expiry: string,
+  status: NotamStatusFilter,
+  severity: NotamSeverityFilter,
 ) {
-  return queryOptions({
-    queryFn: () => fetchNotamsPage(page, pageSize, search, severity, expiry),
-    queryKey: NOTAMS_QUERY_KEYS.list(page, pageSize, search, severity, expiry),
-    staleTime: 5 * 60 * 1000,
-    placeholderData: (previousData) => previousData,
+  return infiniteQueryOptions({
+    queryFn: ({ pageParam }) =>
+      fetchNotamsPage(pageParam, pageSize, search, status, severity),
+    queryKey: NOTAMS_QUERY_KEYS.list(pageSize, search, status, severity),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) =>
+      lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
+    staleTime: 60 * 1000,
   });
 }
