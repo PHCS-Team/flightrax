@@ -89,7 +89,7 @@ export function AccountProfile({ profile }: { profile: Profile }) {
           </TabsContent>
 
           <TabsContent value="log">
-            <AccountLogSection profile={profile} />
+            <AccountLogSection />
           </TabsContent>
         </Tabs>
       )}

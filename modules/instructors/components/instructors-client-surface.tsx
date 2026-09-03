@@ -11,17 +11,18 @@ import { useDebouncedQueryState } from "@/shared/hooks/use-debounced-query-state
 import { EmptyState } from "@/shared/components/layout/empty-state";
 import { GlassSurface } from "@/shared/components/layout/glass-surface";
 import { LoadingScreen } from "@/shared/components/layout/loading-screen";
+import type { CredentialAccess } from "@/shared/types/credential-access";
 
 const DEFAULT_PAGE_SIZE = 10;
 
 export function InstructorsClientSurface({
   canManageAvailability,
-  restrictPeerCredentials,
+  credentialAccess,
   showPeerPrivacyNote,
   viewerId,
 }: {
   canManageAvailability: boolean;
-  restrictPeerCredentials: boolean;
+  credentialAccess: CredentialAccess;
   showPeerPrivacyNote: boolean;
   viewerId: string | null;
 }) {
@@ -79,7 +80,7 @@ export function InstructorsClientSurface({
           onSearchChange={setSearchInput}
           page={page}
           pageSize={pageSize}
-          restrictPeerCredentials={restrictPeerCredentials}
+          credentialAccess={credentialAccess}
           search={searchInput}
           totalCount={totalCount}
           totalPages={totalPages}

@@ -19,14 +19,14 @@ const OPTIONAL_AERODROME_PATTERN = /^([A-Za-z]{4})?$/;
 const aerodromeSchema = z
   .string()
   .trim()
-  .regex(AERODROME_PATTERN, "Enter a 4-letter ICAO code (ZZZZ if none).");
+  .regex(AERODROME_PATTERN, "Choose an aerodrome (ZZZZ if not listed).");
 
 const optionalAerodromeSchema = z
   .string()
   .trim()
-  .regex(OPTIONAL_AERODROME_PATTERN, "Enter a 4-letter ICAO code.");
+  .regex(OPTIONAL_AERODROME_PATTERN, "Choose an aerodrome.");
 
-export const flightPlanFormSchema = z.object({
+const flightPlanFormObjectSchema = z.object({
   // Section 1
   addressee: z.string().trim(),
   dofRaw: z
@@ -135,15 +135,59 @@ export const flightPlanFormSchema = z.object({
   pilotInCommandName: z.string().trim().min(1, "Choose a pilot in command."),
 });
 
+// Per the client's format, Other Information must always carry a DEP/
+// (departure) line and a DEST/ (destination) line, each with a value.
+// The columns store Other Information as free text, so the lines are
+// checked in the text itself.
+function requireZzzzOtherInformation(
+  values: {
+    departureAerodrome: string;
+    destinationAerodrome: string;
+    otherRemarks: string;
+  },
+  ctx: z.RefinementCtx,
+) {
+  const hasLineWithValue = (prefix: string) =>
+    new RegExp(`(^|\\n)\\s*${prefix}\\/[ \\t]*\\S+`, "i").test(
+      values.otherRemarks,
+    );
+
+  if (!hasLineWithValue("DEP")) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["otherRemarks"],
+      message:
+        "Other Information must include a DEP/ line with the departure location.",
+    });
+  }
+
+  if (!hasLineWithValue("DEST")) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["otherRemarks"],
+      message:
+        "Other Information must include a DEST/ line with the destination location.",
+    });
+  }
+}
+
+export const flightPlanFormSchema = flightPlanFormObjectSchema.superRefine(
+  requireZzzzOtherInformation,
+);
+
 export type FlightPlanFormValues = z.infer<typeof flightPlanFormSchema>;
 
-export const createFlightPlanSchema = flightPlanFormSchema.extend({
-  aircraftId: z.string().uuid(),
-});
+export const createFlightPlanSchema = flightPlanFormObjectSchema
+  .extend({
+    aircraftId: z.string().uuid(),
+  })
+  .superRefine(requireZzzzOtherInformation);
 
-export const updateFlightPlanSchema = flightPlanFormSchema.extend({
-  flightPlanId: z.string().uuid(),
-});
+export const updateFlightPlanSchema = flightPlanFormObjectSchema
+  .extend({
+    flightPlanId: z.string().uuid(),
+  })
+  .superRefine(requireZzzzOtherInformation);
 
 export const deleteFlightPlanSchema = z.object({
   flightPlanId: z.string().uuid(),

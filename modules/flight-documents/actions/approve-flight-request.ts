@@ -1,6 +1,11 @@
 "use server";
 
 import { approveFlightRequestSchema } from "@/modules/flight-documents/schemas/flight-request-schema";
+import {
+  buildAircraftDofConflictMessage,
+  getAircraftDofConflict,
+  getAircraftStatusBlock,
+} from "@/modules/flight-documents/services/journey-conflicts.server";
 import { isLicenseValid } from "@/shared/lib/aviation/license-validity";
 import { verifyProfilePasscode } from "@/shared/lib/passcode";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
@@ -25,7 +30,7 @@ export const approveFlightRequestAction = actionClient
     const { data: flightPlan, error: planError } = await supabase
       .from("flight_plans")
       .select(
-        "id, pilot_in_command_id, flight_requests(id, status, weight_balance_id)",
+        "id, aircraft_id, dof_resolved, pilot_in_command_id, flight_requests(id, status, weight_balance_id)",
       )
       .eq("id", parsedInput.flightPlanId)
       .maybeSingle();
@@ -140,14 +145,58 @@ export const approveFlightRequestAction = actionClient
       }
     }
 
+    const dofDate = flightPlan.dof_resolved
+      ? flightPlan.dof_resolved.slice(0, 10)
+      : null;
+
+    if (flightPlan.aircraft_id) {
+      const statusBlock = await getAircraftStatusBlock(flightPlan.aircraft_id);
+
+      if (statusBlock) {
+        return { ok: false, message: statusBlock };
+      }
+    }
+
+    if (flightPlan.aircraft_id && flightPlan.dof_resolved) {
+      const dofConflict = await getAircraftDofConflict(
+        flightPlan.aircraft_id,
+        flightPlan.dof_resolved,
+        request.id,
+      );
+
+      if (dofConflict) {
+        return {
+          ok: false,
+          message: buildAircraftDofConflictMessage(
+            flightPlan.dof_resolved,
+            dofConflict.filedByName,
+          ),
+        };
+      }
+    }
+
     const { error: journeyError } = await supabase
       .from("flight_journeys")
       .upsert(
-        { flight_request_id: request.id, status: "scheduled" },
-        { onConflict: "flight_request_id", ignoreDuplicates: true },
+        {
+          flight_request_id: request.id,
+          status: "scheduled",
+          aircraft_id: flightPlan.aircraft_id,
+          dof_date: dofDate,
+          dof_at: flightPlan.dof_resolved,
+        },
+        { onConflict: "flight_request_id" },
       );
 
     if (journeyError) {
+      if (journeyError.code === "23505") {
+        return {
+          ok: false,
+          message:
+            "This aircraft was just scheduled for the exact same date and time of flight by another request — it is no longer available.",
+        };
+      }
+
       return { ok: false, message: journeyError.message };
     }
 

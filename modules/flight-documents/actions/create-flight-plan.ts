@@ -100,10 +100,11 @@ export const createFlightPlanAction = actionClient
       status: license.status,
     }));
 
+    const dofDate = resolveDof(parsedInput.dofRaw).slice(0, 10);
+
     // The chosen PIC must be available on the flight's zulu date — the
     // filer may always name themselves, even while marked unavailable.
     if (parsedInput.pilotInCommandId !== actor.id) {
-      const dofDate = resolveDof(parsedInput.dofRaw).slice(0, 10);
       const unavailableUntil = await getPicUnavailabilityEndsOn(
         parsedInput.pilotInCommandId,
         dofDate,
@@ -118,6 +119,10 @@ export const createFlightPlanAction = actionClient
       }
     }
 
+    // No aircraft-conflict guard here: drafts may freely target any
+    // aircraft/DOF. The conflict rules apply when submitting for
+    // approval (no active flight on the aircraft) and at approval time
+    // (one live journey per aircraft per DOF date).
     const flightPlanRow = {
       // Every free-text field is stored uppercase — form convention.
       addressee: parsedInput.addressee

@@ -1,14 +1,13 @@
 "use server";
 
 import { addInstructorUnavailabilitySchema } from "@/modules/instructors/schemas/instructor-unavailability-schema";
+import { INSTRUCTORS_MANAGE } from "@/modules/instructors/constants/permissions";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
-import { ROLE } from "@/shared/lib/rbac/config";
+import { hasPermission } from "@/shared/lib/rbac/config";
 import { isApproved } from "@/shared/lib/rbac/guards";
 import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 
-// Postgres error code for exclusion constraint violations — here that
-// means the new period overlaps an existing one for the instructor.
 const EXCLUSION_VIOLATION = "23P01";
 
 export const addInstructorUnavailabilityAction = actionClient
@@ -19,16 +18,16 @@ export const addInstructorUnavailabilityAction = actionClient
     if (
       !actor ||
       !isApproved(actor) ||
-      (actor.role !== ROLE.ADMIN && actor.role !== ROLE.SUPERADMIN)
+      !hasPermission(actor.role, INSTRUCTORS_MANAGE, actor.admin_department)
     ) {
       return {
         ok: false,
-        message: "Only admins can manage instructor availability.",
+        message:
+          "You do not have permission to manage instructor availability.",
       };
     }
 
     const supabase = createAdminClient();
-    // All dates are zulu — "today" is the current UTC date.
     const today = new Date().toISOString().slice(0, 10);
 
     if (parsedInput.endsOn < today) {
@@ -38,16 +37,11 @@ export const addInstructorUnavailabilityAction = actionClient
       };
     }
 
-    // Opportunistic housekeeping: expired periods are useless (no audit
-    // requirement), so prune them on every write instead of via a
-    // scheduled job.
     await supabase
       .from("instructor_unavailabilities")
       .delete()
       .lt("ends_on", today);
 
-    // Pre-check overlaps so the admin sees WHICH period conflicts; the
-    // exclusion constraint below stays as the race-proof backstop.
     const { data: overlapping } = await supabase
       .from("instructor_unavailabilities")
       .select("starts_on, ends_on")

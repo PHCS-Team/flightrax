@@ -1,14 +1,15 @@
 import { PageHeader } from "@/shared/components/layout/page-header";
+import type { CredentialAccess } from "@/shared/types/credential-access";
 import { InstructorsClientSurface } from "@/modules/instructors/components/instructors-client-surface";
 
 export function InstructorsPage({
   canManageAvailability,
-  restrictPeerCredentials,
+  credentialAccess,
   showPeerPrivacyNote,
   viewerId,
 }: {
   canManageAvailability: boolean;
-  restrictPeerCredentials: boolean;
+  credentialAccess: CredentialAccess;
   showPeerPrivacyNote: boolean;
   viewerId: string | null;
 }) {
@@ -24,7 +25,7 @@ export function InstructorsPage({
 
       <InstructorsClientSurface
         canManageAvailability={canManageAvailability}
-        restrictPeerCredentials={restrictPeerCredentials}
+        credentialAccess={credentialAccess}
         showPeerPrivacyNote={showPeerPrivacyNote}
         viewerId={viewerId}
       />

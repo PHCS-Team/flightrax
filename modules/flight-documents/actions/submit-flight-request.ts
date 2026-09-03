@@ -2,6 +2,7 @@
 
 import { EDITABLE_FLIGHT_REQUEST_STATUSES } from "@/modules/flight-documents/constants/flight-request-options";
 import { submitFlightRequestSchema } from "@/modules/flight-documents/schemas/flight-request-schema";
+import { getAircraftStatusBlock } from "@/modules/flight-documents/services/journey-conflicts.server";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { isApproved } from "@/shared/lib/rbac/guards";
 import { actionClient } from "@/shared/lib/safe-action";
@@ -23,7 +24,9 @@ export const submitFlightRequestAction = actionClient
 
     const { data: flightPlan, error: planError } = await supabase
       .from("flight_plans")
-      .select("id, created_by, flight_requests(id, status, weight_balance_id)")
+      .select(
+        "id, aircraft_id, dof_resolved, created_by, flight_requests(id, status, weight_balance_id)",
+      )
       .eq("id", parsedInput.flightPlanId)
       .maybeSingle();
 
@@ -55,6 +58,19 @@ export const submitFlightRequestAction = actionClient
         message:
           "File the Weight & Balance before submitting for approval.",
       };
+    }
+
+    // Submitting is deliberately NOT blocked by scheduled/active
+    // conflicts on the aircraft — pending requests queue for the PIC
+    // and only APPROVAL enforces the one-live-journey-per-aircraft-per-
+    // DOF rule (plus no-active-flight). Only a hard blocker stops the
+    // submit here: an aircraft that is not operationally active.
+    if (flightPlan.aircraft_id) {
+      const statusBlock = await getAircraftStatusBlock(flightPlan.aircraft_id);
+
+      if (statusBlock) {
+        return { ok: false, message: statusBlock };
+      }
     }
 
     const { error: updateError } = await supabase

@@ -29,7 +29,7 @@ export const updateFlightPlanAction = actionClient
 
     const { data: flightPlan, error: planFetchError } = await supabase
       .from("flight_plans")
-      .select("id, created_by, flight_requests(status)")
+      .select("id, aircraft_id, created_by, flight_requests(id, status)")
       .eq("id", parsedInput.flightPlanId)
       .maybeSingle();
 
@@ -55,10 +55,11 @@ export const updateFlightPlanAction = actionClient
       };
     }
 
+    const dofDate = resolveDof(parsedInput.dofRaw).slice(0, 10);
+
     // The chosen PIC must be available on the flight's zulu date — the
     // filer may always name themselves, even while marked unavailable.
     if (parsedInput.pilotInCommandId !== actor.id) {
-      const dofDate = resolveDof(parsedInput.dofRaw).slice(0, 10);
       const unavailableUntil = await getPicUnavailabilityEndsOn(
         parsedInput.pilotInCommandId,
         dofDate,
@@ -73,6 +74,8 @@ export const updateFlightPlanAction = actionClient
       }
     }
 
+    // No aircraft-conflict guard here: drafts may freely target any
+    // aircraft/DOF — the conflict rules apply at submit and approval.
     // Aircraft, filer, and license snapshots stay as filed — edits only
     // touch the form fields. Free text is stored uppercase.
     const { error: updateError } = await supabase

@@ -13,7 +13,7 @@ import { useEffect, useRef, useState } from "react";
 import { useAircraftOptionsRealtime } from "@/modules/flight-documents/hooks/use-aircraft-options-realtime";
 import { useFlightPlanAircraftOptions } from "@/modules/flight-documents/hooks/use-aircraft-options.query";
 import { useFlightPlanTypeOptions } from "@/modules/flight-documents/hooks/use-flight-plan-type-options.query";
-import { useInfiniteScrollSentinel } from "@/modules/flight-documents/hooks/use-infinite-scroll-sentinel";
+import { useInfiniteScrollSentinel } from "@/shared/hooks/use-infinite-scroll-sentinel";
 import { DialogSectionHeader } from "@/shared/components/layout/dialog-section-header";
 import { Button } from "@/shared/components/ui/button";
 import {

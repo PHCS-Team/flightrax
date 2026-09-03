@@ -6,7 +6,7 @@ import { useState } from "react";
 
 import { FlightRequestsReviewList } from "@/modules/flight-documents/components/flight-requests-review-list";
 import { PlanCodeSearchInput } from "@/modules/flight-documents/components/plan-code-search-input";
-import { useInfiniteScrollSentinel } from "@/modules/flight-documents/hooks/use-infinite-scroll-sentinel";
+import { useInfiniteScrollSentinel } from "@/shared/hooks/use-infinite-scroll-sentinel";
 import { useFlightRequestsRealtime } from "@/modules/flight-documents/hooks/use-flight-requests-realtime";
 import { useReviewFlightRequests } from "@/modules/flight-documents/hooks/use-review-flight-requests.query";
 import type { FlightRequestReviewScope } from "@/modules/flight-documents/types/flight-request";

@@ -1,75 +1,26 @@
-import {
-  ActivityIcon,
-  ClockIcon,
-  PlaneIcon,
-  ShieldCheckIcon,
-} from "lucide-react";
+import type { ReactNode } from "react";
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/shared/components/ui/card";
-import { PageHeader } from "@/shared/components/layout/page-header";
+import { FlightOperationsHome } from "@/modules/dashboard/components/flight-operations-home";
+import { FlightStatusClientSurface } from "@/modules/dashboard/components/flight-status-client-surface";
+import { OrganizedFlightStatusClientSurface } from "@/modules/dashboard/components/organized-flight-status-client-surface";
+import { getDashboardHomeSurface } from "@/modules/dashboard/utils/home-surface";
+import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 
-const metrics = [
-  {
-    label: "Active flights",
-    value: "42",
-    note: "Across 7 sectors",
-    icon: PlaneIcon,
-  },
-  {
-    label: "On-time rate",
-    value: "94%",
-    note: "Static target",
-    icon: ClockIcon,
-  },
-  {
-    label: "Ops alerts",
-    value: "3",
-    note: "Awaiting realtime",
-    icon: ActivityIcon,
-  },
-  {
-    label: "Crew ready",
-    value: "128",
-    note: "Roster placeholder",
-    icon: ShieldCheckIcon,
-  },
-];
+export async function DashboardPage({
+  aircraftsSurface,
+}: {
+  aircraftsSurface: ReactNode;
+}) {
+  const profile = await getCurrentAuthorizationProfile();
+  const surface = getDashboardHomeSurface(profile);
 
-export function DashboardPage() {
-  return (
-    <section>
-      <PageHeader
-        breadcrumbs={[{ href: "/dashboard", label: "Dashboard" }]}
-        title="Flight Status"
-      />
+  if (surface === "aircrafts") {
+    return <FlightOperationsHome>{aircraftsSurface}</FlightOperationsHome>;
+  }
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {metrics.map((metric) => {
-          const Icon = metric.icon;
+  if (surface === "organized-board") {
+    return <OrganizedFlightStatusClientSurface />;
+  }
 
-          return (
-            <Card key={metric.label}>
-              <CardHeader className="flex flex-row items-center justify-between gap-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  {metric.label}
-                </CardTitle>
-                <Icon className="size-5 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-semibold">{metric.value}</div>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  {metric.note}
-                </p>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
-    </section>
-  );
+  return <FlightStatusClientSurface />;
 }
