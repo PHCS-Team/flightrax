@@ -1,5 +1,4 @@
 import { ACCOUNT_VIEW } from "@/modules/auth/constants/permissions";
-import { AIRCRAFTS_VIEW } from "@/modules/aircrafts/constants/permissions";
 import { ACCOUNT_REVIEW } from "@/modules/account-review/constants/permissions";
 import { INSTRUCTORS_VIEW } from "@/modules/instructors/constants/permissions";
 import { STUDENTS_VIEW } from "@/modules/students/constants/permissions";
@@ -12,6 +11,7 @@ import {
 import { SCHEDULE_VIEW } from "@/modules/schedule/constants/permissions";
 import { NOTAMS_VIEW } from "@/modules/notams/constants/permissions";
 import { APPROVAL_STATUS, hasPermission } from "@/shared/lib/rbac/config";
+import { SYSTEM_MANAGE } from "@/shared/lib/rbac/permissions";
 import type { Permission, Profile, ProfileRole } from "@/shared/lib/rbac/types";
 
 export type RouteAccessProfile = Pick<
@@ -27,8 +27,8 @@ const PROTECTED_ROUTES: Array<{ prefix: string; permission: Permission }> = [
   { prefix: "/flight-plans", permission: FLIGHT_PLANS_VIEW },
   { prefix: "/instructors", permission: INSTRUCTORS_VIEW },
   { prefix: "/schedule", permission: SCHEDULE_VIEW },
-  { prefix: "/aircrafts", permission: AIRCRAFTS_VIEW },
   { prefix: "/notams", permission: NOTAMS_VIEW },
+  { prefix: "/aircrafts", permission: SYSTEM_MANAGE },
   { prefix: "/students", permission: STUDENTS_VIEW },
   { prefix: "/account-review", permission: ACCOUNT_REVIEW },
 ];
@@ -47,7 +47,8 @@ export function getDefaultRedirectForProfile(profile: RouteAccessProfile) {
 }
 
 export function getRequiredPermission(pathname: string) {
-  return PROTECTED_ROUTES.find((route) => pathname.startsWith(route.prefix))?.permission;
+  return PROTECTED_ROUTES.find((route) => pathname.startsWith(route.prefix))
+    ?.permission;
 }
 
 export function canAccessPath(profile: RouteAccessProfile, pathname: string) {
@@ -72,5 +73,10 @@ export function isProtectedPath(pathname: string) {
 }
 
 export function isAuthPath(pathname: string) {
-  return pathname === "/login" || pathname.startsWith("/login/") || pathname === "/register" || pathname.startsWith("/register/");
+  return (
+    pathname === "/login" ||
+    pathname.startsWith("/login/") ||
+    pathname === "/register" ||
+    pathname.startsWith("/register/")
+  );
 }

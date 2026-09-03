@@ -1,7 +1,12 @@
 import { PageHeader } from "@/shared/components/layout/page-header";
 import { StudentsClientSurface } from "@/modules/students/components/students-client-surface";
+import type { CredentialAccess } from "@/shared/types/credential-access";
 
-export function StudentsPage() {
+export function StudentsPage({
+  credentialAccess,
+}: {
+  credentialAccess: CredentialAccess;
+}) {
   return (
     <section>
       <PageHeader
@@ -12,7 +17,7 @@ export function StudentsPage() {
         title="Students"
       />
 
-      <StudentsClientSurface />
+      <StudentsClientSurface credentialAccess={credentialAccess} />
     </section>
   );
 }

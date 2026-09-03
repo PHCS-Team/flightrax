@@ -1,7 +1,8 @@
 import "server-only";
 
+import { FLIGHT_PLANS_VIEW } from "@/modules/flight-documents/constants/permissions";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
-import { ROLE } from "@/shared/lib/rbac/config";
+import { hasPermission } from "@/shared/lib/rbac/config";
 import { isApproved } from "@/shared/lib/rbac/guards";
 import { AIRCRAFT_PHOTOS_BUCKET } from "@/shared/lib/storage/buckets";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
@@ -26,7 +27,7 @@ export async function getFlightLogsAuditPage(
   if (
     !viewer ||
     !isApproved(viewer) ||
-    (viewer.role !== ROLE.ADMIN && viewer.role !== ROLE.SUPERADMIN)
+    !hasPermission(viewer.role, FLIGHT_PLANS_VIEW, viewer.admin_department)
   ) {
     throw new Error(
       "You do not have permission to view the flight plans audit.",

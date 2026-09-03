@@ -32,10 +32,12 @@ import { CertificateDetailsDialog } from "@/shared/components/certificate-detail
 import { LicenseTags } from "@/shared/components/license-tags";
 import { LicenseDetailsDialog } from "@/shared/components/license-details-dialog";
 import type { CertificateSummary } from "@/shared/types/certificate-summary";
+import type { CredentialAccess } from "@/shared/types/credential-access";
 import type { LicenseSummary } from "@/shared/types/license-summary";
 import type { ApprovedStudent } from "@/modules/students/types/student";
 
 export function StudentsTable({
+  credentialAccess,
   onPageChange,
   onSearchChange,
   page,
@@ -45,6 +47,7 @@ export function StudentsTable({
   totalCount,
   totalPages,
 }: {
+  credentialAccess: CredentialAccess;
   onPageChange: (page: number) => void;
   onSearchChange: (search: string) => void;
   page: number;
@@ -97,7 +100,9 @@ export function StudentsTable({
       cell: ({ row }) => (
         <LicenseTags
           licenses={row.original.licenses}
-          onLicenseClick={setDetailsLicense}
+          onLicenseClick={
+            credentialAccess === "all" ? setDetailsLicense : undefined
+          }
         />
       ),
     },
@@ -107,7 +112,9 @@ export function StudentsTable({
       cell: ({ row }) => (
         <CertificateTags
           certificates={row.original.certificates}
-          onCertificateClick={setDetailsCertificate}
+          onCertificateClick={
+            credentialAccess === "all" ? setDetailsCertificate : undefined
+          }
         />
       ),
     },

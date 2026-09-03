@@ -10,10 +10,15 @@ import { useApprovedStudents } from "@/modules/students/hooks/use-approved-stude
 import { useDebouncedQueryState } from "@/shared/hooks/use-debounced-query-state";
 import { EmptyState } from "@/shared/components/layout/empty-state";
 import { LoadingScreen } from "@/shared/components/layout/loading-screen";
+import type { CredentialAccess } from "@/shared/types/credential-access";
 
 const DEFAULT_PAGE_SIZE = 10;
 
-export function StudentsClientSurface() {
+export function StudentsClientSurface({
+  credentialAccess,
+}: {
+  credentialAccess: CredentialAccess;
+}) {
   const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
   const [pageSize] = useQueryState(
     "pageSize",
@@ -48,6 +53,7 @@ export function StudentsClientSurface() {
 
   return (
     <StudentsTable
+      credentialAccess={credentialAccess}
       onPageChange={setPage}
       onSearchChange={setSearchInput}
       page={page}

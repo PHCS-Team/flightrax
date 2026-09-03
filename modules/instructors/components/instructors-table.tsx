@@ -45,6 +45,7 @@ import { CertificateDetailsDialog } from "@/shared/components/certificate-detail
 import { LicenseTags } from "@/shared/components/license-tags";
 import { LicenseDetailsDialog } from "@/shared/components/license-details-dialog";
 import type { CertificateSummary } from "@/shared/types/certificate-summary";
+import type { CredentialAccess } from "@/shared/types/credential-access";
 import type { LicenseSummary } from "@/shared/types/license-summary";
 import type { ApprovedInstructor } from "@/modules/instructors/types/instructor";
 
@@ -55,7 +56,7 @@ export function InstructorsTable({
   onSearchChange,
   page,
   pageSize,
-  restrictPeerCredentials,
+  credentialAccess,
   search,
   totalCount,
   totalPages,
@@ -67,7 +68,7 @@ export function InstructorsTable({
   onSearchChange: (search: string) => void;
   page: number;
   pageSize: number;
-  restrictPeerCredentials: boolean;
+  credentialAccess: CredentialAccess;
   search: string;
   totalCount: number;
   totalPages: number;
@@ -87,7 +88,15 @@ export function InstructorsTable({
     ) ?? null;
 
   function canViewCredentials(instructor: ApprovedInstructor) {
-    return !restrictPeerCredentials || instructor.id === viewerId;
+    if (credentialAccess === "all") {
+      return true;
+    }
+
+    if (credentialAccess === "own") {
+      return instructor.id === viewerId;
+    }
+
+    return false;
   }
 
   function isCurrentlyUnavailable(instructor: ApprovedInstructor) {

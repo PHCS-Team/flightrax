@@ -1,7 +1,10 @@
 import { ACCOUNT_VIEW } from "@/modules/auth/constants/permissions";
 import { AIRCRAFTS_VIEW } from "@/modules/aircrafts/constants/permissions";
 import { ACCOUNT_REVIEW } from "@/modules/account-review/constants/permissions";
-import { INSTRUCTORS_VIEW } from "@/modules/instructors/constants/permissions";
+import {
+  INSTRUCTORS_MANAGE,
+  INSTRUCTORS_VIEW,
+} from "@/modules/instructors/constants/permissions";
 import { STUDENTS_VIEW } from "@/modules/students/constants/permissions";
 import { DASHBOARD_VIEW } from "@/modules/dashboard/constants/permissions";
 import {
@@ -9,8 +12,15 @@ import {
   FLIGHT_PLANS_VIEW,
   FLIGHT_REQUESTS_VIEW,
 } from "@/modules/flight-documents/constants/permissions";
-import { SCHEDULE_VIEW } from "@/modules/schedule/constants/permissions";
+import {
+  SCHEDULE_MANAGE,
+  SCHEDULE_VIEW,
+} from "@/modules/schedule/constants/permissions";
 import { NOTAMS_VIEW } from "@/modules/notams/constants/permissions";
+import {
+  CREDENTIALS_VIEW_DETAILS,
+  SYSTEM_MANAGE,
+} from "@/shared/lib/rbac/permissions";
 import type {
   AdminDepartment,
   ApprovalStatus,
@@ -76,6 +86,7 @@ const ROLE_PERMISSIONS = {
   ],
   [ROLE.INSTRUCTOR]: [
     ACCOUNT_VIEW,
+    CREDENTIALS_VIEW_DETAILS,
     DASHBOARD_VIEW,
     FLIGHT_DOCUMENTS_VIEW,
     FLIGHT_REQUESTS_VIEW,
@@ -85,40 +96,24 @@ const ROLE_PERMISSIONS = {
   ],
   [ROLE.ADMIN]: [
     ACCOUNT_VIEW,
-    AIRCRAFTS_VIEW,
-    STUDENTS_VIEW,
-    ACCOUNT_REVIEW,
     DASHBOARD_VIEW,
-    FLIGHT_PLANS_VIEW,
-    NOTAMS_VIEW,
-    SCHEDULE_VIEW,
     INSTRUCTORS_VIEW,
+    SCHEDULE_VIEW,
+    STUDENTS_VIEW,
   ],
-  [ROLE.SUPERADMIN]: ["system.manage"],
+  [ROLE.SUPERADMIN]: [SYSTEM_MANAGE],
 } satisfies Record<ProfileRole, Permission[]>;
 
 const ADMIN_DEPARTMENT_PERMISSIONS = {
   [ADMIN_DEPARTMENT.FLIGHT_OPERATIONS_PERSONNEL]: [
-    "admin.flight_operations_personnel",
+    ACCOUNT_REVIEW,
     AIRCRAFTS_VIEW,
-    NOTAMS_VIEW,
-    SCHEDULE_VIEW,
-    INSTRUCTORS_VIEW,
+    CREDENTIALS_VIEW_DETAILS,
+    INSTRUCTORS_MANAGE,
+    SCHEDULE_MANAGE,
   ],
-  [ADMIN_DEPARTMENT.AIR_TRAFFIC_CONTROLLER]: [
-    "admin.air_traffic_controller",
-    AIRCRAFTS_VIEW,
-    NOTAMS_VIEW,
-    SCHEDULE_VIEW,
-    INSTRUCTORS_VIEW,
-  ],
-  [ADMIN_DEPARTMENT.SAFETY_PERSONNEL]: [
-    "admin.safety_personnel",
-    AIRCRAFTS_VIEW,
-    NOTAMS_VIEW,
-    SCHEDULE_VIEW,
-    INSTRUCTORS_VIEW,
-  ],
+  [ADMIN_DEPARTMENT.AIR_TRAFFIC_CONTROLLER]: [FLIGHT_PLANS_VIEW],
+  [ADMIN_DEPARTMENT.SAFETY_PERSONNEL]: [NOTAMS_VIEW],
 } satisfies Record<AdminDepartment, Permission[]>;
 
 export function getRolePermissions(
@@ -126,7 +121,7 @@ export function getRolePermissions(
   department?: AdminDepartment | null,
 ) {
   if (role === ROLE.SUPERADMIN) {
-    return ["system.manage"] satisfies Permission[];
+    return [SYSTEM_MANAGE] satisfies Permission[];
   }
 
   const permissions = new Set<Permission>(ROLE_PERMISSIONS[role]);
