@@ -120,11 +120,11 @@ export function FlightStatusBoard({
             <PlaneIcon className="size-4 fill-primary-foreground/70 text-primary-foreground/70" />
           </span>
           <div className="min-w-0">
-            <p className="truncate font-semibold text-primary-foreground">
-              {row.original.aircraftIdentification}
+            <p className="truncate font-semibold uppercase text-primary-foreground">
+              {row.original.registrationMark}
             </p>
             <p className="truncate text-[11px] text-primary-foreground/60">
-              {row.original.model}
+              {row.original.typeIcaoDesignator}
             </p>
           </div>
         </div>
@@ -152,7 +152,7 @@ export function FlightStatusBoard({
       id: "trainee",
       header: "Trainee",
       cell: ({ row }) => (
-        <p className="truncate text-sm text-primary-foreground/90">
+        <p className="truncate text-sm uppercase text-primary-foreground/90">
           {row.original.journey
             ? formatShortPersonName(row.original.journey.traineeName)
             : "—"}
@@ -163,7 +163,7 @@ export function FlightStatusBoard({
       id: "instructor",
       header: "Instructor",
       cell: ({ row }) => (
-        <p className="truncate text-sm text-primary-foreground/90">
+        <p className="truncate text-sm uppercase text-primary-foreground/90">
           {row.original.journey
             ? formatShortPersonName(row.original.journey.pilotInCommandName)
             : "—"}
@@ -334,7 +334,7 @@ function DetailField({ label, value }: { label: string; value: string }) {
       <p className="truncate text-[10px] font-medium uppercase tracking-wide text-primary-foreground/60">
         {label}
       </p>
-      <p className="truncate text-sm font-semibold text-primary-foreground">
+      <p className="truncate text-sm font-semibold uppercase text-primary-foreground">
         {value}
       </p>
     </div>
@@ -375,7 +375,7 @@ function FlightStatusDetails({ row }: { row: DashboardFlightStatusRow }) {
           />
           <p
             className={cn(
-              "truncate text-lg font-bold tracking-wide",
+              "truncate text-lg font-bold uppercase tracking-wide",
               journey
                 ? "text-primary-foreground"
                 : "text-primary-foreground/60",
@@ -391,7 +391,7 @@ function FlightStatusDetails({ row }: { row: DashboardFlightStatusRow }) {
           <p className="truncate text-[10px] font-medium uppercase tracking-wide text-primary-foreground/60">
             Type
           </p>
-          <p className="truncate text-sm font-semibold text-primary-foreground">
+          <p className="truncate text-sm font-semibold uppercase text-primary-foreground">
             {row.typeName}
           </p>
         </div>

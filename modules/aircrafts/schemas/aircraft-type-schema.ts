@@ -1,7 +1,17 @@
 import { z } from "zod";
 
+export const icaoDesignatorSchema = z
+  .string()
+  .trim()
+  .toUpperCase()
+  .regex(
+    /^[A-Z0-9]{2,4}$/,
+    "Use the 2–4 character ICAO designator, e.g. C152.",
+  );
+
 export const createAircraftTypeSchema = z.object({
   type: z.string().trim().min(1, "Enter aircraft type name."),
+  icaoDesignator: icaoDesignatorSchema,
 });
 
 export const deleteAircraftTypeSchema = z.object({
@@ -11,6 +21,7 @@ export const deleteAircraftTypeSchema = z.object({
 export const setAircraftTypeWbSpecsSchema = z
   .object({
     typeKey: z.string().min(1),
+    icaoDesignator: icaoDesignatorSchema,
     usableFuelArm: z.coerce
       .number()
       .positive("Usable fuel arm must be positive."),
@@ -26,9 +37,7 @@ export const setAircraftTypeWbSpecsSchema = z
     baggageAreas: z
       .array(
         z.object({
-          arm: z.coerce
-            .number()
-            .positive("Baggage area arm must be positive."),
+          arm: z.coerce.number().positive("Baggage area arm must be positive."),
         }),
       )
       .max(6, "A type can have at most 6 baggage areas."),

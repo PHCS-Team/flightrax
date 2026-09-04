@@ -11,7 +11,7 @@ import { isApproved } from "@/shared/lib/rbac/guards";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 
 const AIRCRAFT_TYPES_SELECT =
-  "type_key, type, created_at, usable_fuel_arm, fi_and_student_arm, maximum_takeoff_weight, baggage_area_max_weight, aircraft_type_baggage_areas(id, position, arm)";
+  "type_key, type, icao_designator, created_at, usable_fuel_arm, fi_and_student_arm, maximum_takeoff_weight, baggage_area_max_weight, aircraft_type_baggage_areas(id, position, arm)";
 
 export async function getAircraftTypes(): Promise<AircraftType[]> {
   const viewer = await getCurrentAuthorizationProfile();
@@ -37,6 +37,7 @@ export async function getAircraftTypes(): Promise<AircraftType[]> {
   return (data ?? []).map((row) => ({
     typeKey: row.type_key,
     type: row.type,
+    icaoDesignator: row.icao_designator,
     usableFuelArm: row.usable_fuel_arm === null ? null : Number(row.usable_fuel_arm),
     fiAndStudentArm:
       row.fi_and_student_arm === null ? null : Number(row.fi_and_student_arm),

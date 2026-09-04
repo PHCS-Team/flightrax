@@ -42,10 +42,10 @@ const AIRCRAFT_PHOTO_HELPER_TEXT = `JPG, PNG, or WebP only. Maximum file size is
 
 function getDefaultValues(aircraft?: Aircraft): AircraftFormInput {
   return {
-    aircraftIdentification: aircraft?.aircraftIdentification ?? "",
+    registrationNumber: aircraft?.registrationNumber ?? "",
     aircraftType: aircraft?.aircraftType ?? "",
     colorMarkings: aircraft?.colorMarkings ?? "",
-    model: aircraft?.model ?? "",
+    registrationMark: aircraft?.registrationMark ?? "",
     photo: null,
     remarks: aircraft?.remarks ?? "",
     serialNumber: aircraft?.serialNumber ?? "",
@@ -117,7 +117,7 @@ export function AircraftFormDialog({
         <DialogSectionHeader
           description={
             isEditing
-              ? `Update ${aircraft?.aircraftIdentification} and replace its image when needed.`
+              ? `Update ${aircraft?.registrationMark} and replace its image when needed.`
               : "Create an aircraft profile for fleet planning and flight plan defaults."
           }
           icon={PlaneIcon}
@@ -176,7 +176,12 @@ export function AircraftFormDialog({
                 <SelectContent>
                   {aircraftTypes.map((type) => (
                     <SelectItem key={type.typeKey} value={type.typeKey}>
-                      {type.type}
+                      <span className="flex items-center gap-2">
+                        {type.type}
+                        <span className="inline-flex h-4.5 items-center rounded-full border border-border bg-muted/40 px-1.5 font-mono text-[10px] font-semibold tracking-wide text-foreground/80">
+                          {type.icaoDesignator}
+                        </span>
+                      </span>
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -188,11 +193,11 @@ export function AircraftFormDialog({
               )}
             </div>
             <AircraftTextField
-              error={errors.model?.message}
-              id={`${dialogId}-model`}
-              label="Model"
-              placeholder="Cessna 172S Skyhawk"
-              register={form.register("model")}
+              error={errors.registrationMark?.message}
+              id={`${dialogId}-registration-mark`}
+              label="Registration Mark"
+              placeholder="RP-C1884"
+              register={form.register("registrationMark")}
               required
             />
           </div>
@@ -201,18 +206,18 @@ export function AircraftFormDialog({
 
           <div className="grid gap-4 sm:grid-cols-2">
             <AircraftTextField
-              error={errors.aircraftIdentification?.message}
-              id={`${dialogId}-identification`}
-              label="Aircraft Identification"
-              placeholder="WCC trainer 218"
-              register={form.register("aircraftIdentification")}
+              error={errors.registrationNumber?.message}
+              id={`${dialogId}-registration-number`}
+              label="Registration No."
+              placeholder="1884"
+              register={form.register("registrationNumber")}
               required
             />
             <AircraftTextField
               error={errors.serialNumber?.message}
               id={`${dialogId}-serial`}
               label="Serial Number"
-              placeholder="172-12345"
+              placeholder="15284100"
               register={form.register("serialNumber")}
               required
             />

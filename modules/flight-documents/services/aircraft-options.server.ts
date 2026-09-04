@@ -59,9 +59,10 @@ export async function getFlightPlanAircraftOptionsPage(
     data: rows.map((row) => ({
       id: row.id,
       aircraftIdentification: row.aircraft_identification,
-      model: row.model,
+      registrationMark: row.model,
       typeKey: row.type_key,
       typeName: row.type_name,
+      typeIcaoDesignator: row.type_icao_designator,
       colorMarkings: row.color_markings,
       photoUrl: row.photo_path
         ? storage.getPublicUrl(row.photo_path).data.publicUrl
@@ -89,7 +90,7 @@ export async function getFlightPlanAircraft(
   const { data, error } = await supabase
     .from("aircrafts")
     .select(
-      "id, aircraft_identification, model, aircraft_type, color_markings, photo_path, aircraft_types!inner(type)",
+      "id, registration_number, registration_mark, aircraft_type, color_markings, photo_path, aircraft_types!inner(type, icao_designator)",
     )
     .eq("id", aircraftId)
     .eq("status", "active")
@@ -107,10 +108,11 @@ export async function getFlightPlanAircraft(
 
   return {
     id: data.id,
-    aircraftIdentification: data.aircraft_identification,
-    model: data.model,
+    aircraftIdentification: data.registration_number,
+    registrationMark: data.registration_mark,
     typeKey: data.aircraft_type,
     typeName: data.aircraft_types.type,
+    typeIcaoDesignator: data.aircraft_types.icao_designator,
     colorMarkings: data.color_markings,
     photoUrl: data.photo_path
       ? storage.getPublicUrl(data.photo_path).data.publicUrl

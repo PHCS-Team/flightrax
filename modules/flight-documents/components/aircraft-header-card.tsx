@@ -62,18 +62,18 @@ export function AircraftHeaderCard({
         </span>
       )}
       <div className="absolute inset-x-0 bottom-0 p-4 text-primary-foreground sm:p-6">
-        <div className="flex items-center gap-2">
-          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
-            {aircraft.aircraftIdentification}
+        <div className="flex min-w-0 items-center gap-2">
+          <h2 className="truncate text-2xl font-bold uppercase tracking-tight sm:text-3xl">
+            {aircraft.registrationMark}
           </h2>
-          <span className="inline-flex shrink-0 items-center rounded-full border border-primary-foreground/30 bg-primary-foreground/10 px-2 py-0.5 text-xs font-medium text-primary-foreground/90">
-            {aircraft.typeName}
+          <span className="inline-flex shrink-0 items-center rounded-full border border-primary-foreground/30 bg-primary-foreground/10 px-2 py-0.5 font-mono text-xs font-semibold tracking-wide text-primary-foreground/90">
+            {aircraft.typeIcaoDesignator}
           </span>
         </div>
-        <p className="mt-0.5 text-sm text-primary-foreground/80">
-          {aircraft.model}
+        <p className="mt-0.5 text-sm uppercase text-primary-foreground/80">
+          {aircraft.typeName} &middot; No. {aircraft.aircraftIdentification}
         </p>
-        <p className="mt-0.5 text-xs text-primary-foreground/60">
+        <p className="mt-0.5 line-clamp-2 text-xs text-primary-foreground/60">
           {aircraft.colorMarkings}
         </p>
       </div>

@@ -56,15 +56,17 @@ export function FlightPlanReviewCard({
       </ReviewSection>
 
       <ReviewSection title="Aircraft">
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2">
           <ReviewField
-            label="Aircraft Identification"
+            label="Aircraft Registration"
             value={aircraft.aircraftIdentification}
           />
-          <ReviewField label="Type of Aircraft" value={aircraft.typeName} />
-          <ReviewField label="Model" value={aircraft.model} />
           <ReviewField
-            className="sm:col-span-3"
+            label="Type of Aircraft"
+            value={aircraft.typeIcaoDesignator}
+          />
+          <ReviewField
+            className="sm:col-span-2"
             label="Aircraft Colour & Marking"
             value={aircraft.colorMarkings}
           />

@@ -162,6 +162,7 @@ export type Database = {
           baggage_area_max_weight: number
           created_at: string
           fi_and_student_arm: number | null
+          icao_designator: string
           maximum_takeoff_weight: number | null
           type: string
           type_key: string
@@ -172,6 +173,7 @@ export type Database = {
           baggage_area_max_weight?: number
           created_at?: string
           fi_and_student_arm?: number | null
+          icao_designator: string
           maximum_takeoff_weight?: number | null
           type: string
           type_key: string
@@ -182,6 +184,7 @@ export type Database = {
           baggage_area_max_weight?: number
           created_at?: string
           fi_and_student_arm?: number | null
+          icao_designator?: string
           maximum_takeoff_weight?: number | null
           type?: string
           type_key?: string
@@ -230,48 +233,48 @@ export type Database = {
       }
       aircrafts: {
         Row: {
-          aircraft_identification: string
           aircraft_type: string
           color_markings: string
           created_at: string
           id: string
-          model: string
           photo_content_type: string | null
           photo_path: string | null
           photo_size_bytes: number | null
           photo_uploaded_at: string | null
+          registration_mark: string
+          registration_number: string
           remarks: string | null
           serial_number: string | null
           status: Database["public"]["Enums"]["aircraft_status"]
           updated_at: string
         }
         Insert: {
-          aircraft_identification: string
           aircraft_type: string
           color_markings: string
           created_at?: string
           id?: string
-          model: string
           photo_content_type?: string | null
           photo_path?: string | null
           photo_size_bytes?: number | null
           photo_uploaded_at?: string | null
+          registration_mark: string
+          registration_number: string
           remarks?: string | null
           serial_number?: string | null
           status?: Database["public"]["Enums"]["aircraft_status"]
           updated_at?: string
         }
         Update: {
-          aircraft_identification?: string
           aircraft_type?: string
           color_markings?: string
           created_at?: string
           id?: string
-          model?: string
           photo_content_type?: string | null
           photo_path?: string | null
           photo_size_bytes?: number | null
           photo_uploaded_at?: string | null
+          registration_mark?: string
+          registration_number?: string
           remarks?: string | null
           serial_number?: string | null
           status?: Database["public"]["Enums"]["aircraft_status"]
@@ -433,6 +436,7 @@ export type Database = {
           aircraft_color_and_marking: string
           aircraft_id: string | null
           aircraft_identification: string
+          aircraft_type_designator: string | null
           authorized_representative_id: string | null
           authorized_representative_licenses: Json | null
           authorized_representative_name: string | null
@@ -495,6 +499,7 @@ export type Database = {
           aircraft_color_and_marking: string
           aircraft_id?: string | null
           aircraft_identification: string
+          aircraft_type_designator?: string | null
           authorized_representative_id?: string | null
           authorized_representative_licenses?: Json | null
           authorized_representative_name?: string | null
@@ -557,6 +562,7 @@ export type Database = {
           aircraft_color_and_marking?: string
           aircraft_id?: string | null
           aircraft_identification?: string
+          aircraft_type_designator?: string | null
           authorized_representative_id?: string | null
           authorized_representative_licenses?: Json | null
           authorized_representative_name?: string | null
@@ -1165,6 +1171,7 @@ export type Database = {
           total_count: number
           total_eet: string
           trainee_name: string
+          type_icao_designator: string
           type_key: string
           type_name: string
         }[]
@@ -1187,6 +1194,7 @@ export type Database = {
           model: string
           photo_path: string
           total_count: number
+          type_icao_designator: string
           type_key: string
           type_name: string
         }[]

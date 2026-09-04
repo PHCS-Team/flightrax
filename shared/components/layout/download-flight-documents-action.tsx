@@ -8,20 +8,19 @@ import { FloatingActionButton } from "@/shared/components/layout/floating-action
 import { Button } from "@/shared/components/ui/button";
 import { Dialog, DialogContent } from "@/shared/components/ui/dialog";
 
-// Page-header action that opens the document download dialog: flight
-// plan PDF, Weight & Balance PDF, or both. Reused wherever a flight's
-// documents can be exported. Options without a handler render disabled
-// — PDF generation arrives in a later phase.
 export function DownloadFlightDocumentsAction({
+  busyLabel,
   onDownloadBoth,
   onDownloadFlightPlan,
   onDownloadWeightBalance,
 }: {
+  busyLabel?: string;
   onDownloadBoth?: () => void;
   onDownloadFlightPlan?: () => void;
   onDownloadWeightBalance?: () => void;
 }) {
   const [open, setOpen] = useState(false);
+  const isBusy = Boolean(busyLabel);
   const hasAnyAction = Boolean(
     onDownloadFlightPlan || onDownloadWeightBalance || onDownloadBoth,
   );
@@ -56,7 +55,7 @@ export function DownloadFlightDocumentsAction({
           <div className="grid gap-2">
             <Button
               className="justify-start disabled:cursor-default"
-              disabled={!onDownloadFlightPlan}
+              disabled={isBusy || !onDownloadFlightPlan}
               onClick={onDownloadFlightPlan}
               type="button"
               variant="outline"
@@ -66,7 +65,7 @@ export function DownloadFlightDocumentsAction({
             </Button>
             <Button
               className="justify-start disabled:cursor-default"
-              disabled={!onDownloadWeightBalance}
+              disabled={isBusy || !onDownloadWeightBalance}
               onClick={onDownloadWeightBalance}
               type="button"
               variant="outline"
@@ -76,7 +75,7 @@ export function DownloadFlightDocumentsAction({
             </Button>
             <Button
               className="justify-start disabled:cursor-default"
-              disabled={!onDownloadBoth}
+              disabled={isBusy || !onDownloadBoth}
               onClick={onDownloadBoth}
               type="button"
               variant="outline"
@@ -86,10 +85,14 @@ export function DownloadFlightDocumentsAction({
             </Button>
           </div>
 
-          {!hasAnyAction && (
-            <p className="text-xs text-muted-foreground">
-              PDF downloads are coming soon.
-            </p>
+          {busyLabel ? (
+            <p className="text-xs text-muted-foreground">{busyLabel}</p>
+          ) : (
+            !hasAnyAction && (
+              <p className="text-xs text-muted-foreground">
+                PDF downloads are coming soon.
+              </p>
+            )
           )}
         </DialogContent>
       </Dialog>

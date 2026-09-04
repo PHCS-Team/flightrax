@@ -29,11 +29,11 @@ export const createFlightPlanAction = actionClient
 
     const supabase = createAdminClient();
 
-    // Snapshot sources: the filed form must keep these values even if the
-    // aircraft or profile changes later.
     const { data: aircraft, error: aircraftError } = await supabase
       .from("aircrafts")
-      .select("id, aircraft_identification, aircraft_type, color_markings")
+      .select(
+        "id, registration_mark, aircraft_type, color_markings, aircraft_types!inner(type, icao_designator)",
+      )
       .eq("id", parsedInput.aircraftId)
       .maybeSingle();
 
@@ -58,8 +58,6 @@ export const createFlightPlanAction = actionClient
       };
     }
 
-    // Saving auto-signs the plan with the filer's registered signature, so
-    // filing requires one.
     if (!filerProfile.signature_svg?.trim()) {
       return {
         ok: false,
@@ -102,8 +100,6 @@ export const createFlightPlanAction = actionClient
 
     const dofDate = resolveDof(parsedInput.dofRaw).slice(0, 10);
 
-    // The chosen PIC must be available on the flight's zulu date — the
-    // filer may always name themselves, even while marked unavailable.
     if (parsedInput.pilotInCommandId !== actor.id) {
       const unavailableUntil = await getPicUnavailabilityEndsOn(
         parsedInput.pilotInCommandId,
@@ -119,12 +115,7 @@ export const createFlightPlanAction = actionClient
       }
     }
 
-    // No aircraft-conflict guard here: drafts may freely target any
-    // aircraft/DOF. The conflict rules apply when submitting for
-    // approval (no active flight on the aircraft) and at approval time
-    // (one live journey per aircraft per DOF date).
     const flightPlanRow = {
-      // Every free-text field is stored uppercase — form convention.
       addressee: parsedInput.addressee
         ? parsedInput.addressee.toUpperCase()
         : null,
@@ -135,11 +126,12 @@ export const createFlightPlanAction = actionClient
         : null,
       message_type: FLIGHT_PLAN_MESSAGE_TYPE,
       aircraft_id: aircraft.id,
-      aircraft_identification: aircraft.aircraft_identification,
+      aircraft_identification: aircraft.registration_mark.toUpperCase(),
       flight_rules: parsedInput.flightRules,
       type_of_flight: parsedInput.typeOfFlight,
       number_of_aircraft: Number(parsedInput.numberOfAircraft),
-      type_of_aircraft: aircraft.aircraft_type,
+      type_of_aircraft: aircraft.aircraft_types.type.toUpperCase(),
+      aircraft_type_designator: aircraft.aircraft_types.icao_designator,
       wake_turbulence_category: parsedInput.wakeTurbulenceCategory,
       com_nav_equipment: parsedInput.comNavEquipment,
       surveillance_equipment: parsedInput.surveillanceEquipment,
@@ -148,8 +140,6 @@ export const createFlightPlanAction = actionClient
       departure_time_resolved: hhmmToTime(parsedInput.departureTimeRaw),
       cruising_speed: parsedInput.cruisingSpeed,
       cruising_level: parsedInput.cruisingLevel,
-      // Route points may contain spaces (e.g. RPT-20 BINALONAN), so the
-      // separator is a comma.
       route: parsedInput.route
         ? parsedInput.route
             .split(",")
@@ -196,19 +186,17 @@ export const createFlightPlanAction = actionClient
         parsedInput.dinghiesHasDinghy && parsedInput.dinghiesColor
           ? parsedInput.dinghiesColor.toUpperCase()
           : null,
-      aircraft_color_and_marking: aircraft.color_markings,
+      aircraft_color_and_marking: aircraft.color_markings.toUpperCase(),
       remarks: parsedInput.remarks ? parsedInput.remarks.toUpperCase() : null,
       pilot_in_command_id: parsedInput.pilotInCommandId,
       pilot_in_command_name: parsedInput.pilotInCommandName.toUpperCase(),
       filed_by_id: filerProfile.id,
-      pilot_name: filerProfile.full_name,
+      pilot_name: filerProfile.full_name.toUpperCase(),
       pilot_signature: filerProfile.signature_svg,
       pilot_licenses: pilotLicenses,
       created_by: filerProfile.id,
     };
 
-    // The plan code is unique — regenerate and retry on the rare
-    // same-day collision.
     let flightPlan: { id: string } | null = null;
     let planError: { message: string } | null = null;
 

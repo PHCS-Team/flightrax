@@ -48,9 +48,8 @@ import {
 } from "@/shared/components/ui/select";
 import { Switch } from "@/shared/components/ui/switch";
 import { Textarea } from "@/shared/components/ui/textarea";
+import { cn } from "@/shared/lib/utils";
 
-// Everything typed on the flight plan is uppercase — displayed via CSS
-// here and enforced server-side on save.
 const INPUT_TEXT_CLASS = "text-[#121212] uppercase placeholder:normal-case";
 const TEXTAREA_CLASS =
   "border-primary-foreground/20 bg-primary-foreground/95 text-[#121212] uppercase placeholder:normal-case placeholder:text-muted-foreground";
@@ -650,7 +649,10 @@ export function FlightPlanForm({
           )}
           {isSelfPic ? (
             <Input
-              className={INPUT_TEXT_CLASS}
+              className={cn(
+                INPUT_TEXT_CLASS,
+                "uppercase placeholder:normal-case",
+              )}
               disabled
               value={filerContext?.profile.fullName ?? ""}
             />
@@ -662,7 +664,10 @@ export function FlightPlanForm({
             >
               <SelectTrigger
                 aria-invalid={Boolean(errors.pilotInCommandId)}
-                className={INPUT_TEXT_CLASS}
+                className={cn(
+                  INPUT_TEXT_CLASS,
+                  "uppercase placeholder:normal-case",
+                )}
                 id="fp-pilot-in-command"
               >
                 <SelectValue placeholder="Choose a flight instructor" />
@@ -697,8 +702,8 @@ export function FlightPlanForm({
           )}
           {!dofDate && !isSelfPic && (
             <p className="text-xs text-muted-foreground">
-              Enter the Date of Filing first — pilot availability depends on
-              the flight date.
+              Enter the Date of Filing first — pilot availability depends on the
+              flight date.
             </p>
           )}
           {errors.pilotInCommandId && (
@@ -811,7 +816,7 @@ function FpTextField({
       <Input
         aria-invalid={Boolean(error)}
         aria-required={required || undefined}
-        className={INPUT_TEXT_CLASS}
+        className={cn(INPUT_TEXT_CLASS, "uppercase placeholder:normal-case")}
         id={id}
         maxLength={maxLength}
         placeholder={placeholder}
@@ -856,7 +861,7 @@ function FpTextareaField({
       </label>
       <Textarea
         aria-invalid={Boolean(error)}
-        className={TEXTAREA_CLASS}
+        className={cn(TEXTAREA_CLASS, "uppercase placeholder:normal-case")}
         id={id}
         placeholder={placeholder}
         rows={rows}
@@ -898,7 +903,7 @@ function FpSelectField({
         <SelectTrigger
           aria-invalid={Boolean(error)}
           aria-required="true"
-          className={INPUT_TEXT_CLASS}
+          className={cn(INPUT_TEXT_CLASS, "uppercase placeholder:normal-case")}
           id={name}
         >
           <SelectValue placeholder="Choose" />

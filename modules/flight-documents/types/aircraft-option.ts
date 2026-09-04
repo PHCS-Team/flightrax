@@ -5,16 +5,16 @@
 export type FlightPlanAircraftOption = {
   id: string;
   aircraftIdentification: string;
-  model: string;
+  registrationMark: string;
   typeKey: string;
   typeName: string;
+  typeIcaoDesignator: string;
   colorMarkings: string;
   photoUrl: string | null;
   isAvailable: boolean;
   unavailableReason: string | null;
 };
 
-// Aircraft type entry for the picker's type filter.
 export type FlightPlanTypeOption = {
   typeKey: string;
   type: string;

@@ -108,7 +108,7 @@ export function AircraftsTable({
               <div className="relative flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground shadow-sm">
                 {a.photoUrl ? (
                   <div
-                    aria-label={`${a.aircraftIdentification} aircraft image`}
+                    aria-label={`${a.registrationMark} aircraft image`}
                     className="absolute inset-0 bg-cover bg-center"
                     role="img"
                     style={{ backgroundImage: `url(${a.photoUrl})` }}
@@ -120,13 +120,16 @@ export function AircraftsTable({
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
                   <p className="truncate font-semibold text-primary-foreground">
-                    {a.aircraftIdentification}
+                    {a.registrationMark}
                   </p>
-                  <span className="inline-flex shrink-0 items-center rounded-full border border-primary-foreground/20 bg-primary-foreground/10 px-1.5 py-0 text-[10px] font-medium leading-4 text-primary-foreground/75">
-                    {a.typeName}
+                  <span
+                    className="inline-flex shrink-0 items-center rounded-full border border-primary-foreground/20 bg-primary-foreground/10 px-1.5 py-0 font-mono text-[10px] font-semibold leading-4 tracking-wide text-primary-foreground/80"
+                    title={a.typeName}
+                  >
+                    {a.typeIcaoDesignator}
                   </span>
                 </div>
-                <p className="text-sm text-primary-foreground/65">{a.model}</p>
+                <p className="text-sm text-primary-foreground/65">No. {a.registrationNumber}</p>
                 <div className="flex items-center gap-1.5">
                   <p className="text-xs text-primary-foreground/50">
                     SRN: {a.serialNumber || "\u2014"}
@@ -392,7 +395,7 @@ export function AircraftsTable({
                 onChange={(event) => {
                   onSearchChange(event.target.value);
                 }}
-                placeholder="Search aircraft identification, model, or serial number"
+                placeholder="Search registration mark, number, or serial number"
                 value={search}
               />
             </div>
@@ -570,7 +573,7 @@ export function AircraftsTable({
 
       {remarksAircraft && (
         <AircraftDetailsDialog
-          aircraftIdentification={remarksAircraft.aircraftIdentification}
+          registrationMark={remarksAircraft.registrationMark}
           colorMarkings={remarksAircraft.colorMarkings}
           onOpenChange={(open) => {
             if (!open) {

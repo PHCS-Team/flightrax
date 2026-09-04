@@ -10,7 +10,7 @@ import { AIRCRAFT_PHOTOS_BUCKET } from "@/shared/lib/storage/buckets";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 
 const FLIGHT_PLAN_EDIT_SELECT =
-  "id, addressee, dof_raw, originator, aircraft_id, aircraft_identification, flight_rules, type_of_flight, number_of_aircraft, type_of_aircraft, wake_turbulence_category, com_nav_equipment, surveillance_equipment, departure_aerodrome, departure_time_raw, cruising_speed, cruising_level, route, destination_aerodrome, total_eet, first_alternate_aerodrome, second_alternate_aerodrome, other_remarks, endurance, persons_on_board, emergency_radio_uhf, emergency_radio_vhf, emergency_radio_elt, survival_polar, survival_desert, survival_maritime, survival_jungle, jacket_light, jacket_fluorescent, jacket_uhf, jacket_vhf, dinghies_has_dinghy, dinghies_number, dinghies_capacity, dinghies_covered, dinghies_color, aircraft_color_and_marking, remarks, pilot_in_command_id, pilot_in_command_name, pilot_name, created_by, flight_requests(status, rejected_reason), aircrafts(model, photo_path, aircraft_types!inner(type))";
+  "id, addressee, dof_raw, originator, aircraft_id, aircraft_identification, aircraft_type_designator, flight_rules, type_of_flight, number_of_aircraft, type_of_aircraft, wake_turbulence_category, com_nav_equipment, surveillance_equipment, departure_aerodrome, departure_time_raw, cruising_speed, cruising_level, route, destination_aerodrome, total_eet, first_alternate_aerodrome, second_alternate_aerodrome, other_remarks, endurance, persons_on_board, emergency_radio_uhf, emergency_radio_vhf, emergency_radio_elt, survival_polar, survival_desert, survival_maritime, survival_jungle, jacket_light, jacket_fluorescent, jacket_uhf, jacket_vhf, dinghies_has_dinghy, dinghies_number, dinghies_capacity, dinghies_covered, dinghies_color, aircraft_color_and_marking, remarks, pilot_in_command_id, pilot_in_command_name, pilot_name, created_by, flight_requests(status, rejected_reason), aircrafts(registration_mark, aircraft_type, photo_path, aircraft_types!inner(type))";
 
 export async function getOwnFlightPlanForEdit(
   flightPlanId: string,
@@ -54,9 +54,10 @@ export async function getOwnFlightPlanForEdit(
     aircraft: {
       id: data.aircraft_id ?? data.id,
       aircraftIdentification: data.aircraft_identification,
-      model: data.aircrafts?.model ?? "",
-      typeKey: data.type_of_aircraft,
-      typeName: data.aircrafts?.aircraft_types.type ?? data.type_of_aircraft,
+      registrationMark: data.aircrafts?.registration_mark ?? "",
+      typeKey: data.aircrafts?.aircraft_type ?? "",
+      typeName: data.type_of_aircraft,
+      typeIcaoDesignator: data.aircraft_type_designator ?? "",
       colorMarkings: data.aircraft_color_and_marking,
       photoUrl: data.aircrafts?.photo_path
         ? storage.getPublicUrl(data.aircrafts.photo_path).data.publicUrl

@@ -44,8 +44,9 @@ export async function getDashboardFlightStatusPage(
     data: rows.map((row) => ({
       aircraftId: row.id,
       aircraftIdentification: row.aircraft_identification,
-      model: row.model,
+      registrationMark: row.model,
       typeName: row.type_name,
+      typeIcaoDesignator: row.type_icao_designator,
       photoUrl: row.photo_path
         ? storage.getPublicUrl(row.photo_path).data.publicUrl
         : null,

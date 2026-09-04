@@ -4,6 +4,7 @@ import { updateAircraftSchema } from "@/modules/aircrafts/schemas/aircraft-schem
 import type { AircraftRow, AircraftUpdate } from "@/modules/aircrafts/types/aircraft";
 import { getAircraftPhotoPath } from "@/modules/aircrafts/utils/aircraft-photo";
 import { canManageAircrafts } from "@/modules/aircrafts/utils/aircraft-permissions";
+import { getAircraftWriteErrorMessage } from "@/modules/aircrafts/utils/aircraft-write-error";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
@@ -52,10 +53,10 @@ export const updateAircraftAction = actionClient
     }
 
     const updateValues: AircraftUpdate = {
-      aircraft_identification: parsedInput.aircraftIdentification,
+      registration_number: parsedInput.registrationNumber,
       aircraft_type: parsedInput.aircraftType,
       color_markings: parsedInput.colorMarkings,
-      model: parsedInput.model,
+      registration_mark: parsedInput.registrationMark,
       remarks: parsedInput.remarks?.trim() || null,
       serial_number: parsedInput.serialNumber?.trim() || null,
       status: parsedInput.status,
@@ -78,7 +79,7 @@ export const updateAircraftAction = actionClient
         await supabase.storage.from(AIRCRAFT_PHOTOS_BUCKET).remove([newPhotoPath]);
       }
 
-      return { ok: false, message: error.message };
+      return { ok: false, message: getAircraftWriteErrorMessage(error) };
     }
 
     if (newPhotoPath && target.photo_path && target.photo_path !== newPhotoPath) {
