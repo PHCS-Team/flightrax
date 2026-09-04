@@ -1,29 +1,31 @@
 import type {
-  AircraftStatus,
   DashboardBoardStatus,
   JourneyStatus,
 } from "@/modules/dashboard/types/flight-status";
 
 export function deriveBoardStatus(
-  aircraftStatus: AircraftStatus,
-  journeyStatus: JourneyStatus | null,
+  journeyStatus: JourneyStatus,
 ): DashboardBoardStatus {
-  if (aircraftStatus === "maintenance" || aircraftStatus === "grounded") {
-    return "on_ground";
-  }
-
   if (journeyStatus === "active") {
     return "active";
   }
 
   if (journeyStatus === "scheduled") {
-    return "scheduled";
+    return "on_ground";
   }
 
-  // standby journeys never reach the board — its query excludes them.
-  if (journeyStatus === "arrived") {
-    return "arrived";
-  }
+  return "arrived";
+}
 
-  return "standby";
+export function isJourneyOverdue(
+  journeyStatus: JourneyStatus,
+  dofAt: string | null,
+  nowMs: number,
+): boolean {
+  return (
+    journeyStatus === "scheduled" &&
+    nowMs > 0 &&
+    dofAt !== null &&
+    new Date(dofAt).getTime() < nowMs
+  );
 }

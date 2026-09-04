@@ -26,7 +26,6 @@ export async function getDashboardFlightStatusPage(
 
   const supabase = createAdminClient();
   const { data, error } = await supabase.rpc("get_dashboard_flight_status", {
-    p_include_on_ground: true,
     p_page: page,
     p_page_size: pageSize,
     ...(statusGroup ? { p_status_group: statusGroup } : {}),
@@ -50,24 +49,22 @@ export async function getDashboardFlightStatusPage(
       photoUrl: row.photo_path
         ? storage.getPublicUrl(row.photo_path).data.publicUrl
         : null,
-      aircraftStatus: row.aircraft_status,
-      boardStatus: deriveBoardStatus(row.aircraft_status, row.journey_status),
-      journey:
-        row.journey_id && row.journey_status
-          ? {
-              status: row.journey_status,
-              commencedAt: row.commenced_at,
-              terminatedAt: row.terminated_at,
-              departureAerodrome: row.departure_aerodrome ?? "",
-              destinationAerodrome: row.destination_aerodrome ?? "",
-              departureTimeRaw: row.departure_time_raw ?? "",
-              cruisingSpeed: row.cruising_speed ?? "",
-              cruisingLevel: row.cruising_level ?? "",
-              totalEet: row.total_eet ? formatIntervalHm(row.total_eet) : "",
-              traineeName: row.trainee_name ?? "",
-              pilotInCommandName: row.pilot_in_command_name ?? "",
-            }
-          : null,
+      boardStatus: deriveBoardStatus(row.journey_status),
+      journey: {
+        id: row.journey_id,
+        status: row.journey_status,
+        dofAt: row.dof_at,
+        commencedAt: row.commenced_at,
+        terminatedAt: row.terminated_at,
+        departureAerodrome: row.departure_aerodrome ?? "",
+        destinationAerodrome: row.destination_aerodrome ?? "",
+        departureTimeRaw: row.departure_time_raw ?? "",
+        cruisingSpeed: row.cruising_speed ?? "",
+        cruisingLevel: row.cruising_level ?? "",
+        totalEet: row.total_eet ? formatIntervalHm(row.total_eet) : "",
+        traineeName: row.trainee_name ?? "",
+        pilotInCommandName: row.pilot_in_command_name ?? "",
+      },
     })),
     totalCount,
     page,

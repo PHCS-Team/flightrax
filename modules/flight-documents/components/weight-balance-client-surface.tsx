@@ -41,10 +41,8 @@ export function WeightBalanceClientSurface({
   });
 
   const submitFlightRequest = useSubmitFlightRequest({
-    onSubmitted: () => {
-      setSavedDialogOpen(false);
-      router.push(`/flight-documents/flight-plans/${flightPlanId}`);
-    },
+    onSubmitted: () =>
+      router.replace(`/flight-documents/flight-plans/${flightPlanId}`),
   });
 
   if (isPending) {
@@ -133,7 +131,9 @@ export function WeightBalanceClientSurface({
           }
           readOnly={readOnly}
           submitLabel={
-            context.weightBalanceId ? "Save and submit" : "Save weight and balance"
+            context.weightBalanceId
+              ? "Save and submit"
+              : "Save weight and balance"
           }
         />
       </GlassSurface>
@@ -155,11 +155,10 @@ export function WeightBalanceClientSurface({
       <FlightPlanSavedDialog
         description="Your Weight & Balance is saved. Submit the request for approval when everything is final, or come back to it later from Flight Documents."
         isSubmittingForApproval={submitFlightRequest.isExecuting}
-        onBackToList={() => router.push("/flight-documents")}
-        onClose={() => {
-          setSavedDialogOpen(false);
-          router.push(`/flight-documents/flight-plans/${flightPlanId}`);
-        }}
+        onBackToList={() => router.replace("/flight-documents")}
+        onClose={() =>
+          router.replace(`/flight-documents/flight-plans/${flightPlanId}`)
+        }
         onSubmitForApproval={() =>
           submitFlightRequest.execute({ flightPlanId })
         }

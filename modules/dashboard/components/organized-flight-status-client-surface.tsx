@@ -1,10 +1,10 @@
 "use client";
 
 import {
+  ClockIcon,
   PlaneLandingIcon,
   PlaneTakeoffIcon,
   RadarIcon,
-  WrenchIcon,
 } from "lucide-react";
 import { parseAsInteger, useQueryState } from "nuqs";
 
@@ -88,8 +88,8 @@ export function OrganizedFlightStatusClientSurface() {
               {
                 id: "on-ground",
                 title: "On Ground",
-                icon: WrenchIcon,
-                emptyMessage: "No aircraft on ground.",
+                icon: ClockIcon,
+                emptyMessage: "No scheduled flights on ground.",
                 rows: onGround.rows,
                 page: groundPage,
                 totalPages: onGround.totalPages,

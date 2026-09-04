@@ -7,8 +7,13 @@ import {
 } from "lucide-react";
 import { Fragment } from "react";
 
-import { BOARD_STATUS_META } from "@/modules/dashboard/components/flight-status-board";
+import {
+  BOARD_STATUS_META,
+  OVERDUE_PILL_CLASS,
+} from "@/modules/dashboard/components/flight-status-board";
+import { useNowMs } from "@/modules/dashboard/hooks/use-now";
 import type { DashboardFlightStatusRow } from "@/modules/dashboard/types/flight-status";
+import { isJourneyOverdue } from "@/modules/dashboard/utils/board-status";
 import {
   formatDurationBetween,
   formatShortPersonName,
@@ -46,6 +51,8 @@ export function OrganizedFlightStatusBoard({
 }: {
   groups: OrganizedBoardGroup[];
 }) {
+  const nowMs = useNowMs();
+
   return (
     <GlassSurface className="overflow-hidden">
       <Table className="table-fixed text-primary-foreground">
@@ -115,7 +122,11 @@ export function OrganizedFlightStatusBoard({
                   </TableRow>
                 ) : (
                   group.rows.map((row) => (
-                    <OrganizedBoardRow key={row.aircraftId} row={row} />
+                    <OrganizedBoardRow
+                      key={row.journey.id}
+                      nowMs={nowMs}
+                      row={row}
+                    />
                   ))
                 )}
               </Fragment>
@@ -127,24 +138,35 @@ export function OrganizedFlightStatusBoard({
   );
 }
 
-function OrganizedBoardRow({ row }: { row: DashboardFlightStatusRow }) {
+function OrganizedBoardRow({
+  nowMs,
+  row,
+}: {
+  nowMs: number;
+  row: DashboardFlightStatusRow;
+}) {
   const journey = row.journey;
-  const subtitle = journey
-    ? `${formatShortPersonName(journey.traineeName)} · ${formatShortPersonName(journey.pilotInCommandName)}`
-    : row.aircraftStatus === "maintenance"
-      ? "Under maintenance"
-      : "Grounded";
-  const departedAt = journey?.commencedAt
-    ? formatTimeOfDay(journey.commencedAt)
-    : "—";
-  const arrivedAt = journey?.terminatedAt
+  const subtitle = `${formatShortPersonName(journey.traineeName)} · ${formatShortPersonName(journey.pilotInCommandName)}`;
+  const overdue = isJourneyOverdue(journey.status, journey.dofAt, nowMs);
+  // On Ground rows have not departed yet — the column shows their
+  // estimated time of departure instead.
+  const departedAt = journey.commencedAt ? (
+    formatTimeOfDay(journey.commencedAt)
+  ) : journey.dofAt ? (
+    <>
+      <span className="mr-1 text-[10px] font-medium uppercase text-primary-foreground/60">
+        ETD
+      </span>
+      {formatTimeOfDay(journey.dofAt)}
+    </>
+  ) : (
+    "—"
+  );
+  const arrivedAt = journey.terminatedAt
     ? formatTimeOfDay(journey.terminatedAt)
     : "—";
   const duration =
-    formatDurationBetween(
-      journey?.commencedAt ?? null,
-      journey?.terminatedAt ?? null,
-    ) ?? "—";
+    formatDurationBetween(journey.commencedAt, journey.terminatedAt) ?? "—";
 
   return (
     <TableRow
@@ -156,8 +178,15 @@ function OrganizedBoardRow({ row }: { row: DashboardFlightStatusRow }) {
     >
       <TableCell className="pl-4 text-primary-foreground sm:pl-6">
         <div className="min-w-0">
-          <p className="truncate font-semibold uppercase">
-            {row.registrationMark}
+          <p className="flex min-w-0 items-center gap-1.5">
+            <span className="truncate font-semibold uppercase">
+              {row.registrationMark}
+            </span>
+            {overdue && (
+              <span className={cn(OVERDUE_PILL_CLASS, "shrink-0")}>
+                Overdue
+              </span>
+            )}
           </p>
           <p className="truncate text-[11px] text-primary-foreground/60">
             {row.typeIcaoDesignator} · {subtitle}

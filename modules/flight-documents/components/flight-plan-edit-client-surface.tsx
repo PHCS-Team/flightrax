@@ -39,7 +39,7 @@ export function FlightPlanEditClientSurface({
     onSaved: () => setSavedDialogOpen(true),
   });
   const deleteFlightPlan = useDeleteFlightPlan({
-    onDeleted: () => router.push("/flight-documents"),
+    onDeleted: () => router.replace("/flight-documents"),
   });
   const { filerContext } = useFlightPlanFilerContext();
 
@@ -184,10 +184,10 @@ export function FlightPlanEditClientSurface({
 
       <FlightPlanSavedDialog
         description="Your changes are saved. Continue to the Weight & Balance when you are ready — closing this keeps you on the flight plan."
-        onBackToList={() => router.push("/flight-documents")}
+        onBackToList={() => router.replace("/flight-documents")}
         onClose={() => setSavedDialogOpen(false)}
         onProceedToWeightBalance={() =>
-          router.push(
+          router.replace(
             `/flight-documents/flight-plans/${flightPlanId}/weight-balance`,
           )
         }

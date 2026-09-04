@@ -1146,20 +1146,15 @@ export type Database = {
     }
     Functions: {
       get_dashboard_flight_status: {
-        Args: {
-          p_include_on_ground?: boolean
-          p_page?: number
-          p_page_size?: number
-          p_status_group?: string
-        }
+        Args: { p_page?: number; p_page_size?: number; p_status_group?: string }
         Returns: {
-          aircraft_status: Database["public"]["Enums"]["aircraft_status"]
           commenced_at: string
           cruising_level: string
           cruising_speed: string
           departure_aerodrome: string
           departure_time_raw: string
           destination_aerodrome: string
+          dof_at: string
           id: string
           journey_id: string
           journey_status: Database["public"]["Enums"]["journey_status"]

@@ -30,16 +30,10 @@ export function FlightRequestReviewActions({
   const [verifiedPasscode, setVerifiedPasscode] = useState("");
   const verifyPasscode = useVerifyPasscode();
   const approveRequest = useApproveFlightRequest({
-    onApproved: () => {
-      setConfirmOpen(false);
-      router.push("/flight-requests");
-    },
+    onApproved: () => router.replace("/flight-requests"),
   });
   const rejectRequest = useRejectFlightRequest({
-    onRejected: () => {
-      setRejectOpen(false);
-      router.push("/flight-requests");
-    },
+    onRejected: () => router.replace("/flight-requests"),
   });
 
   if (requestStatus !== "pending_approval") {

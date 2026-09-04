@@ -1,6 +1,5 @@
 import type { Database } from "@/shared/types/supabase";
 
-export type AircraftStatus = Database["public"]["Enums"]["aircraft_status"];
 export type JourneyStatus = Database["public"]["Enums"]["journey_status"];
 
 export type DashboardFlightStatusRpcRow =
@@ -8,15 +7,12 @@ export type DashboardFlightStatusRpcRow =
 
 export type DashboardStatusGroup = "all" | "active" | "arrived" | "on_ground";
 
-export type DashboardBoardStatus =
-  | "active"
-  | "scheduled"
-  | "arrived"
-  | "standby"
-  | "on_ground";
+export type DashboardBoardStatus = "active" | "on_ground" | "arrived";
 
 export type DashboardFlightJourney = {
+  id: string;
   status: JourneyStatus;
+  dofAt: string | null;
   commencedAt: string | null;
   terminatedAt: string | null;
   departureAerodrome: string;
@@ -36,7 +32,6 @@ export type DashboardFlightStatusRow = {
   typeName: string;
   typeIcaoDesignator: string;
   photoUrl: string | null;
-  aircraftStatus: AircraftStatus;
   boardStatus: DashboardBoardStatus;
-  journey: DashboardFlightJourney | null;
+  journey: DashboardFlightJourney;
 };
