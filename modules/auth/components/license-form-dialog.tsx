@@ -34,6 +34,7 @@ import {
   DialogContent,
   DialogFooter,
 } from "@/shared/components/ui/dialog";
+import { DatePicker } from "@/shared/components/date-picker";
 import { Input } from "@/shared/components/ui/input";
 import {
   Popover,
@@ -114,6 +115,7 @@ export function LicenseFormDialog({
     control: form.control,
     name: "idBack",
   });
+  const expiryDate = useWatch({ control: form.control, name: "expiry_date" });
   const isExecuting = createLicense.isExecuting || updateLicense.isExecuting;
   const selectedRatings = selectedRatingsRaw ?? [];
   const ratingLabels = selectedRatings
@@ -272,16 +274,23 @@ export function LicenseFormDialog({
                 No expiry date
               </div>
             ) : (
-              <Input
+              <DatePicker
                 aria-describedby={
                   errors.expiry_date ? `${dialogId}-expiry-error` : undefined
                 }
                 aria-invalid={Boolean(errors.expiry_date)}
                 aria-required="true"
+                disabled={isExecuting}
                 id={`${dialogId}-expiry`}
-                type="date"
-                {...form.register("expiry_date")}
-              />
+                onChange={(value) =>
+                  form.setValue("expiry_date", value, {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                  })
+                }
+                placeholder="Select expiry date"
+                value={expiryDate}
+                />
             )}
             {errors.expiry_date && (
               <p

@@ -21,6 +21,7 @@ import type { NotamSeverity } from "@/shared/types/notam";
 import { ConfirmationDialog } from "@/shared/components/layout/confirmation-dialog";
 import { Button } from "@/shared/components/ui/button";
 import { DialogFooter } from "@/shared/components/ui/dialog";
+import { DatePicker } from "@/shared/components/date-picker";
 import { Input } from "@/shared/components/ui/input";
 import {
   Select,
@@ -63,6 +64,7 @@ export function NotamForm({
   });
   const errors = form.formState.errors;
   const severity = useWatch({ control: form.control, name: "severity" });
+  const expiresOn = useWatch({ control: form.control, name: "expiresOn" });
   const fieldId = (name: string) => `notam-${name}`;
 
   return (
@@ -147,12 +149,19 @@ export function NotamForm({
             >
               Expires On
             </label>
-            <Input
+            <DatePicker
               aria-invalid={Boolean(errors.expiresOn)}
+              disabled={createNotam.isExecuting}
               id={fieldId("expires-on")}
               min={todayDate()}
-              type="date"
-              {...form.register("expiresOn")}
+              onChange={(value) =>
+                form.setValue("expiresOn", value, {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                })
+              }
+              placeholder="Select expiry date"
+              value={expiresOn}
             />
             {errors.expiresOn && (
               <p className="text-xs text-destructive">

@@ -18,7 +18,7 @@ import {
   DialogContent,
   DialogFooter,
 } from "@/shared/components/ui/dialog";
-import { Input } from "@/shared/components/ui/input";
+import { DatePicker } from "@/shared/components/date-picker";
 
 // Admin-only dialog: list, add, and remove an instructor's leave
 // periods. Dates are zulu calendar dates; a single-day leave keeps the
@@ -129,12 +129,12 @@ export function ManageAvailabilityDialog({
               >
                 Start Date
               </label>
-              <Input
-                className="border-border bg-muted/30 text-[#121212]"
+              <DatePicker
+                className="border-border bg-muted/30"
                 id="unavailability-starts-on"
                 min={todayUtcDate()}
-                onChange={(event) => setStartsOn(event.target.value)}
-                type="date"
+                onChange={setStartsOn}
+                placeholder="Select start date"
                 value={startsOn}
               />
             </div>
@@ -145,12 +145,13 @@ export function ManageAvailabilityDialog({
               >
                 End Date
               </label>
-              <Input
-                className="border-border bg-muted/30 text-[#121212]"
+              <DatePicker
+                allowClear
+                className="border-border bg-muted/30"
                 id="unavailability-ends-on"
                 min={startsOn || todayUtcDate()}
-                onChange={(event) => setEndsOn(event.target.value)}
-                type="date"
+                onChange={setEndsOn}
+                placeholder="Same day (optional)"
                 value={endsOn}
               />
             </div>
