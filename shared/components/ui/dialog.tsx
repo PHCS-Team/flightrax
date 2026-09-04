@@ -4,6 +4,7 @@ import * as React from "react"
 import { Dialog as DialogPrimitive } from "radix-ui"
 
 import { cn } from "@/shared/lib/utils"
+import { useHistoryBackClose } from "@/shared/hooks/use-history-back-close"
 import { useVisualViewportCenter } from "@/shared/hooks/use-visual-viewport-center"
 import { Button } from "@/shared/components/ui/button"
 import { XIcon } from "lucide-react"
@@ -22,10 +23,42 @@ function isSelectLayerTarget(target: EventTarget | null) {
   return Boolean(popperWrapper?.querySelector("[data-slot='select-content']"))
 }
 
+// Controllable wrapper so the phone's Back button can close the dialog
+// (see useHistoryBackClose) whether the caller controls `open` or not.
 function Dialog({
+  defaultOpen = false,
+  onOpenChange,
+  open,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Root>) {
-  return <DialogPrimitive.Root data-slot="dialog" {...props} />
+  const [uncontrolledOpen, setUncontrolledOpen] = React.useState(defaultOpen)
+  const isControlled = open !== undefined
+  const isOpen = isControlled ? open : uncontrolledOpen
+  const handleOpenChange = React.useCallback(
+    (nextOpen: boolean) => {
+      if (!isControlled) {
+        setUncontrolledOpen(nextOpen)
+      }
+
+      onOpenChange?.(nextOpen)
+    },
+    [isControlled, onOpenChange]
+  )
+  const closeFromHistory = React.useCallback(
+    () => handleOpenChange(false),
+    [handleOpenChange]
+  )
+
+  useHistoryBackClose(isOpen, closeFromHistory)
+
+  return (
+    <DialogPrimitive.Root
+      data-slot="dialog"
+      onOpenChange={handleOpenChange}
+      open={isOpen}
+      {...props}
+    />
+  )
 }
 
 function DialogTrigger({
