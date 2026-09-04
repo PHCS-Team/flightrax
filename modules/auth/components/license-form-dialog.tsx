@@ -47,11 +47,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
-import { Separator } from "@/shared/components/ui/separator";
-import {
-  LICENSE_TYPE_OPTIONS,
-  RATING_OPTIONS,
-} from "@/shared/lib/aviation/license-options";
+import { LICENSE_TYPE_OPTIONS } from "@/shared/lib/aviation/license-options";
+import { useRatingOptions } from "@/shared/hooks/use-rating-options.query";
 import { cn } from "@/shared/lib/utils";
 
 const LICENSE_PHOTO_HELPER_TEXT = `JPG, PNG, or WebP only. Maximum file size is ${LICENSE_IMAGE_MAX_BYTES / 1024 / 1024} MB. New uploads replace the current photo.`;
@@ -81,6 +78,7 @@ export function LicenseFormDialog({
   const isEditing = Boolean(license);
   const dialogId = license?.id ?? "new-license";
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const { ratingOptions } = useRatingOptions();
   const form = useForm<LicenseFormInput>({
     resolver: zodResolver(licenseFormSchema),
     defaultValues: getDefaultValues(license),
@@ -121,7 +119,7 @@ export function LicenseFormDialog({
   const ratingLabels = selectedRatings
     .map(
       (value) =>
-        RATING_OPTIONS.find((option) => option.value === value)?.label ?? value,
+        ratingOptions.find((option) => option.value === value)?.label ?? value,
     )
     .filter(Boolean);
 
@@ -335,20 +333,22 @@ export function LicenseFormDialog({
               >
                 {ratingLabels.length > 0 ? (
                   <>
-                    <span className="flex flex-1 flex-wrap items-center gap-1.5">
+                    {/* min-w-0 + shrinkable badges: a long rating label
+                        truncates instead of widening the dialog on mobile. */}
+                    <span className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
                       {ratingLabels.slice(0, 2).map((label) => (
                         <Badge
-                          className="h-6 gap-1 bg-muted px-2 text-foreground"
+                          className="h-6 min-w-0 max-w-full shrink gap-1 bg-muted px-2 text-foreground"
                           key={label}
                           variant="outline"
                         >
-                          {label}
+                          <span className="truncate">{label}</span>
                           <span
-                            className="flex size-3.5 cursor-pointer items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-border hover:text-foreground"
+                            className="flex size-3.5 shrink-0 cursor-pointer items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-border hover:text-foreground"
                             onClick={(event) => {
                               event.preventDefault();
                               toggleRating(
-                                RATING_OPTIONS.find(
+                                ratingOptions.find(
                                   (option) => option.label === label,
                                 )?.value ?? label,
                               );
@@ -385,7 +385,7 @@ export function LicenseFormDialog({
                   <CommandList>
                     <CommandEmpty>No rating found.</CommandEmpty>
                     <CommandGroup>
-                      {RATING_OPTIONS.map((option) => {
+                      {ratingOptions.map((option) => {
                         const isSelected = (selectedRatingsRaw ?? []).includes(
                           option.value,
                         );
@@ -460,24 +460,27 @@ export function LicenseFormDialog({
             />
           </div>
 
+          {isEditing && (
+            <div className="flex flex-col gap-2 rounded-lg border border-destructive/30 bg-destructive/5 p-3 sm:flex-row sm:items-center sm:justify-between sm:rounded-2xl">
+              <p className="text-xs text-muted-foreground">
+                Removing this license deletes its photos and cannot be undone.
+              </p>
+              <Button
+                className="shrink-0 border-destructive/40 bg-background text-destructive hover:bg-destructive/10 hover:text-destructive"
+                disabled={isExecuting}
+                onClick={() => setDeleteOpen(true)}
+                size="sm"
+                type="button"
+                variant="outline"
+              >
+                <Trash2Icon className="size-4" />
+                Remove license
+              </Button>
+            </div>
+          )}
+
           <DialogFooter className="-mx-6 -mb-6 mt-1 sm:justify-end">
-            {isEditing && (
-              <>
-                <Button
-                  className="w-full sm:mr-auto sm:w-auto"
-                  disabled={isExecuting}
-                  onClick={() => setDeleteOpen(true)}
-                  type="button"
-                  variant="destructive"
-                >
-                  <Trash2Icon className="size-4" />
-                  Remove license
-                </Button>
-                <Separator className="sm:hidden" />
-              </>
-            )}
             <Button
-              className="w-full sm:w-auto"
               disabled={isExecuting}
               onClick={() => onOpenChange(false)}
               type="button"
@@ -485,11 +488,7 @@ export function LicenseFormDialog({
             >
               Cancel
             </Button>
-            <Button
-              className="w-full sm:w-auto"
-              disabled={isExecuting}
-              type="submit"
-            >
+            <Button disabled={isExecuting} type="submit">
               {isExecuting
                 ? isEditing
                   ? "Saving..."

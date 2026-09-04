@@ -14,7 +14,7 @@ import { AIRCRAFT_PHOTOS_BUCKET } from "@/shared/lib/storage/buckets";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 
 const WEIGHT_BALANCE_CONTEXT_SELECT =
-  "id, aircraft_id, aircraft_identification, type_of_aircraft, aircraft_color_and_marking, created_by, pilot_in_command_id, flight_requests(id, status, rejected_reason, weight_balance_id), aircrafts(model, photo_path, aircraft_weight_balance_configs(basic_empty_weight, basic_empty_weight_arm, basic_empty_weight_moment), aircraft_types!inner(type, usable_fuel_arm, fi_and_student_arm, maximum_takeoff_weight, baggage_area_max_weight, aircraft_type_baggage_areas(position, arm)))";
+  "id, aircraft_id, aircraft_identification, aircraft_type_designator, type_of_aircraft, aircraft_color_and_marking, created_by, pilot_in_command_id, flight_requests(id, status, rejected_reason, weight_balance_id), aircrafts(registration_number, aircraft_type, photo_path, aircraft_weight_balance_configs(basic_empty_weight, basic_empty_weight_arm, basic_empty_weight_moment), aircraft_types!inner(type, usable_fuel_arm, fi_and_student_arm, maximum_takeoff_weight, baggage_area_max_weight, aircraft_type_baggage_areas(position, arm)))";
 
 export async function getWeightBalanceContext(
   flightPlanId: string,
@@ -144,10 +144,11 @@ export async function getWeightBalanceContext(
     weightBalanceId: data.flight_requests.weight_balance_id,
     aircraft: {
       id: data.aircraft_id ?? data.id,
-      aircraftIdentification: data.aircraft_identification,
-      model: aircraftRow?.model ?? "",
-      typeKey: data.type_of_aircraft,
-      typeName: type?.type ?? data.type_of_aircraft,
+      registrationNumber: aircraftRow?.registration_number ?? "",
+      registrationMark: data.aircraft_identification,
+      typeKey: aircraftRow?.aircraft_type ?? "",
+      typeName: data.type_of_aircraft,
+      typeIcaoDesignator: data.aircraft_type_designator ?? "",
       colorMarkings: data.aircraft_color_and_marking,
       photoUrl: aircraftRow?.photo_path
         ? storage.getPublicUrl(aircraftRow.photo_path).data.publicUrl

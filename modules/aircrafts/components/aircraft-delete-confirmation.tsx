@@ -25,7 +25,7 @@ export function AircraftDeleteConfirmation({
       confirmingLabel="Deleting..."
       description={
         aircraft
-          ? `${aircraft.aircraftIdentification} will be removed from the fleet. Its image, weight and balance configurations, and any flight records will also be deleted.`
+          ? `${aircraft.registrationMark} will be removed from the fleet. Its image, weight and balance configurations, and any flight records will also be deleted.`
           : "Remove this aircraft from the fleet."
       }
       icon={Trash2Icon}

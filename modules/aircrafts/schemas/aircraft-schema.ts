@@ -35,10 +35,16 @@ const optionalAircraftPhotoSchema = z
   });
 
 export const aircraftFormSchema = z.object({
-  aircraftIdentification: z.string().trim().min(1, "Enter aircraft identification."),
   aircraftType: z.string().trim().min(1, "Select an aircraft type."),
   colorMarkings: z.string().trim().min(1, "Enter color and markings."),
-  model: z.string().trim().min(1, "Enter aircraft model."),
+  registrationMark: z
+    .string()
+    .trim()
+    .min(1, "Enter the registration mark, e.g. RP-C1884."),
+  registrationNumber: z
+    .string()
+    .trim()
+    .min(1, "Enter the registration number, e.g. 1884."),
   photo: optionalAircraftPhotoSchema,
   remarks: z.string().trim().optional(),
   serialNumber: z.string().trim().min(1, "Enter aircraft serial number."),

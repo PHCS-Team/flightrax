@@ -5,60 +5,50 @@ export const LICENSE_TYPE_VALUES = [
   "flight_instructor_license",
 ] as const;
 
-export const RATING_VALUES = [
-  "instrument_rating",
-  "cessna_152_rating",
-  "cessna_172_rating",
-  "tecnam_p2002jf_rating",
-  "tecnam_p_mentor_rating",
-  "tecnam_p2006t_rating",
-] as const;
-
 export const LICENSE_TYPE_OPTIONS = [
-  { value: "student_pilot_license", label: "Student Pilot License" },
-  { value: "private_pilot_license", label: "Private Pilot License" },
-  { value: "commercial_pilot_license", label: "Commercial Pilot License" },
-  { value: "flight_instructor_license", label: "Flight Instructor License" },
+  {
+    value: "student_pilot_license",
+    label: "Student Pilot License",
+    abbreviation: "SPL",
+  },
+  {
+    value: "private_pilot_license",
+    label: "Private Pilot License",
+    abbreviation: "PPL",
+  },
+  {
+    value: "commercial_pilot_license",
+    label: "Commercial Pilot License",
+    abbreviation: "CPL",
+  },
+  {
+    value: "flight_instructor_license",
+    label: "Flight Instructor License",
+    abbreviation: "FI",
+  },
 ] as const satisfies ReadonlyArray<{
+  abbreviation: string;
   label: string;
   value: (typeof LICENSE_TYPE_VALUES)[number];
 }>;
 
-export const RATING_OPTIONS = [
-  { value: "instrument_rating", label: "Instrument Rating" },
-  { value: "cessna_152_rating", label: "Cessna 152 Rating" },
-  { value: "cessna_172_rating", label: "Cessna 172 Rating" },
-  { value: "tecnam_p2002jf_rating", label: "Tecnam P2002JF Rating" },
-  { value: "tecnam_p_mentor_rating", label: "Tecnam P-MENTOR Rating" },
-  { value: "tecnam_p2006t_rating", label: "Tecnam P2006T Rating" },
-] as const satisfies ReadonlyArray<{
-  label: string;
-  value: (typeof RATING_VALUES)[number];
-}>;
-
 export type LicenseTypeValue = (typeof LICENSE_TYPE_OPTIONS)[number]["value"];
-export type RatingValue = (typeof RATING_OPTIONS)[number]["value"];
 
 export function getLicenseTypeLabel(value: string | null) {
-  return LICENSE_TYPE_OPTIONS.find((option) => option.value === value)?.label ?? null;
+  return (
+    LICENSE_TYPE_OPTIONS.find((option) => option.value === value)?.label ?? null
+  );
 }
 
-export function getRatingLabel(value: string | null) {
-  return RATING_OPTIONS.find((option) => option.value === value)?.label ?? null;
+export function getLicenseTypeAbbreviation(value: string | null) {
+  return (
+    LICENSE_TYPE_OPTIONS.find((option) => option.value === value)
+      ?.abbreviation ?? null
+  );
 }
 
-export function getRatingsLabels(values: readonly string[] | null | undefined) {
-  if (!values || values.length === 0) {
-    return [];
-  }
-
-  return values.map((value) => getRatingLabel(value)).filter(Boolean);
-}
-
-export function isLicenseTypeValue(value: string | null): value is LicenseTypeValue {
+export function isLicenseTypeValue(
+  value: string | null,
+): value is LicenseTypeValue {
   return LICENSE_TYPE_VALUES.some((option) => option === value);
-}
-
-export function isRatingValue(value: string | null): value is RatingValue {
-  return RATING_VALUES.some((option) => option === value);
 }

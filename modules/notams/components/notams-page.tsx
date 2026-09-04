@@ -1,20 +1,13 @@
-import { AlertTriangleIcon } from "lucide-react";
-
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/shared/components/ui/card";
+import { NotamsClientSurface } from "@/modules/notams/components/notams-client-surface";
 import { PageHeader } from "@/shared/components/layout/page-header";
 
-const notams = [
-  ["Runway lighting", "Maintenance advisory for evening operations"],
-  ["Training area", "Altitude restriction near western practice sector"],
-  ["Tower frequency", "Monitor alternate frequency during drill window"],
-];
-
-export function NotamsPage() {
+export function NotamsPage({
+  canDeleteAny,
+  viewerId,
+}: {
+  canDeleteAny: boolean;
+  viewerId: string | null;
+}) {
   return (
     <section>
       <PageHeader
@@ -22,22 +15,10 @@ export function NotamsPage() {
           { href: "/dashboard", label: "Dashboard" },
           { href: "/notams", label: "NOTAMs" },
         ]}
-        title="Notice board"
+        title="NOTAMs"
       />
 
-      <div className="grid gap-4">
-        {notams.map(([title, description]) => (
-          <Card key={title}>
-            <CardHeader className="flex flex-row items-start justify-between gap-3">
-              <CardTitle>{title}</CardTitle>
-              <AlertTriangleIcon className="size-5 text-warning" />
-            </CardHeader>
-            <CardContent className="text-sm text-muted-foreground">
-              {description}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      <NotamsClientSurface canDeleteAny={canDeleteAny} viewerId={viewerId} />
     </section>
   );
 }

@@ -6,13 +6,13 @@ import { DialogSectionHeader } from "@/shared/components/layout/dialog-section-h
 import { Dialog, DialogContent } from "@/shared/components/ui/dialog";
 
 export function AircraftDetailsDialog({
-  aircraftIdentification,
+  registrationMark,
   colorMarkings,
   onOpenChange,
   open,
   remarks,
 }: {
-  aircraftIdentification: string;
+  registrationMark: string;
   colorMarkings: string;
   onOpenChange: (open: boolean) => void;
   open: boolean;
@@ -22,7 +22,7 @@ export function AircraftDetailsDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogSectionHeader
-          description={`Details and notes for ${aircraftIdentification}`}
+          description={`Details and notes for ${registrationMark}`}
           icon={WrenchIcon}
           title="Aircraft Details"
         />

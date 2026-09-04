@@ -32,9 +32,9 @@ export function AircraftTypeWbSpecsDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto p-6 sm:max-w-md">
         <DialogSectionHeader
-          description={`Define the weight and balance specifications for ${aircraftType.type}. Every aircraft of this type shares these values.`}
+          description={`The ICAO designator and weight and balance specifications for ${aircraftType.type}. Every aircraft of this type shares these values.`}
           icon={ScaleIcon}
-          title="W&B Specifications"
+          title="Type Specifications"
         />
         <WbSpecsForm aircraftType={aircraftType} onOpenChange={onOpenChange} />
       </DialogContent>
@@ -49,6 +49,9 @@ function WbSpecsForm({
   aircraftType: AircraftType;
   onOpenChange: (open: boolean) => void;
 }) {
+  const [icaoDesignator, setIcaoDesignator] = useState(
+    aircraftType.icaoDesignator,
+  );
   const [usableFuelArm, setUsableFuelArm] = useState(() =>
     aircraftType.usableFuelArm === null
       ? ""
@@ -118,6 +121,11 @@ function WbSpecsForm({
     const scalars = [usableFuelArm, fiAndStudentArm, maximumTakeoffWeight];
     const areas = baggageArms.map((arm) => arm.trim());
 
+    if (!/^[A-Z0-9]{2,4}$/.test(icaoDesignator)) {
+      setError("Enter the 2–4 character ICAO type designator, e.g. C152.");
+      return;
+    }
+
     if (
       scalars.some(
         (value) => !DECIMAL_NUMBER_PATTERN.test(value.trim()) || Number(value) <= 0,
@@ -149,6 +157,7 @@ function WbSpecsForm({
     setError(null);
     saveSpecs.execute({
       typeKey: aircraftType.typeKey,
+      icaoDesignator,
       usableFuelArm: Number(usableFuelArm),
       fiAndStudentArm: Number(fiAndStudentArm),
       maximumTakeoffWeight: Number(maximumTakeoffWeight),
@@ -161,6 +170,33 @@ function WbSpecsForm({
 
   return (
     <form className="grid gap-5" onSubmit={handleSubmit}>
+      <h3 className="-mb-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
+        Identification
+      </h3>
+      <div className="grid gap-2">
+        <label
+          className="text-sm font-semibold text-foreground"
+          htmlFor="type-icao-designator"
+        >
+          ICAO Designator
+          <span className="ml-1 text-secondary">*</span>
+        </label>
+        <Input
+          autoCapitalize="characters"
+          className="border-border bg-muted/30 font-mono uppercase text-[#121212] placeholder:normal-case placeholder:font-sans placeholder:text-muted-foreground/55 disabled:cursor-default"
+          disabled={isExecuting}
+          id="type-icao-designator"
+          maxLength={4}
+          onChange={(event) =>
+            setIcaoDesignator(
+              event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ""),
+            )
+          }
+          placeholder="C152"
+          value={icaoDesignator}
+        />
+      </div>
+
       <h3 className="-mb-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
         ARM Specifications
       </h3>

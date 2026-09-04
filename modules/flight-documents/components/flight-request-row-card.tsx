@@ -104,7 +104,7 @@ export function FlightRequestRowCard({
             {pill.label}
           </span>
         </div>
-        <p className="mt-2 flex items-center gap-2.5 text-sm font-semibold">
+        <p className="mt-2 flex items-center gap-2.5 text-sm font-semibold uppercase">
           <span className="truncate">{aircraftIdentification}</span>
           <span className="flex shrink-0 items-center gap-1">
             <span>{departureAerodrome}</span>

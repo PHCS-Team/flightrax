@@ -5,10 +5,9 @@ import { AwardIcon, IdCardIcon } from "lucide-react";
 
 import { useCertificates } from "@/modules/auth/hooks/use-certificates.query";
 import { useLicenses } from "@/modules/auth/hooks/use-licenses.query";
-import {
-  getLicenseTypeLabel,
-  getRatingsLabels,
-} from "@/shared/lib/aviation/license-options";
+import { getLicenseTypeLabel } from "@/shared/lib/aviation/license-options";
+import { resolveRatings } from "@/shared/lib/aviation/ratings";
+import { useRatingOptions } from "@/shared/hooks/use-rating-options.query";
 import { GlassSurface } from "@/shared/components/layout/glass-surface";
 import { Badge } from "@/shared/components/ui/badge";
 import { cn } from "@/shared/lib/utils";
@@ -40,9 +39,8 @@ function formatExpiry(hasNoExpiry: boolean, expiryDate: string | null) {
   return format(new Date(`${expiryDate}T00:00:00`), "MMM d, yyyy");
 }
 
-// Read-only overview for the Profile tab; management lives in the
-// Licenses & Certificates tab.
 export function AccountCredentialsSummary() {
+  const { ratingOptions } = useRatingOptions();
   const licensesQuery = useLicenses();
   const certificatesQuery = useCertificates();
   const licenses = licensesQuery.data ?? [];
@@ -78,7 +76,10 @@ export function AccountCredentialsSummary() {
             const status = getStatusBadge(
               license.status === "expired" || isPastExpiry(license.expiry_date),
             );
-            const ratingLabels = getRatingsLabels(license.ratings);
+            const ratingLabels = resolveRatings(
+              license.ratings,
+              ratingOptions,
+            ).map((rating) => rating.label);
 
             return (
               <li
@@ -93,10 +94,7 @@ export function AccountCredentialsSummary() {
                     </p>
                     <span className="shrink-0 text-xs font-medium text-primary-foreground/70">
                       Expires{" "}
-                      {formatExpiry(
-                        license.has_no_expiry,
-                        license.expiry_date,
-                      )}
+                      {formatExpiry(license.has_no_expiry, license.expiry_date)}
                     </span>
                   </div>
                   <p className="mt-0.5 truncate text-xs text-primary-foreground/65">

@@ -35,7 +35,7 @@ export function AircraftWeightBalanceCell({
         </Button>
         <AircraftWeightBalanceDialog
           aircraftId={aircraft.id}
-          aircraftLabel={aircraft.aircraftIdentification}
+          aircraftLabel={aircraft.registrationMark}
           onOpenChange={setWbDialogOpen}
           open={wbDialogOpen}
         />
@@ -96,7 +96,7 @@ export function AircraftWeightBalanceCell({
       </div>
       <AircraftWeightBalanceDialog
         aircraftId={aircraft.id}
-        aircraftLabel={aircraft.aircraftIdentification}
+        aircraftLabel={aircraft.registrationMark}
         initialValues={wbConfig}
         onOpenChange={setWbDialogOpen}
         open={wbDialogOpen}

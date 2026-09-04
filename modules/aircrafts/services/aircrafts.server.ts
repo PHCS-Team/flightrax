@@ -10,7 +10,7 @@ import { AIRCRAFT_PHOTOS_BUCKET } from "@/shared/lib/storage/buckets";
 import type { PaginatedResponse } from "@/shared/types/pagination";
 
 const AIRCRAFT_SELECT =
-  "aircraft_identification, aircraft_type, aircraft_types!inner(type, usable_fuel_arm, fi_and_student_arm, maximum_takeoff_weight, baggage_area_max_weight), color_markings, created_at, id, model, photo_path, remarks, serial_number, status, updated_at, aircraft_weight_balance_configs(id, basic_empty_weight, basic_empty_weight_arm, basic_empty_weight_moment)" as const;
+  "registration_number, registration_mark, aircraft_type, aircraft_types!inner(type, icao_designator, usable_fuel_arm, fi_and_student_arm, maximum_takeoff_weight, baggage_area_max_weight), color_markings, created_at, id, photo_path, remarks, serial_number, status, updated_at, aircraft_weight_balance_configs(id, basic_empty_weight, basic_empty_weight_arm, basic_empty_weight_moment)" as const;
 
 async function getMatchingAircraftTypes(
   supabase: ReturnType<typeof createAdminClient>,
@@ -26,8 +26,8 @@ async function getMatchingAircraftTypes(
 
 function buildSearchFilter(search: string, matchingAircraftTypes: string[]) {
   const filters: string[] = [
-    `aircraft_identification.ilike.%${search}%`,
-    `model.ilike.%${search}%`,
+    `registration_number.ilike.%${search}%`,
+    `registration_mark.ilike.%${search}%`,
     `serial_number.ilike.%${search}%`,
   ];
 
@@ -76,7 +76,7 @@ export async function getAircraftsPage(
     error,
     count: totalCount,
   } = await query
-    .order("aircraft_identification", { ascending: true })
+    .order("registration_number", { ascending: true })
     .range(from, to);
 
   if (error) {
@@ -96,18 +96,19 @@ export async function getAircraftsPage(
     const wb = row.aircraft_weight_balance_configs;
 
     return {
-      aircraftIdentification: row.aircraft_identification,
+      registrationMark: row.registration_mark,
+      registrationNumber: row.registration_number,
       aircraftType: row.aircraft_type,
       colorMarkings: row.color_markings,
       createdAt: row.created_at,
       id: row.id,
-      model: row.model,
       photoPath: row.photo_path,
       photoUrl,
       remarks: row.remarks,
       serialNumber: row.serial_number,
       status: row.status,
       typeName: row.aircraft_types.type,
+      typeIcaoDesignator: row.aircraft_types.icao_designator,
       typeWbSpecs: {
         usableFuelArm: row.aircraft_types.usable_fuel_arm,
         fiAndStudentArm: row.aircraft_types.fi_and_student_arm,

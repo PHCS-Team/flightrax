@@ -70,7 +70,7 @@ export function ReviewField({
       </p>
       <div
         className={cn(
-          "min-w-0 rounded-lg border border-primary-foreground/15 bg-primary-foreground/10 px-3 text-sm wrap-break-word text-primary-foreground sm:rounded-2xl",
+          "min-w-0 rounded-lg border border-primary-foreground/15 bg-primary-foreground/10 px-3 text-sm uppercase wrap-break-word text-primary-foreground sm:rounded-2xl",
           multiline
             ? "whitespace-pre-wrap py-2"
             : "flex min-h-9 items-center md:min-h-10",
@@ -82,8 +82,6 @@ export function ReviewField({
   );
 }
 
-// Read-only mirror of the form's radio list: every option stays visible
-// so the reviewer can see what was available, with the filed choice lit.
 export function ReviewOptionsField({
   className,
   label,
@@ -135,7 +133,6 @@ export function ReviewOptionsField({
   );
 }
 
-// Read-only mirror of the form's checkbox lists for multi-select groups.
 export function ReviewChecklistField({
   className,
   items,

@@ -1,5 +1,3 @@
-import { format } from "date-fns";
-
 import {
   DEFAULT_AERODROME_CODE,
   DEFAULT_DEPARTURE_POINT_REMARK,
@@ -7,9 +5,10 @@ import {
 import { getAerodromeName } from "@/modules/flight-documents/constants/philippine-aerodromes";
 import type { FlightPlanFilerContext } from "@/modules/flight-documents/types/filer-context";
 import {
-  getLicenseTypeLabel,
-  getRatingLabel,
-} from "@/shared/lib/aviation/license-options";
+  formatLicenseLine,
+  toLicenseShortForm,
+} from "@/modules/flight-documents/utils/format-license-line";
+import type { RatingOption } from "@/shared/types/rating-option";
 
 export type OtherInformationInput = {
   dofRaw: string;
@@ -18,37 +17,6 @@ export type OtherInformationInput = {
   firstAlternateAerodrome: string;
   secondAlternateAerodrome: string;
 };
-
-// License types and ratings are stored as underscored keys — use the
-// canonical labels, falling back to humanizing unknown values.
-function humanize(value: string) {
-  return value
-    .replace(/_RATING$/i, "")
-    .replaceAll("_", " ")
-    .toUpperCase();
-}
-
-function licenseTypeLabel(value: string) {
-  return (getLicenseTypeLabel(value) ?? humanize(value)).toUpperCase();
-}
-
-function ratingLabel(value: string) {
-  const label = getRatingLabel(value);
-
-  return (label ? label.replace(/ Rating$/, "") : humanize(value)).toUpperCase();
-}
-
-function formatExpiry(expiryDate: string | null, hasNoExpiry: boolean) {
-  if (hasNoExpiry) {
-    return "NO EXPIRY";
-  }
-
-  if (!expiryDate) {
-    return "—";
-  }
-
-  return format(new Date(`${expiryDate}T00:00:00`), "MM/dd/yyyy");
-}
 
 function roleLabel(role: FlightPlanFilerContext["profile"]["role"]) {
   if (role === "student") {
@@ -177,21 +145,15 @@ export function syncDofLine(text: string, dofRaw: string): string {
 export function buildOtherInformation(
   input: OtherInformationInput,
   context: FlightPlanFilerContext,
+  ratingOptions: readonly RatingOption[],
 ): string {
-  const licenseSegments = context.licenses.map((license) =>
-    [
-      `${licenseTypeLabel(license.licenseType)} ${license.licenseNumber}`,
-      license.ratings.length > 0
-        ? license.ratings.map(ratingLabel).join(" / ")
-        : "—",
-      formatExpiry(license.expiryDate, license.hasNoExpiry),
-    ].join(" | "),
+  // Same short form as the signature block: "123456-SPL | C152 | 25 APR '24".
+  const licenseLine = formatLicenseLine(
+    context.licenses.map((license) => toLicenseShortForm(license, ratingOptions)),
   );
-
-  const remark = [
-    context.profile.fullName.toUpperCase(),
-    ...licenseSegments,
-  ].join(" | ");
+  const remark = [context.profile.fullName.toUpperCase(), licenseLine]
+    .filter(Boolean)
+    .join(" | ");
 
   const lines = [`DOF/ ${input.dofRaw}`];
 

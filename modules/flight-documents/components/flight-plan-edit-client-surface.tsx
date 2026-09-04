@@ -198,7 +198,7 @@ export function FlightPlanEditClientSurface({
       <ConfirmationDialog
         confirmLabel="Delete flight plan"
         confirmingLabel="Deleting..."
-        description={`This permanently deletes the flight plan for ${flightPlan.aircraft.aircraftIdentification}, its request, and any linked Weight & Balance. This cannot be undone.`}
+        description={`This permanently deletes the flight plan for ${flightPlan.aircraft.registrationMark}, its request, and any linked Weight & Balance. This cannot be undone.`}
         icon={Trash2Icon}
         isConfirming={deleteFlightPlan.isExecuting}
         onConfirm={() => deleteFlightPlan.execute({ flightPlanId })}

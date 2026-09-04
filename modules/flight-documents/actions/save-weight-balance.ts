@@ -124,7 +124,7 @@ export const saveWeightBalanceAction = actionClient
         totalWeight <= maximumTakeoffWeight ? "within_limits" : "overweight",
       balance_status: parsedInput.balanceStatus,
       prepared_by_id: actor.id,
-      prepared_by_name: actor.full_name,
+      prepared_by_name: actor.full_name.toUpperCase(),
       prepared_by_signature: actor.signature_svg,
     };
 

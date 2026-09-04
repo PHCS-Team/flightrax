@@ -149,8 +149,13 @@ function AircraftTypeList() {
                     >
                       <div className="flex items-center gap-2">
                         <div className="min-w-0 flex-1">
-                          <span className="block truncate text-sm font-medium text-foreground">
-                            {type.type}
+                          <span className="flex min-w-0 items-center gap-2">
+                            <span className="truncate text-sm font-medium text-foreground">
+                              {type.type}
+                            </span>
+                            <span className="inline-flex h-5 shrink-0 items-center rounded-full border border-border bg-background px-2 font-mono text-[10px] font-semibold tracking-wide text-foreground">
+                              {type.icaoDesignator}
+                            </span>
                           </span>
                           <span className="block truncate text-xs text-muted-foreground/60">
                             {type.typeKey}
@@ -189,46 +194,87 @@ function AircraftTypeList() {
 
 function CreateTypeRow() {
   const [type, setType] = useState("");
-  const createType = useCreateAircraftType({ onSaved: () => setType("") });
+  const [icaoDesignator, setIcaoDesignator] = useState("");
+  const createType = useCreateAircraftType({
+    onSaved: () => {
+      setType("");
+      setIcaoDesignator("");
+    },
+  });
+  const canSubmit =
+    Boolean(type.trim()) &&
+    /^[A-Z0-9]{2,4}$/.test(icaoDesignator) &&
+    !createType.isExecuting;
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
 
-    if (!type.trim()) {
+    if (!canSubmit) {
       return;
     }
 
-    createType.execute({ type: type.trim() });
+    createType.execute({ type: type.trim(), icaoDesignator });
   }
 
   return (
-    <div className="grid gap-2">
-      <label
-        className="text-sm font-semibold text-foreground"
-        htmlFor="new-type-name"
-      >
-        Type Name
-        <span className="ml-1 text-secondary">*</span>
-      </label>
-      <form className="flex items-center gap-2" onSubmit={handleSubmit}>
-        <Input
-          className="flex-1 border-border bg-muted/30 text-[#121212] placeholder:text-muted-foreground/55"
-          disabled={createType.isExecuting}
-          id="new-type-name"
-          onChange={(e) => setType(e.target.value)}
-          placeholder="Cessna 172, Piper Archer, ..."
-          value={type}
-        />
-        <Button disabled={createType.isExecuting || !type.trim()} type="submit">
+    <form className="grid gap-2" onSubmit={handleSubmit}>
+      {/* One row on every viewport: name, designator, add. */}
+      <div className="grid grid-cols-[minmax(0,1fr)_5.5rem_auto] items-end gap-2">
+        <div className="grid gap-1.5">
+          <label
+            className="text-sm font-semibold text-foreground"
+            htmlFor="new-type-name"
+          >
+            Type Name
+            <span className="ml-1 text-secondary">*</span>
+          </label>
+          <Input
+            className="border-border bg-muted/30 text-[#121212] placeholder:text-muted-foreground/55"
+            disabled={createType.isExecuting}
+            id="new-type-name"
+            onChange={(e) => setType(e.target.value)}
+            placeholder="Cessna 172, Piper Archer, ..."
+            value={type}
+          />
+        </div>
+        <div className="grid gap-1.5">
+          <label
+            className="text-sm font-semibold text-foreground"
+            htmlFor="new-type-icao"
+          >
+            ICAO
+            <span className="ml-1 text-secondary">*</span>
+          </label>
+          <Input
+            autoCapitalize="characters"
+            className="border-border bg-muted/30 font-mono uppercase text-[#121212] placeholder:font-sans placeholder:normal-case placeholder:text-muted-foreground/55"
+            disabled={createType.isExecuting}
+            id="new-type-icao"
+            maxLength={4}
+            onChange={(e) =>
+              setIcaoDesignator(
+                e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ""),
+              )
+            }
+            placeholder="C172"
+            value={icaoDesignator}
+          />
+        </div>
+        <Button
+          aria-label="Add aircraft type"
+          className="disabled:cursor-default"
+          disabled={!canSubmit}
+          type="submit"
+        >
           <PlusIcon className="size-4" />
-          Add
+          <span className="hidden sm:inline">Add</span>
         </Button>
-      </form>
+      </div>
       <p className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400">
         <InfoIcon className="size-3.5 shrink-0" />
-        Types cannot be edited after creation. Double-check before adding.
+        Type names cannot be edited after creation.
       </p>
-    </div>
+    </form>
   );
 }
 

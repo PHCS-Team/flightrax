@@ -8,8 +8,9 @@ import { useLicenseImages } from "@/shared/hooks/use-license-images.query";
 import type { LicenseSummary } from "@/shared/types/license-summary";
 import {
   getLicenseTypeLabel,
-  getRatingsLabels,
 } from "@/shared/lib/aviation/license-options";
+import { resolveRatings } from "@/shared/lib/aviation/ratings";
+import { useRatingOptions } from "@/shared/hooks/use-rating-options.query";
 import { DialogSectionHeader } from "@/shared/components/layout/dialog-section-header";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
@@ -95,11 +96,12 @@ export function LicenseDetailsDialog({
   onOpenChange: (open: boolean) => void;
   open: boolean;
 }) {
+  const { ratingOptions } = useRatingOptions();
   const { data: urls, isPending, error } = useLicenseImages(license.id, open);
   const status = getStatusDetails(license);
   const licenseTypeLabel =
     getLicenseTypeLabel(license.license_type) ?? license.license_type;
-  const ratingLabels = getRatingsLabels(license.ratings);
+  const ratingLabels = resolveRatings(license.ratings, ratingOptions).map((rating) => rating.label);
   const errorMessage =
     error instanceof Error
       ? error.message

@@ -4,7 +4,6 @@ import {
   ChevronDownIcon,
   FileTextIcon,
   NotebookTextIcon,
-  PlaneIcon,
   ScaleIcon,
   TowerControlIcon,
   type LucideIcon,
@@ -14,26 +13,18 @@ import { useState, type ReactNode } from "react";
 
 import { AircraftHeaderCard } from "@/modules/flight-documents/components/aircraft-header-card";
 import { FlightJourneyReviewCard } from "@/modules/flight-documents/components/flight-journey-review-card";
-import { ReviewField } from "@/modules/flight-documents/components/flight-request-review-primitives";
 import { FlightPlanReviewCard } from "@/modules/flight-documents/components/flight-plan-review-card";
 import { WeightBalanceReviewCard } from "@/modules/flight-documents/components/weight-balance-review-card";
 import { useFlightJourney } from "@/modules/flight-documents/hooks/use-flight-journey.query";
 import { useOwnFlightPlanForEdit } from "@/modules/flight-documents/hooks/use-flight-plan.query";
 import { useWeightBalanceContext } from "@/modules/flight-documents/hooks/use-weight-balance-context.query";
 import { EmptyState } from "@/shared/components/layout/empty-state";
-import { GlassSurface } from "@/shared/components/layout/glass-surface";
 import { LoadingScreen } from "@/shared/components/layout/loading-screen";
 import { Button } from "@/shared/components/ui/button";
 import { cn } from "@/shared/lib/utils";
 
-type LogSectionId = "aircraft" | "plan" | "weight-balance" | "journey";
+type LogSectionId = "plan" | "weight-balance" | "journey";
 
-// One accordion section of the flight log — a glass bar toggles its
-// content, and the surface keeps only one section open at a time. The
-// section container owns the border and rounding permanently and clips
-// its content, so opening/closing only animates height — no corner or
-// border switching mid-animation. The content card's own chrome is
-// stripped; the container is its frame.
 function LogAccordionSection({
   children,
   icon: Icon,
@@ -77,7 +68,7 @@ function LogAccordionSection({
         )}
       >
         <div className="overflow-hidden">
-          <div className="[&>[data-slot=glass-surface]]:rounded-none [&>[data-slot=glass-surface]]:border-0 [&>[data-slot=glass-surface]]:sm:rounded-none">
+          <div className="*:data-[slot=glass-surface]:rounded-none *:data-[slot=glass-surface]:border-0 *:data-[slot=glass-surface]:sm:rounded-none">
             {children}
           </div>
         </div>
@@ -92,9 +83,7 @@ export function FlightLogClientSurface({
   flightPlanId: string;
 }) {
   const router = useRouter();
-  const [openSection, setOpenSection] = useState<LogSectionId | null>(
-    "aircraft",
-  );
+  const [openSection, setOpenSection] = useState<LogSectionId | null>("plan");
   const flightPlanQuery = useOwnFlightPlanForEdit(flightPlanId);
   const weightBalanceQuery = useWeightBalanceContext(flightPlanId);
   const journeyQuery = useFlightJourney(flightPlanId);
@@ -144,33 +133,6 @@ export function FlightLogClientSurface({
   return (
     <div className="grid sm:gap-4">
       <AircraftHeaderCard aircraft={flightPlan.aircraft} />
-
-      <LogAccordionSection
-        icon={PlaneIcon}
-        onToggle={() => toggleSection("aircraft")}
-        open={openSection === "aircraft"}
-        title="Aircraft Details"
-      >
-        <GlassSurface className="grid gap-6 p-4 sm:p-6">
-          <div className="grid gap-4 sm:grid-cols-3">
-            <ReviewField
-              label="Aircraft Identification"
-              value={flightPlan.aircraft.aircraftIdentification}
-            />
-            <ReviewField
-              label="Type of Aircraft"
-              value={flightPlan.aircraft.typeName}
-            />
-            <ReviewField label="Model" value={flightPlan.aircraft.model} />
-            <ReviewField
-              className="sm:col-span-3"
-              label="Color & Markings"
-              multiline
-              value={flightPlan.aircraft.colorMarkings}
-            />
-          </div>
-        </GlassSurface>
-      </LogAccordionSection>
 
       <LogAccordionSection
         icon={FileTextIcon}

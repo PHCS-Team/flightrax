@@ -104,7 +104,7 @@ export function AircraftSelectDialog({
             <Input
               className="border-border bg-muted/30 pl-9 text-[#121212] placeholder:text-muted-foreground/55"
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search identification or model"
+              placeholder="Search registration mark or number"
               value={search}
             />
           </div>
@@ -179,7 +179,7 @@ export function AircraftSelectDialog({
                     <div className="relative flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-muted">
                       {aircraft.photoUrl ? (
                         <div
-                          aria-label={`${aircraft.aircraftIdentification} image`}
+                          aria-label={`${aircraft.registrationMark} image`}
                           className="absolute inset-0 bg-cover bg-center"
                           role="img"
                           style={{
@@ -191,11 +191,17 @@ export function AircraftSelectDialog({
                       )}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-semibold text-foreground">
-                        {aircraft.aircraftIdentification}
-                      </p>
+                      <div className="flex min-w-0 items-center gap-1.5">
+                        <p className="truncate text-sm font-semibold text-foreground">
+                          {aircraft.registrationMark}
+                        </p>
+                        <span className="inline-flex h-4.5 shrink-0 items-center rounded-full border border-border bg-muted/40 px-1.5 font-mono text-[10px] font-semibold tracking-wide text-foreground/80">
+                          {aircraft.typeIcaoDesignator}
+                        </span>
+                      </div>
                       <p className="truncate text-xs text-muted-foreground">
-                        {aircraft.typeName} &middot; {aircraft.model}
+                        {aircraft.typeName} &middot; No.{" "}
+                        {aircraft.registrationNumber}
                       </p>
                     </div>
                     {!aircraft.isAvailable && aircraft.unavailableReason ? (
@@ -219,11 +225,9 @@ export function AircraftSelectDialog({
               })}
               <div aria-hidden className="h-px" ref={sentinelRef} />
               {isFetchingNextPage && (
-                <div className="grid gap-2">
-                  {Array.from({ length: 2 }).map((_, i) => (
-                    <Skeleton className="h-16 w-full" key={i} />
-                  ))}
-                </div>
+                <p className="py-3 text-center text-sm text-muted-foreground">
+                  Loading more aircraft...
+                </p>
               )}
               {!hasNextPage && aircraftOptions.length > 0 && (
                 <p className="py-2 text-center text-xs text-muted-foreground">

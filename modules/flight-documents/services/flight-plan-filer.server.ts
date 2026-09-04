@@ -7,6 +7,7 @@ import type {
 import type { LicenseTypeValue } from "@/shared/lib/aviation/license-options";
 import { isLicenseValid } from "@/shared/lib/aviation/license-validity";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
+import { ROLE } from "@/shared/lib/rbac/config";
 import { isApproved } from "@/shared/lib/rbac/guards";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 
@@ -34,10 +35,14 @@ export async function getFlightPlanFilerContext(): Promise<FlightPlanFilerContex
   const hasValidLicense = (licenses ?? []).some((license) =>
     isLicenseValid(license),
   );
-  const canSetSelfAsPic = (licenses ?? []).some(
-    (license) =>
-      license.license_type === PPL_LICENSE_TYPE && isLicenseValid(license),
-  );
+  const isInstructor =
+    viewer.role === ROLE.INSTRUCTOR || viewer.role === ROLE.SUPERADMIN;
+  const canSetSelfAsPic = isInstructor
+    ? hasValidLicense
+    : (licenses ?? []).some(
+        (license) =>
+          license.license_type === PPL_LICENSE_TYPE && isLicenseValid(license),
+      );
 
   return {
     profile: {

@@ -16,7 +16,10 @@ import {
   SCHEDULE_MANAGE,
   SCHEDULE_VIEW,
 } from "@/modules/schedule/constants/permissions";
-import { NOTAMS_VIEW } from "@/modules/notams/constants/permissions";
+import {
+  NOTAMS_MANAGE,
+  NOTAMS_VIEW,
+} from "@/modules/notams/constants/permissions";
 import {
   CREDENTIALS_VIEW_DETAILS,
   SYSTEM_MANAGE,
@@ -113,7 +116,7 @@ const ADMIN_DEPARTMENT_PERMISSIONS = {
     SCHEDULE_MANAGE,
   ],
   [ADMIN_DEPARTMENT.AIR_TRAFFIC_CONTROLLER]: [FLIGHT_PLANS_VIEW],
-  [ADMIN_DEPARTMENT.SAFETY_PERSONNEL]: [NOTAMS_VIEW],
+  [ADMIN_DEPARTMENT.SAFETY_PERSONNEL]: [NOTAMS_MANAGE, NOTAMS_VIEW],
 } satisfies Record<AdminDepartment, Permission[]>;
 
 export function getRolePermissions(

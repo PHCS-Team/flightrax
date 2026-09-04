@@ -3,6 +3,7 @@
 import { createAircraftSchema } from "@/modules/aircrafts/schemas/aircraft-schema";
 import { getAircraftPhotoPath } from "@/modules/aircrafts/utils/aircraft-photo";
 import { canManageAircrafts } from "@/modules/aircrafts/utils/aircraft-permissions";
+import { getAircraftWriteErrorMessage } from "@/modules/aircrafts/utils/aircraft-write-error";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
@@ -38,11 +39,11 @@ export const createAircraftAction = actionClient
 
     const now = new Date().toISOString();
     const { error } = await supabase.from("aircrafts").insert({
-      aircraft_identification: parsedInput.aircraftIdentification,
+      registration_number: parsedInput.registrationNumber,
       aircraft_type: parsedInput.aircraftType,
       color_markings: parsedInput.colorMarkings,
       id: aircraftId,
-      model: parsedInput.model,
+      registration_mark: parsedInput.registrationMark,
       photo_content_type: parsedInput.photo?.type ?? null,
       photo_path: photoPath,
       photo_size_bytes: parsedInput.photo?.size ?? null,
@@ -57,7 +58,7 @@ export const createAircraftAction = actionClient
         await supabase.storage.from(AIRCRAFT_PHOTOS_BUCKET).remove([photoPath]);
       }
 
-      return { ok: false, message: error.message };
+      return { ok: false, message: getAircraftWriteErrorMessage(error) };
     }
 
     return { ok: true, message: "Aircraft created." };

@@ -76,9 +76,6 @@ const PASSCODE_DESCRIPTIONS: Record<FlightActionType, string> = {
   cancel: "Enter your 4-digit security passcode to cancel this flight.",
 };
 
-// Right-side drawer listing the day's flight journeys — scheduled ones
-// waiting to commence, active ones waiting to terminate, and arrived
-// ones for reference. Both actions are passcode-gated.
 export function TodaysFlightsDrawer({
   onOpenChange,
   open,
@@ -156,8 +153,6 @@ export function TodaysFlightsDrawer({
         <SheetContent
           className="gap-0 overflow-y-auto p-4 data-[side=right]:w-full data-[side=right]:sm:max-w-md sm:p-6"
           onEscapeKeyDown={(event) => {
-            // The passcode/confirmation dialogs are portaled outside the
-            // sheet — while one is open, the sheet must not react.
             if (pendingAction || cancelConfirm || earlierBlock) {
               event.preventDefault();
             }
@@ -286,12 +281,12 @@ export function TodaysFlightsDrawer({
           {earlierBlock && (
             <>
               <div className="grid gap-1 rounded-lg border border-border bg-muted/30 p-3">
-                <p className="font-semibold text-foreground">
+                <p className="font-semibold uppercase text-foreground">
                   {earlierBlock.aircraftIdentification}
                   {earlierBlock.dofAt &&
                     ` · ${format(new Date(earlierBlock.dofAt), "h:mm a")}`}
                 </p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm uppercase text-muted-foreground">
                   Trainee: {formatShortPersonName(earlierBlock.traineeName)}
                 </p>
               </div>
@@ -384,7 +379,7 @@ function TodaysFlightCard({
   return (
     <div className="grid gap-1.5 rounded-lg border border-border bg-muted/30 p-2.5 sm:gap-2 sm:rounded-xl sm:p-3">
       <div className="flex items-center justify-between gap-2">
-        <p className="truncate text-sm font-semibold text-foreground sm:text-base">
+        <p className="truncate text-sm font-semibold uppercase text-foreground sm:text-base">
           {row.aircraftIdentification}
         </p>
         <span className="flex shrink-0 items-center gap-1.5">
@@ -408,7 +403,7 @@ function TodaysFlightCard({
 
       <p className="flex min-w-0 items-center gap-1.5 text-sm font-medium text-foreground">
         <PlaneIcon className="size-4 shrink-0 fill-muted-foreground text-muted-foreground" />
-        <span className="truncate">
+        <span className="truncate uppercase">
           {row.departureAerodrome} - {row.destinationAerodrome}
           <span className="font-normal text-muted-foreground">
             {" "}
@@ -417,7 +412,7 @@ function TodaysFlightCard({
         </span>
       </p>
 
-      <p className="truncate text-xs text-muted-foreground">
+      <p className="truncate text-xs uppercase text-muted-foreground">
         {formatShortPersonName(row.traineeName)} ·{" "}
         {formatShortPersonName(row.pilotInCommandName)}
         <span className="hidden sm:inline"> — trainee · instructor</span>
