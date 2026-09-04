@@ -4,7 +4,7 @@
 // currently active flight.
 export type FlightPlanAircraftOption = {
   id: string;
-  aircraftIdentification: string;
+  registrationNumber: string;
   registrationMark: string;
   typeKey: string;
   typeName: string;

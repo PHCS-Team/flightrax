@@ -59,7 +59,7 @@ export function FlightPlanReviewCard({
         <div className="grid gap-4 sm:grid-cols-2">
           <ReviewField
             label="Aircraft Registration"
-            value={aircraft.aircraftIdentification}
+            value={aircraft.registrationMark}
           />
           <ReviewField
             label="Type of Aircraft"

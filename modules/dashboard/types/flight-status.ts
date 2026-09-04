@@ -31,7 +31,7 @@ export type DashboardFlightJourney = {
 
 export type DashboardFlightStatusRow = {
   aircraftId: string;
-  aircraftIdentification: string;
+  registrationNumber: string;
   registrationMark: string;
   typeName: string;
   typeIcaoDesignator: string;

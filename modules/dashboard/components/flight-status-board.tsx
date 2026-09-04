@@ -112,7 +112,7 @@ export function FlightStatusBoard({
 
   const columns = [
     {
-      accessorKey: "aircraftIdentification",
+      accessorKey: "registrationMark",
       header: "Aircraft",
       cell: ({ row }) => (
         <div className="flex min-w-0 items-center gap-2">
@@ -405,7 +405,7 @@ function FlightStatusDetails({ row }: { row: DashboardFlightStatusRow }) {
 
       {row.photoUrl ? (
         <div
-          aria-label={`${row.aircraftIdentification} aircraft image`}
+          aria-label={`${row.registrationMark} aircraft image`}
           className="h-full min-h-24 rounded-lg border border-primary-foreground/15 bg-primary-foreground/10 bg-cover bg-center sm:min-h-28 sm:rounded-xl"
           role="img"
           style={{ backgroundImage: `url(${row.photoUrl})` }}

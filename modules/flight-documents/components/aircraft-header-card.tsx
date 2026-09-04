@@ -31,7 +31,7 @@ export function AircraftHeaderCard({
     >
       {aircraft.photoUrl ? (
         <div
-          aria-label={`${aircraft.aircraftIdentification} aircraft image`}
+          aria-label={`${aircraft.registrationMark} aircraft image`}
           className="absolute inset-0 bg-cover bg-center"
           role="img"
           style={{ backgroundImage: `url(${aircraft.photoUrl})` }}
@@ -71,9 +71,9 @@ export function AircraftHeaderCard({
           </span>
         </div>
         <p className="mt-0.5 text-sm uppercase text-primary-foreground/80">
-          {aircraft.typeName} &middot; No. {aircraft.aircraftIdentification}
+          {aircraft.typeName} &middot; No. {aircraft.registrationNumber}
         </p>
-        <p className="mt-0.5 line-clamp-2 text-xs text-primary-foreground/60">
+        <p className="mt-0.5 line-clamp-2 text-xs uppercase text-primary-foreground/60">
           {aircraft.colorMarkings}
         </p>
       </div>

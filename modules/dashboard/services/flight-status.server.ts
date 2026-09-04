@@ -43,8 +43,8 @@ export async function getDashboardFlightStatusPage(
   return {
     data: rows.map((row) => ({
       aircraftId: row.id,
-      aircraftIdentification: row.aircraft_identification,
-      registrationMark: row.model,
+      registrationNumber: row.registration_number,
+      registrationMark: row.registration_mark,
       typeName: row.type_name,
       typeIcaoDesignator: row.type_icao_designator,
       photoUrl: row.photo_path

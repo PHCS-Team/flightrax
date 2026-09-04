@@ -58,8 +58,8 @@ export async function getFlightPlanAircraftOptionsPage(
   return {
     data: rows.map((row) => ({
       id: row.id,
-      aircraftIdentification: row.aircraft_identification,
-      registrationMark: row.model,
+      registrationNumber: row.registration_number,
+      registrationMark: row.registration_mark,
       typeKey: row.type_key,
       typeName: row.type_name,
       typeIcaoDesignator: row.type_icao_designator,
@@ -108,7 +108,7 @@ export async function getFlightPlanAircraft(
 
   return {
     id: data.id,
-    aircraftIdentification: data.registration_number,
+    registrationNumber: data.registration_number,
     registrationMark: data.registration_mark,
     typeKey: data.aircraft_type,
     typeName: data.aircraft_types.type,

@@ -1153,7 +1153,6 @@ export type Database = {
           p_status_group?: string
         }
         Returns: {
-          aircraft_identification: string
           aircraft_status: Database["public"]["Enums"]["aircraft_status"]
           commenced_at: string
           cruising_level: string
@@ -1164,9 +1163,10 @@ export type Database = {
           id: string
           journey_id: string
           journey_status: Database["public"]["Enums"]["journey_status"]
-          model: string
           photo_path: string
           pilot_in_command_name: string
+          registration_mark: string
+          registration_number: string
           terminated_at: string
           total_count: number
           total_eet: string
@@ -1184,15 +1184,15 @@ export type Database = {
           p_type_key?: string
         }
         Returns: {
-          aircraft_identification: string
           color_markings: string
           has_active_flight: boolean
           has_type_specs: boolean
           has_wb_config: boolean
           id: string
           is_available: boolean
-          model: string
           photo_path: string
+          registration_mark: string
+          registration_number: string
           total_count: number
           type_icao_designator: string
           type_key: string
