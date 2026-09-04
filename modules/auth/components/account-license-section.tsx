@@ -10,8 +10,9 @@ import { useLicenses } from "@/modules/auth/hooks/use-licenses.query";
 import type { License } from "@/shared/types/license";
 import {
   getLicenseTypeLabel,
-  getRatingsLabels,
 } from "@/shared/lib/aviation/license-options";
+import { resolveRatings } from "@/shared/lib/aviation/ratings";
+import { useRatingOptions } from "@/shared/hooks/use-rating-options.query";
 import { EmptyState } from "@/shared/components/layout/empty-state";
 import { GlassSurface } from "@/shared/components/layout/glass-surface";
 import { LoadingScreen } from "@/shared/components/layout/loading-screen";
@@ -45,6 +46,7 @@ function formatExpiryDate(license: License) {
 }
 
 export function AccountLicenseSection() {
+  const { ratingOptions } = useRatingOptions();
   const { data, isPending, error } = useLicenses();
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [editingLicense, setEditingLicense] = useState<License | null>(null);
@@ -125,7 +127,7 @@ export function AccountLicenseSection() {
               const licenseTypeLabel =
                 getLicenseTypeLabel(license.license_type) ??
                 license.license_type;
-              const ratingLabels = getRatingsLabels(license.ratings);
+              const ratingLabels = resolveRatings(license.ratings, ratingOptions).map((rating) => rating.label);
 
               return (
                 <div

@@ -26,7 +26,6 @@ import {
   DialogFooter,
 } from "@/shared/components/ui/dialog";
 import { Input } from "@/shared/components/ui/input";
-import { Separator } from "@/shared/components/ui/separator";
 import { Textarea } from "@/shared/components/ui/textarea";
 
 const CERTIFICATE_PHOTO_HELPER_TEXT = `JPG, PNG, or WebP only. Maximum file size is ${CERTIFICATE_IMAGE_MAX_BYTES / 1024 / 1024} MB. New uploads replace the current image.`;
@@ -259,24 +258,27 @@ export function CertificateFormDialog({
             value={selectedImage ?? null}
           />
 
+          {isEditing && (
+            <div className="flex flex-col gap-2 rounded-lg border border-destructive/30 bg-destructive/5 p-3 sm:flex-row sm:items-center sm:justify-between sm:rounded-2xl">
+              <p className="text-xs text-muted-foreground">
+                Removing this certificate deletes its photos and cannot be undone.
+              </p>
+              <Button
+                className="shrink-0 border-destructive/40 bg-background text-destructive hover:bg-destructive/10 hover:text-destructive"
+                disabled={isExecuting}
+                onClick={() => setDeleteOpen(true)}
+                size="sm"
+                type="button"
+                variant="outline"
+              >
+                <Trash2Icon className="size-4" />
+                Remove certificate
+              </Button>
+            </div>
+          )}
+
           <DialogFooter className="-mx-6 -mb-6 mt-1 sm:justify-end">
-            {isEditing && (
-              <>
-                <Button
-                  className="w-full sm:mr-auto sm:w-auto"
-                  disabled={isExecuting}
-                  onClick={() => setDeleteOpen(true)}
-                  type="button"
-                  variant="destructive"
-                >
-                  <Trash2Icon className="size-4" />
-                  Remove certificate
-                </Button>
-                <Separator className="sm:hidden" />
-              </>
-            )}
             <Button
-              className="w-full sm:w-auto"
               disabled={isExecuting}
               onClick={() => onOpenChange(false)}
               type="button"
@@ -284,11 +286,7 @@ export function CertificateFormDialog({
             >
               Cancel
             </Button>
-            <Button
-              className="w-full sm:w-auto"
-              disabled={isExecuting}
-              type="submit"
-            >
+            <Button disabled={isExecuting} type="submit">
               {isExecuting
                 ? isEditing
                   ? "Saving..."

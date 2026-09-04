@@ -200,7 +200,8 @@ export function AircraftSelectDialog({
                         </span>
                       </div>
                       <p className="truncate text-xs text-muted-foreground">
-                        {aircraft.typeName} &middot; No. {aircraft.registrationNumber}
+                        {aircraft.typeName} &middot; No.{" "}
+                        {aircraft.registrationNumber}
                       </p>
                     </div>
                     {!aircraft.isAvailable && aircraft.unavailableReason ? (
