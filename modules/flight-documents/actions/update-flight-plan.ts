@@ -9,7 +9,10 @@ import {
 } from "@/modules/flight-documents/utils/flight-plan-time";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { isApproved } from "@/shared/lib/rbac/guards";
-import { getPicUnavailabilityEndsOn } from "@/modules/flight-documents/services/flight-plan-filer.server";
+import {
+  getPicUnavailabilityEndsOn,
+  isInstructorProfile,
+} from "@/modules/flight-documents/services/flight-plan-filer.server";
 import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 
@@ -57,8 +60,6 @@ export const updateFlightPlanAction = actionClient
 
     const dofDate = resolveDof(parsedInput.dofRaw).slice(0, 10);
 
-    // The chosen PIC must be available on the flight's zulu date — the
-    // filer may always name themselves, even while marked unavailable.
     if (parsedInput.pilotInCommandId !== actor.id) {
       const unavailableUntil = await getPicUnavailabilityEndsOn(
         parsedInput.pilotInCommandId,
@@ -74,10 +75,25 @@ export const updateFlightPlanAction = actionClient
       }
     }
 
-    // No aircraft-conflict guard here: drafts may freely target any
-    // aircraft/DOF — the conflict rules apply at submit and approval.
-    // Aircraft, filer, and license snapshots stay as filed — edits only
-    // touch the form fields. Free text is stored uppercase.
+    if (!(await isInstructorProfile(parsedInput.instructorId))) {
+      return { ok: false, message: "Choose a flight instructor." };
+    }
+
+    if (parsedInput.instructorId !== actor.id) {
+      const unavailableUntil = await getPicUnavailabilityEndsOn(
+        parsedInput.instructorId,
+        dofDate,
+      );
+
+      if (unavailableUntil) {
+        return {
+          ok: false,
+          message:
+            "The selected flight instructor is unavailable on the date of flight — choose another instructor.",
+        };
+      }
+    }
+
     const { error: updateError } = await supabase
       .from("flight_plans")
       .update({
@@ -154,6 +170,15 @@ export const updateFlightPlanAction = actionClient
 
     if (updateError) {
       return { ok: false, message: updateError.message };
+    }
+
+    const { error: requestUpdateError } = await supabase
+      .from("flight_requests")
+      .update({ instructor_profile_id: parsedInput.instructorId })
+      .eq("flight_plan_id", parsedInput.flightPlanId);
+
+    if (requestUpdateError) {
+      return { ok: false, message: requestUpdateError.message };
     }
 
     return { ok: true, message: "Flight plan updated." };

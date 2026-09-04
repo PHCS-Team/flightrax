@@ -172,7 +172,7 @@ export function FlightStatusBoard({
       header: "Instructor",
       cell: ({ row }) => (
         <p className="truncate text-sm uppercase text-primary-foreground/90">
-          {formatShortPersonName(row.original.journey.pilotInCommandName)}
+          {formatShortPersonName(row.original.journey.instructorName)}
         </p>
       ),
     },

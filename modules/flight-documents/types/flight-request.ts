@@ -50,9 +50,9 @@ export type FlightRequestListItem = {
 export type FlightRequestReviewListItem = FlightRequestListItem & {
   requestedByName: string;
   pilotInCommandName: string;
+  instructorName: string;
 };
 
-// Journey lifecycle record shown on the read-only flight log preview.
 export type FlightJourneyDetails = {
   status: JourneyStatus;
   commencedAt: string | null;

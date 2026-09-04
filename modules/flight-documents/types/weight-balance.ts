@@ -24,8 +24,6 @@ export type WeightBalanceBaggageEntryUpdate =
 export type WeightStatus = (typeof WEIGHT_STATUS_OPTIONS)[number]["value"];
 export type BalanceStatus = (typeof BALANCE_STATUS_OPTIONS)[number]["value"];
 
-// Given data the W&B form displays read-only: the aircraft's measured
-// basic empty weight trio plus the type's ARMs and limits.
 export type WeightBalanceGivens = {
   basicEmptyWeight: number;
   basicEmptyWeightArm: number;
@@ -37,11 +35,11 @@ export type WeightBalanceGivens = {
   baggageAreaMaxWeight: number;
 };
 
-// Everything the W&B page needs for one flight plan's request.
 export type WeightBalanceContext = {
   isOwner: boolean;
   flightPlanId: string;
   pilotInCommandId: string | null;
+  instructorProfileId: string | null;
   rejectedReason: string | null;
   requestId: string;
   requestStatus: FlightRequestStatus;
@@ -51,7 +49,6 @@ export type WeightBalanceContext = {
   existing: WeightBalanceFormValues | null;
 };
 
-// One weight/arm/moment station line on the W&B sheet.
 export type WeightBalanceStation = {
   weight: number | null;
   arm: number | null;

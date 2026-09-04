@@ -14,12 +14,12 @@ import { PasscodeGatewayDialog } from "@/shared/components/layout/passcode-gatew
 import { Button } from "@/shared/components/ui/button";
 
 export function FlightRequestReviewActions({
+  canReview,
   flightPlanId,
-  isPic,
   requestStatus,
 }: {
+  canReview: boolean;
   flightPlanId: string;
-  isPic: boolean;
   requestStatus: FlightRequestStatus;
 }) {
   const router = useRouter();
@@ -72,16 +72,16 @@ export function FlightRequestReviewActions({
   return (
     <>
       <div className="grid gap-2 p-4 sm:p-0">
-        {!isPic && (
+        {!canReview && (
           <p className="text-xs text-primary-foreground/60 sm:text-right">
-            Only the assigned pilot in command can approve or reject this
-            request.
+            Only the assigned flight instructor or the pilot in command can
+            approve or reject this request.
           </p>
         )}
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <Button
             className="border-red-200/25 bg-red-200/10 text-red-100 hover:bg-red-200/15 hover:text-red-50 disabled:cursor-default"
-            disabled={!isPic || rejectRequest.isExecuting}
+            disabled={!canReview || rejectRequest.isExecuting}
             onClick={() => startFlow("reject")}
             type="button"
             variant="outline"
@@ -91,7 +91,7 @@ export function FlightRequestReviewActions({
           </Button>
           <Button
             className="disabled:cursor-default"
-            disabled={!isPic || approveRequest.isExecuting}
+            disabled={!canReview || approveRequest.isExecuting}
             onClick={() => startFlow("approve")}
             type="button"
           >

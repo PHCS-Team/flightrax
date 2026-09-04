@@ -146,10 +146,8 @@ function OrganizedBoardRow({
   row: DashboardFlightStatusRow;
 }) {
   const journey = row.journey;
-  const subtitle = `${formatShortPersonName(journey.traineeName)} · ${formatShortPersonName(journey.pilotInCommandName)}`;
+  const subtitle = `${formatShortPersonName(journey.traineeName)} · ${formatShortPersonName(journey.instructorName)}`;
   const overdue = isJourneyOverdue(journey.status, journey.dofAt, nowMs);
-  // On Ground rows have not departed yet — the column shows their
-  // estimated time of departure instead.
   const departedAt = journey.commencedAt ? (
     formatTimeOfDay(journey.commencedAt)
   ) : journey.dofAt ? (

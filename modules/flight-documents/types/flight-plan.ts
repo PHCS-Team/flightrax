@@ -25,8 +25,6 @@ export type ComNavEquipment =
 export type SurveillanceEquipment =
   (typeof SURVEILLANCE_EQUIPMENT_OPTIONS)[number]["value"];
 
-// Item 19 emergency equipment checkboxes, mirrored as flat boolean
-// columns on flight_plans.
 export type EmergencyEquipment = {
   radioUhf: boolean;
   radioVhf: boolean;
@@ -49,13 +47,11 @@ export type DinghiesInfo = {
   color: string | null;
 };
 
-// A flight plan loaded for editing: form values plus everything the edit
-// surface needs to gate and render (request status, rejection reason, and
-// the aircraft header info).
 export type FlightPlanForEdit = {
   flightPlanId: string;
   aircraftId: string | null;
   filedByName: string;
+  instructorName: string;
   isOwner: boolean;
   requestStatus: FlightRequestStatus;
   rejectedReason: string | null;
@@ -63,8 +59,6 @@ export type FlightPlanForEdit = {
   values: FlightPlanFormValues;
 };
 
-// Shape of one snapshotted license row stored in
-// flight_plans.pilot_licenses / authorized_representative_licenses.
 export type PilotLicenseSnapshot = {
   licenseType: string;
   licenseNumber: string;

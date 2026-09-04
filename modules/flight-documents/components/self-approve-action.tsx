@@ -22,8 +22,9 @@ export function SelfApproveAction({ flightPlanId }: { flightPlanId: string }) {
     <>
       <div className="flex flex-col gap-2 rounded-lg border border-primary-foreground/15 bg-primary-foreground/5 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-xs text-primary-foreground/80">
-          You are the pilot in command on this flight plan, so you can approve
-          your own request once you have double-checked every detail.
+          You are the pilot in command or the flight instructor on this flight
+          plan, so you can approve your own request once you have
+          double-checked every detail.
         </p>
         <Button
           className="shrink-0 disabled:cursor-default"
@@ -61,7 +62,7 @@ export function SelfApproveAction({ flightPlanId }: { flightPlanId: string }) {
         confirmLabel="Approve request"
         confirmVariant="default"
         confirmingLabel="Approving..."
-        description="You are about to approve your own flight plan request as its pilot in command."
+        description="You are about to approve your own flight plan request."
         icon={TriangleAlertIcon}
         warning="Double-check every field of the flight plan and its Weight & Balance before confirming. Once approved, the plan is locked from editing and the approval is permanently traced back to you as the approver."
         isConfirming={approveRequest.isExecuting}

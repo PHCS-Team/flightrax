@@ -11,7 +11,10 @@ import { generatePlanCode } from "@/modules/flight-documents/utils/generate-plan
 import { isLicenseValid } from "@/shared/lib/aviation/license-validity";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { isApproved } from "@/shared/lib/rbac/guards";
-import { getPicUnavailabilityEndsOn } from "@/modules/flight-documents/services/flight-plan-filer.server";
+import {
+  getPicUnavailabilityEndsOn,
+  isInstructorProfile,
+} from "@/modules/flight-documents/services/flight-plan-filer.server";
 import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 
@@ -111,6 +114,25 @@ export const createFlightPlanAction = actionClient
           ok: false,
           message:
             "The selected pilot in command is unavailable on the date of flight — choose another PIC.",
+        };
+      }
+    }
+
+    if (!(await isInstructorProfile(parsedInput.instructorId))) {
+      return { ok: false, message: "Choose a flight instructor." };
+    }
+
+    if (parsedInput.instructorId !== actor.id) {
+      const unavailableUntil = await getPicUnavailabilityEndsOn(
+        parsedInput.instructorId,
+        dofDate,
+      );
+
+      if (unavailableUntil) {
+        return {
+          ok: false,
+          message:
+            "The selected flight instructor is unavailable on the date of flight — choose another instructor.",
         };
       }
     }
@@ -231,6 +253,7 @@ export const createFlightPlanAction = actionClient
       .insert({
         flight_plan_id: flightPlan.id,
         requested_by: filerProfile.id,
+        instructor_profile_id: parsedInput.instructorId,
         status: "draft",
       });
 

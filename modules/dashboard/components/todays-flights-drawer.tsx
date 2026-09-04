@@ -414,7 +414,7 @@ function TodaysFlightCard({
 
       <p className="truncate text-xs uppercase text-muted-foreground">
         {formatShortPersonName(row.traineeName)} ·{" "}
-        {formatShortPersonName(row.pilotInCommandName)}
+        {formatShortPersonName(row.instructorName)}
         <span className="hidden sm:inline"> — trainee · instructor</span>
       </p>
 

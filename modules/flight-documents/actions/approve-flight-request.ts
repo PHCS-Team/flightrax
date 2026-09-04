@@ -6,6 +6,10 @@ import {
   getAircraftDofConflict,
   getAircraftStatusBlock,
 } from "@/modules/flight-documents/services/journey-conflicts.server";
+import {
+  canActOnFlightRequest,
+  canCommandAsPic,
+} from "@/modules/flight-documents/utils/flight-request-eligibility";
 import { isLicenseValid } from "@/shared/lib/aviation/license-validity";
 import { verifyProfilePasscode } from "@/shared/lib/passcode";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
@@ -30,7 +34,7 @@ export const approveFlightRequestAction = actionClient
     const { data: flightPlan, error: planError } = await supabase
       .from("flight_plans")
       .select(
-        "id, aircraft_id, dof_resolved, pilot_in_command_id, flight_requests(id, status, weight_balance_id)",
+        "id, aircraft_id, dof_resolved, pilot_in_command_id, flight_requests(id, status, weight_balance_id, instructor_profile_id)",
       )
       .eq("id", parsedInput.flightPlanId)
       .maybeSingle();
@@ -43,13 +47,6 @@ export const approveFlightRequestAction = actionClient
 
     if (!flightPlan || !request) {
       return { ok: false, message: "Flight plan not found." };
-    }
-
-    if (flightPlan.pilot_in_command_id !== actor.id) {
-      return {
-        ok: false,
-        message: "Only the assigned pilot in command can approve this request.",
-      };
     }
 
     if (request.status !== "pending_approval") {
@@ -102,6 +99,21 @@ export const approveFlightRequestAction = actionClient
         ok: false,
         message:
           "Approving requires an active, non-expired license on your account.",
+      };
+    }
+
+    if (
+      !canActOnFlightRequest({
+        viewerId: actor.id,
+        viewerCanCommandAsPic: canCommandAsPic(actor.role, licenses ?? []),
+        pilotInCommandId: flightPlan.pilot_in_command_id,
+        instructorProfileId: request.instructor_profile_id,
+      })
+    ) {
+      return {
+        ok: false,
+        message:
+          "Only the assigned flight instructor, or a pilot in command eligible to command, can approve this request.",
       };
     }
 

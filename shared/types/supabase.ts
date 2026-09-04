@@ -665,6 +665,7 @@ export type Database = {
           created_at: string
           flight_plan_id: string
           id: string
+          instructor_profile_id: string | null
           rejected_reason: string | null
           requested_by: string
           status: string
@@ -677,6 +678,7 @@ export type Database = {
           created_at?: string
           flight_plan_id: string
           id?: string
+          instructor_profile_id?: string | null
           rejected_reason?: string | null
           requested_by: string
           status?: string
@@ -689,6 +691,7 @@ export type Database = {
           created_at?: string
           flight_plan_id?: string
           id?: string
+          instructor_profile_id?: string | null
           rejected_reason?: string | null
           requested_by?: string
           status?: string
@@ -708,6 +711,13 @@ export type Database = {
             columns: ["flight_plan_id"]
             isOneToOne: true
             referencedRelation: "flight_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "flight_requests_instructor_profile_id_fkey"
+            columns: ["instructor_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {
@@ -1156,6 +1166,7 @@ export type Database = {
           destination_aerodrome: string
           dof_at: string
           id: string
+          instructor_name: string
           journey_id: string
           journey_status: Database["public"]["Enums"]["journey_status"]
           photo_path: string
@@ -1210,6 +1221,7 @@ export type Database = {
           dof_at: string
           flight_plan_id: string
           flight_request_id: string
+          instructor_name: string
           journey_id: string
           journey_status: Database["public"]["Enums"]["journey_status"]
           pilot_in_command_name: string

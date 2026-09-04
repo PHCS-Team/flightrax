@@ -10,6 +10,7 @@ import { WeightBalanceReviewCard } from "@/modules/flight-documents/components/w
 import { useFlightPlanFilerContext } from "@/modules/flight-documents/hooks/use-filer-context.query";
 import { useOwnFlightPlanForEdit } from "@/modules/flight-documents/hooks/use-flight-plan.query";
 import { useWeightBalanceContext } from "@/modules/flight-documents/hooks/use-weight-balance-context.query";
+import { canActOnFlightRequest } from "@/modules/flight-documents/utils/flight-request-eligibility";
 import { EmptyState } from "@/shared/components/layout/empty-state";
 import { LoadingScreen } from "@/shared/components/layout/loading-screen";
 import { Button } from "@/shared/components/ui/button";
@@ -67,6 +68,7 @@ export function FlightRequestReviewClientSurface({
       <FlightPlanReviewCard
         aircraft={flightPlan.aircraft}
         filedByName={flightPlan.filedByName}
+        instructorName={flightPlan.instructorName}
         values={flightPlan.values}
       />
 
@@ -75,11 +77,16 @@ export function FlightRequestReviewClientSurface({
       </div>
 
       <FlightRequestReviewActions
-        flightPlanId={flightPlanId}
-        isPic={Boolean(
+        canReview={Boolean(
           filerContext &&
-            flightPlan.values.pilotInCommandId === filerContext.profile.id,
+            canActOnFlightRequest({
+              viewerId: filerContext.profile.id,
+              viewerCanCommandAsPic: filerContext.canSetSelfAsPic,
+              pilotInCommandId: flightPlan.values.pilotInCommandId || null,
+              instructorProfileId: flightPlan.values.instructorId || null,
+            }),
         )}
+        flightPlanId={flightPlanId}
         requestStatus={flightPlan.requestStatus}
       />
     </div>

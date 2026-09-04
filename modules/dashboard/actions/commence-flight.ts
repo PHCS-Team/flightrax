@@ -25,7 +25,7 @@ export const commenceFlightAction = actionClient
     const { data: journey, error: journeyError } = await supabase
       .from("flight_journeys")
       .select(
-        "id, status, aircraft_id, dof_date, dof_at, flight_requests!inner(requested_by, flight_plans!inner(pilot_name, pilot_in_command_id, pilot_in_command_name, aircraft_identification))",
+        "id, status, aircraft_id, dof_date, dof_at, flight_requests!inner(requested_by, instructor_profile_id, instructor:profiles!flight_requests_instructor_profile_id_fkey(full_name), flight_plans!inner(pilot_name, pilot_in_command_id, pilot_in_command_name, aircraft_identification))",
       )
       .eq("flight_request_id", parsedInput.flightRequestId)
       .maybeSingle();
@@ -60,7 +60,7 @@ export const commenceFlightAction = actionClient
     const { data: activeJourneys, error: activeError } = await supabase
       .from("flight_journeys")
       .select(
-        "id, aircraft_id, flight_requests!inner(requested_by, flight_plans!inner(pilot_in_command_id, aircraft_identification))",
+        "id, aircraft_id, flight_requests!inner(requested_by, instructor_profile_id, flight_plans!inner(pilot_in_command_id, aircraft_identification))",
       )
       .eq("status", "active")
       .neq("id", journey.id);
@@ -82,27 +82,26 @@ export const commenceFlightAction = actionClient
 
     const ourRequester = journey.flight_requests.requested_by;
     const ourPic = plan.pilot_in_command_id;
-    const busyJourney = (activeJourneys ?? []).find((active) => {
-      const theirPersons = [
-        active.flight_requests.requested_by,
-        active.flight_requests.flight_plans.pilot_in_command_id,
-      ].filter(Boolean);
+    const ourInstructor = journey.flight_requests.instructor_profile_id;
+    const activePersons = new Set(
+      (activeJourneys ?? []).flatMap((active) =>
+        [
+          active.flight_requests.requested_by,
+          active.flight_requests.flight_plans.pilot_in_command_id,
+          active.flight_requests.instructor_profile_id,
+        ].filter((person): person is string => Boolean(person)),
+      ),
+    );
 
-      return (
-        theirPersons.includes(ourRequester) ||
-        (ourPic ? theirPersons.includes(ourPic) : false)
-      );
-    });
+    const busyName = activePersons.has(ourRequester)
+      ? plan.pilot_name
+      : ourPic && activePersons.has(ourPic)
+        ? plan.pilot_in_command_name
+        : ourInstructor && activePersons.has(ourInstructor)
+          ? journey.flight_requests.instructor?.full_name
+          : undefined;
 
-    if (busyJourney) {
-      const theirPersons = [
-        busyJourney.flight_requests.requested_by,
-        busyJourney.flight_requests.flight_plans.pilot_in_command_id,
-      ];
-      const busyName = theirPersons.includes(ourRequester)
-        ? plan.pilot_name
-        : plan.pilot_in_command_name;
-
+    if (busyName !== undefined) {
       return {
         ok: false,
         message: `${busyName ?? "A pilot on this flight"} still has an active flight — it must arrive before another of their flights can commence.`,

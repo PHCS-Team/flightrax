@@ -64,6 +64,7 @@ export async function getDashboardFlightStatusPage(
         totalEet: row.total_eet ? formatIntervalHm(row.total_eet) : "",
         traineeName: row.trainee_name ?? "",
         pilotInCommandName: row.pilot_in_command_name ?? "",
+        instructorName: row.instructor_name ?? "",
       },
     })),
     totalCount,

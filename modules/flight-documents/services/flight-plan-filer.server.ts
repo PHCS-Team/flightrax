@@ -4,14 +4,14 @@ import type {
   FlightPlanFilerContext,
   FlightPlanPicOption,
 } from "@/modules/flight-documents/types/filer-context";
-import type { LicenseTypeValue } from "@/shared/lib/aviation/license-options";
+import {
+  canCommandAsPic,
+  isInstructorRole,
+} from "@/modules/flight-documents/utils/flight-request-eligibility";
 import { isLicenseValid } from "@/shared/lib/aviation/license-validity";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
-import { ROLE } from "@/shared/lib/rbac/config";
 import { isApproved } from "@/shared/lib/rbac/guards";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
-
-const PPL_LICENSE_TYPE: LicenseTypeValue = "private_pilot_license";
 
 export async function getFlightPlanFilerContext(): Promise<FlightPlanFilerContext> {
   const viewer = await getCurrentAuthorizationProfile();
@@ -35,14 +35,7 @@ export async function getFlightPlanFilerContext(): Promise<FlightPlanFilerContex
   const hasValidLicense = (licenses ?? []).some((license) =>
     isLicenseValid(license),
   );
-  const isInstructor =
-    viewer.role === ROLE.INSTRUCTOR || viewer.role === ROLE.SUPERADMIN;
-  const canSetSelfAsPic = isInstructor
-    ? hasValidLicense
-    : (licenses ?? []).some(
-        (license) =>
-          license.license_type === PPL_LICENSE_TYPE && isLicenseValid(license),
-      );
+  const canSetSelfAsPic = canCommandAsPic(viewer.role, licenses ?? []);
 
   return {
     profile: {
@@ -121,6 +114,21 @@ export async function getFlightPlanPicOptions(): Promise<
       unavailabilities: unavailabilitiesByProfile.get(row.profiles.id) ?? [],
     }))
     .sort((a, b) => a.fullName.localeCompare(b.fullName));
+}
+
+export async function isInstructorProfile(profileId: string): Promise<boolean> {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", profileId)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data ? isInstructorRole(data.role) : false;
 }
 
 export async function getPicUnavailabilityEndsOn(

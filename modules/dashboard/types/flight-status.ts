@@ -23,6 +23,7 @@ export type DashboardFlightJourney = {
   totalEet: string;
   traineeName: string;
   pilotInCommandName: string;
+  instructorName: string;
 };
 
 export type DashboardFlightStatusRow = {
