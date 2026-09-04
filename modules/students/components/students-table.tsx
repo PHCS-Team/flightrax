@@ -141,7 +141,7 @@ export function StudentsTable({
   });
 
   return (
-    <GlassSurface className="space-y-4 py-3 sm:py-4">
+    <GlassSurface className="space-y-3 sm:space-y-4 py-3 sm:py-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between px-2.5 sm:px-4">
         <Input
           className="max-w-sm border-primary-foreground/20 bg-primary-foreground/10 text-[#121212] placeholder:text-[#121212]/55 focus-visible:border-primary-foreground/45 focus-visible:ring-primary-foreground/20"

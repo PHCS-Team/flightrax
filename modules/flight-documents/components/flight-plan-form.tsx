@@ -25,6 +25,7 @@ import { AerodromeSelectField } from "@/modules/flight-documents/components/aero
 import { FormRadioGroup } from "@/modules/flight-documents/components/form-radio-group";
 import { FLIGHT_PLAN_FORM_DEFAULTS } from "@/modules/flight-documents/constants/flight-plan-form-defaults";
 import { useFlightPlanFilerContext } from "@/modules/flight-documents/hooks/use-filer-context.query";
+import { useRatingOptions } from "@/shared/hooks/use-rating-options.query";
 import { useFlightPlanPicOptions } from "@/modules/flight-documents/hooks/use-pic-options.query";
 import {
   flightPlanFormSchema,
@@ -48,9 +49,8 @@ import {
 } from "@/shared/components/ui/select";
 import { Switch } from "@/shared/components/ui/switch";
 import { Textarea } from "@/shared/components/ui/textarea";
+import { cn } from "@/shared/lib/utils";
 
-// Everything typed on the flight plan is uppercase — displayed via CSS
-// here and enforced server-side on save.
 const INPUT_TEXT_CLASS = "text-[#121212] uppercase placeholder:normal-case";
 const TEXTAREA_CLASS =
   "border-primary-foreground/20 bg-primary-foreground/95 text-[#121212] uppercase placeholder:normal-case placeholder:text-muted-foreground";
@@ -107,6 +107,7 @@ export function FlightPlanForm({
   });
   const errors = form.formState.errors;
   const { filerContext } = useFlightPlanFilerContext();
+  const { ratingOptions } = useRatingOptions();
   const { picOptions } = useFlightPlanPicOptions();
   const hasDinghy = useWatch({
     control: form.control,
@@ -134,15 +135,10 @@ export function FlightPlanForm({
   const isSelfPic = Boolean(
     filerContext && pilotInCommandId === filerContext.profile.id,
   );
-  // In edit mode a saved Other Information value must never be overwritten
-  // by the auto-fill — treat it as already user-edited from the start.
   const [otherInfoEdited, setOtherInfoEdited] = useState(() =>
     Boolean(defaultValues?.otherRemarks?.trim()),
   );
 
-  // Keep Other Information auto-filled from the DOF, any ZZZZ aerodromes
-  // (DEP// DEST// ALTN/ lines), and the filer's licenses until the user
-  // edits the field themselves.
   useEffect(() => {
     if (!filerContext || otherInfoEdited) {
       return;
@@ -159,11 +155,13 @@ export function FlightPlanForm({
           secondAlternateAerodrome,
         },
         filerContext,
+        ratingOptions,
       ),
       { shouldDirty: false },
     );
   }, [
     dofRaw,
+    ratingOptions,
     departureAerodrome,
     destinationAerodrome,
     firstAlternateAerodrome,
@@ -173,9 +171,6 @@ export function FlightPlanForm({
     otherInfoEdited,
   ]);
 
-  // Aerodrome changes always reconcile the DEP//DEST//ALTN/ lines of
-  // Other Information — in edit mode and after user edits too. Only
-  // those lines are added/removed; everything else in the text stays.
   const previousAerodromesRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -186,7 +181,6 @@ export function FlightPlanForm({
       secondAlternateAerodrome,
     ].join("|");
 
-    // Skip the initial mount so saved text is never rewritten on load.
     if (previousAerodromesRef.current === null) {
       previousAerodromesRef.current = aerodromesKey;
 
@@ -218,13 +212,6 @@ export function FlightPlanForm({
     form,
   ]);
 
-  // The DOF is the source of truth — every change updates its
-  // dependents (create and edit alike); each stays manually editable
-  // until the next DOF change. The initial value never triggers this.
-  // 1. The PIC choice is cleared: availability is per-date, so a PIC
-  //    picked for the old date may be unavailable on the new one.
-  // 2. Departure time takes the DOF's HHMM.
-  // 3. The DOF/ line in Other Information is rewritten in place.
   const previousDofRef = useRef(defaultValues?.dofRaw ?? "");
 
   useEffect(() => {
@@ -277,16 +264,12 @@ export function FlightPlanForm({
     form.setValue("pilotInCommandName", "", { shouldDirty: true });
   }
 
-  // PIC availability is judged against the flight's zulu date — the
-  // UTC date of the resolved DOF, not the day the plan is filed.
   const dofDate = DOF_PATTERN.test(dofRaw ?? "")
     ? resolveDof(dofRaw).slice(0, 10)
     : null;
 
   function getPicUnavailability(optionId: string) {
     if (!dofDate || optionId === filerContext?.profile.id) {
-      // The filer may always pick themselves, even while marked
-      // unavailable.
       return null;
     }
 
@@ -644,13 +627,18 @@ export function FlightPlanForm({
           </div>
           {!filerContext?.canSetSelfAsPic && (
             <p className="text-xs text-muted-foreground">
-              Setting yourself as PIC requires an active, non-expired PPL
-              license.
+              {filerContext?.profile.role === "instructor" ||
+              filerContext?.profile.role === "superadmin"
+                ? "Setting yourself as PIC requires an active, non-expired license."
+                : "Setting yourself as PIC requires an active, non-expired PPL license."}
             </p>
           )}
           {isSelfPic ? (
             <Input
-              className={INPUT_TEXT_CLASS}
+              className={cn(
+                INPUT_TEXT_CLASS,
+                "uppercase placeholder:normal-case",
+              )}
               disabled
               value={filerContext?.profile.fullName ?? ""}
             />
@@ -662,7 +650,10 @@ export function FlightPlanForm({
             >
               <SelectTrigger
                 aria-invalid={Boolean(errors.pilotInCommandId)}
-                className={INPUT_TEXT_CLASS}
+                className={cn(
+                  INPUT_TEXT_CLASS,
+                  "uppercase placeholder:normal-case",
+                )}
                 id="fp-pilot-in-command"
               >
                 <SelectValue placeholder="Choose a flight instructor" />
@@ -697,8 +688,8 @@ export function FlightPlanForm({
           )}
           {!dofDate && !isSelfPic && (
             <p className="text-xs text-muted-foreground">
-              Enter the Date of Filing first — pilot availability depends on
-              the flight date.
+              Enter the Date of Filing first — pilot availability depends on the
+              flight date.
             </p>
           )}
           {errors.pilotInCommandId && (
@@ -811,7 +802,7 @@ function FpTextField({
       <Input
         aria-invalid={Boolean(error)}
         aria-required={required || undefined}
-        className={INPUT_TEXT_CLASS}
+        className={cn(INPUT_TEXT_CLASS, "uppercase placeholder:normal-case")}
         id={id}
         maxLength={maxLength}
         placeholder={placeholder}
@@ -856,7 +847,7 @@ function FpTextareaField({
       </label>
       <Textarea
         aria-invalid={Boolean(error)}
-        className={TEXTAREA_CLASS}
+        className={cn(TEXTAREA_CLASS, "uppercase placeholder:normal-case")}
         id={id}
         placeholder={placeholder}
         rows={rows}
@@ -898,7 +889,7 @@ function FpSelectField({
         <SelectTrigger
           aria-invalid={Boolean(error)}
           aria-required="true"
-          className={INPUT_TEXT_CLASS}
+          className={cn(INPUT_TEXT_CLASS, "uppercase placeholder:normal-case")}
           id={name}
         >
           <SelectValue placeholder="Choose" />

@@ -162,6 +162,7 @@ export type Database = {
           baggage_area_max_weight: number
           created_at: string
           fi_and_student_arm: number | null
+          icao_designator: string
           maximum_takeoff_weight: number | null
           type: string
           type_key: string
@@ -172,6 +173,7 @@ export type Database = {
           baggage_area_max_weight?: number
           created_at?: string
           fi_and_student_arm?: number | null
+          icao_designator: string
           maximum_takeoff_weight?: number | null
           type: string
           type_key: string
@@ -182,6 +184,7 @@ export type Database = {
           baggage_area_max_weight?: number
           created_at?: string
           fi_and_student_arm?: number | null
+          icao_designator?: string
           maximum_takeoff_weight?: number | null
           type?: string
           type_key?: string
@@ -230,48 +233,48 @@ export type Database = {
       }
       aircrafts: {
         Row: {
-          aircraft_identification: string
           aircraft_type: string
           color_markings: string
           created_at: string
           id: string
-          model: string
           photo_content_type: string | null
           photo_path: string | null
           photo_size_bytes: number | null
           photo_uploaded_at: string | null
+          registration_mark: string
+          registration_number: string
           remarks: string | null
           serial_number: string | null
           status: Database["public"]["Enums"]["aircraft_status"]
           updated_at: string
         }
         Insert: {
-          aircraft_identification: string
           aircraft_type: string
           color_markings: string
           created_at?: string
           id?: string
-          model: string
           photo_content_type?: string | null
           photo_path?: string | null
           photo_size_bytes?: number | null
           photo_uploaded_at?: string | null
+          registration_mark: string
+          registration_number: string
           remarks?: string | null
           serial_number?: string | null
           status?: Database["public"]["Enums"]["aircraft_status"]
           updated_at?: string
         }
         Update: {
-          aircraft_identification?: string
           aircraft_type?: string
           color_markings?: string
           created_at?: string
           id?: string
-          model?: string
           photo_content_type?: string | null
           photo_path?: string | null
           photo_size_bytes?: number | null
           photo_uploaded_at?: string | null
+          registration_mark?: string
+          registration_number?: string
           remarks?: string | null
           serial_number?: string | null
           status?: Database["public"]["Enums"]["aircraft_status"]
@@ -433,6 +436,7 @@ export type Database = {
           aircraft_color_and_marking: string
           aircraft_id: string | null
           aircraft_identification: string
+          aircraft_type_designator: string | null
           authorized_representative_id: string | null
           authorized_representative_licenses: Json | null
           authorized_representative_name: string | null
@@ -495,6 +499,7 @@ export type Database = {
           aircraft_color_and_marking: string
           aircraft_id?: string | null
           aircraft_identification: string
+          aircraft_type_designator?: string | null
           authorized_representative_id?: string | null
           authorized_representative_licenses?: Json | null
           authorized_representative_name?: string | null
@@ -557,6 +562,7 @@ export type Database = {
           aircraft_color_and_marking?: string
           aircraft_id?: string | null
           aircraft_identification?: string
+          aircraft_type_designator?: string | null
           authorized_representative_id?: string | null
           authorized_representative_licenses?: Json | null
           authorized_representative_name?: string | null
@@ -864,8 +870,8 @@ export type Database = {
       }
       notams: {
         Row: {
-          category: string
           created_at: string
+          created_by: string | null
           description: string | null
           expires_at: string | null
           id: string
@@ -874,8 +880,8 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          category?: string
           created_at?: string
+          created_by?: string | null
           description?: string | null
           expires_at?: string | null
           id?: string
@@ -884,8 +890,8 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          category?: string
           created_at?: string
+          created_by?: string | null
           description?: string | null
           expires_at?: string | null
           id?: string
@@ -893,7 +899,15 @@ export type Database = {
           title?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "notams_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -1139,7 +1153,6 @@ export type Database = {
           p_status_group?: string
         }
         Returns: {
-          aircraft_identification: string
           aircraft_status: Database["public"]["Enums"]["aircraft_status"]
           commenced_at: string
           cruising_level: string
@@ -1150,13 +1163,15 @@ export type Database = {
           id: string
           journey_id: string
           journey_status: Database["public"]["Enums"]["journey_status"]
-          model: string
           photo_path: string
           pilot_in_command_name: string
+          registration_mark: string
+          registration_number: string
           terminated_at: string
           total_count: number
           total_eet: string
           trainee_name: string
+          type_icao_designator: string
           type_key: string
           type_name: string
         }[]
@@ -1169,16 +1184,17 @@ export type Database = {
           p_type_key?: string
         }
         Returns: {
-          aircraft_identification: string
           color_markings: string
           has_active_flight: boolean
           has_type_specs: boolean
           has_wb_config: boolean
           id: string
           is_available: boolean
-          model: string
           photo_path: string
+          registration_mark: string
+          registration_number: string
           total_count: number
+          type_icao_designator: string
           type_key: string
           type_name: string
         }[]
@@ -1238,12 +1254,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1267,11 +1283,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1292,11 +1308,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1317,11 +1333,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1334,11 +1350,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }

@@ -18,7 +18,10 @@ import {
   SCHEDULE_MANAGE,
   SCHEDULE_VIEW,
 } from "@/modules/schedule/constants/permissions";
-import { NOTAMS_VIEW } from "@/modules/notams/constants/permissions";
+import {
+  NOTAMS_MANAGE,
+  NOTAMS_VIEW,
+} from "@/modules/notams/constants/permissions";
 import {
   CREDENTIALS_VIEW_DETAILS,
   SYSTEM_MANAGE,
@@ -58,6 +61,7 @@ export type Permission =
   | typeof SCHEDULE_MANAGE
   | typeof AIRCRAFTS_VIEW
   | typeof NOTAMS_VIEW
+  | typeof NOTAMS_MANAGE
   | typeof STUDENTS_VIEW
   | typeof ACCOUNT_REVIEW
   | typeof CREDENTIALS_VIEW_DETAILS

@@ -1,5 +1,5 @@
-import { NotamsPage } from "@/modules/notams/components/notams-page";
+import { NotamsRoute } from "@/modules/notams/components/notams-route";
 
-export default function Page() {
-  return <NotamsPage />;
+export default async function Page() {
+  return <NotamsRoute />;
 }

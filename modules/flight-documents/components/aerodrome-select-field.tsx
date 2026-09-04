@@ -91,6 +91,10 @@ export function AerodromeSelectField({
                 </span>
               )}
             </span>
+          ) : optional ? (
+            <span className="min-w-0 truncate text-left font-medium text-[#121212]">
+              None
+            </span>
           ) : (
             <span className="min-w-0 truncate text-left text-muted-foreground">
               Choose aerodrome

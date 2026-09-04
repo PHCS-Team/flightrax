@@ -155,9 +155,11 @@ function OrganizedBoardRow({ row }: { row: DashboardFlightStatusRow }) {
     >
       <TableCell className="pl-4 text-primary-foreground sm:pl-6">
         <div className="min-w-0">
-          <p className="truncate font-semibold">{row.aircraftIdentification}</p>
+          <p className="truncate font-semibold uppercase">
+            {row.registrationMark}
+          </p>
           <p className="truncate text-[11px] text-primary-foreground/60">
-            {subtitle}
+            {row.typeIcaoDesignator} · {subtitle}
           </p>
         </div>
       </TableCell>

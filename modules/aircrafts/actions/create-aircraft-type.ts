@@ -26,6 +26,7 @@ export const createAircraftTypeAction = actionClient
     const { error } = await supabase.from("aircraft_types").insert({
       type_key: typeKey,
       type: parsedInput.type,
+      icao_designator: parsedInput.icaoDesignator,
     });
 
     if (error) {

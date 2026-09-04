@@ -85,7 +85,7 @@ export function FlightLogListItem({
 
         <div className="grid min-w-0 gap-1">
           <div className="flex min-w-0 items-center gap-2">
-            <p className="truncate text-base font-semibold">
+            <p className="truncate text-base font-semibold uppercase">
               {log.aircraftIdentification}
             </p>
             <span
@@ -97,7 +97,7 @@ export function FlightLogListItem({
               {pill.label}
             </span>
           </div>
-          <p className="flex min-w-0 items-center gap-1.5 truncate text-sm font-medium text-primary-foreground/90">
+          <p className="flex min-w-0 items-center gap-1.5 truncate text-sm font-medium uppercase text-primary-foreground/90">
             <PlaneIcon className="size-3.5 shrink-0 fill-primary-foreground/60 text-primary-foreground/60" />
             {log.departureAerodrome} - {log.destinationAerodrome}
           </p>

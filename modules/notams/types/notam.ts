@@ -1,29 +1,14 @@
-import type { Database } from "@/shared/types/supabase";
+import type {
+  NOTAM_SEVERITY_FILTERS,
+  NOTAM_STATUS_FILTERS,
+} from "@/modules/notams/constants/notam-options";
+import type { NotamSummary } from "@/shared/types/notam";
 
-type NotamRow = Database["public"]["Tables"]["notams"]["Row"];
+export type NotamSeverityFilter = (typeof NOTAM_SEVERITY_FILTERS)[number];
 
-export type Notam = {
-  id: string;
-  title: string;
-  description: string | null;
-  category: string;
-  severity: "advisory" | "warning" | "alert";
-  expiresAt: string | null;
-  createdAt: string;
-  updatedAt: string;
+export type NotamStatusFilter = (typeof NOTAM_STATUS_FILTERS)[number];
+
+export type Notam = NotamSummary & {
+  createdBy: string | null;
+  postedBy: string | null;
 };
-
-export type NotamSeverity = Notam["severity"];
-
-export function toNotam(row: NotamRow): Notam {
-  return {
-    id: row.id,
-    title: row.title,
-    description: row.description,
-    category: row.category,
-    severity: row.severity as NotamSeverity,
-    expiresAt: row.expires_at,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
-  };
-}

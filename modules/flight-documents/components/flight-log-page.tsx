@@ -1,5 +1,5 @@
+import { FlightDocumentsDownloadAction } from "@/modules/flight-documents/components/flight-documents-download-action";
 import { FlightLogClientSurface } from "@/modules/flight-documents/components/flight-log-client-surface";
-import { DownloadFlightDocumentsAction } from "@/shared/components/layout/download-flight-documents-action";
 import { PageHeader } from "@/shared/components/layout/page-header";
 
 export function FlightLogPage({
@@ -28,7 +28,7 @@ export function FlightLogPage({
   return (
     <section>
       <PageHeader
-        action={<DownloadFlightDocumentsAction />}
+        action={<FlightDocumentsDownloadAction flightPlanId={flightPlanId} />}
         breadcrumbs={breadcrumbs}
         title="Flight Log"
       />

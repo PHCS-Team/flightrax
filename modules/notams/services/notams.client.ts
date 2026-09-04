@@ -1,29 +1,41 @@
+import type {
+  Notam,
+  NotamSeverityFilter,
+  NotamStatusFilter,
+} from "@/modules/notams/types/notam";
+import { getApiErrorMessage } from "@/shared/lib/api-error";
 import type { PaginatedResponse } from "@/shared/types/pagination";
-import type { Notam } from "@/modules/notams/types/notam";
-
-type SeverityFilter = "" | "advisory" | "warning" | "alert";
 
 export async function fetchNotamsPage(
   page: number,
   pageSize: number,
   search: string,
-  severity: SeverityFilter,
-  expiry: string,
-): Promise<PaginatedResponse<Notam>> {
+  status: NotamStatusFilter,
+  severity: NotamSeverityFilter,
+) {
   const params = new URLSearchParams({
     page: String(page),
     pageSize: String(pageSize),
-    search,
-    severity,
-    expiry,
+    status,
   });
 
-  const response = await fetch(`/api/notams?${params}`);
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: "Failed to fetch NOTAMs" }));
-    throw new Error(error.message ?? "Failed to fetch NOTAMs");
+  if (search.trim()) {
+    params.set("search", search.trim());
   }
 
-  return response.json();
+  if (severity !== "all") {
+    params.set("severity", severity);
+  }
+
+  const response = await fetch(`/api/notams?${params}`, {
+    credentials: "same-origin",
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      await getApiErrorMessage(response, "Unable to load NOTAMs."),
+    );
+  }
+
+  return (await response.json()) as PaginatedResponse<Notam>;
 }

@@ -16,6 +16,7 @@ export type AircraftTypeBaggageArea = {
 export type AircraftType = {
   typeKey: string;
   type: string;
+  icaoDesignator: string;
   usableFuelArm: number | null;
   fiAndStudentArm: number | null;
   maximumTakeoffWeight: number | null;
@@ -25,4 +26,5 @@ export type AircraftType = {
 
 export type AircraftTypeFormInput = {
   type: string;
+  icaoDesignator: string;
 };

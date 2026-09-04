@@ -120,7 +120,7 @@ export const approveFlightRequestAction = actionClient
       .from("flight_plans")
       .update({
         authorized_representative_id: approverProfile.id,
-        authorized_representative_name: approverProfile.full_name,
+        authorized_representative_name: approverProfile.full_name.toUpperCase(),
         authorized_representative_signature: approverProfile.signature_svg,
         authorized_representative_licenses: approverLicenses,
       })
@@ -135,7 +135,7 @@ export const approveFlightRequestAction = actionClient
         .from("weight_balances")
         .update({
           verified_by_id: approverProfile.id,
-          verified_by_name: approverProfile.full_name,
+          verified_by_name: approverProfile.full_name.toUpperCase(),
           verified_by_signature: approverProfile.signature_svg,
         })
         .eq("id", request.weight_balance_id);

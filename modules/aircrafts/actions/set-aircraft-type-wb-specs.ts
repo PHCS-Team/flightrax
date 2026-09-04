@@ -23,6 +23,7 @@ export const setAircraftTypeWbSpecsAction = actionClient
     const { data: aircraftType, error: updateError } = await supabase
       .from("aircraft_types")
       .update({
+        icao_designator: parsedInput.icaoDesignator,
         usable_fuel_arm: parsedInput.usableFuelArm,
         fi_and_student_arm: parsedInput.fiAndStudentArm,
         maximum_takeoff_weight: parsedInput.maximumTakeoffWeight,
@@ -65,5 +66,5 @@ export const setAircraftTypeWbSpecsAction = actionClient
       }
     }
 
-    return { ok: true, message: "Weight and balance specifications saved." };
+    return { ok: true, message: "Aircraft type specifications saved." };
   });
