@@ -43,7 +43,7 @@ export const DEFAULT_DEPARTURE_POINT_REMARK = "RPT-20 BINALONAN";
 export const MAX_NUMBER_OF_AIRCRAFT = 999;
 
 // DOF (date of filing): 6 digits, DDHHMM — day of month plus filing time
-// in UTC (zulu). e.g. 280100 = the 28th at 0100Z; dof_resolved carries the
+// DD local date + HHMM zulu. e.g. 280100 = the 28th (local) at 0100Z; dof_resolved carries the
 // full resolved timestamp.
 export const DOF_PATTERN = /^\d{6}$/;
 
@@ -63,3 +63,8 @@ export const PERSONS_ON_BOARD_TBN = "TBN";
 
 export const MAX_DINGHIES_NUMBER = 99;
 export const MAX_DINGHIES_CAPACITY = 999;
+
+// The school's local time zone. The DOF's day (DD) and every "today"
+// check are in this zone; only clock times are zulu. Mirrors
+// public.operations_date() in the database.
+export const OPERATIONS_TIME_ZONE = "Asia/Manila";

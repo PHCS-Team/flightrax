@@ -1230,6 +1230,8 @@ export type Database = {
           trainee_name: string
         }[]
       }
+      operations_date: { Args: { ts: string }; Returns: string }
+      operations_today: { Args: never; Returns: string }
     }
     Enums: {
       admin_department:

@@ -157,10 +157,6 @@ export const approveFlightRequestAction = actionClient
       }
     }
 
-    const dofDate = flightPlan.dof_resolved
-      ? flightPlan.dof_resolved.slice(0, 10)
-      : null;
-
     if (flightPlan.aircraft_id) {
       const statusBlock = await getAircraftStatusBlock(flightPlan.aircraft_id);
 
@@ -194,7 +190,6 @@ export const approveFlightRequestAction = actionClient
           flight_request_id: request.id,
           status: "scheduled",
           aircraft_id: flightPlan.aircraft_id,
-          dof_date: dofDate,
           dof_at: flightPlan.dof_resolved,
         },
         { onConflict: "flight_request_id" },

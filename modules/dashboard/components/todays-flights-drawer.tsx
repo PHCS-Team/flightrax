@@ -26,6 +26,7 @@ import { Dialog, DialogContent } from "@/shared/components/ui/dialog";
 import {
   formatElapsedHm,
   formatShortPersonName,
+  formatTimeOfDay,
   formatZuluTimeToLocal,
 } from "@/modules/dashboard/utils/format";
 import { ConfirmationDialog } from "@/shared/components/layout/confirmation-dialog";
@@ -374,7 +375,11 @@ function TodaysFlightCard({
 
   const timeLine = row.commencedAt
     ? `Departed: ${formatElapsedHm(row.commencedAt)} ago`
-    : `Will depart at ${formatZuluTimeToLocal(row.departureTimeRaw)}`;
+    : `Will depart at ${
+        row.dofAt
+          ? formatTimeOfDay(row.dofAt)
+          : formatZuluTimeToLocal(row.departureTimeRaw)
+      }`;
 
   return (
     <div className="grid gap-1.5 rounded-lg border border-border bg-muted/30 p-2.5 sm:gap-2 sm:rounded-xl sm:p-3">

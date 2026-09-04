@@ -2,16 +2,9 @@ import "server-only";
 
 import { format } from "date-fns";
 
+import { toOperationsDate } from "@/modules/flight-documents/utils/flight-plan-time";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 
-// One live journey (scheduled or active) per aircraft per zulu DOF
-// date. These checks give the friendly error; the partial unique index
-// on flight_journeys (aircraft_id, dof_date) backs them against races.
-
-// An aircraft must be operationally active to fly — maintenance,
-// grounded, and retired aircraft cannot be submitted for approval or
-// approved. Returns a ready-to-show message, or null when the aircraft
-// is fine.
 export async function getAircraftStatusBlock(
   aircraftId: string,
 ): Promise<string | null> {
@@ -27,9 +20,6 @@ export async function getAircraftStatusBlock(
     throw new Error(error.message);
   }
 
-  // The aircraft cannot be changed on a filed plan — when it is out of
-  // service, the only paths are waiting (if it may return to active) or
-  // deleting the plan and filing a new one with another aircraft.
   if (!data) {
     return "The aircraft on this flight plan no longer exists. Delete this flight plan and file a new one with another aircraft.";
   }
@@ -90,7 +80,7 @@ export function buildAircraftDofConflictMessage(
   filedByName: string,
 ): string {
   const dateLabel = format(
-    new Date(`${dofAt.slice(0, 10)}T00:00:00`),
+    new Date(`${toOperationsDate(dofAt)}T00:00:00`),
     "MMM d, yyyy",
   );
   const timeLabel = `${dofAt.slice(11, 16).replace(":", "")}Z`;

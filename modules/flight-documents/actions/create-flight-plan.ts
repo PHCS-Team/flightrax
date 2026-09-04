@@ -6,6 +6,7 @@ import {
   hhmmToInterval,
   hhmmToTime,
   resolveDof,
+  resolveDofDate,
 } from "@/modules/flight-documents/utils/flight-plan-time";
 import { generatePlanCode } from "@/modules/flight-documents/utils/generate-plan-code";
 import { isLicenseValid } from "@/shared/lib/aviation/license-validity";
@@ -101,7 +102,7 @@ export const createFlightPlanAction = actionClient
       status: license.status,
     }));
 
-    const dofDate = resolveDof(parsedInput.dofRaw).slice(0, 10);
+    const dofDate = resolveDofDate(parsedInput.dofRaw);
 
     if (parsedInput.pilotInCommandId !== actor.id) {
       const unavailableUntil = await getPicUnavailabilityEndsOn(

@@ -36,7 +36,7 @@ import {
   syncAerodromeLines,
   syncDofLine,
 } from "@/modules/flight-documents/utils/build-other-information";
-import { resolveDof } from "@/modules/flight-documents/utils/flight-plan-time";
+import { resolveDofDate } from "@/modules/flight-documents/utils/flight-plan-time";
 import { Button } from "@/shared/components/ui/button";
 import { Checkbox } from "@/shared/components/ui/checkbox";
 import { Input } from "@/shared/components/ui/input";
@@ -308,7 +308,7 @@ export function FlightPlanForm({
   }
 
   const dofDate = DOF_PATTERN.test(dofRaw ?? "")
-    ? resolveDof(dofRaw).slice(0, 10)
+    ? resolveDofDate(dofRaw)
     : null;
 
   function getPicUnavailability(optionId: string) {
@@ -356,7 +356,7 @@ export function FlightPlanForm({
           />
           <FpTextField
             error={errors.dofRaw?.message}
-            helper="DDHHMM in zulu — e.g. 280100 = the 28th at 0100Z"
+            helper="DD = day (local date), HHMM = time in zulu — e.g. 280100 = the 28th at 0100Z (9:00 AM)"
             id="fp-dof"
             maxLength={6}
             label="Date of Filing"

@@ -6,6 +6,7 @@ import {
   hhmmToInterval,
   hhmmToTime,
   resolveDof,
+  resolveDofDate,
 } from "@/modules/flight-documents/utils/flight-plan-time";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { isApproved } from "@/shared/lib/rbac/guards";
@@ -58,7 +59,7 @@ export const updateFlightPlanAction = actionClient
       };
     }
 
-    const dofDate = resolveDof(parsedInput.dofRaw).slice(0, 10);
+    const dofDate = resolveDofDate(parsedInput.dofRaw);
 
     if (parsedInput.pilotInCommandId !== actor.id) {
       const unavailableUntil = await getPicUnavailabilityEndsOn(
