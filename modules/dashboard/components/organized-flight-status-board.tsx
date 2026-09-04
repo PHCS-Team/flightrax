@@ -149,8 +149,9 @@ function OrganizedBoardRow({ row }: { row: DashboardFlightStatusRow }) {
   return (
     <TableRow
       className={cn(
-        "border-primary-foreground/10 hover:bg-primary-foreground/10",
+        "hover:bg-primary-foreground/10",
         BOARD_STATUS_META[row.boardStatus].rowClassName,
+        BOARD_STATUS_META[row.boardStatus].borderClassName,
       )}
     >
       <TableCell className="pl-4 text-primary-foreground sm:pl-6">
