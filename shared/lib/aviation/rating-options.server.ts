@@ -6,9 +6,6 @@ import { isApproved } from "@/shared/lib/rbac/guards";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 import type { RatingOption } from "@/shared/types/rating-option";
 
-// Any approved user may see the rating list — students pick ratings on
-// their own licenses — so this deliberately does not require the
-// aircraft-management permission the aircrafts module uses.
 export async function getRatingOptions(): Promise<RatingOption[]> {
   const viewer = await getCurrentAuthorizationProfile();
 
