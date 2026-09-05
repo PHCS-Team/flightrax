@@ -1165,6 +1165,7 @@ export type Database = {
           departure_time_raw: string
           destination_aerodrome: string
           dof_at: string
+          flight_plan_id: string
           id: string
           instructor_name: string
           journey_id: string

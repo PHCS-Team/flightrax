@@ -143,6 +143,7 @@ export function FlightLogClientSurface({
         <FlightPlanReviewCard
           aircraft={flightPlan.aircraft}
           filedByName={flightPlan.filedByName}
+          instructorName={flightPlan.instructorName}
           showHeading={false}
           values={flightPlan.values}
         />

@@ -5,10 +5,12 @@ import {
   BanIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  FileTextIcon,
   PlaneIcon,
   TowerControlIcon,
   TriangleAlertIcon,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { useCancelFlight } from "@/modules/dashboard/hooks/use-cancel-flight.action";
@@ -50,7 +52,7 @@ const JOURNEY_STATUS_PILLS: Partial<
   Record<JourneyStatus, { label: string; className: string }>
 > = {
   scheduled: {
-    label: "Scheduled",
+    label: "On Ground",
     className: "border-orange-200/50 bg-orange-500/80 text-white",
   },
   active: {
@@ -218,7 +220,7 @@ export function TodaysFlightsDrawer({
                 <p className="text-sm text-muted-foreground">
                   {search
                     ? "No flights match your search."
-                    : "No flights scheduled for today."}
+                    : "No flights for today."}
                 </p>
               </div>
             ) : (
@@ -275,9 +277,9 @@ export function TodaysFlightsDrawer({
       >
         <DialogContent className="p-6 sm:max-w-md">
           <DialogSectionHeader
-            description="An earlier flight on this aircraft is still scheduled — it must commence or be cancelled before this flight can start."
+            description="An earlier flight on this aircraft is still on ground — it must commence or be cancelled before this flight can start."
             icon={TriangleAlertIcon}
-            title="Earlier Flight Still Scheduled"
+            title="Earlier Flight Still On Ground"
           />
           {earlierBlock && (
             <>
@@ -331,7 +333,7 @@ export function TodaysFlightsDrawer({
       <ConfirmationDialog
         confirmLabel="Cancel flight"
         confirmingLabel="Cancelling..."
-        description={`The scheduled ${cancelConfirm?.aircraftIdentification ?? ""} flight will be cancelled and the aircraft freed for a new request. This cannot be undone.`}
+        description={`The on-ground ${cancelConfirm?.aircraftIdentification ?? ""} flight will be cancelled and the aircraft freed for a new request. This cannot be undone.`}
         icon={BanIcon}
         isConfirming={cancelFlight.isExecuting}
         onConfirm={() => {
@@ -366,6 +368,7 @@ function TodaysFlightCard({
   onAct: (type: FlightActionType) => void;
   row: TodaysFlightRow;
 }) {
+  const router = useRouter();
   const pill = JOURNEY_STATUS_PILLS[row.journeyStatus];
   const isOverdue =
     row.journeyStatus === "scheduled" &&
@@ -390,7 +393,7 @@ function TodaysFlightCard({
         <span className="flex shrink-0 items-center gap-1.5">
           {isOverdue && (
             <span className="inline-flex items-center whitespace-nowrap rounded-full border border-red-200/40 bg-red-700/70 px-2 py-0.5 text-[10px] font-semibold text-red-50">
-              Overdue
+              Delayed
             </span>
           )}
           {pill && (
@@ -456,6 +459,22 @@ function TodaysFlightCard({
           variant="destructive"
         >
           Terminate flight
+        </Button>
+      )}
+      {row.journeyStatus === "arrived" && (
+        <Button
+          className="mt-0.5 h-8 w-full"
+          onClick={() =>
+            router.replace(
+              `/flight-documents/flight-plans/${row.flightPlanId}/log`,
+            )
+          }
+          size="sm"
+          type="button"
+          variant="outline"
+        >
+          <FileTextIcon className="size-4" />
+          Flight terminated — view flight log
         </Button>
       )}
     </div>

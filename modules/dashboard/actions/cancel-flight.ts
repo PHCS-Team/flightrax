@@ -53,7 +53,7 @@ export const cancelFlightAction = actionClient
     if (journey.status !== "scheduled") {
       return {
         ok: false,
-        message: "Only scheduled flights can be cancelled.",
+        message: "Only on-ground flights can be cancelled.",
       };
     }
 
@@ -87,7 +87,7 @@ export const cancelFlightAction = actionClient
     if (!updated) {
       return {
         ok: false,
-        message: "This flight is no longer scheduled and cannot be cancelled.",
+        message: "This flight is no longer on ground and cannot be cancelled.",
       };
     }
 

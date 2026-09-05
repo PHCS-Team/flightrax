@@ -52,6 +52,7 @@ export async function getDashboardFlightStatusPage(
       boardStatus: deriveBoardStatus(row.journey_status),
       journey: {
         id: row.journey_id,
+        flightPlanId: row.flight_plan_id,
         status: row.journey_status,
         dofAt: row.dof_at,
         commencedAt: row.commenced_at,

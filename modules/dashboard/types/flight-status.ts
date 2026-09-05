@@ -11,6 +11,7 @@ export type DashboardBoardStatus = "active" | "on_ground" | "arrived";
 
 export type DashboardFlightJourney = {
   id: string;
+  flightPlanId: string;
   status: JourneyStatus;
   dofAt: string | null;
   commencedAt: string | null;

@@ -53,7 +53,7 @@ export const commenceFlightAction = actionClient
     if (journey.status !== "scheduled") {
       return {
         ok: false,
-        message: "Only scheduled flights can be commenced.",
+        message: "Only on-ground flights can be commenced.",
       };
     }
 
@@ -131,7 +131,7 @@ export const commenceFlightAction = actionClient
           ok: false,
           code: "EARLIER_SCHEDULED" as const,
           message:
-            "An earlier flight on this aircraft is still scheduled — it must commence or be cancelled before this one starts.",
+            "An earlier flight on this aircraft is still on ground — it must commence or be cancelled before this one starts.",
           earlierFlight: {
             flightRequestId: earlier.flight_request_id,
             aircraftIdentification:

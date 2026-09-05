@@ -19,7 +19,11 @@ import { NotamsSection } from "@/modules/dashboard/components/notams-section";
 
 const PAGE_SIZE = 10;
 
-export function OrganizedFlightStatusClientSurface() {
+export function OrganizedFlightStatusClientSurface({
+  canViewFlightLog,
+}: {
+  canViewFlightLog: boolean;
+}) {
   const [departedPage, setDepartedPage] = useQueryState(
     "departedPage",
     parseAsInteger.withDefault(1),
@@ -64,6 +68,7 @@ export function OrganizedFlightStatusClientSurface() {
           <NotamsSection />
 
           <OrganizedFlightStatusBoard
+            canViewFlightLog={canViewFlightLog}
             groups={[
               {
                 id: "departed",
@@ -89,7 +94,7 @@ export function OrganizedFlightStatusClientSurface() {
                 id: "on-ground",
                 title: "On Ground",
                 icon: ClockIcon,
-                emptyMessage: "No scheduled flights on ground.",
+                emptyMessage: "No flights on ground.",
                 rows: onGround.rows,
                 page: groundPage,
                 totalPages: onGround.totalPages,

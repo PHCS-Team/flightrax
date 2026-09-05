@@ -17,12 +17,19 @@ import {
 } from "lucide-react";
 import { Fragment, useEffect, useState } from "react";
 
+import {
+  DelayedTab,
+  PastEetTab,
+} from "@/modules/dashboard/components/board-alert-tab";
 import { useNowMs } from "@/modules/dashboard/hooks/use-now";
 import type {
   DashboardBoardStatus,
   DashboardFlightStatusRow,
 } from "@/modules/dashboard/types/flight-status";
-import { isJourneyOverdue } from "@/modules/dashboard/utils/board-status";
+import {
+  isJourneyOverdue,
+  isJourneyPastEet,
+} from "@/modules/dashboard/utils/board-status";
 import {
   formatElapsedHm,
   formatShortPersonName,
@@ -57,7 +64,6 @@ export const BOARD_STATUS_META: Record<
       "bg-linear-to-r from-emerald-700/60 via-emerald-600/20 to-transparent",
     borderClassName: "border-emerald-300/35",
   },
-  // Scheduled for today, aircraft still preparing for departure.
   on_ground: {
     label: "On Ground",
     className: "border-orange-200/50 bg-orange-500/80 text-white",
@@ -76,12 +82,6 @@ export const BOARD_STATUS_META: Record<
 
 const PILL_CLASS =
   "inline-flex items-center whitespace-nowrap rounded-full border px-1.5 py-0.5 text-[10px] font-semibold sm:px-2.5 sm:text-xs";
-
-// A scheduled flight past its filed DOF that has not been commenced.
-export const OVERDUE_PILL_CLASS = cn(
-  PILL_CLASS,
-  "border-red-200/40 bg-red-700/70 text-red-50",
-);
 
 const PAGINATION_BUTTON_CLASS =
   "size-8 border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground disabled:border-primary-foreground/10 disabled:bg-primary-foreground/5 disabled:text-primary-foreground/50";
@@ -144,17 +144,9 @@ export function FlightStatusBoard({
       header: "Remarks",
       cell: ({ row }) => {
         const meta = BOARD_STATUS_META[row.original.boardStatus];
-        const overdue = isJourneyOverdue(
-          row.original.journey.status,
-          row.original.journey.dofAt,
-          nowMs,
-        );
 
         return (
-          <span className="inline-flex flex-wrap items-center justify-center gap-1">
-            <span className={cn(PILL_CLASS, meta.className)}>{meta.label}</span>
-            {overdue && <span className={OVERDUE_PILL_CLASS}>Overdue</span>}
-          </span>
+          <span className={cn(PILL_CLASS, meta.className)}>{meta.label}</span>
         );
       },
     },
@@ -171,9 +163,17 @@ export function FlightStatusBoard({
       id: "instructor",
       header: "Instructor",
       cell: ({ row }) => (
-        <p className="truncate text-sm uppercase text-primary-foreground/90">
-          {formatShortPersonName(row.original.journey.instructorName)}
-        </p>
+        <>
+          <p className="truncate text-sm uppercase text-primary-foreground/90">
+            {formatShortPersonName(row.original.journey.instructorName)}
+          </p>
+          {isJourneyOverdue(
+            row.original.journey.status,
+            row.original.journey.dofAt,
+            nowMs,
+          ) && <DelayedTab />}
+          {isJourneyPastEet(row.original.journey, nowMs) && <PastEetTab />}
+        </>
       ),
     },
   ] satisfies ColumnDef<DashboardFlightStatusRow>[];
@@ -283,7 +283,7 @@ export function FlightStatusBoard({
                         "text-primary-foreground",
                         index === 0 ? "pl-4 sm:pl-6" : "text-center",
                         index === row.getVisibleCells().length - 1 &&
-                          "pr-4 sm:pr-6",
+                          "relative pr-4 sm:pr-6",
                       )}
                       key={cell.id}
                     >
@@ -366,7 +366,7 @@ function FlightStatusDetails({
       : journey.commencedAt
         ? `Departed: ${formatElapsedHm(journey.commencedAt)} ago`
         : isJourneyOverdue(journey.status, journey.dofAt, nowMs)
-          ? `Overdue — was due to depart at ${scheduledLabel}`
+          ? `Delayed — was due to depart at ${scheduledLabel}`
           : `Will depart at ${scheduledLabel}`;
 
   return (

@@ -28,7 +28,7 @@ const EMPTY_STATE_COPY: Record<
 > = {
   in_progress: {
     description:
-      "Drafts and rejected requests you can still edit appear here. Start by filing a flight plan for your scheduled flight.",
+      "Drafts and rejected requests you can still edit appear here. Start by filing a flight plan for your upcoming flight.",
     title: "No Flight Plans in Progress",
   },
   pending_approval: {
