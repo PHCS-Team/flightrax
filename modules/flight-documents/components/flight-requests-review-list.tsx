@@ -41,9 +41,13 @@ export function FlightRequestsReviewList({
           planCode={request.planCode}
         >
           <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-primary-foreground/70">
-            <span className="truncate">By {request.requestedByName}</span>
-            {scope === "all" && request.pilotInCommandName && (
-              <span className="truncate">PIC {request.pilotInCommandName}</span>
+            <span className="truncate">
+              By <span className="uppercase">{request.requestedByName}</span>
+            </span>
+            {scope === "all" && request.instructorName && (
+              <span className="truncate">
+                FI <span className="uppercase">{request.instructorName}</span>
+              </span>
             )}
             <span>
               DOF{" "}

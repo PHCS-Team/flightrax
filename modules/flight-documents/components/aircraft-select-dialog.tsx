@@ -43,6 +43,7 @@ export function AircraftSelectDialog({
 }) {
   const router = useRouter();
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [isNavigating, setIsNavigating] = useState(false);
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
@@ -85,12 +86,21 @@ export function AircraftSelectDialog({
       return;
     }
 
-    onOpenChange(false);
-    router.push(`/flight-documents/flight-plans/new?aircraft=${selectedId}`);
+    setIsNavigating(true);
+    router.replace(`/flight-documents/flight-plans/new?aircraft=${selectedId}`);
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      onOpenChange={(nextOpen) => {
+        if (!nextOpen) {
+          setIsNavigating(false);
+        }
+
+        onOpenChange(nextOpen);
+      }}
+      open={open}
+    >
       <DialogContent className="flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-[calc(100vw-1rem)] flex-col overflow-hidden p-4 sm:w-full sm:max-w-lg sm:p-6">
         <DialogSectionHeader
           description="Choose the aircraft for this flight plan."
@@ -246,8 +256,12 @@ export function AircraftSelectDialog({
           >
             Cancel
           </Button>
-          <Button disabled={!selectedId} onClick={handleContinue} type="button">
-            Continue
+          <Button
+            disabled={!selectedId || isNavigating}
+            onClick={handleContinue}
+            type="button"
+          >
+            {isNavigating ? "Opening..." : "Continue"}
           </Button>
         </DialogFooter>
       </DialogContent>

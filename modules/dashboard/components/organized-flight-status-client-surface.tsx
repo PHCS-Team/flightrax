@@ -1,10 +1,10 @@
 "use client";
 
 import {
+  ClockIcon,
   PlaneLandingIcon,
   PlaneTakeoffIcon,
   RadarIcon,
-  WrenchIcon,
 } from "lucide-react";
 import { parseAsInteger, useQueryState } from "nuqs";
 
@@ -19,7 +19,11 @@ import { NotamsSection } from "@/modules/dashboard/components/notams-section";
 
 const PAGE_SIZE = 10;
 
-export function OrganizedFlightStatusClientSurface() {
+export function OrganizedFlightStatusClientSurface({
+  canViewFlightLog,
+}: {
+  canViewFlightLog: boolean;
+}) {
   const [departedPage, setDepartedPage] = useQueryState(
     "departedPage",
     parseAsInteger.withDefault(1),
@@ -64,6 +68,7 @@ export function OrganizedFlightStatusClientSurface() {
           <NotamsSection />
 
           <OrganizedFlightStatusBoard
+            canViewFlightLog={canViewFlightLog}
             groups={[
               {
                 id: "departed",
@@ -88,8 +93,8 @@ export function OrganizedFlightStatusClientSurface() {
               {
                 id: "on-ground",
                 title: "On Ground",
-                icon: WrenchIcon,
-                emptyMessage: "No aircraft on ground.",
+                icon: ClockIcon,
+                emptyMessage: "No flights on ground.",
                 rows: onGround.rows,
                 page: groundPage,
                 totalPages: onGround.totalPages,

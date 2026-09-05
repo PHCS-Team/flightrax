@@ -103,7 +103,7 @@ export async function getOwnFlightRequestsPage(
 }
 
 const FLIGHT_REQUEST_REVIEW_SELECT =
-  "id, status, rejected_reason, flight_plan_id, weight_balance_id, created_at, updated_at, profiles!flight_requests_requested_by_fkey(full_name), flight_plans!inner(plan_code, aircraft_identification, type_of_aircraft, departure_aerodrome, destination_aerodrome, dof_raw, dof_resolved, departure_time_raw, pilot_in_command_id, pilot_in_command_name, aircrafts(photo_path))";
+  "id, status, rejected_reason, flight_plan_id, weight_balance_id, created_at, updated_at, profiles!flight_requests_requested_by_fkey(full_name), instructor:profiles!flight_requests_instructor_profile_id_fkey(full_name), flight_plans!inner(plan_code, aircraft_identification, type_of_aircraft, departure_aerodrome, destination_aerodrome, dof_raw, dof_resolved, departure_time_raw, pilot_in_command_id, pilot_in_command_name, aircrafts(photo_path))";
 
 export async function getReviewFlightRequestsPage(
   page: number,
@@ -136,8 +136,26 @@ export async function getReviewFlightRequestsPage(
     .eq("status", "pending_approval");
 
   if (scope === "assigned") {
-    countQuery = countQuery.eq("flight_plans.pilot_in_command_id", viewer.id);
-    listQuery = listQuery.eq("flight_plans.pilot_in_command_id", viewer.id);
+    const { data: picPlans, error: picPlansError } = await supabase
+      .from("flight_plans")
+      .select("id, flight_requests!inner(status)")
+      .eq("pilot_in_command_id", viewer.id)
+      .eq("flight_requests.status", "pending_approval");
+
+    if (picPlansError) {
+      throw new Error(picPlansError.message);
+    }
+
+    const picPlanIds = (picPlans ?? []).map((plan) => plan.id);
+    const assignedFilter = [
+      `instructor_profile_id.eq.${viewer.id}`,
+      ...(picPlanIds.length > 0
+        ? [`flight_plan_id.in.(${picPlanIds.join(",")})`]
+        : []),
+    ].join(",");
+
+    countQuery = countQuery.or(assignedFilter);
+    listQuery = listQuery.or(assignedFilter);
   }
 
   if (codeSearch) {
@@ -184,6 +202,7 @@ export async function getReviewFlightRequestsPage(
       updatedAt: row.updated_at,
       requestedByName: row.profiles.full_name,
       pilotInCommandName: row.flight_plans.pilot_in_command_name ?? "",
+      instructorName: row.instructor?.full_name ?? "",
       hasWeightBalance: Boolean(row.weight_balance_id),
     })),
     totalCount,

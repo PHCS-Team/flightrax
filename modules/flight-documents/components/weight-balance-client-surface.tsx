@@ -14,6 +14,7 @@ import { RejectionReasonAction } from "@/modules/flight-documents/components/rej
 import { SelfApproveAction } from "@/modules/flight-documents/components/self-approve-action";
 import { EDITABLE_FLIGHT_REQUEST_STATUSES } from "@/modules/flight-documents/constants/flight-request-options";
 import { useFlightPlanFilerContext } from "@/modules/flight-documents/hooks/use-filer-context.query";
+import { canActOnFlightRequest } from "@/modules/flight-documents/utils/flight-request-eligibility";
 import { useSaveWeightBalance } from "@/modules/flight-documents/hooks/use-save-weight-balance.action";
 import { useSubmitFlightRequest } from "@/modules/flight-documents/hooks/use-submit-flight-request.action";
 import { useWeightBalanceContext } from "@/modules/flight-documents/hooks/use-weight-balance-context.query";
@@ -31,20 +32,24 @@ export function WeightBalanceClientSurface({
   const [savedDialogOpen, setSavedDialogOpen] = useState(false);
   const { context, error, isPending } = useWeightBalanceContext(flightPlanId);
   const { filerContext } = useFlightPlanFilerContext();
-  const isSelfPic = Boolean(
+  const canSelfApprove = Boolean(
     context &&
-    filerContext &&
-    context.pilotInCommandId === filerContext.profile.id,
+      filerContext &&
+      filerContext.hasValidLicense &&
+      canActOnFlightRequest({
+        viewerId: filerContext.profile.id,
+        viewerCanCommandAsPic: filerContext.canSetSelfAsPic,
+        pilotInCommandId: context.pilotInCommandId,
+        instructorProfileId: context.instructorProfileId,
+      }),
   );
   const saveWeightBalance = useSaveWeightBalance({
     onSaved: () => setSavedDialogOpen(true),
   });
 
   const submitFlightRequest = useSubmitFlightRequest({
-    onSubmitted: () => {
-      setSavedDialogOpen(false);
-      router.push(`/flight-documents/flight-plans/${flightPlanId}`);
-    },
+    onSubmitted: () =>
+      router.replace(`/flight-documents/flight-plans/${flightPlanId}`),
   });
 
   if (isPending) {
@@ -113,9 +118,7 @@ export function WeightBalanceClientSurface({
       {isPendingApproval && context.isOwner && (
         <div className="grid gap-2 p-3 sm:gap-3 sm:p-0">
           <PendingApprovalAlert flightPlanId={flightPlanId} />
-          {isSelfPic && filerContext?.hasValidLicense && (
-            <SelfApproveAction flightPlanId={flightPlanId} />
-          )}
+          {canSelfApprove && <SelfApproveAction flightPlanId={flightPlanId} />}
         </div>
       )}
 
@@ -133,7 +136,9 @@ export function WeightBalanceClientSurface({
           }
           readOnly={readOnly}
           submitLabel={
-            context.weightBalanceId ? "Save and submit" : "Save weight and balance"
+            context.weightBalanceId
+              ? "Save and submit"
+              : "Save weight and balance"
           }
         />
       </GlassSurface>
@@ -155,11 +160,10 @@ export function WeightBalanceClientSurface({
       <FlightPlanSavedDialog
         description="Your Weight & Balance is saved. Submit the request for approval when everything is final, or come back to it later from Flight Documents."
         isSubmittingForApproval={submitFlightRequest.isExecuting}
-        onBackToList={() => router.push("/flight-documents")}
-        onClose={() => {
-          setSavedDialogOpen(false);
-          router.push(`/flight-documents/flight-plans/${flightPlanId}`);
-        }}
+        onBackToList={() => router.replace("/flight-documents")}
+        onClose={() =>
+          router.replace(`/flight-documents/flight-plans/${flightPlanId}`)
+        }
         onSubmitForApproval={() =>
           submitFlightRequest.execute({ flightPlanId })
         }

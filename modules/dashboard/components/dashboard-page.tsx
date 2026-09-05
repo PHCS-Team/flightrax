@@ -5,6 +5,7 @@ import { FlightStatusClientSurface } from "@/modules/dashboard/components/flight
 import { OrganizedFlightStatusClientSurface } from "@/modules/dashboard/components/organized-flight-status-client-surface";
 import { getDashboardHomeSurface } from "@/modules/dashboard/utils/home-surface";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
+import { canAccessPath } from "@/shared/lib/rbac/routes";
 
 export async function DashboardPage({
   aircraftsSurface,
@@ -19,7 +20,13 @@ export async function DashboardPage({
   }
 
   if (surface === "organized-board") {
-    return <OrganizedFlightStatusClientSurface />;
+    return (
+      <OrganizedFlightStatusClientSurface
+        canViewFlightLog={Boolean(
+          profile && canAccessPath(profile, "/flight-plans"),
+        )}
+      />
+    );
   }
 
   return <FlightStatusClientSurface />;

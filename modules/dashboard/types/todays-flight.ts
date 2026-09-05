@@ -18,6 +18,7 @@ export type TodaysFlightRow = {
   commencedAt: string | null;
   traineeName: string;
   pilotInCommandName: string;
+  instructorName: string;
 };
 
 export type EarlierScheduledFlight = {

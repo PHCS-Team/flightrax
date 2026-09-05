@@ -6,6 +6,10 @@ import {
   getAircraftDofConflict,
   getAircraftStatusBlock,
 } from "@/modules/flight-documents/services/journey-conflicts.server";
+import {
+  canActOnFlightRequest,
+  canCommandAsPic,
+} from "@/modules/flight-documents/utils/flight-request-eligibility";
 import { isLicenseValid } from "@/shared/lib/aviation/license-validity";
 import { verifyProfilePasscode } from "@/shared/lib/passcode";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
@@ -30,7 +34,7 @@ export const approveFlightRequestAction = actionClient
     const { data: flightPlan, error: planError } = await supabase
       .from("flight_plans")
       .select(
-        "id, aircraft_id, dof_resolved, pilot_in_command_id, flight_requests(id, status, weight_balance_id)",
+        "id, aircraft_id, dof_resolved, pilot_in_command_id, flight_requests(id, status, weight_balance_id, instructor_profile_id)",
       )
       .eq("id", parsedInput.flightPlanId)
       .maybeSingle();
@@ -43,13 +47,6 @@ export const approveFlightRequestAction = actionClient
 
     if (!flightPlan || !request) {
       return { ok: false, message: "Flight plan not found." };
-    }
-
-    if (flightPlan.pilot_in_command_id !== actor.id) {
-      return {
-        ok: false,
-        message: "Only the assigned pilot in command can approve this request.",
-      };
     }
 
     if (request.status !== "pending_approval") {
@@ -105,6 +102,21 @@ export const approveFlightRequestAction = actionClient
       };
     }
 
+    if (
+      !canActOnFlightRequest({
+        viewerId: actor.id,
+        viewerCanCommandAsPic: canCommandAsPic(actor.role, licenses ?? []),
+        pilotInCommandId: flightPlan.pilot_in_command_id,
+        instructorProfileId: request.instructor_profile_id,
+      })
+    ) {
+      return {
+        ok: false,
+        message:
+          "Only the assigned flight instructor, or a pilot in command eligible to command, can approve this request.",
+      };
+    }
+
     const approverLicenses = (licenses ?? []).map((license) => ({
       licenseType: license.license_type,
       licenseNumber: license.license_number,
@@ -145,10 +157,6 @@ export const approveFlightRequestAction = actionClient
       }
     }
 
-    const dofDate = flightPlan.dof_resolved
-      ? flightPlan.dof_resolved.slice(0, 10)
-      : null;
-
     if (flightPlan.aircraft_id) {
       const statusBlock = await getAircraftStatusBlock(flightPlan.aircraft_id);
 
@@ -182,7 +190,6 @@ export const approveFlightRequestAction = actionClient
           flight_request_id: request.id,
           status: "scheduled",
           aircraft_id: flightPlan.aircraft_id,
-          dof_date: dofDate,
           dof_at: flightPlan.dof_resolved,
         },
         { onConflict: "flight_request_id" },

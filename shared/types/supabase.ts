@@ -665,6 +665,7 @@ export type Database = {
           created_at: string
           flight_plan_id: string
           id: string
+          instructor_profile_id: string | null
           rejected_reason: string | null
           requested_by: string
           status: string
@@ -677,6 +678,7 @@ export type Database = {
           created_at?: string
           flight_plan_id: string
           id?: string
+          instructor_profile_id?: string | null
           rejected_reason?: string | null
           requested_by: string
           status?: string
@@ -689,6 +691,7 @@ export type Database = {
           created_at?: string
           flight_plan_id?: string
           id?: string
+          instructor_profile_id?: string | null
           rejected_reason?: string | null
           requested_by?: string
           status?: string
@@ -708,6 +711,13 @@ export type Database = {
             columns: ["flight_plan_id"]
             isOneToOne: true
             referencedRelation: "flight_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "flight_requests_instructor_profile_id_fkey"
+            columns: ["instructor_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {
@@ -1146,21 +1156,18 @@ export type Database = {
     }
     Functions: {
       get_dashboard_flight_status: {
-        Args: {
-          p_include_on_ground?: boolean
-          p_page?: number
-          p_page_size?: number
-          p_status_group?: string
-        }
+        Args: { p_page?: number; p_page_size?: number; p_status_group?: string }
         Returns: {
-          aircraft_status: Database["public"]["Enums"]["aircraft_status"]
           commenced_at: string
           cruising_level: string
           cruising_speed: string
           departure_aerodrome: string
           departure_time_raw: string
           destination_aerodrome: string
+          dof_at: string
+          flight_plan_id: string
           id: string
+          instructor_name: string
           journey_id: string
           journey_status: Database["public"]["Enums"]["journey_status"]
           photo_path: string
@@ -1215,6 +1222,7 @@ export type Database = {
           dof_at: string
           flight_plan_id: string
           flight_request_id: string
+          instructor_name: string
           journey_id: string
           journey_status: Database["public"]["Enums"]["journey_status"]
           pilot_in_command_name: string
@@ -1223,6 +1231,8 @@ export type Database = {
           trainee_name: string
         }[]
       }
+      operations_date: { Args: { ts: string }; Returns: string }
+      operations_today: { Args: never; Returns: string }
     }
     Enums: {
       admin_department:

@@ -29,7 +29,7 @@ const HELP_SECTIONS = [
       {
         term: "DOF (Date of Filing)",
         detail:
-          "6 digits, DDHHMM: day of month followed by the time in zulu. Example: 280100 = the 28th at 0100Z (9:00 AM PH time).",
+          "6 digits, DDHHMM: the day of the month on the local calendar, followed by the clock time in zulu. Example: 280100 = the 28th at 0100Z (9:00 AM PH time); 282300 = the 28th at 2300Z (7:00 AM PH time that same morning).",
       },
       {
         term: "Addressee(s) / Originator",

@@ -128,17 +128,11 @@ const flightPlanFormObjectSchema = z.object({
   dinghiesCovered: z.boolean(),
   dinghiesColor: z.string().trim(),
   remarks: z.string().trim(),
-  pilotInCommandId: z
-    .string()
-    .trim()
-    .uuid("Choose a pilot in command."),
+  pilotInCommandId: z.string().trim().uuid("Choose a pilot in command."),
   pilotInCommandName: z.string().trim().min(1, "Choose a pilot in command."),
+  instructorId: z.string().trim().uuid("Choose a flight instructor."),
 });
 
-// Per the client's format, Other Information must always carry a DEP/
-// (departure) line and a DEST/ (destination) line, each with a value.
-// The columns store Other Information as free text, so the lines are
-// checked in the text itself.
 function requireZzzzOtherInformation(
   values: {
     departureAerodrome: string;

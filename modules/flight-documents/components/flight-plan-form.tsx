@@ -36,7 +36,7 @@ import {
   syncAerodromeLines,
   syncDofLine,
 } from "@/modules/flight-documents/utils/build-other-information";
-import { resolveDof } from "@/modules/flight-documents/utils/flight-plan-time";
+import { resolveDofDate } from "@/modules/flight-documents/utils/flight-plan-time";
 import { Button } from "@/shared/components/ui/button";
 import { Checkbox } from "@/shared/components/ui/checkbox";
 import { Input } from "@/shared/components/ui/input";
@@ -76,6 +76,7 @@ export function getFlightPlanFormDefaults(): FlightPlanFormValues {
     dinghiesColor: "",
     pilotInCommandId: "",
     pilotInCommandName: "",
+    instructorId: "",
     ...FLIGHT_PLAN_FORM_DEFAULTS,
   };
 }
@@ -132,8 +133,23 @@ export function FlightPlanForm({
     control: form.control,
     name: "pilotInCommandId",
   });
+  const instructorId = useWatch({
+    control: form.control,
+    name: "instructorId",
+  });
   const isSelfPic = Boolean(
     filerContext && pilotInCommandId === filerContext.profile.id,
+  );
+  const filerIsInstructor =
+    filerContext?.profile.role === "instructor" ||
+    filerContext?.profile.role === "superadmin";
+  const picIsInstructor = Boolean(
+    pilotInCommandId &&
+    (picOptions.some((option) => option.id === pilotInCommandId) ||
+      (isSelfPic && filerIsInstructor)),
+  );
+  const isInstructorSameAsPic = Boolean(
+    instructorId && instructorId === pilotInCommandId,
   );
   const [otherInfoEdited, setOtherInfoEdited] = useState(() =>
     Boolean(defaultValues?.otherRemarks?.trim()),
@@ -226,6 +242,10 @@ export function FlightPlanForm({
       form.setValue("pilotInCommandName", "", { shouldDirty: true });
     }
 
+    if (form.getValues("instructorId")) {
+      form.setValue("instructorId", "", { shouldDirty: true });
+    }
+
     if (!DOF_PATTERN.test(dofRaw ?? "")) {
       return;
     }
@@ -244,28 +264,51 @@ export function FlightPlanForm({
     }
   }, [dofRaw, form]);
 
+  function setPilotInCommand(id: string, name: string, isInstructor: boolean) {
+    const followsPic =
+      Boolean(form.getValues("instructorId")) &&
+      form.getValues("instructorId") === form.getValues("pilotInCommandId");
+
+    form.setValue("pilotInCommandId", id, { shouldDirty: true });
+    form.setValue("pilotInCommandName", name, { shouldDirty: true });
+
+    if (followsPic) {
+      form.setValue("instructorId", isInstructor ? id : "", {
+        shouldDirty: true,
+      });
+    }
+  }
+
   function handleSelfPicToggle(enabled: boolean) {
     if (!filerContext) {
       return;
     }
 
     if (enabled) {
-      form.setValue("pilotInCommandId", filerContext.profile.id, {
-        shouldDirty: true,
-      });
-      form.setValue("pilotInCommandName", filerContext.profile.fullName, {
-        shouldDirty: true,
-      });
+      setPilotInCommand(
+        filerContext.profile.id,
+        filerContext.profile.fullName,
+        filerIsInstructor,
+      );
 
       return;
     }
 
-    form.setValue("pilotInCommandId", "", { shouldDirty: true });
-    form.setValue("pilotInCommandName", "", { shouldDirty: true });
+    setPilotInCommand("", "", false);
+  }
+
+  function handleSameAsPicToggle(enabled: boolean) {
+    form.setValue("instructorId", enabled ? pilotInCommandId : "", {
+      shouldDirty: true,
+    });
+  }
+
+  function handleInstructorSelect(id: string) {
+    form.setValue("instructorId", id, { shouldDirty: true });
   }
 
   const dofDate = DOF_PATTERN.test(dofRaw ?? "")
-    ? resolveDof(dofRaw).slice(0, 10)
+    ? resolveDofDate(dofRaw)
     : null;
 
   function getPicUnavailability(optionId: string) {
@@ -285,10 +328,7 @@ export function FlightPlanForm({
   function handlePicSelect(picId: string) {
     const pic = picOptions.find((option) => option.id === picId);
 
-    form.setValue("pilotInCommandId", pic?.id ?? "", { shouldDirty: true });
-    form.setValue("pilotInCommandName", pic?.fullName ?? "", {
-      shouldDirty: true,
-    });
+    setPilotInCommand(pic?.id ?? "", pic?.fullName ?? "", Boolean(pic));
   }
 
   return (
@@ -316,7 +356,7 @@ export function FlightPlanForm({
           />
           <FpTextField
             error={errors.dofRaw?.message}
-            helper="DDHHMM in zulu — e.g. 280100 = the 28th at 0100Z"
+            helper="DD = day (local date), HHMM = time in zulu — e.g. 280100 = the 28th at 0100Z (9:00 AM)"
             id="fp-dof"
             maxLength={6}
             label="Date of Filing"
@@ -686,15 +726,98 @@ export function FlightPlanForm({
               </SelectContent>
             </Select>
           )}
-          {!dofDate && !isSelfPic && (
-            <p className="text-xs text-muted-foreground">
-              Enter the Date of Filing first — pilot availability depends on the
-              flight date.
-            </p>
-          )}
           {errors.pilotInCommandId && (
             <p className="text-sm text-destructive">
               {errors.pilotInCommandId.message}
+            </p>
+          )}
+        </div>
+
+        <div className="grid gap-2">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm font-semibold text-foreground">
+              Flight Instructor
+              <span className="ml-1 text-secondary">*</span>
+            </p>
+            <label className="flex cursor-pointer items-center gap-2 text-xs font-medium text-muted-foreground">
+              Same as PIC
+              <Switch
+                aria-label="Set the flight instructor to the pilot in command"
+                checked={isInstructorSameAsPic}
+                className="cursor-pointer"
+                disabled={isSubmitting || !picIsInstructor}
+                onCheckedChange={handleSameAsPicToggle}
+              />
+            </label>
+          </div>
+          {pilotInCommandId && !picIsInstructor && (
+            <p className="text-xs text-muted-foreground">
+              Same as PIC is only available when the pilot in command is a
+              flight instructor.
+            </p>
+          )}
+          {isInstructorSameAsPic ? (
+            <Input
+              className={cn(
+                INPUT_TEXT_CLASS,
+                "uppercase placeholder:normal-case",
+              )}
+              disabled
+              value={form.getValues("pilotInCommandName")}
+            />
+          ) : (
+            <Select
+              disabled={!dofDate}
+              onValueChange={handleInstructorSelect}
+              value={instructorId || undefined}
+            >
+              <SelectTrigger
+                aria-invalid={Boolean(errors.instructorId)}
+                className={cn(
+                  INPUT_TEXT_CLASS,
+                  "uppercase placeholder:normal-case",
+                )}
+                id="fp-instructor"
+              >
+                <SelectValue placeholder="Choose a flight instructor" />
+              </SelectTrigger>
+              <SelectContent>
+                {picOptions.map((option) => {
+                  const unavailability = getPicUnavailability(option.id);
+
+                  return (
+                    <SelectItem
+                      disabled={Boolean(unavailability)}
+                      key={option.id}
+                      value={option.id}
+                    >
+                      <span className="flex items-center gap-2">
+                        {option.fullName}
+                        {unavailability && (
+                          <span className="text-xs text-muted-foreground">
+                            Unavailable until{" "}
+                            {format(
+                              parseISO(unavailability.endsOn),
+                              "MMM d, yyyy",
+                            )}
+                          </span>
+                        )}
+                      </span>
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+          )}
+          {!dofDate && !isInstructorSameAsPic && (
+            <p className="text-xs text-muted-foreground">
+              Enter the Date of Filing first — instructor availability depends
+              on the flight date.
+            </p>
+          )}
+          {errors.instructorId && (
+            <p className="text-sm text-destructive">
+              {errors.instructorId.message}
             </p>
           )}
         </div>

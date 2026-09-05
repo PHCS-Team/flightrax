@@ -61,13 +61,7 @@ export function LicenseSetupDialog({
           >
             Not now
           </Button>
-          <Button
-            onClick={() => {
-              onOpenChange?.(false);
-              router.push("/account");
-            }}
-            type="button"
-          >
+          <Button onClick={() => router.replace("/account")} type="button">
             Go to account settings
           </Button>
         </DialogFooter>

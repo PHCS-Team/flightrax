@@ -45,7 +45,7 @@ export function NotamsSection() {
   useEffect(() => {
     const autoplayPlugin = api?.plugins().autoplay;
 
-    if (!autoplayPlugin) {
+    if (!autoplayPlugin || !api || api.scrollSnapList().length <= 1) {
       return;
     }
 
@@ -54,7 +54,7 @@ export function NotamsSection() {
     } else {
       autoplayPlugin.play();
     }
-  }, [api, listOpen]);
+  }, [api, listOpen, notams.length]);
 
   if (isPending) {
     return (

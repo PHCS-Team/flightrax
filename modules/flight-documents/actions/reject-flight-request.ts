@@ -1,6 +1,10 @@
 "use server";
 
 import { rejectFlightRequestSchema } from "@/modules/flight-documents/schemas/flight-request-schema";
+import {
+  canActOnFlightRequest,
+  canCommandAsPic,
+} from "@/modules/flight-documents/utils/flight-request-eligibility";
 import { verifyProfilePasscode } from "@/shared/lib/passcode";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { isApproved } from "@/shared/lib/rbac/guards";
@@ -23,7 +27,9 @@ export const rejectFlightRequestAction = actionClient
 
     const { data: flightPlan, error: planError } = await supabase
       .from("flight_plans")
-      .select("id, pilot_in_command_id, flight_requests(id, status)")
+      .select(
+        "id, pilot_in_command_id, flight_requests(id, status, instructor_profile_id)",
+      )
       .eq("id", parsedInput.flightPlanId)
       .maybeSingle();
 
@@ -37,10 +43,27 @@ export const rejectFlightRequestAction = actionClient
       return { ok: false, message: "Flight plan not found." };
     }
 
-    if (flightPlan.pilot_in_command_id !== actor.id) {
+    const { data: licenses, error: licensesError } = await supabase
+      .from("licenses")
+      .select("license_type, expiry_date, has_no_expiry, status")
+      .eq("user_id", actor.id);
+
+    if (licensesError) {
+      return { ok: false, message: licensesError.message };
+    }
+
+    if (
+      !canActOnFlightRequest({
+        viewerId: actor.id,
+        viewerCanCommandAsPic: canCommandAsPic(actor.role, licenses ?? []),
+        pilotInCommandId: flightPlan.pilot_in_command_id,
+        instructorProfileId: request.instructor_profile_id,
+      })
+    ) {
       return {
         ok: false,
-        message: "Only the assigned pilot in command can reject this request.",
+        message:
+          "Only the assigned flight instructor, or a pilot in command eligible to command, can reject this request.",
       };
     }
 

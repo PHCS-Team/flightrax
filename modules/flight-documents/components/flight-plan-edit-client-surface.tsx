@@ -15,6 +15,7 @@ import { SelfApproveAction } from "@/modules/flight-documents/components/self-ap
 import { EDITABLE_FLIGHT_REQUEST_STATUSES } from "@/modules/flight-documents/constants/flight-request-options";
 import { useDeleteFlightPlan } from "@/modules/flight-documents/hooks/use-delete-flight-plan.action";
 import { useFlightPlanFilerContext } from "@/modules/flight-documents/hooks/use-filer-context.query";
+import { canActOnFlightRequest } from "@/modules/flight-documents/utils/flight-request-eligibility";
 import { useOwnFlightPlanForEdit } from "@/modules/flight-documents/hooks/use-flight-plan.query";
 import { useUpdateFlightPlan } from "@/modules/flight-documents/hooks/use-update-flight-plan.action";
 import { ConfirmationDialog } from "@/shared/components/layout/confirmation-dialog";
@@ -39,7 +40,7 @@ export function FlightPlanEditClientSurface({
     onSaved: () => setSavedDialogOpen(true),
   });
   const deleteFlightPlan = useDeleteFlightPlan({
-    onDeleted: () => router.push("/flight-documents"),
+    onDeleted: () => router.replace("/flight-documents"),
   });
   const { filerContext } = useFlightPlanFilerContext();
 
@@ -113,9 +114,12 @@ export function FlightPlanEditClientSurface({
           <PendingApprovalAlert flightPlanId={flightPlanId} />
           {filerContext &&
             filerContext.hasValidLicense &&
-            flightPlan.values.pilotInCommandId === filerContext.profile.id && (
-              <SelfApproveAction flightPlanId={flightPlanId} />
-            )}
+            canActOnFlightRequest({
+              viewerId: filerContext.profile.id,
+              viewerCanCommandAsPic: filerContext.canSetSelfAsPic,
+              pilotInCommandId: flightPlan.values.pilotInCommandId || null,
+              instructorProfileId: flightPlan.values.instructorId || null,
+            }) && <SelfApproveAction flightPlanId={flightPlanId} />}
         </div>
       )}
 
@@ -184,10 +188,10 @@ export function FlightPlanEditClientSurface({
 
       <FlightPlanSavedDialog
         description="Your changes are saved. Continue to the Weight & Balance when you are ready — closing this keeps you on the flight plan."
-        onBackToList={() => router.push("/flight-documents")}
+        onBackToList={() => router.replace("/flight-documents")}
         onClose={() => setSavedDialogOpen(false)}
         onProceedToWeightBalance={() =>
-          router.push(
+          router.replace(
             `/flight-documents/flight-plans/${flightPlanId}/weight-balance`,
           )
         }

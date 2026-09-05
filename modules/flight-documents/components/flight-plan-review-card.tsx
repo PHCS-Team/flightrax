@@ -21,17 +21,16 @@ import type { FlightPlanFormValues } from "@/modules/flight-documents/schemas/fl
 import type { FlightPlanAircraftOption } from "@/modules/flight-documents/types/aircraft-option";
 import { GlassSurface } from "@/shared/components/layout/glass-surface";
 
-// Read-only display of a filed flight plan, mirroring the form's
-// sections field for field, plus the aircraft snapshot fields the form
-// auto-populates.
 export function FlightPlanReviewCard({
   aircraft,
   filedByName,
+  instructorName,
   showHeading = true,
   values,
 }: {
   aircraft: FlightPlanAircraftOption;
   filedByName: string;
+  instructorName?: string;
   showHeading?: boolean;
   values: FlightPlanFormValues;
 }) {
@@ -52,6 +51,9 @@ export function FlightPlanReviewCard({
             label="Pilot in Command"
             value={values.pilotInCommandName}
           />
+          {instructorName !== undefined && (
+            <ReviewField label="Flight Instructor" value={instructorName} />
+          )}
         </div>
       </ReviewSection>
 

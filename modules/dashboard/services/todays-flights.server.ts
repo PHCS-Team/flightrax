@@ -53,6 +53,7 @@ export async function getTodaysFlightsPage(
       commencedAt: row.commenced_at,
       traineeName: row.trainee_name ?? "",
       pilotInCommandName: row.pilot_in_command_name ?? "",
+      instructorName: row.instructor_name ?? "",
     })),
     totalCount,
     page,
