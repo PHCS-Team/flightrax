@@ -63,8 +63,3 @@ export const PERSONS_ON_BOARD_TBN = "TBN";
 
 export const MAX_DINGHIES_NUMBER = 99;
 export const MAX_DINGHIES_CAPACITY = 999;
-
-// The school's local time zone. The DOF's day (DD) and every "today"
-// check are in this zone; only clock times are zulu. Mirrors
-// public.operations_date() in the database.
-export const OPERATIONS_TIME_ZONE = "Asia/Manila";

@@ -1,4 +1,4 @@
-import { OPERATIONS_TIME_ZONE } from "@/modules/flight-documents/constants/flight-plan-options";
+import { OPERATIONS_TIME_ZONE } from "@/shared/lib/aviation/operations-time-zone";
 
 // Flight plan TIMES are zulu (UTC). The DOF's DAY is not: DD of DDHHMM
 // is the school's local calendar date (Asia/Manila), followed by the

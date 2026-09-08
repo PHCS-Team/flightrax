@@ -27,10 +27,10 @@ import { DialogSectionHeader } from "@/shared/components/layout/dialog-section-h
 import { Dialog, DialogContent } from "@/shared/components/ui/dialog";
 import {
   formatElapsedHm,
-  formatShortPersonName,
   formatTimeOfDay,
   formatZuluTimeToLocal,
 } from "@/modules/dashboard/utils/format";
+import { formatShortPersonName } from "@/shared/lib/aviation/flight-board";
 import { ConfirmationDialog } from "@/shared/components/layout/confirmation-dialog";
 import { PasscodeGatewayDialog } from "@/shared/components/layout/passcode-gateway-dialog";
 import { useVerifyPasscode } from "@/shared/hooks/use-verify-passcode.action";

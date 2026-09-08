@@ -1183,6 +1183,23 @@ export type Database = {
           type_name: string
         }[]
       }
+      get_flight_monitor_board: {
+        Args: never
+        Returns: {
+          aircraft_id: string
+          commenced_at: string
+          departure_aerodrome: string
+          destination_aerodrome: string
+          destination_text: string
+          dof_at: string
+          instructor_name: string
+          journey_status: Database["public"]["Enums"]["journey_status"]
+          registration_mark: string
+          terminated_at: string
+          total_eet: string
+          trainee_name: string
+        }[]
+      }
       get_flight_plan_aircraft_options: {
         Args: {
           p_page?: number

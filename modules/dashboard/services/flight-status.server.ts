@@ -2,7 +2,7 @@ import "server-only";
 
 import type { DashboardFlightStatusRow } from "@/modules/dashboard/types/flight-status";
 import { deriveBoardStatus } from "@/modules/dashboard/utils/board-status";
-import { formatIntervalHm } from "@/modules/dashboard/utils/format";
+import { formatIntervalHm } from "@/shared/lib/aviation/flight-board";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { isApproved } from "@/shared/lib/rbac/guards";
 import { AIRCRAFT_PHOTOS_BUCKET } from "@/shared/lib/storage/buckets";
