@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: "6mb",
     },
+    turbopackFileSystemCacheForDev: false,
   },
 };
 
