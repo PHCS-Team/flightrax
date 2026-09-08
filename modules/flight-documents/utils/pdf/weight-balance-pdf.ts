@@ -17,7 +17,7 @@ import {
 } from "@/modules/flight-documents/utils/pdf/pdf-text";
 
 // US Letter, drawn from scratch to match the school's Weight and Balance
-// spreadsheet form (see public/Docs/WEIGHT-AND-BALANCE.pdf): banner, load
+// spreadsheet form (see docs/WEIGHT-AND-BALANCE.pdf): banner, load
 // table, notes grid, two signature boxes, and the red/navy chevrons
 // behind the lower rows.
 const PAGE_WIDTH = 612;

@@ -17,7 +17,7 @@ import {
 } from "@/modules/flight-documents/utils/pdf/pdf-text";
 
 // The official CAAP Form ATS 2019-1 (page 1) with its back-page guidance
-// (page 2), extracted from public/Docs/FLIGHT-PLAN-FORMAT.pdf.
+// (page 2), extracted from docs/FLIGHT-PLAN-FORMAT.pdf.
 export const CAAP_FLIGHT_PLAN_FORM_URL = "/forms/caap-form-ats-2019-1.pdf";
 
 // Page is 612 x 1008 pt (8.5" x 14"). Every coordinate below was read off
