@@ -22,20 +22,18 @@ import {
   PastEetTab,
 } from "@/modules/dashboard/components/board-alert-tab";
 import { useNowMs } from "@/modules/dashboard/hooks/use-now";
-import type {
-  DashboardBoardStatus,
-  DashboardFlightStatusRow,
-} from "@/modules/dashboard/types/flight-status";
-import {
-  isJourneyOverdue,
-  isJourneyPastEet,
-} from "@/modules/dashboard/utils/board-status";
+import type { DashboardFlightStatusRow } from "@/modules/dashboard/types/flight-status";
 import {
   formatElapsedHm,
-  formatShortPersonName,
   formatTimeOfDay,
 } from "@/modules/dashboard/utils/format";
+import {
+  formatShortPersonName,
+  isJourneyOverdue,
+  isJourneyPastEet,
+} from "@/shared/lib/aviation/flight-board";
 import { GlassSurface } from "@/shared/components/layout/glass-surface";
+import { BOARD_STATUS_STYLES } from "@/shared/lib/aviation/board-status-styles";
 import { Button } from "@/shared/components/ui/button";
 import {
   Table,
@@ -46,39 +44,6 @@ import {
   TableRow,
 } from "@/shared/components/ui/table";
 import { cn } from "@/shared/lib/utils";
-
-export const BOARD_STATUS_META: Record<
-  DashboardBoardStatus,
-  {
-    label: string;
-    className: string;
-    rowClassName: string;
-    /** Row separator tinted to the status so it doesn't read as a gap. */
-    borderClassName: string;
-  }
-> = {
-  active: {
-    label: "Active",
-    className: "border-emerald-200/50 bg-emerald-600/80 text-white",
-    rowClassName:
-      "bg-linear-to-r from-emerald-700/60 via-emerald-600/20 to-transparent",
-    borderClassName: "border-emerald-300/35",
-  },
-  on_ground: {
-    label: "On Ground",
-    className: "border-orange-200/50 bg-orange-500/80 text-white",
-    rowClassName:
-      "bg-linear-to-r from-orange-700/60 via-orange-600/20 to-transparent",
-    borderClassName: "border-orange-300/35",
-  },
-  arrived: {
-    label: "Arrived",
-    className: "border-yellow-200/60 bg-yellow-500/80 text-white",
-    rowClassName:
-      "bg-linear-to-r from-yellow-600/50 via-yellow-500/15 to-transparent",
-    borderClassName: "border-yellow-300/35",
-  },
-};
 
 const PILL_CLASS =
   "inline-flex items-center whitespace-nowrap rounded-full border px-1.5 py-0.5 text-[10px] font-semibold sm:px-2.5 sm:text-xs";
@@ -143,7 +108,7 @@ export function FlightStatusBoard({
       id: "remarks",
       header: "Remarks",
       cell: ({ row }) => {
-        const meta = BOARD_STATUS_META[row.original.boardStatus];
+        const meta = BOARD_STATUS_STYLES[row.original.boardStatus];
 
         return (
           <span className={cn(PILL_CLASS, meta.className)}>{meta.label}</span>
@@ -266,8 +231,8 @@ export function FlightStatusBoard({
                 <TableRow
                   className={cn(
                     "cursor-pointer hover:bg-primary-foreground/10",
-                    BOARD_STATUS_META[row.original.boardStatus].rowClassName,
-                    BOARD_STATUS_META[row.original.boardStatus].borderClassName,
+                    BOARD_STATUS_STYLES[row.original.boardStatus].rowClassName,
+                    BOARD_STATUS_STYLES[row.original.boardStatus].borderClassName,
                   )}
                   onClick={() =>
                     setExpandedAircraftId((current) =>
@@ -298,7 +263,7 @@ export function FlightStatusBoard({
                   className={cn(
                     "hover:bg-transparent",
                     expandedAircraftId === row.original.aircraftId
-                      ? BOARD_STATUS_META[row.original.boardStatus].borderClassName
+                      ? BOARD_STATUS_STYLES[row.original.boardStatus].borderClassName
                       : "border-0",
                   )}
                 >
@@ -373,7 +338,7 @@ function FlightStatusDetails({
     <div
       className={cn(
         "grid grid-cols-2 items-stretch gap-3 bg-primary-foreground/5 p-3 sm:grid-cols-[minmax(0,1fr)_14rem] sm:gap-4 sm:p-4",
-        BOARD_STATUS_META[row.boardStatus].rowClassName,
+        BOARD_STATUS_STYLES[row.boardStatus].rowClassName,
       )}
     >
       <div className="flex min-w-0 flex-col gap-1.5 sm:justify-center sm:gap-2.5">

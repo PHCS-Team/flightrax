@@ -9,6 +9,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { useCreateNotam } from "@/modules/notams/hooks/use-create-notam.action";
 import {
   createNotamSchema,
+  NOTAM_DESCRIPTION_MAX_LENGTH,
   type CreateNotamInput,
 } from "@/modules/notams/schemas/notam-schema";
 
@@ -65,6 +66,8 @@ export function NotamForm({
   const errors = form.formState.errors;
   const severity = useWatch({ control: form.control, name: "severity" });
   const expiresOn = useWatch({ control: form.control, name: "expiresOn" });
+  const description = useWatch({ control: form.control, name: "description" });
+  const descriptionLength = description?.length ?? 0;
   const fieldId = (name: string) => `notam-${name}`;
 
   return (
@@ -105,11 +108,20 @@ export function NotamForm({
             placeholder="What pilots need to know, when it applies, and who to coordinate with"
             {...form.register("description")}
           />
-          {errors.description && (
-            <p className="text-xs text-destructive">
-              {errors.description.message}
+          <div className="flex items-baseline justify-between gap-3 text-xs">
+            <p className="min-w-0 text-destructive">
+              {errors.description?.message}
             </p>
-          )}
+            <p
+              className={
+                descriptionLength > NOTAM_DESCRIPTION_MAX_LENGTH
+                  ? "shrink-0 font-medium tabular-nums text-destructive"
+                  : "shrink-0 tabular-nums text-muted-foreground"
+              }
+            >
+              {descriptionLength} / {NOTAM_DESCRIPTION_MAX_LENGTH}
+            </p>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-3">

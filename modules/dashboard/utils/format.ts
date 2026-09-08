@@ -2,59 +2,6 @@ import { format } from "date-fns";
 
 // Display formatting for the flight status board.
 
-function toTitleCase(value: string): string {
-  return value
-    .toLowerCase()
-    .split(/\s+/)
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-}
-
-// "Bautista, Kenneth" / "KENNETH BAUTISTA" → "K. Bautista". Handles
-// both "Last, First" and "First Last" shapes; names are stored in
-// mixed or full uppercase.
-export function formatShortPersonName(fullName: string): string {
-  const trimmed = fullName.trim();
-
-  if (!trimmed) {
-    return "—";
-  }
-
-  let first = "";
-  let last = "";
-
-  if (trimmed.includes(",")) {
-    const [lastPart, firstPart] = trimmed.split(",");
-    last = lastPart.trim();
-    first = (firstPart ?? "").trim();
-  } else {
-    const parts = trimmed.split(/\s+/);
-
-    if (parts.length === 1) {
-      return toTitleCase(parts[0]);
-    }
-
-    first = parts[0];
-    last = parts[parts.length - 1];
-  }
-
-  const initial = first.charAt(0).toUpperCase();
-  const lastLabel = toTitleCase(last);
-
-  return initial ? `${initial}. ${lastLabel}` : lastLabel;
-}
-
-// Postgres interval text ("01:30:00") → "01:30".
-export function formatIntervalHm(value: string): string {
-  const match = value.match(/^(\d+):(\d{2})/);
-
-  if (!match) {
-    return "";
-  }
-
-  return `${match[1].padStart(2, "0")}:${match[2]}`;
-}
-
 // Filed zulu departure time (HHMM, e.g. "1130") → the viewer's local
 // time in readable form, e.g. "7:30 PM". Resolved against the current
 // zulu date, which is the board's flight date.
@@ -111,28 +58,3 @@ export function formatElapsedHm(fromIso: string): string {
   return `${hours}:${String(minutes).padStart(2, "0")}`;
 }
 
-// ISO timestamp → zulu clock time as HH:MM, e.g. "02:00" for 10:00 AM
-// Philippine time. The organized board reports every time in zulu.
-export function formatZuluHm(iso: string): string {
-  const date = new Date(iso);
-
-  return `${String(date.getUTCHours()).padStart(2, "0")}:${String(date.getUTCMinutes()).padStart(2, "0")}`;
-}
-
-// Span between an ISO start and an end (ISO or epoch ms) as H:MM.
-export function formatSpanHm(startIso: string, end: string | number): string {
-  const endMs = typeof end === "number" ? end : new Date(end).getTime();
-  const totalMinutes = Math.max(
-    0,
-    Math.floor((endMs - new Date(startIso).getTime()) / 60000),
-  );
-
-  return `${Math.floor(totalMinutes / 60)}:${String(totalMinutes % 60).padStart(2, "0")}`;
-}
-
-// "HH:MM" (board EET text) → minutes, or null when unparseable.
-export function hmToMinutes(value: string): number | null {
-  const match = value.match(/^(\d+):(\d{2})$/);
-
-  return match ? Number(match[1]) * 60 + Number(match[2]) : null;
-}

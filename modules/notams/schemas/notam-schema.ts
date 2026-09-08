@@ -7,6 +7,10 @@ const dateFieldSchema = z
   .string()
   .regex(/^\d{4}-\d{2}-\d{2}$/, "Enter a valid date.");
 
+// Shown whole on the flight monitor TV; longer text cannot stay readable
+// from across a room.
+export const NOTAM_DESCRIPTION_MAX_LENGTH = 300;
+
 export const createNotamSchema = z.object({
   title: z
     .string()
@@ -16,7 +20,10 @@ export const createNotamSchema = z.object({
   description: z
     .string()
     .trim()
-    .max(2000, "Keep the description under 2000 characters.")
+    .max(
+      NOTAM_DESCRIPTION_MAX_LENGTH,
+      `Keep the description under ${NOTAM_DESCRIPTION_MAX_LENGTH} characters.`,
+    )
     .optional(),
   severity: z.enum(NOTAM_SEVERITIES),
   expiresOn: dateFieldSchema.refine(

@@ -9,7 +9,6 @@ import {
 import { useRouter } from "next/navigation";
 import { Fragment } from "react";
 
-import { BOARD_STATUS_META } from "@/modules/dashboard/components/flight-status-board";
 import {
   DelayedTab,
   PastEetTab,
@@ -17,15 +16,14 @@ import {
 import { useNowMs } from "@/modules/dashboard/hooks/use-now";
 import type { DashboardFlightStatusRow } from "@/modules/dashboard/types/flight-status";
 import {
-  isJourneyOverdue,
-  isJourneyPastEet,
-} from "@/modules/dashboard/utils/board-status";
-import {
   formatShortPersonName,
   formatSpanHm,
   formatZuluHm,
-} from "@/modules/dashboard/utils/format";
+  isJourneyOverdue,
+  isJourneyPastEet,
+} from "@/shared/lib/aviation/flight-board";
 import { GlassSurface } from "@/shared/components/layout/glass-surface";
+import { BOARD_STATUS_STYLES } from "@/shared/lib/aviation/board-status-styles";
 import {
   Table,
   TableBody,
@@ -191,7 +189,7 @@ function OrganizedBoardRow({
 }) {
   const router = useRouter();
   const journey = row.journey;
-  const meta = BOARD_STATUS_META[row.boardStatus];
+  const meta = BOARD_STATUS_STYLES[row.boardStatus];
   const overdue = isJourneyOverdue(journey.status, journey.dofAt, nowMs);
   const pastEet = isJourneyPastEet(journey, nowMs);
   const time = getRowTime(row);
