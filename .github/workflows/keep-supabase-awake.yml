@@ -1,0 +1,60 @@
+# Supabase pauses free-tier projects after ~7 days of inactivity, which
+# would take FlightraX offline over a semester break. A scheduled request
+# that performs a real database read resets that clock.
+#
+# /api/monitor is the right target: it is public (the lobby TV has no
+# session), force-dynamic, and calls the get_flight_monitor_board RPC, so
+# each ping is genuine database activity rather than a static page hit.
+#
+# Runs Monday and Thursday, so the longest gap is ~4 days against a 7-day
+# pause threshold. Do not rely on the pg_cron jobs instead: they run inside
+# the database and it is not documented that internal activity counts.
+#
+# Note: GitHub disables scheduled workflows in a repository with no commits
+# for 60 days. Over a long break, check this workflow is still enabled.
+
+name: Keep Supabase Awake
+
+on:
+  schedule:
+    - cron: "0 3 * * 1,4"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping the monitor endpoint
+        env:
+          APP_URL: ${{ vars.APP_URL }}
+        run: |
+          if [ -z "$APP_URL" ]; then
+            echo "::error::Repository variable APP_URL is not set."
+            echo "Settings -> Secrets and variables -> Actions -> Variables"
+            echo "Add APP_URL, e.g. https://flightrax.vercel.app (no trailing slash)."
+            exit 1
+          fi
+
+          status=$(curl --silent --show-error --location \
+            --max-time 30 --retry 3 --retry-delay 10 \
+            --output /tmp/monitor.json \
+            --write-out '%{http_code}' \
+            "$APP_URL/api/monitor")
+
+          echo "GET $APP_URL/api/monitor -> $status"
+
+          if [ "$status" != "200" ]; then
+            echo "::error::Expected 200, got $status"
+            head -c 500 /tmp/monitor.json || true
+            exit 1
+          fi
+
+          # The endpoint returns the board plus a generatedAt timestamp, so a
+          # 200 with this field present proves the database was actually read.
+          if ! grep -q '"generatedAt"' /tmp/monitor.json; then
+            echo "::error::Response did not contain generatedAt - database read may not have happened"
+            head -c 500 /tmp/monitor.json
+            exit 1
+          fi
+
+          echo "Database read confirmed."

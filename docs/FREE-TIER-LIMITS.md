@@ -114,10 +114,17 @@ realtime surface and confirm the counts match the estimate.
 **Two Hobby restrictions that affect this project specifically:**
 
 1. **Non-commercial use only.** Vercel's fair-use guidelines restrict Hobby to
-   "non-commercial, personal use only." A system operated by a school for its actual
-   flight operations is arguably commercial use. If FlightraX goes into real institutional
-   service, budget for **Vercel Pro ($20/month)** — an account suspension mid-semester
-   would be far more disruptive than the fee.
+   "non-commercial, personal use only."
+
+   **This is fine for FlightraX today.** It is a research/capstone project, not a system
+   in commercial service, which is exactly why every tier here is deliberately free.
+   Hobby's restriction is not currently being breached.
+
+   It becomes a live question only if the client adopts FlightraX for real flight
+   operations — and that is their decision to make, not the project's. If that happens,
+   the hosting tier has to move with it: **Vercel Pro ($20/month)**, since an account
+   suspension mid-semester would be far more disruptive than the fee. Record it as a
+   hand-over condition rather than a task.
 2. **Hobby cannot connect to Git-organization repositories.** This repo lives under the
    `PHCS-Team` organization, so deploying it from that org requires a Vercel **Team**
    (Pro). Verify how the current deployment is wired before assuming Hobby is viable.
@@ -145,10 +152,19 @@ When a project is paused:
 
 Any genuine API or database traffic resets the inactivity clock. Options, best first:
 
-1. **A scheduled external ping** — a GitHub Actions workflow on a weekly cron that hits a
-   lightweight endpoint (for example `/api/monitor`, which performs a real database read).
-   This repo already uses GitHub Actions (`.github/workflows/sync-main-to-staging.yml`),
-   so it is the cheapest reliable option.
+1. **A scheduled external ping** — **implemented**:
+   `.github/workflows/keep-supabase-awake.yml` calls `/api/monitor` every Monday and
+   Thursday, so the longest gap is ~4 days against the 7-day threshold. That endpoint is
+   public, `force-dynamic`, and runs the `get_flight_monitor_board` RPC, so each ping is a
+   genuine database read rather than a static page hit; the workflow asserts `generatedAt`
+   is present to prove it.
+
+   It needs the repository variable **`APP_URL`** (Settings → Secrets and variables →
+   Actions → Variables), e.g. `https://flightrax.vercel.app`, with no trailing slash. The
+   workflow fails loudly if it is missing, and can be run by hand from the Actions tab.
+
+   ⚠️ GitHub disables scheduled workflows in a repository with no commits for 60 days —
+   over a long break, confirm this workflow is still enabled.
 2. **Upgrade to Supabase Pro ($25/month)** — Pro projects are never paused for inactivity.
 
 > **Do not rely on the existing `pg_cron` jobs** (`standby_arrived_flights_cron`,
@@ -234,7 +250,7 @@ Worth stating plainly, because it is a common worry when planning push notificat
 | Database approaching 400 MB | Supabase Pro (8 GB) |
 | Storage approaching 800 MB | Supabase Pro (100 GB) |
 | Monthly egress above ~4 GB | Supabase Pro (250 GB) |
-| The system enters real institutional use | **Vercel Pro** — Hobby forbids commercial use |
+| The client adopts it for real flight operations | **Vercel Pro** — Hobby forbids commercial use. A hand-over condition, not a task for now |
 | Deploying from the `PHCS-Team` org | **Vercel Pro** — Hobby cannot use org repos |
 | Data loss would be unacceptable | Supabase Pro for automatic daily backups, or maintain a disciplined manual backup routine (§6) |
 
