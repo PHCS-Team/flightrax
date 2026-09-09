@@ -88,6 +88,7 @@ export const rejectFlightRequestAction = actionClient
       .update({
         status: "rejected",
         rejected_reason: parsedInput.reason,
+        rejected_by: actor.id,
         approved_by: null,
         approved_at: null,
       })

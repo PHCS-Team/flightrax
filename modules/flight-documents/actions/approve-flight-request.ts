@@ -214,6 +214,7 @@ export const approveFlightRequestAction = actionClient
         approved_by: actor.id,
         approved_at: new Date().toISOString(),
         rejected_reason: null,
+        rejected_by: null,
       })
       .eq("id", request.id);
 

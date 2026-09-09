@@ -28,6 +28,7 @@ const PROTECTED_ROUTES: Array<{ prefix: string; permission: Permission }> = [
   { prefix: "/instructors", permission: INSTRUCTORS_VIEW },
   { prefix: "/schedule", permission: SCHEDULE_VIEW },
   { prefix: "/notams", permission: NOTAMS_VIEW },
+  { prefix: "/notifications", permission: DASHBOARD_VIEW },
   { prefix: "/aircrafts", permission: SYSTEM_MANAGE },
   { prefix: "/students", permission: STUDENTS_VIEW },
   { prefix: "/account-review", permission: ACCOUNT_REVIEW },

@@ -666,6 +666,7 @@ export type Database = {
           flight_plan_id: string
           id: string
           instructor_profile_id: string
+          rejected_by: string | null
           rejected_reason: string | null
           requested_by: string
           status: string
@@ -679,6 +680,7 @@ export type Database = {
           flight_plan_id: string
           id?: string
           instructor_profile_id: string
+          rejected_by?: string | null
           rejected_reason?: string | null
           requested_by: string
           status?: string
@@ -692,6 +694,7 @@ export type Database = {
           flight_plan_id?: string
           id?: string
           instructor_profile_id?: string
+          rejected_by?: string | null
           rejected_reason?: string | null
           requested_by?: string
           status?: string
@@ -716,6 +719,13 @@ export type Database = {
           {
             foreignKeyName: "flight_requests_instructor_profile_id_fkey"
             columns: ["instructor_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "flight_requests_rejected_by_fkey"
+            columns: ["rejected_by"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -1317,6 +1327,35 @@ export type Database = {
           total_count: number
           trainee_name: string
         }[]
+      }
+      notification_approved_profiles: {
+        Args: never
+        Returns: {
+          profile_id: string
+          profile_role: Database["public"]["Enums"]["app_role"]
+        }[]
+      }
+      notification_audience_department: {
+        Args: { p_department: Database["public"]["Enums"]["admin_department"] }
+        Returns: string[]
+      }
+      notification_audience_everyone: { Args: never; Returns: string[] }
+      notification_audience_participants: {
+        Args: { p_flight_request_id: string }
+        Returns: string[]
+      }
+      notification_audience_role: {
+        Args: { p_role: Database["public"]["Enums"]["app_role"] }
+        Returns: string[]
+      }
+      notification_audience_superadmins: { Args: never; Returns: string[] }
+      notification_flight_label: {
+        Args: { p_flight_plan_id: string }
+        Returns: string
+      }
+      notification_person_name: {
+        Args: { p_profile_id: string }
+        Returns: string
       }
       operations_date: { Args: { ts: string }; Returns: string }
       operations_today: { Args: never; Returns: string }

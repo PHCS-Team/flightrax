@@ -122,13 +122,22 @@ Every audience is deduplicated (Rule D) and filtered by Rule A before rows are i
 
 | Event | Source | Audience | Message |
 | --- | --- | --- | --- |
-| `account_approved` | `approveAccountRequestAction` | `USER:` requester | "Your account has been approved." |
-| `account_rejected` | `rejectAccountRequestAction` | `USER:` requester | "Your account was rejected — \<reason\>." |
-| `account_submitted` | `registerStudentAction`, `registerInstructorAction` | `DEPT:flight_ops` | "\<Name\> registered as a \<role\> and is awaiting review." |
-| `account_resubmitted` | `resubmitRejectedAccountAction` | `DEPT:flight_ops` | "\<Name\> resubmitted their account for review." |
-| `admin_registered` | `registerAdminAction` | superadmin | "\<Name\> registered as an admin (\<department\>)." |
+| `account_submitted` | first `submitted_at` stamp | `DEPT:flight_ops` | "\<Name\> registered as a \<role\>" |
+| `account_resubmitted` | `rejected → pending` | `DEPT:flight_ops` | "\<Name\> resubmitted their account" |
 
-`registerSuperadminAction` produces **no** notification.
+`submitAccountRequest` stamps `submitted_at`; the row itself is created earlier by
+`handle_new_user` at auth signup, before any ID number or document exists, so INSERT is the
+wrong moment to tell a reviewer there is something to review.
+
+**Not in-app — deferred to push (see §5):** `account_approved` and `account_rejected`.
+Their recipient cannot reach the in-app feed: while `approval_status` is not `approved`,
+`canAccessPath` confines them to `/pending-approval`, so there is no dashboard and no bell.
+The row would sit unread until approval and then show a stale rejection beside the
+approval.
+
+**Dropped entirely:** `admin_registered`. Admin accounts are never reviewed —
+`handle_new_user` creates `admin_profiles` directly at signup — so there is no decision to
+announce.
 
 ### Flight requests
 
@@ -167,7 +176,7 @@ The `standby-arrived-flights` cron is internal state cleanup and produces no not
 | --- | --- | --- | --- |
 | `notam_posted` | `createNotamAction` | `EVERYONE` | "\<Severity\> NOTAM: \<title\>" |
 | `aircraft_status_changed` | `updateAircraftStatusAction` | `PARTICIPANTS` of live journeys on that aircraft (§7) | "\<Aircraft\> is now \<status\> — your flight \<code\> may be affected." |
-| `instructor_unavailable` | `addInstructorUnavailabilityAction` | `ROLE:student` | "\<Instructor\> is unavailable on \<date\>." |
+| `instructor_unavailable` | `addInstructorUnavailabilityAction` | `ROLE:student` | "\<Instructor\> is unavailable on \<date\>." → `/instructors` |
 
 Instructor unavailability goes to **all students**, deliberately — resolving which specific
 students have flights with that instructor was rejected as over-complication.
@@ -203,6 +212,8 @@ No notification is emitted for any of these.
 | Schedule uploaded / changed | **`modules/schedule/` is empty scaffolding** — only `schedule-page.tsx` and `constants/permissions.ts` exist, there are zero schedule actions. Nothing to hook into yet. |
 | License expiry warning | Needs a new `pg_cron` job; no expiry-check job exists today |
 | Certificate expiry warning | Same |
+| `account_approved` push → `/dashboard` | Phase 3 (push). Useless in-app because the recipient cannot reach the feed before approval; a push reaches a signed-out device. |
+| `account_rejected` push → `/pending-approval` | Phase 3 (push). Same reason. The type strings remain in the `notifications` check constraint so no schema change is needed then. |
 
 ---
 
@@ -251,7 +262,35 @@ independent of the notifications work.
 | --- | --- | --- |
 | 1 | `instructor_profile_id` NOT NULL; `notifications` table, RLS, realtime, `create_notifications()` | **Delivered** — `20260909000000_*`, `20260909010000_*` |
 | 2 | Read path, bell badge, panel, `/notifications` page, mark-read | **Delivered** — `modules/notifications/` |
-| 3 | Triggers emitting the 16 events | Not started — **until this lands no notifications exist**, so the UI shows its empty state |
+| 3 | Triggers emitting the 16 events | **Delivered** — `20260910000000_*` … `20260910030000_*` |
+
+**Actor propagation.** Triggers cannot use `auth.uid()`: every write in this app goes
+through the service-role admin client, so it is null. The actor is instead read from the
+row that changed — `approved_by`, `rejected_by`, `commenced_by`, `terminated_by`,
+`cancelled_by`, `created_by`, or the subject's own `profile_id` for registrations. Two
+consequences worth remembering:
+
+- `flight_requests` had no `rejected_by` (the reject action nulls `approved_by` and stored
+  only the reason), so `20260910000000_flight_request_rejected_by.sql` adds it and
+  `reject-flight-request.ts` now records it.
+- The no-show cron sets `cancelled_at` but never `cancelled_by`. That null is exactly what
+  distinguishes `flight_no_show` from `flight_cancelled`, and it gives the passive voice
+  Rule B requires — no extra flag needed.
+
+`aircrafts` records no actor for a status change, which is harmless: its audience is flight
+participants and the actor is an admin, so Rule A never needs to exclude them.
+
+**Flight request resubmission.** A rejected request is editable
+(`EDITABLE_FLIGHT_REQUEST_STATUSES`), so it goes `rejected → pending_approval` directly
+rather than back through `draft`. Two consequences:
+
+- `rejected_by` must be cleared on resubmit *and* on approve, alongside the
+  `rejected_reason` reset those actions already did. Otherwise a pending or approved
+  request still names the reviewer who once rejected it.
+- The instructor is told it is a *re*submission (`old.status = 'rejected'`), since they may
+  have rejected this very request. Same `flight_request_submitted` type — the type drives
+  the icon and grouping, the title carries the nuance — so the check constraint is
+  untouched.
 
 ---
 

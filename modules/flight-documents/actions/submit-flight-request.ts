@@ -55,16 +55,10 @@ export const submitFlightRequestAction = actionClient
     if (!request.weight_balance_id) {
       return {
         ok: false,
-        message:
-          "File the Weight & Balance before submitting for approval.",
+        message: "File the Weight & Balance before submitting for approval.",
       };
     }
 
-    // Submitting is deliberately NOT blocked by scheduled/active
-    // conflicts on the aircraft — pending requests queue for the PIC
-    // and only APPROVAL enforces the one-live-journey-per-aircraft-per-
-    // DOF rule (plus no-active-flight). Only a hard blocker stops the
-    // submit here: an aircraft that is not operationally active.
     if (flightPlan.aircraft_id) {
       const statusBlock = await getAircraftStatusBlock(flightPlan.aircraft_id);
 
@@ -77,9 +71,8 @@ export const submitFlightRequestAction = actionClient
       .from("flight_requests")
       .update({
         status: "pending_approval",
-        // A resubmission starts a fresh review — the old reason no longer
-        // applies.
         rejected_reason: null,
+        rejected_by: null,
       })
       .eq("id", request.id);
 
