@@ -337,7 +337,7 @@ function FlightStatusDetails({
   return (
     <div
       className={cn(
-        "grid grid-cols-2 items-stretch gap-3 bg-primary-foreground/5 p-3 sm:grid-cols-[minmax(0,1fr)_14rem] sm:gap-4 sm:p-4",
+        "grid grid-cols-2 items-stretch gap-3 whitespace-normal bg-primary-foreground/5 p-3 sm:grid-cols-[minmax(0,1fr)_14rem] sm:gap-4 sm:p-4",
         BOARD_STATUS_STYLES[row.boardStatus].rowClassName,
       )}
     >

@@ -15,6 +15,7 @@ import {
 
 import { useDashboardProfile } from "@/modules/auth/hooks/use-dashboard-profile.query";
 import { NotificationsBell } from "@/modules/notifications/components/notifications-bell";
+import { InstallAppAction } from "@/shared/components/layout/install-app-action";
 import {
   Avatar,
   AvatarFallback,
@@ -95,6 +96,8 @@ function AppInfoCard() {
           </span>
         </p>
       </div>
+
+      <InstallAppAction />
     </div>
   );
 }
