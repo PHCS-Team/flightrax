@@ -665,7 +665,7 @@ export type Database = {
           created_at: string
           flight_plan_id: string
           id: string
-          instructor_profile_id: string | null
+          instructor_profile_id: string
           rejected_reason: string | null
           requested_by: string
           status: string
@@ -678,7 +678,7 @@ export type Database = {
           created_at?: string
           flight_plan_id: string
           id?: string
-          instructor_profile_id?: string | null
+          instructor_profile_id: string
           rejected_reason?: string | null
           requested_by: string
           status?: string
@@ -691,7 +691,7 @@ export type Database = {
           created_at?: string
           flight_plan_id?: string
           id?: string
-          instructor_profile_id?: string | null
+          instructor_profile_id?: string
           rejected_reason?: string | null
           requested_by?: string
           status?: string
@@ -913,6 +913,63 @@ export type Database = {
           {
             foreignKeyName: "notams_created_by_fkey"
             columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          actor_id: string | null
+          body: string | null
+          created_at: string
+          entity_id: string | null
+          entity_type: string | null
+          href: string | null
+          id: string
+          read_at: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          actor_id?: string | null
+          body?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          href?: string | null
+          id?: string
+          read_at?: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          actor_id?: string | null
+          body?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          href?: string | null
+          id?: string
+          read_at?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -1155,6 +1212,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_notifications: {
+        Args: {
+          p_actor_id?: string
+          p_body?: string
+          p_entity_id?: string
+          p_entity_type?: string
+          p_href?: string
+          p_title: string
+          p_type: string
+          p_user_ids: string[]
+        }
+        Returns: number
+      }
       get_dashboard_flight_status: {
         Args: { p_page?: number; p_page_size?: number; p_status_group?: string }
         Returns: {
