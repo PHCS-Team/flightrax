@@ -1,9 +1,10 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist_Mono, Manrope } from "next/font/google";
 
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 import { BrowserConsoleBranding } from "@/shared/components/layout/browser-console-branding";
+import { ServiceWorkerRegistration } from "@/shared/components/layout/service-worker-registration";
 import { QueryProvider } from "@/shared/components/providers/query-provider";
 import { Toaster } from "@/shared/components/ui/sonner";
 
@@ -24,9 +25,20 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "FlightraX",
   description: "Flight operations command center",
+  applicationName: "FlightraX",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "FlightraX",
+  },
   icons: {
     icon: "/logo/flightrax.svg",
+    apple: "/icons/apple-touch-icon.png",
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#10519a",
 };
 
 export default function RootLayout({
@@ -44,6 +56,7 @@ export default function RootLayout({
           <QueryProvider>{children}</QueryProvider>
         </NuqsAdapter>
         <BrowserConsoleBranding />
+        <ServiceWorkerRegistration />
         <Toaster closeButton position="top-right" richColors />
       </body>
     </html>
