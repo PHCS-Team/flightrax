@@ -236,8 +236,8 @@ No notification is emitted for any of these.
 | Event | Blocked on |
 | --- | --- |
 | Schedule uploaded / changed | **`modules/schedule/` is empty scaffolding** — only `schedule-page.tsx` and `constants/permissions.ts` exist, there are zero schedule actions. Nothing to hook into yet. |
-| License expiry warning | Needs a new `pg_cron` job; no expiry-check job exists today |
-| Certificate expiry warning | Same |
+| ~~License expiry warning~~ | **Dropped, 2026-09-10.** The credential surfaces already indicate expiry, so a notification restates what is on screen — and it would need another `pg_cron` job to do it. Not deferred: decided against. |
+| ~~Certificate expiry warning~~ | **Dropped, 2026-09-10.** Same reasoning. |
 | `account_approved` push → `/dashboard` | Phase 3 (push). Useless in-app because the recipient cannot reach the feed before approval; a push reaches a signed-out device. |
 | `account_rejected` push → `/pending-approval` | Phase 3 (push). Same reason. The type strings remain in the `notifications` check constraint so no schema change is needed then. |
 

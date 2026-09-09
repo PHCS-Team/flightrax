@@ -1,7 +1,10 @@
-// TODO(notifications): two events are still owed — a schedule event once
-// modules/schedule exists, and license/certificate expiry warnings once a
-// cron is written for them. Both are tracked in
-// docs/NOTIFICATIONS-MATRIX.md §5.
+// TODO(notifications): one event is still owed — a schedule event, once
+// modules/schedule exists. Tracked in docs/NOTIFICATIONS-MATRIX.md §5.
+//
+// License and certificate expiry notifications were considered and
+// deliberately dropped: the credential surfaces already show expiry state,
+// so a notification would restate what is on screen at the cost of another
+// cron. Do not add them back without a reason that argument does not cover.
 //
 // Adding an event touches five places, in this order:
 //   1. a migration extending the `type` check constraint on
