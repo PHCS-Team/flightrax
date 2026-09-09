@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { Button } from "@/shared/components/ui/button";
 import { FlightRaxBackground } from "@/shared/components/layout/flightrax-background";
+import { InstallAppAction } from "@/shared/components/layout/install-app-action";
 import { SuperadminSecretTrigger } from "@/modules/dashboard/components/superadmin-secret-trigger";
 
 export function HomePage() {
@@ -39,6 +40,8 @@ export function HomePage() {
               <Link href="/register">Register</Link>
             </Button>
           </div>
+
+          <InstallAppAction className="mt-4 w-auto justify-center border-0 bg-transparent text-sm text-primary-foreground/70 hover:bg-primary-foreground/10 hover:text-primary-foreground sm:mt-5" />
         </section>
 
         <aside className="hidden space-y-5 border-t-2 border-primary-foreground/15 pt-8 lg:block lg:border-l-2 lg:border-t-0 lg:pl-10 lg:pt-0">

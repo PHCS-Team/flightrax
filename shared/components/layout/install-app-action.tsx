@@ -7,8 +7,9 @@ import { DownloadIcon } from "lucide-react";
 import { InstallAppDialog } from "@/shared/components/layout/install-app-dialog";
 import { Button } from "@/shared/components/ui/button";
 import { useInstallApp } from "@/shared/hooks/use-install-app";
+import { cn } from "@/shared/lib/utils";
 
-export function InstallAppAction() {
+export function InstallAppAction({ className }: { className?: string }) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const { canPromptDirectly, install, isIos, isStandalone } = useInstallApp();
 
@@ -29,7 +30,10 @@ export function InstallAppAction() {
   return (
     <>
       <Button
-        className="mt-3 w-full cursor-pointer justify-start gap-2 border border-primary-foreground/20 bg-primary-foreground/10 text-xs font-semibold text-primary-foreground hover:bg-primary-foreground/20 hover:text-primary-foreground"
+        className={cn(
+          "mt-3 w-full justify-start gap-2 border border-primary-foreground/20 bg-primary-foreground/10 text-xs font-semibold text-primary-foreground hover:bg-primary-foreground/20 hover:text-primary-foreground",
+          className,
+        )}
         onClick={onInstall}
         size="sm"
         type="button"
