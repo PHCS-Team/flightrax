@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 
 import { FlightRaxBackground } from "@/shared/components/layout/flightrax-background";
+import { InstallAppAction } from "@/shared/components/layout/install-app-action";
 import { cn } from "@/shared/lib/utils";
 import Image from "next/image";
 
@@ -71,6 +72,8 @@ export function AuthShell({
             )}
           >
             {children}
+
+            <InstallAppAction className="mx-auto mt-4 flex w-fit border-0 bg-transparent text-xs text-primary-foreground/70 hover:bg-primary-foreground/10 hover:text-primary-foreground" />
           </div>
         </section>
       </main>

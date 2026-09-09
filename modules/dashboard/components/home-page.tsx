@@ -41,7 +41,7 @@ export function HomePage() {
             </Button>
           </div>
 
-          <InstallAppAction className="mt-4 w-auto justify-center border-0 bg-transparent text-sm text-primary-foreground/70 hover:bg-primary-foreground/10 hover:text-primary-foreground sm:mt-5" />
+          <InstallAppAction className="mx-auto mt-4 flex w-fit border-0 bg-transparent text-sm text-primary-foreground/70 hover:bg-primary-foreground/10 hover:text-primary-foreground sm:mt-5 lg:mx-0" />
         </section>
 
         <aside className="hidden space-y-5 border-t-2 border-primary-foreground/15 pt-8 lg:block lg:border-l-2 lg:border-t-0 lg:pl-10 lg:pt-0">
