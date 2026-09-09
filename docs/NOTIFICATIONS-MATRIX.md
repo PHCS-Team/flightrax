@@ -250,8 +250,8 @@ independent of the notifications work.
 | Slice | Contents | State |
 | --- | --- | --- |
 | 1 | `instructor_profile_id` NOT NULL; `notifications` table, RLS, realtime, `create_notifications()` | **Delivered** — `20260909000000_*`, `20260909010000_*` |
-| 2 | Read path, bell badge, panel, mark-read | Not started |
-| 3 | Triggers emitting the 16 events | Not started |
+| 2 | Read path, bell badge, panel, `/notifications` page, mark-read | **Delivered** — `modules/notifications/` |
+| 3 | Triggers emitting the 16 events | Not started — **until this lands no notifications exist**, so the UI shows its empty state |
 
 ---
 

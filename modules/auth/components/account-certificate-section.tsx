@@ -52,7 +52,7 @@ export function AccountCertificateSection() {
     useState<Certificate | null>(null);
 
   if (isPending) {
-    return <LoadingScreen />;
+    return <LoadingScreen variant="section" />;
   }
 
   if (error) {

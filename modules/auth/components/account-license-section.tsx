@@ -53,7 +53,7 @@ export function AccountLicenseSection() {
   const [detailsLicense, setDetailsLicense] = useState<License | null>(null);
 
   if (isPending) {
-    return <LoadingScreen />;
+    return <LoadingScreen variant="section" />;
   }
 
   if (error) {

@@ -7,7 +7,6 @@ import type { ReactNode } from "react";
 import { useState } from "react";
 import { motion, type Variants } from "motion/react";
 import {
-  BellIcon,
   ChevronDownIcon,
   MenuIcon,
   PlaneIcon,
@@ -15,6 +14,7 @@ import {
 } from "lucide-react";
 
 import { useDashboardProfile } from "@/modules/auth/hooks/use-dashboard-profile.query";
+import { NotificationsBell } from "@/modules/notifications/components/notifications-bell";
 import {
   Avatar,
   AvatarFallback,
@@ -413,15 +413,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
               </div>
 
               <div className="flex items-center gap-2.5 sm:gap-2">
-                <Button
-                  aria-label="Notifications"
-                  size="icon"
-                  variant="ghost"
-                  className="relative rounded-full text-primary-foreground/85 hover:bg-primary-foreground/10 hover:text-primary-foreground"
-                >
-                  <BellIcon className="size-6 sm:size-5 " />
-                  <span className="absolute right-1 top-1 sm:right-1.5 sm:top-1.5 size-2 sm:size-1.5 rounded-full bg-warning" />
-                </Button>
+                <NotificationsBell userId={profile?.id} />
 
                 <Button
                   asChild

@@ -24,11 +24,22 @@ const LOADING_FACTS = [
 
 const FACT_INTERVAL = 5000;
 
-export function LoadingScreen() {
+type LoadingScreenVariant = "page" | "section";
+
+export function LoadingScreen({
+  variant = "page",
+}: {
+  variant?: LoadingScreenVariant;
+} = {}) {
   const [factIndex, setFactIndex] = useState(0);
   const [fadeIn, setFadeIn] = useState(true);
+  const isSection = variant === "section";
 
   useEffect(() => {
+    if (isSection) {
+      return;
+    }
+
     const interval = setInterval(() => {
       setFadeIn(false);
 
@@ -41,7 +52,38 @@ export function LoadingScreen() {
     }, FACT_INTERVAL);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [isSection]);
+
+  if (isSection) {
+    return (
+      <div className="flex min-h-48 items-center justify-center px-4 py-10">
+        <div className="flex items-center gap-2">
+          <svg
+            className="size-4 animate-spin text-primary-foreground/55"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            />
+            <path
+              className="opacity-75"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+              fill="currentColor"
+            />
+          </svg>
+          <span className="text-sm font-medium text-primary-foreground/60">
+            Loading please wait...
+          </span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-[60dvh] items-center justify-center px-4">
@@ -82,7 +124,7 @@ export function LoadingScreen() {
           </span>
         </div>
 
-        <div className="h-[2px] w-56 bg-primary-foreground/50 rounded-full" />
+        <div className="h-0.5 w-56 bg-primary-foreground/50 rounded-full" />
 
         <div className="max-w-72">
           <p className="text-[0.6rem] font-semibold uppercase tracking-[0.18em] text-primary-foreground/45">

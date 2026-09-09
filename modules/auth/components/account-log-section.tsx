@@ -27,7 +27,7 @@ export function AccountLogSection() {
   });
 
   if (isPending) {
-    return <LoadingScreen />;
+    return <LoadingScreen variant="section" />;
   }
 
   if (error) {

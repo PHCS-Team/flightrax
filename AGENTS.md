@@ -324,6 +324,11 @@ useReactTable({
 - The `LoadingScreen` component provides a branded loading experience with rotating aviation facts. Using it ensures consistency across every module.
 - The pattern is: check `isPending` → return `<LoadingScreen />`, check `error` → return `<EmptyState />`, otherwise render the main component.
 
+Two recorded exceptions to "no inline skeletons":
+
+- **`<LoadingScreen variant="section" />`** for a block *inside* an already-rendered page — a tab panel, or one of several stacked sections. The default `page` variant is `min-h-[60dvh]` with a large logo, so two sibling sections loading at once stack into screens of repeated logos (this was the account Documents tab). The `section` variant is the same loader scaled down: spinner and label only, no logo, no facts. Still `LoadingScreen`, so the rule holds.
+- **A bespoke compact skeleton inside a popover or sheet panel**, where even the `section` variant is too tall — currently only `notifications-panel.tsx`. Page-level surfaces must still use `LoadingScreen`; this is not licence to hand-roll skeletons on pages.
+
 ```tsx
 // ✅ CORRECT — students-client-surface.tsx as reference
 if (isPending) {
