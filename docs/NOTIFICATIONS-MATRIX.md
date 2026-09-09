@@ -296,7 +296,27 @@ independent of the notifications work.
 
 ---
 
-## 7. Implementation status
+## 7. iOS — untested as of 2026-09-10
+
+Android push is confirmed working end to end. **No iPhone or iPad was
+available, so every iOS-specific path is written but unverified.** Treat these
+as unproven rather than working:
+
+- The `needs-install` gate — iOS in a Safari tab should offer "Install the app
+  first" instead of an Enable button.
+- The custom permission dialog. Safari rejects `requestPermission()` without a
+  user gesture, so iOS is the only platform that reaches that fallback;
+  Android and desktop get the native prompt and never exercise it.
+- Delivery through Apple's push service, and the 404/410 pruning that depends
+  on how it reports retired endpoints.
+- `apple-touch-icon.png` as the home screen icon, and standalone launch.
+
+Nothing here is expected to be wrong — it follows documented iOS 16.4+
+behaviour — but none of it has been run on a device.
+
+---
+
+## 8. Implementation status
 
 | Slice | Contents | State |
 | --- | --- | --- |
@@ -334,7 +354,7 @@ rather than back through `draft`. Two consequences:
 
 ---
 
-## 8. Resolved — `aircraft_status_changed` audience
+## 9. Resolved — `aircraft_status_changed` audience
 
 **Participants only.** When an aircraft changes status, the notification goes to the
 trainee and assigned instructor of the flight(s) scheduled on that aircraft — not to all
