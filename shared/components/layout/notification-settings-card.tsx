@@ -54,12 +54,11 @@ export function NotificationSettingsCard() {
       {status === "denied" && (
         <>
           <Button
-            className="cursor-pointer border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground"
+            className="w-full"
             onClick={() => setGuideOpen(true)}
             type="button"
             variant="outline"
           >
-            <BellOffIcon className="size-4" />
             How to unblock
           </Button>
 
@@ -77,17 +76,12 @@ export function NotificationSettingsCard() {
 
       {canAct && (
         <Button
-          className="cursor-pointer border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground disabled:cursor-default"
+          className="w-full"
           disabled={isBusy}
           onClick={() => void (isEnabled ? disable() : enable())}
           type="button"
           variant="outline"
         >
-          {isEnabled ? (
-            <BellOffIcon className="size-4" />
-          ) : (
-            <BellIcon className="size-4" />
-          )}
           {isEnabled ? "Turn off notifications" : "Enable notifications"}
         </Button>
       )}

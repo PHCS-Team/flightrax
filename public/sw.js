@@ -44,7 +44,11 @@ self.addEventListener("push", (event) => {
     self.registration.showNotification(payload.title || "FlightraX", {
       body: payload.body || "",
       icon: "/icons/icon-192.png",
-      badge: "/icons/icon-192.png",
+      // Android renders the badge from its alpha channel alone, as a white
+      // silhouette in the status bar. A full-colour icon with an opaque
+      // background therefore shows as a solid white box — this one is the
+      // mark on transparency.
+      badge: "/icons/badge-96.png",
       // Collapses repeats of the same notification rather than stacking a
       // tray full of them; renotify still buzzes for a genuinely new one.
       tag: payload.tag || undefined,
