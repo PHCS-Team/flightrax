@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 
 import { useDashboardProfile } from "@/modules/auth/hooks/use-dashboard-profile.query";
+import { EnableNotificationsAction } from "@/modules/notifications/components/enable-notifications-action";
+import { NotificationPermissionGate } from "@/modules/notifications/components/notification-permission-gate";
 import { NotificationsBell } from "@/modules/notifications/components/notifications-bell";
 import { InstallAppAction } from "@/shared/components/layout/install-app-action";
 import {
@@ -98,6 +100,9 @@ function AppInfoCard() {
       </div>
 
       <InstallAppAction />
+      <div className="lg:hidden">
+        <EnableNotificationsAction />
+      </div>
     </div>
   );
 }
@@ -446,6 +451,8 @@ export function DashboardShell({ children }: { children: ReactNode }) {
           </header>
 
           <main className="min-w-0 lg:pb-8">{children}</main>
+
+          <NotificationPermissionGate />
         </div>
       </div>
     </FlightRaxBackground>

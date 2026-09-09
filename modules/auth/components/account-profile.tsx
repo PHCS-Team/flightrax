@@ -6,6 +6,7 @@ import { AccountLicenseSection } from "@/modules/auth/components/account-license
 import { AccountLogSection } from "@/modules/auth/components/account-log-section";
 import { AccountPasscodeSection } from "@/modules/auth/components/account-passcode-section";
 import { AccountSignatureSection } from "@/modules/auth/components/account-signature-section";
+import { NotificationSettingsCard } from "@/shared/components/layout/notification-settings-card";
 import { ProfilePhotoUploader } from "@/modules/auth/components/profile-photo-uploader";
 import { parseDisplayName } from "@/modules/auth/utils/display-name";
 import { getAdminDepartmentLabel } from "@/modules/auth/utils/profile-utils";
@@ -74,9 +75,14 @@ export function AccountProfile({ profile }: { profile: Profile }) {
             <AccountCredentialsSummary />
             <div className="grid gap-1.5 sm:gap-4 lg:grid-cols-2 lg:items-start">
               <AccountSignatureSection profile={profile} />
-              {canManagePasscode(profile.role) && (
-                <AccountPasscodeSection passcodeHash={profile.passcode_hash} />
-              )}
+              <div className="grid gap-1.5 sm:gap-4">
+                {canManagePasscode(profile.role) && (
+                  <AccountPasscodeSection
+                    passcodeHash={profile.passcode_hash}
+                  />
+                )}
+                <NotificationSettingsCard />
+              </div>
             </div>
           </TabsContent>
 
