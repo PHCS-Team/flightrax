@@ -31,6 +31,33 @@ function readPayload(event) {
   }
 }
 
+// Browsers allow only a budget of pushes that show nothing before they
+// substitute their own "site updated in the background" notice. Suppressing
+// while focused spends that budget, so it is capped: after this many skips in
+// a row the next push is shown regardless. A burst arrives within seconds,
+// while the worker is still alive, which is exactly when the counter matters.
+//
+// The real browser limit is not publicly documented and varies with the
+// engagement score of the origin, so this is a safety valve rather than an
+// exact match — low enough to keep headroom, high enough that a realistic
+// burst never surfaces a banner for something already on screen.
+const MAX_CONSECUTIVE_SUPPRESSED = 6;
+let consecutiveSuppressed = 0;
+
+// The app is only "in front of the user" when a window is both focused and
+// visible. A background tab or a minimised window does not count — those
+// users still need the banner.
+async function isAppInForeground() {
+  const clientList = await self.clients.matchAll({
+    type: "window",
+    includeUncontrolled: true,
+  });
+
+  return clientList.some(
+    (client) => client.focused && client.visibilityState === "visible",
+  );
+}
+
 self.addEventListener("push", (event) => {
   const payload = readPayload(event);
 
@@ -38,23 +65,43 @@ self.addEventListener("push", (event) => {
     return;
   }
 
-  // userVisibleOnly was set when subscribing, so a push that shows nothing
-  // is a contract violation the browser may punish. Always show something.
   event.waitUntil(
-    self.registration.showNotification(payload.title || "FlightraX", {
-      body: payload.body || "",
-      icon: "/icons/icon-192.png",
-      // Android renders the badge from its alpha channel alone, as a white
-      // silhouette in the status bar. A full-colour icon with an opaque
-      // background therefore shows as a solid white box — this one is the
-      // mark on transparency.
-      badge: "/icons/badge-96.png",
-      // Collapses repeats of the same notification rather than stacking a
-      // tray full of them; renotify still buzzes for a genuinely new one.
-      tag: payload.tag || undefined,
-      renotify: Boolean(payload.tag),
-      data: { href: payload.href || "/notifications" },
-    }),
+    (async () => {
+      // Suppress the banner when the user is already looking at the app: the
+      // bell badge and the realtime feed have shown it, so a system
+      // notification on top is the same news twice.
+      //
+      // This is a deliberate exception to userVisibleOnly, which we set when
+      // subscribing. Browsers allow a small budget of pushes that show
+      // nothing before substituting their own "site updated in background"
+      // notice. Skipping only while focused keeps this rare — a user staring
+      // at the app is not receiving many notifications they cannot see.
+      if (
+        (await isAppInForeground()) &&
+        consecutiveSuppressed < MAX_CONSECUTIVE_SUPPRESSED
+      ) {
+        consecutiveSuppressed += 1;
+
+        return;
+      }
+
+      consecutiveSuppressed = 0;
+
+      await self.registration.showNotification(payload.title || "FlightraX", {
+        body: payload.body || "",
+        icon: "/icons/icon-192.png",
+        // Android renders the badge from its alpha channel alone, as a white
+        // silhouette in the status bar. A full-colour icon with an opaque
+        // background therefore shows as a solid white box — this one is the
+        // mark on transparency.
+        badge: "/icons/badge-96.png",
+        // Collapses repeats of the same notification rather than stacking a
+        // tray full of them; renotify still buzzes for a genuinely new one.
+        tag: payload.tag || undefined,
+        renotify: Boolean(payload.tag),
+        data: { href: payload.href || "/notifications" },
+      });
+    })(),
   );
 });
 
