@@ -474,7 +474,7 @@ export type Database = {
           originator: string | null
           other_remarks: string | null
           persons_on_board: string
-          pilot_in_command_id: string | null
+          pilot_in_command_id: string
           pilot_in_command_name: string | null
           pilot_licenses: Json
           pilot_name: string
@@ -537,7 +537,7 @@ export type Database = {
           originator?: string | null
           other_remarks?: string | null
           persons_on_board?: string
-          pilot_in_command_id?: string | null
+          pilot_in_command_id: string
           pilot_in_command_name?: string | null
           pilot_licenses?: Json
           pilot_name: string
@@ -600,7 +600,7 @@ export type Database = {
           originator?: string | null
           other_remarks?: string | null
           persons_on_board?: string
-          pilot_in_command_id?: string | null
+          pilot_in_command_id?: string
           pilot_in_command_name?: string | null
           pilot_licenses?: Json
           pilot_name?: string
