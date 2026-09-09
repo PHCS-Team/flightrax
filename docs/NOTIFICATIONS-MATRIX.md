@@ -109,6 +109,7 @@ the one shared helper, no event type can reintroduce a double-send.
 | `DEPT:flight_ops` | Admins in `flight_operations_personnel` |
 | `DEPT:atc` | Admins in `air_traffic_controller` |
 | `DEPT:safety` | Admins in `safety_personnel` |
+| `EVERYONE except DEPT:x` | All approved users bar one admin department (`notification_audience_everyone_except_department`) |
 | `USER:<id>` | One specific person |
 | `PARTICIPANTS` | Trainee + pilot-in-command + assigned instructor on a flight |
 
@@ -143,13 +144,32 @@ announce.
 
 | Event | Source | Audience | Message |
 | --- | --- | --- | --- |
-| `flight_request_submitted` | `submitFlightRequestAction` | assigned instructor **only** | "\<Student\> submitted a flight request for \<aircraft\> on \<date\>." |
-| `flight_request_approved` | `approveFlightRequestAction` | `USER:` requester **+** `DEPT:atc` | Requester: "\<Instructor\> approved your flight request for \<aircraft\>." · ATC: "Flight plan \<code\> for \<aircraft\> was approved." |
-| `flight_request_rejected` | `rejectFlightRequestAction` | `USER:` requester | "\<Instructor\> rejected your flight request — \<reason\>." |
-| `flight_request_withdrawn` | `cancelFlightRequestAction` | assigned instructor **only** | "\<Student\> withdrew their flight request for \<aircraft\>." |
+| `flight_request_submitted` | `submitFlightRequestAction` | assigned instructor **and** pilot in command | "\<Student\> submitted a flight request" · body names the recipient's role |
+| `flight_request_approved` | `approveFlightRequestAction` | `USER:` requester **+** the other reviewer **+** `DEPT:atc` | Requester: "\<Instructor\> approved your flight request for \<aircraft\>." · ATC: "Flight plan \<code\> for \<aircraft\> was approved." |
+| `flight_request_rejected` | `rejectFlightRequestAction` | `USER:` requester **+** the other reviewer | "\<Instructor\> rejected your flight request — \<reason\>." |
+| `flight_request_withdrawn` | `cancelFlightRequestAction` | assigned instructor **and** pilot in command | "\<Student\> withdrew their flight request" · body names the recipient's role |
 
 **Never fan out to all instructors.** An instructor who is not assigned to a request must
 not be notified about it — that noise was explicitly rejected.
+
+**An outcome closes the loop for the other reviewer.** Approval and rejection reach the
+requester *and* whichever reviewer did not act, because either the PIC or the instructor may
+review — otherwise the other one keeps a "waiting for your review" notification that never
+resolves. It matters most for self-approval, a first-class flow (`SelfApproveAction`): the
+requester is the actor, Rule A drops them, and before this the event produced **no
+notifications at all** while the other reviewer still believed the request was pending.
+
+The requester is removed from the reviewer group, so a requester who is also a reviewer gets
+one row ("your flight request"), never two.
+
+**Both reviewers are notified, and each is told which role they hold.**
+`canActOnFlightRequest` lets either the assigned flight instructor *or* the pilot in
+command approve or reject, and the review queue's "assigned" scope filters on
+`pilot_in_command_id` OR `instructor_profile_id` — so notifying only the instructor left
+requests sitting silently in the PIC's queue. The body reads "You are the pilot in command
+for flight …" / "the flight instructor for …", and when one person holds both it collapses
+to a single row reading "the pilot in command and flight instructor" (Rule D).
+`pilot_in_command_id` is nullable and is simply skipped when absent.
 
 `cancelFlightRequestAction` is requester-only (verified: it rejects when
 `flightPlan.created_by !== actor.id`) and returns the request to `draft` rather than
@@ -174,9 +194,15 @@ The `standby-arrived-flights` cron is internal state cleanup and produces no not
 
 | Event | Source | Audience | Message |
 | --- | --- | --- | --- |
-| `notam_posted` | `createNotamAction` | `EVERYONE` | "\<Severity\> NOTAM: \<title\>" |
+| `notam_posted` | `createNotamAction` | `EVERYONE` **except** `DEPT:flight_ops` | "\<Severity\> NOTAM: \<title\>" → `/dashboard` |
 | `aircraft_status_changed` | `updateAircraftStatusAction` | `PARTICIPANTS` of live journeys on that aircraft (§7) | "\<Aircraft\> is now \<status\> — your flight \<code\> may be affected." |
 | `instructor_unavailable` | `addInstructorUnavailabilityAction` | `ROLE:student` | "\<Instructor\> is unavailable on \<date\>." → `/instructors` |
+
+Flight operations admins are excluded from NOTAMs: they hold no `NOTAMS_VIEW`, and
+`getDashboardHomeSurface` routes their `/dashboard` to the `"aircrafts"` surface, which does
+not render `NotamsSection`. They have nowhere to read one. Their remit is aircraft and user
+management. Every other role lands on `flight-board` or `organized-board`, both of which
+show NOTAMs.
 
 Instructor unavailability goes to **all students**, deliberately — resolving which specific
 students have flights with that instructor was rejected as over-complication.
@@ -241,6 +267,20 @@ the app requires it on every create and update."*
 backfills any residual nulls from `pilot_in_command_id` and then applies `set not null`.
 Written as a new timestamped file; `20260904100000_flight_request_instructor.sql` is
 already applied and was not edited.
+
+### 6.3 Make `flight_plans.pilot_in_command_id` NOT NULL
+
+Same shape as 6.1. `flight-plan-schema.ts:131` declares `pilotInCommandId` as a
+non-optional uuid and both create and update actions write and validate it; only the
+database column was left nullable in `20260817030000`.
+
+It matters because the PIC is a reviewer — `canActOnFlightRequest` lets either them or the
+assigned instructor approve — so `flight_request_submitted` and `flight_request_withdrawn`
+are addressed to both. A null PIC would be a request nobody is told about.
+
+**Done** — `supabase/migrations/20260910060000_flight_plan_pic_required.sql`. No backfill:
+unlike `instructor_profile_id`, which could be derived from the PIC, no other column
+reliably identifies the pilot in command.
 
 ### 6.2 Registration mark in the flight lifecycle actions
 

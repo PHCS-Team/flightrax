@@ -1340,6 +1340,10 @@ export type Database = {
         Returns: string[]
       }
       notification_audience_everyone: { Args: never; Returns: string[] }
+      notification_audience_everyone_except_department: {
+        Args: { p_department: Database["public"]["Enums"]["admin_department"] }
+        Returns: string[]
+      }
       notification_audience_participants: {
         Args: { p_flight_request_id: string }
         Returns: string[]
