@@ -100,8 +100,24 @@ export function usePushNotifications() {
       const registration = await navigator.serviceWorker.ready;
       const existing = await registration.pushManager.getSubscription();
 
-      if (!cancelled) {
-        setHasSubscription(existing !== null);
+      if (cancelled) {
+        return;
+      }
+
+      setHasSubscription(existing !== null);
+
+      // Re-register an existing subscription on every launch. The browser
+      // keeps handing back a subscription object after the app is
+      // reinstalled, so the UI reads as "enabled" while the server has no
+      // row for it — the user then receives nothing until they toggle off
+      // and on. Upserting on endpoint makes that self-healing and costs one
+      // write per launch.
+      if (existing) {
+        const payload = toSubscriptionPayload(existing);
+
+        if (payload) {
+          void savePushSubscriptionAction(payload);
+        }
       }
     })();
 

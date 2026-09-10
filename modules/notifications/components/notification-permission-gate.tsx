@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
 import { NotificationPermissionDialog } from "@/modules/notifications/components/notification-permission-dialog";
 import { usePushNotifications } from "@/modules/notifications/hooks/use-push-notifications";
@@ -8,26 +8,7 @@ import { usePushNotifications } from "@/modules/notifications/hooks/use-push-not
 export function NotificationPermissionGate() {
   const { enable, hasAsked, isBusy, markAsked, platform, status } =
     usePushNotifications();
-  const attemptedRef = useRef(false);
-  const [needsGesture, setNeedsGesture] = useState(false);
   const [closed, setClosed] = useState(false);
-
-  useEffect(() => {
-    if (status !== "disabled" || hasAsked || attemptedRef.current) {
-      return;
-    }
-
-    attemptedRef.current = true;
-
-    void enable()
-      .then(() => {
-        markAsked();
-      })
-      .catch(() => {
-        markAsked();
-        setNeedsGesture(true);
-      });
-  }, [enable, hasAsked, markAsked, status]);
 
   const onDismiss = () => {
     markAsked();
@@ -40,6 +21,11 @@ export function NotificationPermissionGate() {
     setClosed(true);
   };
 
+  // The browser's own permission prompt is deliberately not fired on launch.
+  // Granting it only records a permission — it does not subscribe the device
+  // or store anything, so a user who accepted it still received nothing and
+  // had no idea why. The permission is now requested from this dialog's
+  // button, where accepting runs the whole flow: permission, subscribe, save.
   return (
     <NotificationPermissionDialog
       isBusy={isBusy}
@@ -51,7 +37,7 @@ export function NotificationPermissionGate() {
           onDismiss();
         }
       }}
-      open={needsGesture && !closed && status === "disabled"}
+      open={status === "disabled" && !hasAsked && !closed}
       platform={platform}
     />
   );
