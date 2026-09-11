@@ -78,6 +78,7 @@ export function isAuthPath(pathname: string) {
     pathname === "/login" ||
     pathname.startsWith("/login/") ||
     pathname === "/register" ||
-    pathname.startsWith("/register/")
+    pathname.startsWith("/register/") ||
+    pathname === "/forgot-password"
   );
 }

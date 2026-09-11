@@ -91,6 +91,24 @@ realtime surface and confirm the counts match the estimate.
 
 ---
 
+## 3b. Resend Free Plan — transactional email
+
+Used only for Supabase Auth email (password reset, and signup confirmation if
+enabled). Configured as custom SMTP in the Supabase dashboard; nothing in the
+app talks to Resend directly. See `docs/PASSWORD-RESET-SETUP.md`.
+
+| Resource | Free plan allowance |
+| --- | --- |
+| Emails | **3,000 / month**, **100 / day** |
+| Verified domains | 1 |
+| Recipients without a verified domain | **Your own account email only** |
+
+The domain requirement is the real constraint, not the volume. `flightrax.app`
+(bought 2026-09-11) is the domain to verify; `flightrax.vercel.app` never
+qualified because Vercel controls its DNS.
+
+---
+
 ## 4. Vercel Hobby Plan — quotas
 
 | Resource | Hobby allowance |

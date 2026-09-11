@@ -3,6 +3,10 @@ import type { z } from "zod";
 import type { changePasswordSchema } from "@/modules/auth/schemas/change-password-schema";
 import type { loginSchema } from "@/modules/auth/schemas/login-schema";
 import type {
+  requestPasswordResetSchema,
+  resetPasswordSchema,
+} from "@/modules/auth/schemas/password-reset-schema";
+import type {
   adminRegisterSchema,
   instructorRegisterSchema,
   studentRegisterSchema,
@@ -21,3 +25,7 @@ export type RejectedAccountResubmissionInput = z.infer<
   typeof rejectedAccountResubmissionSchema
 >;
 export type ProfilePhotoInput = z.infer<typeof profilePhotoSchema>;
+export type RequestPasswordResetInput = z.infer<
+  typeof requestPasswordResetSchema
+>;
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
