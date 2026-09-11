@@ -2,7 +2,6 @@
 
 import { savePushSubscriptionSchema } from "@/modules/notifications/schemas/push-subscription-schema";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
-import { isApproved } from "@/shared/lib/rbac/guards";
 import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 
@@ -11,7 +10,7 @@ export const savePushSubscriptionAction = actionClient
   .action(async ({ parsedInput }) => {
     const actor = await getCurrentAuthorizationProfile();
 
-    if (!actor || !isApproved(actor)) {
+    if (!actor) {
       return { ok: false, message: "You are not signed in." };
     }
 

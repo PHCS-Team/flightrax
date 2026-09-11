@@ -158,6 +158,18 @@
 }
 
 @layer utilities {
+  /* Keeps a region scrollable without painting a scrollbar over it. Used for
+     the sidebar nav, where the track sits on the brand surface and reads as a
+     stray line rather than a control. */
+  .scrollbar-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
   :where(.flightrax-rays) {
     position: relative;
   }

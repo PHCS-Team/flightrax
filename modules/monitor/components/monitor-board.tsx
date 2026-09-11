@@ -1,5 +1,6 @@
 "use client";
 
+import { MonitorFullscreenButton } from "@/modules/monitor/components/monitor-fullscreen-button";
 import { MonitorNotamBand } from "@/modules/monitor/components/monitor-notam-band";
 import { useMonitorClockMs } from "@/modules/monitor/hooks/use-monitor-clock";
 import { useMonitorTimeZone } from "@/modules/monitor/hooks/use-monitor-time-zone";
@@ -83,6 +84,8 @@ export function MonitorBoard({ board }: { board: MonitorBoardData }) {
       className="h-dvh w-screen cursor-none overflow-hidden"
       contentClassName="grid h-full grid-rows-[auto_minmax(0,1fr)_auto]"
     >
+      <MonitorFullscreenButton />
+
       <header className="flex items-center justify-between gap-[3vw] bg-primary-foreground px-[3vw] py-[1vh] text-primary">
         <div
           className="flex items-baseline gap-[1.5vw] animate-in fade-in duration-1000"

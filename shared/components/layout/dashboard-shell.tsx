@@ -202,7 +202,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
 
           <div className="mt-6 flex min-h-0 flex-1 flex-col gap-6">
             <TooltipProvider>
-              <nav className="grid gap-1">
+              <nav className="-mx-1 grid min-h-0 flex-1 auto-rows-max gap-1 overflow-y-auto overscroll-contain px-1 py-1 scrollbar-none">
                 {navigationSections.map((section) => {
                   if (isNavigationGroup(section)) {
                     const groupId = section.id;
@@ -383,7 +383,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
               </nav>
             </TooltipProvider>
 
-            <div className={cn("mt-auto", desktopCollapsed && "lg:hidden")}>
+            <div className={cn("mt-auto shrink-0", desktopCollapsed && "lg:hidden")}>
               <AppInfoCard />
             </div>
           </div>

@@ -6,6 +6,7 @@ import { AuthShell } from "@/modules/auth/components/auth-shell";
 import { LogoutConfirmationButton } from "@/modules/auth/components/logout-confirmation-button";
 import { RejectedAccountResubmissionForm } from "@/modules/auth/components/rejected-account-resubmission-form";
 import { Button } from "@/shared/components/ui/button";
+import { NotificationOptInCard } from "@/shared/components/layout/notification-opt-in-card";
 import {
   APPROVAL_STATUS,
   ROLE_LABELS,
@@ -86,6 +87,9 @@ export function PendingApprovalClientSurface({
           />
           <LogoutForm variant="secondary" />
         </div>
+        <div className="mt-5">
+          <NotificationOptInCard />
+        </div>
       </AuthShell>
     );
   }
@@ -103,6 +107,7 @@ export function PendingApprovalClientSurface({
           An admin must approve your {roleLabel} account before you can access
           FlightraX. Please check back after your campus verifies your account.
         </p>
+        <NotificationOptInCard />
         <LogoutForm variant="primary" />
       </div>
     </AuthShell>
