@@ -66,5 +66,12 @@ export function isProtectedPath(pathname: string) {
 }
 
 export function isAuthPath(pathname: string) {
-  return pathname === "/login" || pathname.startsWith("/login/") || pathname === "/register" || pathname.startsWith("/register/");
+  return (
+    pathname === "/login" ||
+    pathname.startsWith("/login/") ||
+    pathname === "/register" ||
+    pathname.startsWith("/register/") ||
+    pathname === "/forgot-password" ||
+    pathname === "/reset-password"
+  );
 }

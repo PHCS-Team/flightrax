@@ -70,6 +70,14 @@ export function LoginForm({ role }: { role: ProfileRole }) {
             {form.formState.errors.password.message}
           </p>
         )}
+        <div className="flex justify-end">
+          <Link
+            className="text-sm font-semibold text-primary-foreground/80 underline-offset-4 transition hover:text-primary-foreground hover:underline"
+            href="/forgot-password"
+          >
+            Forgot password?
+          </Link>
+        </div>
       </div>
       <Button
         className="mt-3 h-12 w-full px-7 font-bold uppercase"
