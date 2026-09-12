@@ -1,5 +1,5 @@
-import { SchedulePage } from "@/modules/schedule/components/schedule-page";
+import { ScheduleRoute } from "@/modules/schedule/components/schedule-route";
 
-export default function Page() {
-  return <SchedulePage />;
+export default async function Page() {
+  return <ScheduleRoute />;
 }
