@@ -1072,6 +1072,77 @@ export type Database = {
           },
         ]
       }
+      schedule_entries: {
+        Row: {
+          aircraft_id: string
+          created_at: string
+          created_by: string
+          ends_at: string
+          id: string
+          instructor_profile_id: string | null
+          label: string | null
+          pilot_profile_id: string | null
+          session_type: string
+          starts_at: string
+          updated_at: string
+        }
+        Insert: {
+          aircraft_id: string
+          created_at?: string
+          created_by: string
+          ends_at: string
+          id?: string
+          instructor_profile_id?: string | null
+          label?: string | null
+          pilot_profile_id?: string | null
+          session_type: string
+          starts_at: string
+          updated_at?: string
+        }
+        Update: {
+          aircraft_id?: string
+          created_at?: string
+          created_by?: string
+          ends_at?: string
+          id?: string
+          instructor_profile_id?: string | null
+          label?: string | null
+          pilot_profile_id?: string | null
+          session_type?: string
+          starts_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "schedule_entries_aircraft_id_fkey"
+            columns: ["aircraft_id"]
+            isOneToOne: false
+            referencedRelation: "aircrafts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "schedule_entries_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "schedule_entries_instructor_profile_id_fkey"
+            columns: ["instructor_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "schedule_entries_pilot_profile_id_fkey"
+            columns: ["pilot_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       student_profiles: {
         Row: {
           created_at: string
