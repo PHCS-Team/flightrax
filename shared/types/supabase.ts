@@ -1143,6 +1143,35 @@ export type Database = {
           },
         ]
       }
+      schedule_pings: {
+        Row: {
+          board_date: string
+          id: string
+          sent_at: string
+          sent_by: string
+        }
+        Insert: {
+          board_date: string
+          id?: string
+          sent_at?: string
+          sent_by: string
+        }
+        Update: {
+          board_date?: string
+          id?: string
+          sent_at?: string
+          sent_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "schedule_pings_sent_by_fkey"
+            columns: ["sent_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       student_profiles: {
         Row: {
           created_at: string
@@ -1472,6 +1501,10 @@ export type Database = {
       notification_person_name: {
         Args: { p_profile_id: string }
         Returns: string
+      }
+      notify_schedule_ready: {
+        Args: { p_actor_id: string; p_date: string }
+        Returns: number
       }
       operations_date: { Args: { ts: string }; Returns: string }
       operations_today: { Args: never; Returns: string }

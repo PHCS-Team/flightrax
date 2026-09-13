@@ -1,6 +1,3 @@
-// TODO(notifications): one event is still owed — a schedule event, once
-// modules/schedule exists. Tracked in docs/NOTIFICATIONS-MATRIX.md §5.
-//
 // License and certificate expiry notifications were considered and
 // deliberately dropped: the credential surfaces already show expiry state,
 // so a notification would restate what is on screen at the cost of another
@@ -37,6 +34,7 @@ export const NOTIFICATION_TYPES = [
   "notam_posted",
   "aircraft_status_changed",
   "instructor_unavailable",
+  "schedule_ready",
 ] as const;
 
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number];

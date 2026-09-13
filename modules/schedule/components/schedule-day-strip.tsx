@@ -13,6 +13,8 @@ import { cn } from "@/shared/lib/utils";
 
 const NAV_BUTTON_CLASS =
   "flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-full text-primary-foreground/80 transition hover:bg-primary-foreground/10 hover:text-primary-foreground";
+const TODAY_BUTTON_CLASS =
+  "h-7 px-2.5 text-xs text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground";
 
 export function ScheduleDayStrip({
   date,
@@ -25,8 +27,8 @@ export function ScheduleDayStrip({
   const week = weekOf(date);
 
   return (
-    <div className="flex min-w-0 flex-1 flex-col gap-2 sm:max-w-2xl">
-      <div className="flex items-center justify-between gap-2">
+    <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+      <div className="flex items-center justify-between gap-2 sm:justify-start">
         <div className="flex items-center gap-1">
           <button
             aria-label="Previous week"
@@ -49,7 +51,7 @@ export function ScheduleDayStrip({
           </button>
         </div>
         <Button
-          className="h-7 px-2.5 text-xs text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
+          className={cn(TODAY_BUTTON_CLASS, "sm:hidden")}
           disabled={date === today}
           onClick={() => onChange(today)}
           size="sm"
@@ -59,7 +61,7 @@ export function ScheduleDayStrip({
           Today
         </Button>
       </div>
-      <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
+      <div className="grid grid-cols-7 gap-1 sm:flex sm:gap-1.5">
         {week.map((day) => {
           const selected = day === date;
           const isToday = day === today;
@@ -68,7 +70,7 @@ export function ScheduleDayStrip({
             <button
               aria-current={selected ? "date" : undefined}
               className={cn(
-                "flex cursor-pointer flex-col items-center gap-0.5 rounded-xl border py-1.5 transition",
+                "flex cursor-pointer flex-col items-center gap-0.5 rounded-xl border py-1.5 transition sm:h-10 sm:flex-row sm:gap-1.5 sm:px-3 sm:py-0",
                 selected
                   ? "border-primary-foreground/40 bg-primary-foreground/20 text-primary-foreground"
                   : "border-primary-foreground/15 bg-primary-foreground/5 text-primary-foreground/75 hover:bg-primary-foreground/10 hover:text-primary-foreground",
@@ -80,7 +82,7 @@ export function ScheduleDayStrip({
               <span className="text-[10px] font-semibold uppercase tracking-wide">
                 {formatDateLabel(day, "EEE")}
               </span>
-              <span className="text-sm font-bold sm:text-base">
+              <span className="text-sm font-bold">
                 {formatDateLabel(day, "d")}
               </span>
               <span
@@ -93,6 +95,16 @@ export function ScheduleDayStrip({
           );
         })}
       </div>
+      <Button
+        className={cn(TODAY_BUTTON_CLASS, "hidden sm:inline-flex")}
+        disabled={date === today}
+        onClick={() => onChange(today)}
+        size="sm"
+        type="button"
+        variant="ghost"
+      >
+        Today
+      </Button>
     </div>
   );
 }

@@ -7,6 +7,7 @@ import { useState } from "react";
 import { ScheduleDayStrip } from "@/modules/schedule/components/schedule-day-strip";
 import { ScheduleEntryDeleteConfirmation } from "@/modules/schedule/components/schedule-entry-delete-confirmation";
 import { ScheduleEntryDialog } from "@/modules/schedule/components/schedule-entry-dialog";
+import { ScheduleLegendAction } from "@/modules/schedule/components/schedule-legend-action";
 import { ScheduleTimeGrid } from "@/modules/schedule/components/schedule-time-grid";
 import { useScheduleDay } from "@/modules/schedule/hooks/use-schedule-day.query";
 import type {
@@ -78,8 +79,9 @@ export function ScheduleClientSurface({ canManage }: { canManage: boolean }) {
   return (
     <TooltipProvider>
       <div className="sm:space-y-4">
-        <div className="px-2.5 pt-2.5 pb-3 sm:px-0 sm:py-0">
+        <div className="flex flex-col gap-3 px-2.5 pt-2.5 pb-3 sm:flex-row sm:items-center sm:justify-between sm:px-0 sm:py-0">
           <ScheduleDayStrip date={activeDate} onChange={setDate} />
+          <ScheduleLegendAction className="hidden sm:flex" />
         </div>
 
         {day.isPending || !day.data ? (

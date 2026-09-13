@@ -64,3 +64,7 @@ export const updateScheduleEntrySchema = entryFieldsSchema
 export const deleteScheduleEntrySchema = z.object({
   id: z.string().uuid(),
 });
+
+export const pingScheduleReadySchema = z.object({
+  date: dateFieldSchema,
+});

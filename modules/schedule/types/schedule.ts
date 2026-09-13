@@ -26,10 +26,16 @@ export type ScheduleEntry = {
   label: string | null;
 };
 
+export type SchedulePing = {
+  sentAt: string;
+  sentByName: string | null;
+};
+
 export type ScheduleDay = {
   date: string;
   aircraft: ScheduleAircraft[];
   entries: ScheduleEntry[];
+  lastPing: SchedulePing | null;
 };
 
 export type SchedulePersonOption = SchedulePerson & {

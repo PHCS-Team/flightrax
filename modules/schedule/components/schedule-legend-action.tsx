@@ -4,24 +4,38 @@ import { InfoIcon } from "lucide-react";
 import { useState } from "react";
 
 import { ScheduleLegendDialog } from "@/modules/schedule/components/schedule-legend-dialog";
-import { Button } from "@/shared/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/shared/components/ui/tooltip";
+import { cn } from "@/shared/lib/utils";
 
-export function ScheduleLegendAction() {
+export function ScheduleLegendAction({ className }: { className?: string }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <>
-      <Button
-        aria-label="Legend"
-        className="size-9 cursor-pointer border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground sm:h-10 sm:w-auto sm:px-4"
-        onClick={() => setOpen(true)}
-        type="button"
-        variant="outline"
-      >
-        <InfoIcon className="size-4" />
-        <span className="hidden sm:inline">Legend</span>
-      </Button>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            aria-label="Legend"
+            className={cn(
+              "flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-full text-primary-foreground/70 transition hover:bg-primary-foreground/10 hover:text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
+              className,
+            )}
+            onClick={() => setOpen(true)}
+            type="button"
+          >
+            <InfoIcon className="size-4.5" />
+          </button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Legend</p>
+        </TooltipContent>
+      </Tooltip>
       <ScheduleLegendDialog onOpenChange={setOpen} open={open} />
-    </>
+    </TooltipProvider>
   );
 }

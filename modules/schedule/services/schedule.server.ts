@@ -45,7 +45,7 @@ export async function getScheduleDay(date: string): Promise<ScheduleDay> {
   await requireViewer();
 
   const supabase = createAdminClient();
-  const [aircraftResult, entriesResult] = await Promise.all([
+  const [aircraftResult, entriesResult, pingResult] = await Promise.all([
     supabase.from("aircrafts").select(AIRCRAFT_SELECT),
     supabase
       .from("schedule_entries")
@@ -53,6 +53,13 @@ export async function getScheduleDay(date: string): Promise<ScheduleDay> {
       .lt("starts_at", dayEnd(date).toISOString())
       .gt("ends_at", dayStart(date).toISOString())
       .order("starts_at", { ascending: true }),
+    supabase
+      .from("schedule_pings")
+      .select("sent_at, profiles!schedule_pings_sent_by_fkey(full_name)")
+      .eq("board_date", date)
+      .order("sent_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
   ]);
 
   if (aircraftResult.error) {
@@ -61,6 +68,10 @@ export async function getScheduleDay(date: string): Promise<ScheduleDay> {
 
   if (entriesResult.error) {
     throw new Error(entriesResult.error.message);
+  }
+
+  if (pingResult.error) {
+    throw new Error(pingResult.error.message);
   }
 
   const aircraft: ScheduleAircraft[] = (aircraftResult.data ?? [])
@@ -90,7 +101,17 @@ export async function getScheduleDay(date: string): Promise<ScheduleDay> {
     label: row.label,
   }));
 
-  return { date, aircraft, entries };
+  return {
+    date,
+    aircraft,
+    entries,
+    lastPing: pingResult.data
+      ? {
+          sentAt: pingResult.data.sent_at,
+          sentByName: pingResult.data.profiles?.full_name ?? null,
+        }
+      : null,
+  };
 }
 
 // Anyone who can be written on the board: approved students and

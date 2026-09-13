@@ -209,6 +209,26 @@ students have flights with that instructor was rejected as over-complication.
 
 `deleteNotamAction` and `removeInstructorUnavailabilityAction` produce no notification.
 
+### Schedule
+
+| Event | Source | Audience | Message |
+| --- | --- | --- | --- |
+| `schedule_ready` | `pingScheduleReadyAction` (admin presses **Ping everyone**) | `EVERYONE` | "Flight schedule for \<Dy, Mon D\> is ready" / "\<Name\> posted the board. Open it and file your flight request." → `/schedule?date=YYYY-MM-DD` |
+
+Schedule entries are **never** announced individually. The admin is usually still editing
+when an entry lands, and a stream of "entry added" would be noise (Rule D's spirit). The
+board is pinned up once, deliberately, like the paper one. Re-pinging the same day is
+allowed — plans change — but the button shows when the last ping went out and the
+confirmation warns that everyone is about to be notified a second time. Each ping is a row
+in `schedule_pings`, which is also the notification's `entity_id`.
+
+Audience is everyone who holds `SCHEDULE_VIEW`: every approved student and instructor,
+every admin department, superadmin — i.e. `notification_audience_everyone()`. Rule A drops
+the sender.
+
+`createScheduleEntryAction`, `updateScheduleEntryAction` and `deleteScheduleEntryAction`
+produce no notification.
+
 ---
 
 ## 4. Explicitly excluded
@@ -235,7 +255,7 @@ No notification is emitted for any of these.
 
 | Event | Blocked on |
 | --- | --- |
-| Schedule uploaded / changed | **`modules/schedule/` is empty scaffolding** — only `schedule-page.tsx` and `constants/permissions.ts` exist, there are zero schedule actions. Nothing to hook into yet. |
+| ~~Schedule uploaded / changed~~ | **Delivered 2026-09-13** as `schedule_ready` (§3 Schedule) — a deliberate ping, not a per-entry event. `20260913030000_schedule_ready_notification.sql`. |
 | ~~License expiry warning~~ | **Dropped, 2026-09-10.** The credential surfaces already indicate expiry, so a notification restates what is on screen — and it would need another `pg_cron` job to do it. Not deferred: decided against. |
 | ~~Certificate expiry warning~~ | **Dropped, 2026-09-10.** Same reasoning. |
 | `account_approved` push → `/dashboard` | Phase 3 (push). Useless in-app because the recipient cannot reach the feed before approval; a push reaches a signed-out device. |
@@ -323,6 +343,7 @@ behaviour — but none of it has been run on a device.
 | 1 | `instructor_profile_id` NOT NULL; `notifications` table, RLS, realtime, `create_notifications()` | **Delivered** — `20260909000000_*`, `20260909010000_*` |
 | 2 | Read path, bell badge, panel, `/notifications` page, mark-read | **Delivered** — `modules/notifications/` |
 | 3 | Triggers emitting the 16 events | **Delivered** — `20260910000000_*` … `20260910030000_*` |
+| 4 | `schedule_ready` — 17th type, `schedule_pings`, `notify_schedule_ready()` called by `pingScheduleReadyAction` | **Delivered** — `20260913030000_*` |
 
 **Actor propagation.** Triggers cannot use `auth.uid()`: every write in this app goes
 through the service-role admin client, so it is null. The actor is instead read from the

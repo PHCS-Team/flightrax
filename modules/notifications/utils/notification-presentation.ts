@@ -1,6 +1,7 @@
 import {
   BanIcon,
   BellIcon,
+  CalendarCheckIcon,
   CalendarOffIcon,
   CircleCheckIcon,
   ClipboardCheckIcon,
@@ -47,6 +48,7 @@ const PRESENTATION: Record<NotificationType, Presentation> = {
   notam_posted: { icon: MegaphoneIcon, tone: "default" },
   aircraft_status_changed: { icon: WrenchIcon, tone: "default" },
   instructor_unavailable: { icon: CalendarOffIcon, tone: "default" },
+  schedule_ready: { icon: CalendarCheckIcon, tone: "success" },
 };
 
 const FALLBACK: Presentation = { icon: BellIcon, tone: "default" };
