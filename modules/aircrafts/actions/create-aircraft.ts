@@ -8,6 +8,7 @@ import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-
 import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 import { AIRCRAFT_PHOTOS_BUCKET } from "@/shared/lib/storage/buckets";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export const createAircraftAction = actionClient
   .inputSchema(createAircraftSchema)
@@ -15,7 +16,10 @@ export const createAircraftAction = actionClient
     const actor = await getCurrentAuthorizationProfile();
 
     if (!canManageAircrafts(actor)) {
-      return { ok: false, message: "You do not have permission to create aircraft." };
+      return {
+        ok: false,
+        message: "You do not have permission to create aircraft.",
+      };
     }
 
     const supabase = createAdminClient();
@@ -33,7 +37,7 @@ export const createAircraftAction = actionClient
         });
 
       if (uploadError) {
-        return { ok: false, message: uploadError.message };
+        return { ok: false, message: describeActionError(uploadError) };
       }
     }
 

@@ -5,12 +5,13 @@ import { useAction } from "next-safe-action/hooks";
 
 import { createLicenseAction } from "@/modules/auth/actions/create-license";
 import { LICENSE_QUERY_KEYS } from "@/modules/auth/queries/licenses";
-import { toastActionResult } from "@/shared/lib/action-toast";
+import { toastActionError, toastActionResult } from "@/shared/lib/action-toast";
 
 export function useCreateLicense({ onSaved }: { onSaved?: () => void } = {}) {
   const queryClient = useQueryClient();
 
   return useAction(createLicenseAction, {
+    onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);
 

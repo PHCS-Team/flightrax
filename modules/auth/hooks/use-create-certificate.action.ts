@@ -5,7 +5,7 @@ import { useAction } from "next-safe-action/hooks";
 
 import { createCertificateAction } from "@/modules/auth/actions/create-certificate";
 import { CERTIFICATE_QUERY_KEYS } from "@/modules/auth/queries/certificates";
-import { toastActionResult } from "@/shared/lib/action-toast";
+import { toastActionError, toastActionResult } from "@/shared/lib/action-toast";
 
 export function useCreateCertificate({
   onSaved,
@@ -13,6 +13,7 @@ export function useCreateCertificate({
   const queryClient = useQueryClient();
 
   return useAction(createCertificateAction, {
+    onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);
 

@@ -6,6 +6,7 @@ import { getDefaultRedirectForProfile } from "@/shared/lib/rbac/routes";
 import { registerBaseProfile } from "@/modules/auth/actions/register-base";
 import { getProfileAccessByUserId } from "@/modules/auth/queries/profile";
 import { superadminRegisterSchema } from "@/modules/auth/schemas/register-schema";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export const registerSuperadminAction = actionClient
   .inputSchema(superadminRegisterSchema)
@@ -18,7 +19,7 @@ export const registerSuperadminAction = actionClient
     });
 
     if (error) {
-      return { ok: false, message: error.message };
+      return { ok: false, message: describeActionError(error) };
     }
 
     if (!data.user) {

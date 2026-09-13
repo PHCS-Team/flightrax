@@ -5,6 +5,7 @@ import { ROLE } from "@/shared/lib/rbac/config";
 import { studentRegisterSchema } from "@/modules/auth/schemas/register-schema";
 import { registerBaseProfile } from "@/modules/auth/actions/register-base";
 import { submitAccountRequest } from "@/modules/auth/services/account-request.server";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export const registerStudentAction = actionClient
   .inputSchema(studentRegisterSchema)
@@ -17,7 +18,7 @@ export const registerStudentAction = actionClient
     });
 
     if (error) {
-      return { ok: false, message: error.message };
+      return { ok: false, message: describeActionError(error) };
     }
 
     if (!data.user) {
@@ -41,7 +42,8 @@ export const registerStudentAction = actionClient
 
     return {
       ok: true,
-      message: "Registration received. Your student account is pending approval.",
+      message:
+        "Registration received. Your student account is pending approval.",
       redirectTo: "/pending-approval",
     };
   });

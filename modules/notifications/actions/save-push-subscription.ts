@@ -4,6 +4,7 @@ import { savePushSubscriptionSchema } from "@/modules/notifications/schemas/push
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export const savePushSubscriptionAction = actionClient
   .inputSchema(savePushSubscriptionSchema)
@@ -29,7 +30,7 @@ export const savePushSubscriptionAction = actionClient
     );
 
     if (error) {
-      return { ok: false, message: error.message };
+      return { ok: false, message: describeActionError(error) };
     }
 
     return { ok: true, message: "Notifications enabled on this device." };

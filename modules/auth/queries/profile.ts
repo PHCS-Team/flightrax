@@ -7,6 +7,7 @@ import {
 } from "@/shared/lib/rbac/profile";
 import { createClient } from "@/shared/lib/supabase/server";
 import type { Profile } from "@/shared/lib/rbac/types";
+import { describeActionError } from "@/shared/lib/action-error";
 
 const PROFILE_DETAIL_SELECT =
   "*, account_requests!account_requests_profile_id_fkey(approval_status, id_document_content_type, id_document_path, id_document_size_bytes, id_document_uploaded_at, id_number, rejection_reason, submitted_at), admin_profiles!admin_profiles_profile_id_fkey(department)";
@@ -23,7 +24,8 @@ function getPublicProfilePhotoUrl(
     return null;
   }
 
-  return supabase.storage.from(PROFILE_PHOTO_BUCKET).getPublicUrl(path).data.publicUrl;
+  return supabase.storage.from(PROFILE_PHOTO_BUCKET).getPublicUrl(path).data
+    .publicUrl;
 }
 
 function toProfile(
@@ -88,7 +90,7 @@ export const getProfileByUserId = cache(async function getProfileByUserId(
     .maybeSingle();
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(describeActionError(error));
   }
 
   if (!data) {
@@ -108,7 +110,7 @@ export const getProfileAccessByUserId = cache(
       .maybeSingle();
 
     if (error) {
-      throw new Error(error.message);
+      throw new Error(describeActionError(error));
     }
 
     if (!data) {
@@ -133,7 +135,7 @@ const getDashboardProfileByUserId = cache(
       .maybeSingle();
 
     if (error) {
-      throw new Error(error.message);
+      throw new Error(describeActionError(error));
     }
 
     if (!data) {

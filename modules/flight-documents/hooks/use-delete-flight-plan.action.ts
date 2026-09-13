@@ -5,7 +5,7 @@ import { useAction } from "next-safe-action/hooks";
 
 import { deleteFlightPlanAction } from "@/modules/flight-documents/actions/delete-flight-plan";
 import { FLIGHT_DOCUMENTS_QUERY_KEYS } from "@/modules/flight-documents/queries/query-keys";
-import { toastActionResult } from "@/shared/lib/action-toast";
+import { toastActionError, toastActionResult } from "@/shared/lib/action-toast";
 
 export function useDeleteFlightPlan({
   onDeleted,
@@ -13,6 +13,7 @@ export function useDeleteFlightPlan({
   const queryClient = useQueryClient();
 
   return useAction(deleteFlightPlanAction, {
+    onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);
 

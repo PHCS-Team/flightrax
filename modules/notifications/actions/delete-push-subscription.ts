@@ -4,6 +4,7 @@ import { deletePushSubscriptionSchema } from "@/modules/notifications/schemas/pu
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export const deletePushSubscriptionAction = actionClient
   .inputSchema(deletePushSubscriptionSchema)
@@ -23,7 +24,7 @@ export const deletePushSubscriptionAction = actionClient
       .eq("user_id", actor.id);
 
     if (error) {
-      return { ok: false, message: error.message };
+      return { ok: false, message: describeActionError(error) };
     }
 
     return { ok: true, message: "Notifications turned off on this device." };

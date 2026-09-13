@@ -5,6 +5,7 @@ import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-
 import { isApproved } from "@/shared/lib/rbac/guards";
 import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export const markNotificationReadAction = actionClient
   .inputSchema(markNotificationReadSchema)
@@ -25,7 +26,7 @@ export const markNotificationReadAction = actionClient
       .is("read_at", null);
 
     if (error) {
-      return { ok: false, message: error.message };
+      return { ok: false, message: describeActionError(error) };
     }
 
     return { ok: true };

@@ -12,6 +12,7 @@ import { hasPermission } from "@/shared/lib/rbac/config";
 import { isApproved } from "@/shared/lib/rbac/guards";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 import type { PaginatedResponse } from "@/shared/types/pagination";
+import { describeActionError } from "@/shared/lib/action-error";
 
 const NOTAM_LIST_SELECT =
   "id, title, description, severity, expires_at, created_at, created_by, profiles!notams_created_by_fkey(full_name)";
@@ -62,7 +63,7 @@ export async function getNotamsPage(
   } = await query.order("created_at", { ascending: false }).range(from, to);
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(describeActionError(error));
   }
 
   const total = totalCount ?? 0;

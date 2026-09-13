@@ -4,6 +4,7 @@ import { useEffect, useId, useRef, useState, type ChangeEvent } from "react";
 import { ImageIcon, Trash2Icon, UploadCloudIcon } from "lucide-react";
 
 import { Button } from "@/shared/components/ui/button";
+import { compressImage } from "@/shared/lib/images/compress-image";
 import { cn } from "@/shared/lib/utils";
 
 type ImagePreview = {
@@ -70,9 +71,11 @@ export function ImageUploadField(props: ImageUploadFieldProps) {
     }
   }
 
-  function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
-    const imageFiles = Array.from(event.target.files ?? []).filter((file) =>
-      file.type.startsWith("image/"),
+  async function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
+    const imageFiles = await Promise.all(
+      Array.from(event.target.files ?? [])
+        .filter((file) => file.type.startsWith("image/"))
+        .map(compressImage),
     );
 
     if (props.multiple) {

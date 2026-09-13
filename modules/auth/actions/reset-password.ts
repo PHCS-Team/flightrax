@@ -5,6 +5,7 @@ import { resetPasswordSchema } from "@/modules/auth/schemas/password-reset-schem
 import { getDefaultRedirectForProfile } from "@/shared/lib/rbac/routes";
 import { actionClient } from "@/shared/lib/safe-action";
 import { createClient } from "@/shared/lib/supabase/server";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export const resetPasswordAction = actionClient
   .inputSchema(resetPasswordSchema)
@@ -29,7 +30,7 @@ export const resetPasswordAction = actionClient
     });
 
     if (error) {
-      return { ok: false, message: error.message };
+      return { ok: false, message: describeActionError(error) };
     }
 
     const profile = await getProfileAccessByUserId(user.id);

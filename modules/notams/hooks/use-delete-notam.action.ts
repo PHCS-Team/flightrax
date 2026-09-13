@@ -5,12 +5,13 @@ import { useAction } from "next-safe-action/hooks";
 
 import { deleteNotamAction } from "@/modules/notams/actions/delete-notam";
 import { NOTAMS_QUERY_KEYS } from "@/modules/notams/queries/query-keys";
-import { toastActionResult } from "@/shared/lib/action-toast";
+import { toastActionError, toastActionResult } from "@/shared/lib/action-toast";
 
 export function useDeleteNotam({ onDeleted }: { onDeleted?: () => void } = {}) {
   const queryClient = useQueryClient();
 
   return useAction(deleteNotamAction, {
+    onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);
 

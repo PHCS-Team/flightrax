@@ -5,12 +5,13 @@ import { useAction } from "next-safe-action/hooks";
 
 import { removeInstructorUnavailabilityAction } from "@/modules/instructors/actions/remove-instructor-unavailability";
 import { INSTRUCTORS_QUERY_KEYS } from "@/modules/instructors/queries/query-keys";
-import { toastActionResult } from "@/shared/lib/action-toast";
+import { toastActionError, toastActionResult } from "@/shared/lib/action-toast";
 
 export function useRemoveInstructorUnavailability() {
   const queryClient = useQueryClient();
 
   return useAction(removeInstructorUnavailabilityAction, {
+    onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);
 

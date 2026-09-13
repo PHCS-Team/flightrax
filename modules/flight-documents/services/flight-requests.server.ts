@@ -14,6 +14,7 @@ import { isApproved } from "@/shared/lib/rbac/guards";
 import { AIRCRAFT_PHOTOS_BUCKET } from "@/shared/lib/storage/buckets";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 import type { PaginatedResponse } from "@/shared/types/pagination";
+import { describeActionError } from "@/shared/lib/action-error";
 
 const FLIGHT_REQUEST_LIST_SELECT =
   "id, status, rejected_reason, flight_plan_id, weight_balance_id, created_at, updated_at, flight_plans!inner(plan_code, aircraft_identification, type_of_aircraft, departure_aerodrome, destination_aerodrome, dof_raw, dof_resolved, departure_time_raw, aircrafts(photo_path))";
@@ -49,7 +50,7 @@ export async function getOwnFlightRequestsPage(
   const { count, error: countError } = await countQuery;
 
   if (countError) {
-    throw new Error(countError.message);
+    throw new Error(describeActionError(countError));
   }
 
   let listQuery = supabase
@@ -67,7 +68,7 @@ export async function getOwnFlightRequestsPage(
     .range(from, to);
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(describeActionError(error));
   }
 
   const totalCount = count ?? 0;
@@ -143,7 +144,7 @@ export async function getReviewFlightRequestsPage(
       .eq("flight_requests.status", "pending_approval");
 
     if (picPlansError) {
-      throw new Error(picPlansError.message);
+      throw new Error(describeActionError(picPlansError));
     }
 
     const picPlanIds = (picPlans ?? []).map((plan) => plan.id);
@@ -166,7 +167,7 @@ export async function getReviewFlightRequestsPage(
   const { count, error: countError } = await countQuery;
 
   if (countError) {
-    throw new Error(countError.message);
+    throw new Error(describeActionError(countError));
   }
 
   const { data, error } = await listQuery
@@ -174,7 +175,7 @@ export async function getReviewFlightRequestsPage(
     .range(from, to);
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(describeActionError(error));
   }
 
   const totalCount = count ?? 0;

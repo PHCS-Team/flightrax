@@ -9,6 +9,7 @@ import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 import { createClient } from "@/shared/lib/supabase/server";
 import type { Database } from "@/shared/types/supabase";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export const createCertificateAction = actionClient
   .inputSchema(createCertificateSchema)
@@ -54,7 +55,7 @@ export const createCertificateAction = actionClient
     if (insertError) {
       await removeCertificateImages(supabase, [image?.path]);
 
-      return { ok: false, message: insertError.message };
+      return { ok: false, message: describeActionError(insertError) };
     }
 
     return { ok: true, message: "Certificate added." };

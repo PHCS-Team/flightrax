@@ -5,7 +5,7 @@ import { useAction } from "next-safe-action/hooks";
 
 import { createFlightPlanAction } from "@/modules/flight-documents/actions/create-flight-plan";
 import { FLIGHT_DOCUMENTS_QUERY_KEYS } from "@/modules/flight-documents/queries/query-keys";
-import { toastActionResult } from "@/shared/lib/action-toast";
+import { toastActionError, toastActionResult } from "@/shared/lib/action-toast";
 
 export function useCreateFlightPlan({
   onSaved,
@@ -13,6 +13,7 @@ export function useCreateFlightPlan({
   const queryClient = useQueryClient();
 
   return useAction(createFlightPlanAction, {
+    onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);
 
@@ -20,9 +21,7 @@ export function useCreateFlightPlan({
         queryClient.invalidateQueries({
           queryKey: FLIGHT_DOCUMENTS_QUERY_KEYS.all,
         });
-        onSaved?.(
-          "flightPlanId" in data ? data.flightPlanId : undefined,
-        );
+        onSaved?.("flightPlanId" in data ? data.flightPlanId : undefined);
       }
     },
   });

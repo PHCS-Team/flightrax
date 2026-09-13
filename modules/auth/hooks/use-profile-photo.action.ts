@@ -8,7 +8,7 @@ import {
   uploadProfilePhotoAction,
 } from "@/modules/auth/actions/upload-profile-photo";
 import { AUTH_QUERY_KEYS } from "@/modules/auth/queries/dashboard-profile";
-import { toastActionResult } from "@/shared/lib/action-toast";
+import { toastActionError, toastActionResult } from "@/shared/lib/action-toast";
 
 export function useProfilePhoto({
   onRemoved,
@@ -20,6 +20,7 @@ export function useProfilePhoto({
   const queryClient = useQueryClient();
 
   const upload = useAction(uploadProfilePhotoAction, {
+    onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);
 
@@ -33,6 +34,7 @@ export function useProfilePhoto({
   });
 
   const remove = useAction(removeProfilePhotoAction, {
+    onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);
 

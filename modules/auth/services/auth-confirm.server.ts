@@ -3,6 +3,7 @@ import "server-only";
 import type { EmailOtpType } from "@supabase/supabase-js";
 
 import { createClient } from "@/shared/lib/supabase/server";
+import { describeActionError } from "@/shared/lib/action-error";
 
 const EMAIL_OTP_TYPES: readonly EmailOtpType[] = [
   "recovery",
@@ -14,7 +15,9 @@ const EMAIL_OTP_TYPES: readonly EmailOtpType[] = [
 ];
 
 export function isEmailOtpType(value: string | null): value is EmailOtpType {
-  return value !== null && (EMAIL_OTP_TYPES as readonly string[]).includes(value);
+  return (
+    value !== null && (EMAIL_OTP_TYPES as readonly string[]).includes(value)
+  );
 }
 
 // Exchanges the token_hash from an email link for a session.
@@ -34,7 +37,9 @@ export async function confirmEmailToken(
     token_hash: tokenHash,
   });
 
-  return error ? { ok: false, message: error.message } : { ok: true };
+  return error
+    ? { ok: false, message: describeActionError(error) }
+    : { ok: true };
 }
 
 // A recovery link must land on the password form; everything else (signup

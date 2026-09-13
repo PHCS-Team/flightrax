@@ -9,6 +9,7 @@ import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 import { createClient } from "@/shared/lib/supabase/server";
 import type { Database } from "@/shared/types/supabase";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export const updateLicenseAction = actionClient
   .inputSchema(updateLicenseSchema)
@@ -32,7 +33,7 @@ export const updateLicenseAction = actionClient
       .maybeSingle();
 
     if (fetchError) {
-      return { ok: false, message: fetchError.message };
+      return { ok: false, message: describeActionError(fetchError) };
     }
 
     if (!existing) {
@@ -48,7 +49,12 @@ export const updateLicenseAction = actionClient
     }
 
     const idFront = parsedInput.idFront
-      ? await uploadLicenseImage(supabase, user.id, "front", parsedInput.idFront)
+      ? await uploadLicenseImage(
+          supabase,
+          user.id,
+          "front",
+          parsedInput.idFront,
+        )
       : null;
 
     if (parsedInput.idFront && !idFront) {
@@ -111,7 +117,7 @@ export const updateLicenseAction = actionClient
     if (updateError) {
       await removeLicenseImages(supabase, [idFront?.path, idBack?.path]);
 
-      return { ok: false, message: updateError.message };
+      return { ok: false, message: describeActionError(updateError) };
     }
 
     await removeLicenseImages(supabase, [

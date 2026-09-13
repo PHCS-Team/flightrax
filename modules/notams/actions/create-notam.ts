@@ -8,6 +8,7 @@ import { hasPermission } from "@/shared/lib/rbac/config";
 import { isApproved } from "@/shared/lib/rbac/guards";
 import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export const createNotamAction = actionClient
   .inputSchema(createNotamSchema)
@@ -19,7 +20,10 @@ export const createNotamAction = actionClient
       !isApproved(actor) ||
       !hasPermission(actor.role, NOTAMS_MANAGE, actor.admin_department)
     ) {
-      return { ok: false, message: "You do not have permission to post NOTAMs." };
+      return {
+        ok: false,
+        message: "You do not have permission to post NOTAMs.",
+      };
     }
 
     const supabase = createAdminClient();
@@ -32,7 +36,7 @@ export const createNotamAction = actionClient
     });
 
     if (error) {
-      return { ok: false, message: error.message };
+      return { ok: false, message: describeActionError(error) };
     }
 
     return { ok: true, message: "NOTAM posted." };

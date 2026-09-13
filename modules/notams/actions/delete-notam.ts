@@ -8,6 +8,7 @@ import { isApproved } from "@/shared/lib/rbac/guards";
 import { SYSTEM_MANAGE } from "@/shared/lib/rbac/permissions";
 import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export const deleteNotamAction = actionClient
   .inputSchema(deleteNotamSchema)
@@ -33,7 +34,7 @@ export const deleteNotamAction = actionClient
       .maybeSingle();
 
     if (lookupError) {
-      return { ok: false, message: lookupError.message };
+      return { ok: false, message: describeActionError(lookupError) };
     }
 
     if (!notam) {
@@ -56,7 +57,7 @@ export const deleteNotamAction = actionClient
       .eq("id", parsedInput.id);
 
     if (error) {
-      return { ok: false, message: error.message };
+      return { ok: false, message: describeActionError(error) };
     }
 
     return { ok: true, message: "NOTAM deleted." };

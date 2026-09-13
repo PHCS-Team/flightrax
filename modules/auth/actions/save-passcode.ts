@@ -7,6 +7,7 @@ import { canManagePasscode } from "@/shared/lib/rbac/config";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 import { createClient } from "@/shared/lib/supabase/server";
 import { passcodeSchema } from "@/modules/auth/schemas/passcode-schema";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export const savePasscodeAction = actionClient
   .inputSchema(passcodeSchema)
@@ -37,10 +38,7 @@ export const savePasscodeAction = actionClient
       }
     }
 
-    const {
-      data: profile,
-      error: profileError,
-    } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("role")
       .eq("id", user.id)
@@ -68,7 +66,7 @@ export const savePasscodeAction = actionClient
       .eq("id", user.id);
 
     if (updateError) {
-      return { ok: false, message: updateError.message };
+      return { ok: false, message: describeActionError(updateError) };
     }
 
     return { ok: true, message: "Passcode saved." };

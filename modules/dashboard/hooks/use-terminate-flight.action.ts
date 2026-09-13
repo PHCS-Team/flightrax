@@ -5,12 +5,13 @@ import { useAction } from "next-safe-action/hooks";
 
 import { terminateFlightAction } from "@/modules/dashboard/actions/terminate-flight";
 import { DASHBOARD_QUERY_KEYS } from "@/modules/dashboard/queries/query-keys";
-import { toastActionResult } from "@/shared/lib/action-toast";
+import { toastActionError, toastActionResult } from "@/shared/lib/action-toast";
 
 export function useTerminateFlight({ onDone }: { onDone?: () => void } = {}) {
   const queryClient = useQueryClient();
 
   return useAction(terminateFlightAction, {
+    onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);
 

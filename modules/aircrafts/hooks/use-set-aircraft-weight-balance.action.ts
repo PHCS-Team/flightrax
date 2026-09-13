@@ -5,7 +5,7 @@ import { useAction } from "next-safe-action/hooks";
 
 import { setAircraftWeightBalanceAction } from "@/modules/aircrafts/actions/set-aircraft-weight-balance";
 import { AIRCRAFTS_QUERY_KEYS } from "@/modules/aircrafts/queries/query-keys";
-import { toastActionResult } from "@/shared/lib/action-toast";
+import { toastActionError, toastActionResult } from "@/shared/lib/action-toast";
 
 export function useSetAircraftWeightBalance({
   onSaved,
@@ -13,6 +13,7 @@ export function useSetAircraftWeightBalance({
   const queryClient = useQueryClient();
 
   return useAction(setAircraftWeightBalanceAction, {
+    onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);
 

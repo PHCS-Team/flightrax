@@ -12,6 +12,7 @@ import { isLicenseValid } from "@/shared/lib/aviation/license-validity";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { isApproved } from "@/shared/lib/rbac/guards";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export async function getFlightPlanFilerContext(): Promise<FlightPlanFilerContext> {
   const viewer = await getCurrentAuthorizationProfile();
@@ -29,7 +30,7 @@ export async function getFlightPlanFilerContext(): Promise<FlightPlanFilerContex
     .eq("user_id", viewer.id);
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(describeActionError(error));
   }
 
   const hasValidLicense = (licenses ?? []).some((license) =>
@@ -76,7 +77,7 @@ export async function getFlightPlanPicOptions(): Promise<
     .eq("approval_status", "approved");
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(describeActionError(error));
   }
 
   const instructorIds = (data ?? []).map((row) => row.profiles.id);
@@ -92,7 +93,7 @@ export async function getFlightPlanPicOptions(): Promise<
       : { data: [], error: null };
 
   if (unavailabilityError) {
-    throw new Error(unavailabilityError.message);
+    throw new Error(describeActionError(unavailabilityError));
   }
 
   const unavailabilitiesByProfile = new Map<
@@ -125,7 +126,7 @@ export async function isInstructorProfile(profileId: string): Promise<boolean> {
     .maybeSingle();
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(describeActionError(error));
   }
 
   return data ? isInstructorRole(data.role) : false;
@@ -145,7 +146,7 @@ export async function getPicUnavailabilityEndsOn(
     .maybeSingle();
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(describeActionError(error));
   }
 
   return data?.ends_on ?? null;

@@ -6,6 +6,7 @@ import { ROLE } from "@/shared/lib/rbac/config";
 import { isApproved } from "@/shared/lib/rbac/guards";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 import type { PaginatedResponse } from "@/shared/types/pagination";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export async function getTodaysFlightsPage(
   page: number,
@@ -32,7 +33,7 @@ export async function getTodaysFlightsPage(
   });
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(describeActionError(error));
   }
 
   const rows = data ?? [];

@@ -7,6 +7,7 @@ import { hasPermission } from "@/shared/lib/rbac/config";
 import { isApproved } from "@/shared/lib/rbac/guards";
 import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export const removeInstructorUnavailabilityAction = actionClient
   .inputSchema(removeInstructorUnavailabilitySchema)
@@ -20,7 +21,8 @@ export const removeInstructorUnavailabilityAction = actionClient
     ) {
       return {
         ok: false,
-        message: "You do not have permission to manage instructor availability.",
+        message:
+          "You do not have permission to manage instructor availability.",
       };
     }
 
@@ -31,7 +33,7 @@ export const removeInstructorUnavailabilityAction = actionClient
       .eq("id", parsedInput.unavailabilityId);
 
     if (error) {
-      return { ok: false, message: error.message };
+      return { ok: false, message: describeActionError(error) };
     }
 
     return { ok: true, message: "Unavailability period removed." };

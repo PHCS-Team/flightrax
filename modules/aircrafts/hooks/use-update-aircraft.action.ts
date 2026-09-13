@@ -5,12 +5,13 @@ import { useAction } from "next-safe-action/hooks";
 
 import { updateAircraftAction } from "@/modules/aircrafts/actions/update-aircraft";
 import { AIRCRAFTS_QUERY_KEYS } from "@/modules/aircrafts/queries/query-keys";
-import { toastActionResult } from "@/shared/lib/action-toast";
+import { toastActionError, toastActionResult } from "@/shared/lib/action-toast";
 
 export function useUpdateAircraft({ onSaved }: { onSaved?: () => void } = {}) {
   const queryClient = useQueryClient();
 
   return useAction(updateAircraftAction, {
+    onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);
 

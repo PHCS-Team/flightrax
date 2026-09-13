@@ -5,7 +5,7 @@ import { useAction } from "next-safe-action/hooks";
 
 import { submitFlightRequestAction } from "@/modules/flight-documents/actions/submit-flight-request";
 import { FLIGHT_DOCUMENTS_QUERY_KEYS } from "@/modules/flight-documents/queries/query-keys";
-import { toastActionResult } from "@/shared/lib/action-toast";
+import { toastActionError, toastActionResult } from "@/shared/lib/action-toast";
 
 export function useSubmitFlightRequest({
   onSubmitted,
@@ -13,6 +13,7 @@ export function useSubmitFlightRequest({
   const queryClient = useQueryClient();
 
   return useAction(submitFlightRequestAction, {
+    onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);
 

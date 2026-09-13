@@ -5,6 +5,7 @@ import { ROLE } from "@/shared/lib/rbac/config";
 import { instructorRegisterSchema } from "@/modules/auth/schemas/register-schema";
 import { registerBaseProfile } from "@/modules/auth/actions/register-base";
 import { submitAccountRequest } from "@/modules/auth/services/account-request.server";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export const registerInstructorAction = actionClient
   .inputSchema(instructorRegisterSchema)
@@ -17,7 +18,7 @@ export const registerInstructorAction = actionClient
     });
 
     if (error) {
-      return { ok: false, message: error.message };
+      return { ok: false, message: describeActionError(error) };
     }
 
     if (!data.user) {

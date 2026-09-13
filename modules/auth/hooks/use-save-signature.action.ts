@@ -5,12 +5,13 @@ import { useAction } from "next-safe-action/hooks";
 
 import { saveSignatureAction } from "@/modules/auth/actions/save-signature";
 import { AUTH_QUERY_KEYS } from "@/modules/auth/queries/dashboard-profile";
-import { toastActionResult } from "@/shared/lib/action-toast";
+import { toastActionError, toastActionResult } from "@/shared/lib/action-toast";
 
 export function useSaveSignature() {
   const queryClient = useQueryClient();
 
   return useAction(saveSignatureAction, {
+    onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);
 

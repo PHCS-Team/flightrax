@@ -6,6 +6,7 @@ import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-
 import { isApproved } from "@/shared/lib/rbac/guards";
 import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export const saveWeightBalanceAction = actionClient
   .inputSchema(saveWeightBalanceSchema)
@@ -38,7 +39,7 @@ export const saveWeightBalanceAction = actionClient
       .maybeSingle();
 
     if (planError) {
-      return { ok: false, message: planError.message };
+      return { ok: false, message: describeActionError(planError) };
     }
 
     if (!flightPlan || flightPlan.created_by !== actor.id) {
@@ -137,7 +138,7 @@ export const saveWeightBalanceAction = actionClient
         .eq("id", weightBalanceId);
 
       if (updateError) {
-        return { ok: false, message: updateError.message };
+        return { ok: false, message: describeActionError(updateError) };
       }
     } else {
       const { data: created, error: insertError } = await supabase
@@ -147,7 +148,7 @@ export const saveWeightBalanceAction = actionClient
         .single();
 
       if (insertError) {
-        return { ok: false, message: insertError.message };
+        return { ok: false, message: describeActionError(insertError) };
       }
 
       weightBalanceId = created.id;
@@ -164,7 +165,7 @@ export const saveWeightBalanceAction = actionClient
           .delete()
           .eq("id", weightBalanceId);
 
-        return { ok: false, message: linkError.message };
+        return { ok: false, message: describeActionError(linkError) };
       }
     }
 
@@ -176,7 +177,7 @@ export const saveWeightBalanceAction = actionClient
       .eq("weight_balance_id", weightBalanceId);
 
     if (entriesDeleteError) {
-      return { ok: false, message: entriesDeleteError.message };
+      return { ok: false, message: describeActionError(entriesDeleteError) };
     }
 
     if (parsedInput.baggageEntries.length > 0) {
@@ -186,7 +187,7 @@ export const saveWeightBalanceAction = actionClient
         .eq("aircraft_type_key", flightPlan.aircrafts?.aircraft_type ?? "");
 
       if (areasError) {
-        return { ok: false, message: areasError.message };
+        return { ok: false, message: describeActionError(areasError) };
       }
 
       const armsByPosition = new Map(
@@ -206,7 +207,7 @@ export const saveWeightBalanceAction = actionClient
         );
 
       if (entriesInsertError) {
-        return { ok: false, message: entriesInsertError.message };
+        return { ok: false, message: describeActionError(entriesInsertError) };
       }
     }
 

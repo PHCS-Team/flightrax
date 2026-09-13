@@ -8,6 +8,7 @@ import { AIRCRAFT_PHOTOS_BUCKET } from "@/shared/lib/storage/buckets";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 import type { FlightLogEntry } from "@/shared/types/flight-log";
 import type { PaginatedResponse } from "@/shared/types/pagination";
+import { describeActionError } from "@/shared/lib/action-error";
 
 type LoggedJourneyStatus = "arrived" | "standby" | "cancelled";
 
@@ -65,7 +66,7 @@ export async function getFlightLogsAuditPage(
     .range(from, to);
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(describeActionError(error));
   }
 
   const storage = supabase.storage.from(AIRCRAFT_PHOTOS_BUCKET);

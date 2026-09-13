@@ -5,6 +5,7 @@ import { canManageAircrafts } from "@/modules/aircrafts/utils/aircraft-permissio
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export const deleteAircraftTypeAction = actionClient
   .inputSchema(deleteAircraftTypeSchema)
@@ -12,7 +13,10 @@ export const deleteAircraftTypeAction = actionClient
     const actor = await getCurrentAuthorizationProfile();
 
     if (!canManageAircrafts(actor)) {
-      return { ok: false, message: "You do not have permission to manage aircraft types." };
+      return {
+        ok: false,
+        message: "You do not have permission to manage aircraft types.",
+      };
     }
 
     const supabase = createAdminClient();
@@ -29,7 +33,7 @@ export const deleteAircraftTypeAction = actionClient
         };
       }
 
-      return { ok: false, message: error.message };
+      return { ok: false, message: describeActionError(error) };
     }
 
     return { ok: true, message: "Aircraft type deleted." };

@@ -10,6 +10,7 @@ import {
   approveAccountRequestSchema,
   rejectAccountRequestSchema,
 } from "@/modules/account-review/schemas/account-review-schema";
+import { describeActionError } from "@/shared/lib/action-error";
 
 async function getAuthorizedReviewer() {
   const profile = await getCurrentAuthorizationProfile();
@@ -50,16 +51,22 @@ export const approveAccountRequestAction = actionClient
         rejection_reason: null,
       })
       .eq("profile_id", parsedInput.requestId)
-      .in("approval_status", [APPROVAL_STATUS.PENDING, APPROVAL_STATUS.REJECTED])
+      .in("approval_status", [
+        APPROVAL_STATUS.PENDING,
+        APPROVAL_STATUS.REJECTED,
+      ])
       .select("profile_id")
       .maybeSingle();
 
     if (error) {
-      return { ok: false, message: error.message };
+      return { ok: false, message: describeActionError(error) };
     }
 
     if (!data) {
-      return { ok: false, message: "This account request has already been reviewed." };
+      return {
+        ok: false,
+        message: "This account request has already been reviewed.",
+      };
     }
 
     return {
@@ -100,11 +107,14 @@ export const rejectAccountRequestAction = actionClient
       .maybeSingle();
 
     if (error) {
-      return { ok: false, message: error.message };
+      return { ok: false, message: describeActionError(error) };
     }
 
     if (!data) {
-      return { ok: false, message: "This account request has already been reviewed." };
+      return {
+        ok: false,
+        message: "This account request has already been reviewed.",
+      };
     }
 
     return {

@@ -27,7 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
-import { toastActionResult } from "@/shared/lib/action-toast";
+import { toastActionError, toastActionResult } from "@/shared/lib/action-toast";
 import { ADMIN_DEPARTMENT_LABELS, ROLE } from "@/shared/lib/rbac/config";
 
 export function AdminRegisterForm() {
@@ -44,6 +44,7 @@ export function AdminRegisterForm() {
     },
   });
   const { execute, isExecuting } = useAction(registerAdminAction, {
+    onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);
 

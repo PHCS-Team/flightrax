@@ -17,6 +17,7 @@ import type {
   AccountReviewRow,
   AccountReviewStatusCounts,
 } from "@/modules/account-review/types/account-review";
+import { describeActionError } from "@/shared/lib/action-error";
 
 async function assertReviewer() {
   const viewer = await getCurrentAuthorizationProfile();
@@ -47,7 +48,7 @@ export async function getAccountReviewItems(
     .order("submitted_at", { ascending: false });
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(describeActionError(error));
   }
 
   const rows = data satisfies AccountReviewRow[];
@@ -91,7 +92,7 @@ export async function getAccountReviewMetrics(): Promise<AccountReviewMetrics> {
           .not("submitted_at", "is", null);
 
         if (error) {
-          throw new Error(error.message);
+          throw new Error(describeActionError(error));
         }
 
         return { type, status, count: count ?? 0 };

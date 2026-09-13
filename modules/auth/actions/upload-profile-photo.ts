@@ -6,6 +6,7 @@ import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 import { createClient } from "@/shared/lib/supabase/server";
 import { PROFILE_PHOTO_BUCKET } from "@/shared/lib/storage/buckets";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export const uploadProfilePhotoAction = actionClient
   .inputSchema(profilePhotoSchema)
@@ -17,7 +18,10 @@ export const uploadProfilePhotoAction = actionClient
     } = await supabase.auth.getUser();
 
     if (userError || !user) {
-      return { ok: false, message: "Sign in before updating your profile photo." };
+      return {
+        ok: false,
+        message: "Sign in before updating your profile photo.",
+      };
     }
 
     const adminSupabase = createAdminClient();
@@ -28,7 +32,7 @@ export const uploadProfilePhotoAction = actionClient
       .maybeSingle();
 
     if (profileError) {
-      return { ok: false, message: profileError.message };
+      return { ok: false, message: describeActionError(profileError) };
     }
 
     const newPath = getProfilePhotoPath(user.id, parsedInput.profilePhoto.type);
@@ -40,7 +44,7 @@ export const uploadProfilePhotoAction = actionClient
       });
 
     if (uploadError) {
-      return { ok: false, message: uploadError.message };
+      return { ok: false, message: describeActionError(uploadError) };
     }
 
     const uploadedAt = new Date().toISOString();
@@ -57,7 +61,7 @@ export const uploadProfilePhotoAction = actionClient
     if (updateError) {
       await supabase.storage.from(PROFILE_PHOTO_BUCKET).remove([newPath]);
 
-      return { ok: false, message: updateError.message };
+      return { ok: false, message: describeActionError(updateError) };
     }
 
     const oldPath = currentProfile?.profile_photo_path;
@@ -77,7 +81,10 @@ export const removeProfilePhotoAction = actionClient.action(async () => {
   } = await supabase.auth.getUser();
 
   if (userError || !user) {
-    return { ok: false, message: "Sign in before removing your profile photo." };
+    return {
+      ok: false,
+      message: "Sign in before removing your profile photo.",
+    };
   }
 
   const adminSupabase = createAdminClient();
@@ -88,7 +95,7 @@ export const removeProfilePhotoAction = actionClient.action(async () => {
     .maybeSingle();
 
   if (profileError) {
-    return { ok: false, message: profileError.message };
+    return { ok: false, message: describeActionError(profileError) };
   }
 
   const oldPath = currentProfile?.profile_photo_path;
@@ -108,7 +115,7 @@ export const removeProfilePhotoAction = actionClient.action(async () => {
     .eq("id", user.id);
 
   if (updateError) {
-    return { ok: false, message: updateError.message };
+    return { ok: false, message: describeActionError(updateError) };
   }
 
   await supabase.storage.from(PROFILE_PHOTO_BUCKET).remove([oldPath]);

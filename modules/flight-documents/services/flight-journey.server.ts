@@ -8,6 +8,7 @@ import { canViewFlightDocumentRecords } from "@/modules/flight-documents/utils/c
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { isApproved } from "@/shared/lib/rbac/guards";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
+import { describeActionError } from "@/shared/lib/action-error";
 
 // The journey lifecycle record for one flight plan — visible to the
 // request's owner and to reviewers.
@@ -31,7 +32,7 @@ export async function getFlightJourneyDetails(
     .maybeSingle();
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(describeActionError(error));
   }
 
   if (!data) {

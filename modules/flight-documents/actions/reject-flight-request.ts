@@ -10,6 +10,7 @@ import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-
 import { isApproved } from "@/shared/lib/rbac/guards";
 import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export const rejectFlightRequestAction = actionClient
   .inputSchema(rejectFlightRequestSchema)
@@ -34,7 +35,7 @@ export const rejectFlightRequestAction = actionClient
       .maybeSingle();
 
     if (planError) {
-      return { ok: false, message: planError.message };
+      return { ok: false, message: describeActionError(planError) };
     }
 
     const request = flightPlan?.flight_requests;
@@ -49,7 +50,7 @@ export const rejectFlightRequestAction = actionClient
       .eq("user_id", actor.id);
 
     if (licensesError) {
-      return { ok: false, message: licensesError.message };
+      return { ok: false, message: describeActionError(licensesError) };
     }
 
     if (
@@ -95,7 +96,7 @@ export const rejectFlightRequestAction = actionClient
       .eq("id", request.id);
 
     if (updateError) {
-      return { ok: false, message: updateError.message };
+      return { ok: false, message: describeActionError(updateError) };
     }
 
     return { ok: true, message: "Flight request rejected." };

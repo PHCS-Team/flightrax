@@ -6,6 +6,7 @@ import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-
 import { hasPermission } from "@/shared/lib/rbac/config";
 import { isApproved } from "@/shared/lib/rbac/guards";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
+import { describeActionError } from "@/shared/lib/action-error";
 
 const WEIGHT_BALANCE_SELECT =
   "id, aircraft_id, basic_empty_weight, basic_empty_weight_arm, basic_empty_weight_moment";
@@ -31,7 +32,7 @@ export async function getAircraftWeightBalance(
     .maybeSingle();
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(describeActionError(error));
   }
 
   if (!data) {

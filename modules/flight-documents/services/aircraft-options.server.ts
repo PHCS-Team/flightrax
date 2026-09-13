@@ -9,6 +9,7 @@ import { isApproved } from "@/shared/lib/rbac/guards";
 import { AIRCRAFT_PHOTOS_BUCKET } from "@/shared/lib/storage/buckets";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 import type { PaginatedResponse } from "@/shared/types/pagination";
+import { describeActionError } from "@/shared/lib/action-error";
 
 // An active flight never blocks filing — drafts are unrestricted; the
 // guards live at submit and approval. Only real filing blockers
@@ -48,7 +49,7 @@ export async function getFlightPlanAircraftOptionsPage(
   );
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(describeActionError(error));
   }
 
   const rows = data ?? [];
@@ -97,7 +98,7 @@ export async function getFlightPlanAircraft(
     .maybeSingle();
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(describeActionError(error));
   }
 
   if (!data) {
@@ -138,7 +139,7 @@ export async function getFlightPlanTypeOptions(): Promise<
     .eq("status", "active");
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(describeActionError(error));
   }
 
   const uniqueTypes = new Map<string, FlightPlanTypeOption>();

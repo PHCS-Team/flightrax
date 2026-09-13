@@ -17,7 +17,9 @@ const optionalPersonSchema = z.string();
 const entryFieldsSchema = z.object({
   startTime: timeFieldSchema,
   endTime: timeFieldSchema,
-  sessionType: z.enum(SCHEDULE_SESSION_TYPES),
+  sessionType: z.enum(SCHEDULE_SESSION_TYPES, {
+    message: "Choose a session type.",
+  }),
   pilotProfileId: optionalPersonSchema,
   instructorProfileId: optionalPersonSchema,
   label: z.string().trim().max(120, "Keep the label under 120 characters."),

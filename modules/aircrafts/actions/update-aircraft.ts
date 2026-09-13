@@ -1,7 +1,10 @@
 "use server";
 
 import { updateAircraftSchema } from "@/modules/aircrafts/schemas/aircraft-schema";
-import type { AircraftRow, AircraftUpdate } from "@/modules/aircrafts/types/aircraft";
+import type {
+  AircraftRow,
+  AircraftUpdate,
+} from "@/modules/aircrafts/types/aircraft";
 import { getAircraftPhotoPath } from "@/modules/aircrafts/utils/aircraft-photo";
 import { canManageAircrafts } from "@/modules/aircrafts/utils/aircraft-permissions";
 import { getAircraftWriteErrorMessage } from "@/modules/aircrafts/utils/aircraft-write-error";
@@ -9,6 +12,7 @@ import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-
 import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 import { AIRCRAFT_PHOTOS_BUCKET } from "@/shared/lib/storage/buckets";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export const updateAircraftAction = actionClient
   .inputSchema(updateAircraftSchema)
@@ -16,25 +20,32 @@ export const updateAircraftAction = actionClient
     const actor = await getCurrentAuthorizationProfile();
 
     if (!canManageAircrafts(actor)) {
-      return { ok: false, message: "You do not have permission to update aircraft." };
+      return {
+        ok: false,
+        message: "You do not have permission to update aircraft.",
+      };
     }
 
     const supabase = createAdminClient();
-    const { data: currentAircraft, error: currentAircraftError } = await supabase
-      .from("aircrafts")
-      .select("id, photo_path")
-      .eq("id", parsedInput.aircraftId)
-      .maybeSingle();
+    const { data: currentAircraft, error: currentAircraftError } =
+      await supabase
+        .from("aircrafts")
+        .select("id, photo_path")
+        .eq("id", parsedInput.aircraftId)
+        .maybeSingle();
 
     if (currentAircraftError) {
-      return { ok: false, message: currentAircraftError.message };
+      return { ok: false, message: describeActionError(currentAircraftError) };
     }
 
     if (!currentAircraft) {
       return { ok: false, message: "Choose an existing aircraft." };
     }
 
-    const target = currentAircraft satisfies Pick<AircraftRow, "id" | "photo_path">;
+    const target = currentAircraft satisfies Pick<
+      AircraftRow,
+      "id" | "photo_path"
+    >;
     const newPhotoPath = parsedInput.photo
       ? getAircraftPhotoPath(parsedInput.aircraftId, parsedInput.photo.type)
       : null;
@@ -48,7 +59,7 @@ export const updateAircraftAction = actionClient
         });
 
       if (uploadError) {
-        return { ok: false, message: uploadError.message };
+        return { ok: false, message: describeActionError(uploadError) };
       }
     }
 
@@ -76,14 +87,22 @@ export const updateAircraftAction = actionClient
 
     if (error) {
       if (newPhotoPath) {
-        await supabase.storage.from(AIRCRAFT_PHOTOS_BUCKET).remove([newPhotoPath]);
+        await supabase.storage
+          .from(AIRCRAFT_PHOTOS_BUCKET)
+          .remove([newPhotoPath]);
       }
 
       return { ok: false, message: getAircraftWriteErrorMessage(error) };
     }
 
-    if (newPhotoPath && target.photo_path && target.photo_path !== newPhotoPath) {
-      await supabase.storage.from(AIRCRAFT_PHOTOS_BUCKET).remove([target.photo_path]);
+    if (
+      newPhotoPath &&
+      target.photo_path &&
+      target.photo_path !== newPhotoPath
+    ) {
+      await supabase.storage
+        .from(AIRCRAFT_PHOTOS_BUCKET)
+        .remove([target.photo_path]);
     }
 
     return { ok: true, message: "Aircraft saved." };

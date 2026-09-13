@@ -5,7 +5,7 @@ import { useAction } from "next-safe-action/hooks";
 
 import { deleteCertificateAction } from "@/modules/auth/actions/delete-certificate";
 import { CERTIFICATE_QUERY_KEYS } from "@/modules/auth/queries/certificates";
-import { toastActionResult } from "@/shared/lib/action-toast";
+import { toastActionError, toastActionResult } from "@/shared/lib/action-toast";
 
 export function useDeleteCertificate({
   onSaved,
@@ -13,6 +13,7 @@ export function useDeleteCertificate({
   const queryClient = useQueryClient();
 
   return useAction(deleteCertificateAction, {
+    onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);
 

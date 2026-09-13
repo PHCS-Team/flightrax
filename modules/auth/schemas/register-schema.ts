@@ -6,20 +6,19 @@ import {
   ID_DOCUMENT_TYPES,
 } from "@/modules/auth/utils/account-document";
 
-const adminDepartmentSchema = z.enum(ADMIN_DEPARTMENTS);
+const adminDepartmentSchema = z.enum(ADMIN_DEPARTMENTS, {
+  message: "Choose your department.",
+});
 export const fullNameSchema = z
   .string()
   .trim()
-  .min(2)
+  .min(2, "Enter your full name.")
   .regex(/^[^,]+,\s*[^,]+$/, "Use the format Lastname, First M.");
-export const idNumberSchema = z
-  .string()
-  .trim()
-  .min(1, "Enter the ID number.");
+export const idNumberSchema = z.string().trim().min(1, "Enter the ID number.");
 const baseRegisterSchema = z.object({
-  email: z.string().trim().email(),
-  password: z.string().min(8),
-  confirmPassword: z.string().min(8),
+  email: z.string().trim().email("Enter a valid email address."),
+  password: z.string().min(8, "Password must be at least 8 characters."),
+  confirmPassword: z.string().min(8, "Re-enter your password."),
   fullName: fullNameSchema,
 });
 const passwordMatchSchema = baseRegisterSchema.superRefine((value, context) => {

@@ -7,6 +7,7 @@ import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-
 import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 import { AIRCRAFT_PHOTOS_BUCKET } from "@/shared/lib/storage/buckets";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export const deleteAircraftAction = actionClient
   .inputSchema(deleteAircraftSchema)
@@ -14,36 +15,45 @@ export const deleteAircraftAction = actionClient
     const actor = await getCurrentAuthorizationProfile();
 
     if (!canManageAircrafts(actor)) {
-      return { ok: false, message: "You do not have permission to delete aircraft." };
+      return {
+        ok: false,
+        message: "You do not have permission to delete aircraft.",
+      };
     }
 
     const supabase = createAdminClient();
-    const { data: currentAircraft, error: currentAircraftError } = await supabase
-      .from("aircrafts")
-      .select("id, photo_path")
-      .eq("id", parsedInput.aircraftId)
-      .maybeSingle();
+    const { data: currentAircraft, error: currentAircraftError } =
+      await supabase
+        .from("aircrafts")
+        .select("id, photo_path")
+        .eq("id", parsedInput.aircraftId)
+        .maybeSingle();
 
     if (currentAircraftError) {
-      return { ok: false, message: currentAircraftError.message };
+      return { ok: false, message: describeActionError(currentAircraftError) };
     }
 
     if (!currentAircraft) {
       return { ok: false, message: "Choose an existing aircraft." };
     }
 
-    const target = currentAircraft satisfies Pick<AircraftRow, "id" | "photo_path">;
+    const target = currentAircraft satisfies Pick<
+      AircraftRow,
+      "id" | "photo_path"
+    >;
     const { error } = await supabase
       .from("aircrafts")
       .delete()
       .eq("id", parsedInput.aircraftId);
 
     if (error) {
-      return { ok: false, message: error.message };
+      return { ok: false, message: describeActionError(error) };
     }
 
     if (target.photo_path) {
-      await supabase.storage.from(AIRCRAFT_PHOTOS_BUCKET).remove([target.photo_path]);
+      await supabase.storage
+        .from(AIRCRAFT_PHOTOS_BUCKET)
+        .remove([target.photo_path]);
     }
 
     return { ok: true, message: "Aircraft deleted." };

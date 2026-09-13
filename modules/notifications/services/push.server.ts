@@ -3,6 +3,7 @@ import "server-only";
 import webpush, { WebPushError } from "web-push";
 
 import { createAdminClient } from "@/shared/lib/supabase/admin";
+import { describeActionError } from "@/shared/lib/action-error";
 
 const PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? "";
 const PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY ?? "";
@@ -50,7 +51,7 @@ export async function sendPushToUser(
     .eq("user_id", userId);
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(describeActionError(error));
   }
 
   if (!subscriptions || subscriptions.length === 0) {

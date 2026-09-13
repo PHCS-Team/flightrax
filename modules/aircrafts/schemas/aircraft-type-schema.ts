@@ -15,12 +15,12 @@ export const createAircraftTypeSchema = z.object({
 });
 
 export const deleteAircraftTypeSchema = z.object({
-  typeKey: z.string().min(1),
+  typeKey: z.string().min(1, "Choose an aircraft type."),
 });
 
 export const setAircraftTypeWbSpecsSchema = z
   .object({
-    typeKey: z.string().min(1),
+    typeKey: z.string().min(1, "Choose an aircraft type."),
     icaoDesignator: icaoDesignatorSchema,
     usableFuelArm: z.coerce
       .number()

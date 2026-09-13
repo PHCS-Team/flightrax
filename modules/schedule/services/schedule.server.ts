@@ -17,6 +17,7 @@ import {
 } from "@/shared/lib/rbac/config";
 import { isApproved } from "@/shared/lib/rbac/guards";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
+import { describeActionError } from "@/shared/lib/action-error";
 
 const AIRCRAFT_SELECT =
   "id, registration_mark, aircraft_types!inner(icao_designator)";
@@ -94,7 +95,9 @@ export async function getScheduleDay(date: string): Promise<ScheduleDay> {
     sessionType: isScheduleSessionType(row.session_type)
       ? row.session_type
       : "tbd",
-    pilot: row.pilot ? { id: row.pilot.id, fullName: row.pilot.full_name } : null,
+    pilot: row.pilot
+      ? { id: row.pilot.id, fullName: row.pilot.full_name }
+      : null,
     instructor: row.instructor
       ? { id: row.instructor.id, fullName: row.instructor.full_name }
       : null,
@@ -128,7 +131,7 @@ export async function getSchedulePeople(): Promise<SchedulePersonOption[]> {
     .eq("approval_status", APPROVAL_STATUS.APPROVED);
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(describeActionError(error));
   }
 
   return (data ?? [])

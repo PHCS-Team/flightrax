@@ -17,6 +17,7 @@ import {
   AvatarImage,
 } from "@/shared/components/ui/avatar";
 import { Button } from "@/shared/components/ui/button";
+import { compressImage } from "@/shared/lib/images/compress-image";
 import {
   Dialog,
   DialogContent,
@@ -85,11 +86,13 @@ export function ProfilePhotoUploader({
     setPreviewUrl(objectUrl);
   }
 
-  function handleFileChange(selectedFile: File | null) {
-    if (!selectedFile) {
+  async function handleFileChange(pickedFile: File | null) {
+    if (!pickedFile) {
       updateSelectedFile(null);
       return;
     }
+
+    const selectedFile = await compressImage(pickedFile);
 
     if (
       !PROFILE_PHOTO_TYPES.includes(

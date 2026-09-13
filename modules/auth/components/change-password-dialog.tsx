@@ -17,7 +17,7 @@ import {
   DialogContent,
   DialogTrigger,
 } from "@/shared/components/ui/dialog";
-import { toastActionResult } from "@/shared/lib/action-toast";
+import { toastActionError, toastActionResult } from "@/shared/lib/action-toast";
 import { cn } from "@/shared/lib/utils";
 
 export function ChangePasswordDialog() {
@@ -31,6 +31,7 @@ export function ChangePasswordDialog() {
     },
   });
   const { execute, isExecuting } = useAction(changePasswordAction, {
+    onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);
 

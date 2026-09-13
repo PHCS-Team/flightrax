@@ -11,6 +11,7 @@ import type {
   ApprovedInstructorRow,
   InstructorUnavailability,
 } from "@/modules/instructors/types/instructor";
+import { describeActionError } from "@/shared/lib/action-error";
 
 async function getMatchingProfileIds(
   supabase: ReturnType<typeof createAdminClient>,
@@ -51,7 +52,7 @@ async function getLicensesByProfileIds(
     .in("user_id", profileIds);
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(describeActionError(error));
   }
 
   const licensesByProfile = new Map<string, LicenseSummary[]>();
@@ -81,7 +82,7 @@ async function getCertificatesByProfileIds(
     .in("user_id", profileIds);
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(describeActionError(error));
   }
 
   const certificatesByProfile = new Map<string, CertificateSummary[]>();
@@ -113,7 +114,7 @@ async function getUnavailabilitiesByProfileIds(
     .order("starts_on", { ascending: true });
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(describeActionError(error));
   }
 
   const byProfile = new Map<string, InstructorUnavailability[]>();
@@ -158,7 +159,7 @@ export async function getApprovedInstructorsPage(
   } = await query.order("id_number", { ascending: true }).range(from, to);
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(describeActionError(error));
   }
 
   const total = totalCount ?? 0;

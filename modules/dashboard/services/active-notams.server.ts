@@ -7,6 +7,7 @@ import { hasPermission } from "@/shared/lib/rbac/config";
 import { isApproved } from "@/shared/lib/rbac/guards";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 import type { NotamSummary } from "@/shared/types/notam";
+import { describeActionError } from "@/shared/lib/action-error";
 
 const ACTIVE_NOTAM_SELECT =
   "id, title, description, severity, expires_at, created_at";
@@ -31,7 +32,7 @@ export async function getActiveNotams(): Promise<NotamSummary[]> {
     .order("created_at", { ascending: false });
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(describeActionError(error));
   }
 
   return (data ?? []).map((row) => ({

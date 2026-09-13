@@ -9,6 +9,7 @@ import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 import { createClient } from "@/shared/lib/supabase/server";
 import type { Database } from "@/shared/types/supabase";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export const createLicenseAction = actionClient
   .inputSchema(createLicenseSchema)
@@ -24,7 +25,12 @@ export const createLicenseAction = actionClient
     }
 
     const idFront = parsedInput.idFront
-      ? await uploadLicenseImage(supabase, user.id, "front", parsedInput.idFront)
+      ? await uploadLicenseImage(
+          supabase,
+          user.id,
+          "front",
+          parsedInput.idFront,
+        )
       : null;
 
     if (parsedInput.idFront && !idFront) {
@@ -47,9 +53,7 @@ export const createLicenseAction = actionClient
       license_number: parsedInput.license_number,
       ratings: parsedInput.ratings?.map((value) => value.trim()) ?? [],
       has_no_expiry: parsedInput.has_no_expiry,
-      expiry_date: parsedInput.has_no_expiry
-        ? null
-        : parsedInput.expiry_date,
+      expiry_date: parsedInput.has_no_expiry ? null : parsedInput.expiry_date,
       status: parsedInput.status ?? "active",
       ...(idFront && {
         id_front_path: idFront.path,
@@ -73,7 +77,7 @@ export const createLicenseAction = actionClient
     if (insertError) {
       await removeLicenseImages(supabase, [idFront?.path, idBack?.path]);
 
-      return { ok: false, message: insertError.message };
+      return { ok: false, message: describeActionError(insertError) };
     }
 
     return { ok: true, message: "License added." };

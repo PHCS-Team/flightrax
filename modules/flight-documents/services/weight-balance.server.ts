@@ -12,6 +12,7 @@ import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-
 import { isApproved } from "@/shared/lib/rbac/guards";
 import { AIRCRAFT_PHOTOS_BUCKET } from "@/shared/lib/storage/buckets";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
+import { describeActionError } from "@/shared/lib/action-error";
 
 const WEIGHT_BALANCE_CONTEXT_SELECT =
   "id, aircraft_id, aircraft_identification, aircraft_type_designator, type_of_aircraft, aircraft_color_and_marking, created_by, pilot_in_command_id, flight_requests(id, status, rejected_reason, weight_balance_id, instructor_profile_id), aircrafts(registration_number, aircraft_type, photo_path, aircraft_weight_balance_configs(basic_empty_weight, basic_empty_weight_arm, basic_empty_weight_moment), aircraft_types!inner(type, usable_fuel_arm, fi_and_student_arm, maximum_takeoff_weight, baggage_area_max_weight, aircraft_type_baggage_areas(position, arm)))";
@@ -33,7 +34,7 @@ export async function getWeightBalanceContext(
     .maybeSingle();
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(describeActionError(error));
   }
 
   if (!data || !data.flight_requests) {
@@ -87,7 +88,7 @@ export async function getWeightBalanceContext(
       .maybeSingle();
 
     if (wbError) {
-      throw new Error(wbError.message);
+      throw new Error(describeActionError(wbError));
     }
 
     if (weightBalance) {

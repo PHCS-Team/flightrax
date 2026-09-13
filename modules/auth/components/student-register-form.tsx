@@ -8,7 +8,7 @@ import { useForm, useWatch } from "react-hook-form";
 
 import { ROLE } from "@/shared/lib/rbac/config";
 import { Button } from "@/shared/components/ui/button";
-import { toastActionResult } from "@/shared/lib/action-toast";
+import { toastActionError, toastActionResult } from "@/shared/lib/action-toast";
 import { registerStudentAction } from "@/modules/auth/actions/register-student";
 import { AccountVerificationFields } from "@/modules/auth/components/account-verification-fields";
 import {
@@ -38,6 +38,7 @@ export function StudentRegisterForm() {
     },
   });
   const { execute, isExecuting } = useAction(registerStudentAction, {
+    onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);
 
@@ -95,7 +96,9 @@ export function StudentRegisterForm() {
           registration={form.register("confirmPassword")}
         />
       </RegisterFormSection>
-      <RegisterFormSection title={ACCOUNT_REQUEST_COPY[ROLE.STUDENT].sectionTitle}>
+      <RegisterFormSection
+        title={ACCOUNT_REQUEST_COPY[ROLE.STUDENT].sectionTitle}
+      >
         <AccountVerificationFields
           idDocument={idDocument ?? null}
           idDocumentError={errors.idDocument?.message}

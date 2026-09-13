@@ -6,6 +6,7 @@ import { isApproved } from "@/shared/lib/rbac/guards";
 import { AIRCRAFT_PHOTOS_BUCKET } from "@/shared/lib/storage/buckets";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 import type { PaginatedResponse } from "@/shared/types/pagination";
+import { describeActionError } from "@/shared/lib/action-error";
 
 // The viewer's own flight history: journeys whose lifecycle ended —
 // completed (arrived/standby) or cancelled — most recent change first.
@@ -35,7 +36,7 @@ export async function getAccountFlightLogsPage(
     .range(from, to);
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(describeActionError(error));
   }
 
   const storage = supabase.storage.from(AIRCRAFT_PHOTOS_BUCKET);

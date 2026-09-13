@@ -4,6 +4,7 @@ import { deleteScheduleEntrySchema } from "@/modules/schedule/schemas/schedule-s
 import { getScheduleManager } from "@/modules/schedule/services/schedule-manager.server";
 import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export const deleteScheduleEntryAction = actionClient
   .inputSchema(deleteScheduleEntrySchema)
@@ -24,7 +25,7 @@ export const deleteScheduleEntryAction = actionClient
       .eq("id", parsedInput.id);
 
     if (error) {
-      return { ok: false, message: error.message };
+      return { ok: false, message: describeActionError(error) };
     }
 
     return { ok: true, message: "Entry removed." };

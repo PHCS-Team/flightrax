@@ -67,10 +67,12 @@ function validateLicense(
 export const licenseFieldsSchema = z.object({
   license_type: z.string().trim().min(1, "Enter a license type."),
   license_number: z.string().trim().min(1, "Enter a license number."),
-  ratings: z.array(z.string().trim().min(1)).optional(),
+  ratings: z.array(z.string().trim().min(1, "Choose a rating.")).optional(),
   has_no_expiry: z.boolean(),
   expiry_date: z.string(),
-  status: z.enum(["active", "expired"]).optional(),
+  status: z
+    .enum(["active", "expired"], { message: "Choose a status." })
+    .optional(),
 });
 
 export const licenseFormSchema = licenseFieldsSchema

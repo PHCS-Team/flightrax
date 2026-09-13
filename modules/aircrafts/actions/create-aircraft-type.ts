@@ -6,6 +6,7 @@ import { generateAircraftTypeKey } from "@/modules/aircrafts/utils/aircraft-type
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export const createAircraftTypeAction = actionClient
   .inputSchema(createAircraftTypeSchema)
@@ -13,13 +14,20 @@ export const createAircraftTypeAction = actionClient
     const actor = await getCurrentAuthorizationProfile();
 
     if (!canManageAircrafts(actor)) {
-      return { ok: false, message: "You do not have permission to manage aircraft types." };
+      return {
+        ok: false,
+        message: "You do not have permission to manage aircraft types.",
+      };
     }
 
     const typeKey = generateAircraftTypeKey(parsedInput.type);
 
     if (!typeKey) {
-      return { ok: false, message: "Aircraft type name must contain at least one alphanumeric character." };
+      return {
+        ok: false,
+        message:
+          "Aircraft type name must contain at least one alphanumeric character.",
+      };
     }
 
     const supabase = createAdminClient();
@@ -31,10 +39,13 @@ export const createAircraftTypeAction = actionClient
 
     if (error) {
       if (error.code === "23505") {
-        return { ok: false, message: `Aircraft type "${parsedInput.type}" already exists.` };
+        return {
+          ok: false,
+          message: `Aircraft type "${parsedInput.type}" already exists.`,
+        };
       }
 
-      return { ok: false, message: error.message };
+      return { ok: false, message: describeActionError(error) };
     }
 
     return { ok: true, message: "Aircraft type created." };

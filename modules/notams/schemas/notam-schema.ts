@@ -25,7 +25,7 @@ export const createNotamSchema = z.object({
       `Keep the description under ${NOTAM_DESCRIPTION_MAX_LENGTH} characters.`,
     )
     .optional(),
-  severity: z.enum(NOTAM_SEVERITIES),
+  severity: z.enum(NOTAM_SEVERITIES, { message: "Choose a severity." }),
   expiresOn: dateFieldSchema.refine(
     (value) => endOfDay(value) > new Date().toISOString(),
     {

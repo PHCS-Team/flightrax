@@ -9,6 +9,7 @@ import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 import { createClient } from "@/shared/lib/supabase/server";
 import type { Database } from "@/shared/types/supabase";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export const updateCertificateAction = actionClient
   .inputSchema(updateCertificateSchema)
@@ -32,7 +33,7 @@ export const updateCertificateAction = actionClient
       .maybeSingle();
 
     if (fetchError) {
-      return { ok: false, message: fetchError.message };
+      return { ok: false, message: describeActionError(fetchError) };
     }
 
     if (!existing) {
@@ -86,7 +87,7 @@ export const updateCertificateAction = actionClient
     if (updateError) {
       await removeCertificateImages(supabase, [image?.path]);
 
-      return { ok: false, message: updateError.message };
+      return { ok: false, message: describeActionError(updateError) };
     }
 
     await removeCertificateImages(supabase, [

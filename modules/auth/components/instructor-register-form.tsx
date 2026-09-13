@@ -21,7 +21,7 @@ import {
   AUTH_MODE_CONFIG,
 } from "@/modules/auth/utils/auth-role-config";
 import { Button } from "@/shared/components/ui/button";
-import { toastActionResult } from "@/shared/lib/action-toast";
+import { toastActionError, toastActionResult } from "@/shared/lib/action-toast";
 import { ROLE } from "@/shared/lib/rbac/config";
 
 export function InstructorRegisterForm() {
@@ -38,6 +38,7 @@ export function InstructorRegisterForm() {
     },
   });
   const { execute, isExecuting } = useAction(registerInstructorAction, {
+    onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);
 

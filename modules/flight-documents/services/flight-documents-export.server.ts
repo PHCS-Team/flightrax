@@ -13,6 +13,7 @@ import type {
 import { toLicenseShortForm } from "@/modules/flight-documents/utils/format-license-line";
 import { getRatingOptions } from "@/shared/lib/aviation/rating-options.server";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
+import { describeActionError } from "@/shared/lib/action-error";
 
 const EXPORT_SELECT =
   "plan_code, dof_resolved, updated_at, pilot_signature, pilot_licenses, authorized_representative_name, authorized_representative_signature, authorized_representative_licenses, aircraft_type_designator, flight_requests(weight_balance_id)";
@@ -88,7 +89,7 @@ export async function getFlightDocumentsExport(
     .maybeSingle();
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(describeActionError(error));
   }
 
   if (!data) {
@@ -106,7 +107,7 @@ export async function getFlightDocumentsExport(
       .maybeSingle();
 
     if (sheetError) {
-      throw new Error(sheetError.message);
+      throw new Error(describeActionError(sheetError));
     }
 
     if (sheet) {

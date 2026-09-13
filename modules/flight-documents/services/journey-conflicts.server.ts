@@ -4,6 +4,7 @@ import { format } from "date-fns";
 
 import { toOperationsDate } from "@/modules/flight-documents/utils/flight-plan-time";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export async function getAircraftStatusBlock(
   aircraftId: string,
@@ -17,7 +18,7 @@ export async function getAircraftStatusBlock(
     .maybeSingle();
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(describeActionError(error));
   }
 
   if (!data) {
@@ -62,7 +63,7 @@ export async function getAircraftDofConflict(
   const { data, error } = await query.maybeSingle();
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(describeActionError(error));
   }
 
   if (!data) {

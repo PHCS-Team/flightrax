@@ -18,6 +18,7 @@ import {
 } from "@/modules/flight-documents/services/flight-plan-filer.server";
 import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export const createFlightPlanAction = actionClient
   .inputSchema(createFlightPlanSchema)
@@ -42,7 +43,7 @@ export const createFlightPlanAction = actionClient
       .maybeSingle();
 
     if (aircraftError) {
-      return { ok: false, message: aircraftError.message };
+      return { ok: false, message: describeActionError(aircraftError) };
     }
 
     if (!aircraft) {
@@ -78,7 +79,7 @@ export const createFlightPlanAction = actionClient
       .eq("user_id", actor.id);
 
     if (licensesError) {
-      return { ok: false, message: licensesError.message };
+      return { ok: false, message: describeActionError(licensesError) };
     }
 
     const hasValidLicense = (licenses ?? []).some((license) =>
@@ -261,7 +262,7 @@ export const createFlightPlanAction = actionClient
     if (requestError) {
       await supabase.from("flight_plans").delete().eq("id", flightPlan.id);
 
-      return { ok: false, message: requestError.message };
+      return { ok: false, message: describeActionError(requestError) };
     }
 
     return {

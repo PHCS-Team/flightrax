@@ -5,7 +5,7 @@ import { useAction } from "next-safe-action/hooks";
 
 import { saveWeightBalanceAction } from "@/modules/flight-documents/actions/save-weight-balance";
 import { FLIGHT_DOCUMENTS_QUERY_KEYS } from "@/modules/flight-documents/queries/query-keys";
-import { toastActionResult } from "@/shared/lib/action-toast";
+import { toastActionError, toastActionResult } from "@/shared/lib/action-toast";
 
 export function useSaveWeightBalance({
   onSaved,
@@ -13,6 +13,7 @@ export function useSaveWeightBalance({
   const queryClient = useQueryClient();
 
   return useAction(saveWeightBalanceAction, {
+    onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);
 

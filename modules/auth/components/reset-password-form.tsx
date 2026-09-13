@@ -11,7 +11,7 @@ import { PasswordInput } from "@/modules/auth/components/password-input";
 import { resetPasswordSchema } from "@/modules/auth/schemas/password-reset-schema";
 import type { ResetPasswordInput } from "@/modules/auth/types/auth";
 import { Button } from "@/shared/components/ui/button";
-import { toastActionResult } from "@/shared/lib/action-toast";
+import { toastActionError, toastActionResult } from "@/shared/lib/action-toast";
 
 export function ResetPasswordForm() {
   const router = useRouter();
@@ -21,6 +21,7 @@ export function ResetPasswordForm() {
     defaultValues: { password: "", confirmPassword: "" },
   });
   const { execute, isExecuting } = useAction(resetPasswordAction, {
+    onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);
 
@@ -39,8 +40,8 @@ export function ResetPasswordForm() {
       <div>
         <h2 className="text-2xl font-semibold tracking-tight">New Password</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          Choose a password of at least 8 characters. You will be signed in
-          once it is saved.
+          Choose a password of at least 8 characters. You will be signed in once
+          it is saved.
         </p>
       </div>
       <div className="space-y-2">

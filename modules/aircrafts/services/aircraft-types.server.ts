@@ -9,6 +9,7 @@ import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-
 import { hasPermission } from "@/shared/lib/rbac/config";
 import { isApproved } from "@/shared/lib/rbac/guards";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
+import { describeActionError } from "@/shared/lib/action-error";
 
 const AIRCRAFT_TYPES_SELECT =
   "type_key, type, icao_designator, created_at, usable_fuel_arm, fi_and_student_arm, maximum_takeoff_weight, baggage_area_max_weight, aircraft_type_baggage_areas(id, position, arm)";
@@ -31,14 +32,15 @@ export async function getAircraftTypes(): Promise<AircraftType[]> {
     .order("type", { ascending: true });
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(describeActionError(error));
   }
 
   return (data ?? []).map((row) => ({
     typeKey: row.type_key,
     type: row.type,
     icaoDesignator: row.icao_designator,
-    usableFuelArm: row.usable_fuel_arm === null ? null : Number(row.usable_fuel_arm),
+    usableFuelArm:
+      row.usable_fuel_arm === null ? null : Number(row.usable_fuel_arm),
     fiAndStudentArm:
       row.fi_and_student_arm === null ? null : Number(row.fi_and_student_arm),
     maximumTakeoffWeight:
@@ -78,7 +80,7 @@ export async function getAircraftTypeBaggageAreas(
     .order("position", { ascending: true });
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(describeActionError(error));
   }
 
   return (data ?? []).map((row) => ({

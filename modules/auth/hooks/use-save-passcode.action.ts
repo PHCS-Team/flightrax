@@ -5,12 +5,13 @@ import { useQueryClient } from "@tanstack/react-query";
 
 import { savePasscodeAction } from "@/modules/auth/actions/save-passcode";
 import { AUTH_QUERY_KEYS } from "@/modules/auth/queries/dashboard-profile";
-import { toastActionResult } from "@/shared/lib/action-toast";
+import { toastActionError, toastActionResult } from "@/shared/lib/action-toast";
 
 export function useSavePasscode() {
   const queryClient = useQueryClient();
 
   return useAction(savePasscodeAction, {
+    onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       queryClient.invalidateQueries({
         queryKey: AUTH_QUERY_KEYS.currentDashboardProfile,

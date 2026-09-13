@@ -5,6 +5,7 @@ import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-
 import { isApproved } from "@/shared/lib/rbac/guards";
 import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export const cancelFlightRequestAction = actionClient
   .inputSchema(cancelFlightRequestSchema)
@@ -27,7 +28,7 @@ export const cancelFlightRequestAction = actionClient
       .maybeSingle();
 
     if (planError) {
-      return { ok: false, message: planError.message };
+      return { ok: false, message: describeActionError(planError) };
     }
 
     if (!flightPlan || flightPlan.created_by !== actor.id) {
@@ -49,7 +50,7 @@ export const cancelFlightRequestAction = actionClient
       .eq("id", request.id);
 
     if (updateError) {
-      return { ok: false, message: updateError.message };
+      return { ok: false, message: describeActionError(updateError) };
     }
 
     return {

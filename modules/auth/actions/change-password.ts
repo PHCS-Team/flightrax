@@ -3,6 +3,7 @@
 import { actionClient } from "@/shared/lib/safe-action";
 import { createClient } from "@/shared/lib/supabase/server";
 import { changePasswordSchema } from "@/modules/auth/schemas/change-password-schema";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export const changePasswordAction = actionClient
   .inputSchema(changePasswordSchema)
@@ -36,7 +37,7 @@ export const changePasswordAction = actionClient
     });
 
     if (error) {
-      return { ok: false, message: error.message };
+      return { ok: false, message: describeActionError(error) };
     }
 
     return { ok: true, message: "Password changed." };

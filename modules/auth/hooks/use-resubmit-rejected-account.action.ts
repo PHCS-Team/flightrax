@@ -3,7 +3,7 @@
 import { useAction } from "next-safe-action/hooks";
 
 import { resubmitRejectedAccountAction } from "@/modules/auth/actions/resubmit-rejected-account";
-import { toastActionResult } from "@/shared/lib/action-toast";
+import { toastActionError, toastActionResult } from "@/shared/lib/action-toast";
 
 export function useResubmitRejectedAccount({
   onResubmitted,
@@ -11,6 +11,7 @@ export function useResubmitRejectedAccount({
   onResubmitted?: () => void;
 } = {}) {
   return useAction(resubmitRejectedAccountAction, {
+    onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);
 

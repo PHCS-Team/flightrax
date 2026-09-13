@@ -13,7 +13,7 @@ import { requestPasswordResetSchema } from "@/modules/auth/schemas/password-rese
 import type { RequestPasswordResetInput } from "@/modules/auth/types/auth";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
-import { toastActionResult } from "@/shared/lib/action-toast";
+import { toastActionError, toastActionResult } from "@/shared/lib/action-toast";
 
 const LINK_ERROR_COPY: Record<LinkError, string> = {
   "invalid-link": "That reset link is not valid. Request a new one below.",
@@ -31,6 +31,7 @@ export function ForgotPasswordForm({
     defaultValues: { email: "" },
   });
   const { execute, isExecuting } = useAction(requestPasswordResetAction, {
+    onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       if (data?.ok) {
         setSentMessage(data.message);
@@ -50,7 +51,9 @@ export function ForgotPasswordForm({
             <MailCheckIcon className="size-5" />
           </span>
           <div>
-            <h2 className="text-2xl font-semibold tracking-tight">Check Your Email</h2>
+            <h2 className="text-2xl font-semibold tracking-tight">
+              Check Your Email
+            </h2>
             <p className="mt-2 text-sm text-muted-foreground">{sentMessage}</p>
           </div>
         </div>
@@ -71,7 +74,9 @@ export function ForgotPasswordForm({
       onSubmit={form.handleSubmit((values) => execute(values))}
     >
       <div>
-        <h2 className="text-2xl font-semibold tracking-tight">Forgot Password</h2>
+        <h2 className="text-2xl font-semibold tracking-tight">
+          Forgot Password
+        </h2>
         <p className="mt-2 text-sm text-muted-foreground">
           Enter the email on your account and we will send a link to choose a
           new password.

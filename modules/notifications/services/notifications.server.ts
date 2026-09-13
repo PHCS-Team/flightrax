@@ -6,6 +6,7 @@ import type {
 } from "@/modules/notifications/types/notification";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 import type { PaginatedResponse } from "@/shared/types/pagination";
+import { describeActionError } from "@/shared/lib/action-error";
 
 const LIST_COLUMNS =
   "id, type, title, body, href, entity_type, entity_id, read_at, created_at";
@@ -46,7 +47,7 @@ export async function getNotificationsPage(
     .range(from, to);
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(describeActionError(error));
   }
 
   const total = totalCount ?? 0;
@@ -72,7 +73,7 @@ export async function getUnreadNotificationCount(
     .is("read_at", null);
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(describeActionError(error));
   }
 
   return count ?? 0;

@@ -4,6 +4,7 @@ import { SCHEDULE_MANAGE } from "@/modules/schedule/constants/permissions";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { hasPermission } from "@/shared/lib/rbac/config";
 import { isApproved } from "@/shared/lib/rbac/guards";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export async function getScheduleManager() {
   const actor = await getCurrentAuthorizationProfile();
@@ -31,5 +32,5 @@ export function describeScheduleWriteError(error: {
     return "Check the times and people on this entry.";
   }
 
-  return error.message;
+  return describeActionError(error);
 }

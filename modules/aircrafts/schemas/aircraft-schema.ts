@@ -17,7 +17,11 @@ const optionalAircraftPhotoSchema = z
       return;
     }
 
-    if (!AIRCRAFT_PHOTO_TYPES.includes(file.type as (typeof AIRCRAFT_PHOTO_TYPES)[number])) {
+    if (
+      !AIRCRAFT_PHOTO_TYPES.includes(
+        file.type as (typeof AIRCRAFT_PHOTO_TYPES)[number],
+      )
+    ) {
       context.addIssue({
         code: "custom",
         path: ["photo"],
@@ -48,7 +52,7 @@ export const aircraftFormSchema = z.object({
   photo: optionalAircraftPhotoSchema,
   remarks: z.string().trim().optional(),
   serialNumber: z.string().trim().min(1, "Enter aircraft serial number."),
-  status: z.enum(AIRCRAFT_STATUS_VALUES),
+  status: z.enum(AIRCRAFT_STATUS_VALUES, { message: "Choose a status." }),
 });
 
 export const createAircraftSchema = aircraftFormSchema;
@@ -59,7 +63,7 @@ export const updateAircraftSchema = aircraftFormSchema.extend({
 
 export const updateAircraftStatusSchema = z.object({
   aircraftId: z.string().uuid(),
-  status: z.enum(AIRCRAFT_STATUS_VALUES),
+  status: z.enum(AIRCRAFT_STATUS_VALUES, { message: "Choose a status." }),
 });
 
 export const deleteAircraftSchema = z.object({

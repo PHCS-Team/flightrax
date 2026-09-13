@@ -5,6 +5,7 @@ import { cache } from "react";
 import type { License, LicenseImageUrls } from "@/shared/types/license";
 import { LICENSE_IMAGES_BUCKET } from "@/shared/lib/storage/buckets";
 import { createClient } from "@/shared/lib/supabase/server";
+import { describeActionError } from "@/shared/lib/action-error";
 
 const LICENSE_IMAGE_URL_EXPIRY_SECONDS = 60 * 60;
 
@@ -30,7 +31,7 @@ export const getOwnLicenses = cache(async function getOwnLicenses(): Promise<
     .order("created_at", { ascending: false });
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(describeActionError(error));
   }
 
   return data ?? [];

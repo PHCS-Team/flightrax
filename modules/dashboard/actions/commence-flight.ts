@@ -7,6 +7,7 @@ import { ROLE } from "@/shared/lib/rbac/config";
 import { isApproved } from "@/shared/lib/rbac/guards";
 import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export const commenceFlightAction = actionClient
   .inputSchema(commenceFlightSchema)
@@ -31,7 +32,7 @@ export const commenceFlightAction = actionClient
       .maybeSingle();
 
     if (journeyError) {
-      return { ok: false, message: journeyError.message };
+      return { ok: false, message: describeActionError(journeyError) };
     }
 
     if (!journey) {
@@ -66,7 +67,7 @@ export const commenceFlightAction = actionClient
       .neq("id", journey.id);
 
     if (activeError) {
-      return { ok: false, message: activeError.message };
+      return { ok: false, message: describeActionError(activeError) };
     }
 
     const aircraftActive = (activeJourneys ?? []).find(
@@ -123,7 +124,7 @@ export const commenceFlightAction = actionClient
         .maybeSingle();
 
       if (earlierError) {
-        return { ok: false, message: earlierError.message };
+        return { ok: false, message: describeActionError(earlierError) };
       }
 
       if (earlier) {
@@ -174,7 +175,7 @@ export const commenceFlightAction = actionClient
         };
       }
 
-      return { ok: false, message: updateError.message };
+      return { ok: false, message: describeActionError(updateError) };
     }
 
     if (!updated) {

@@ -6,6 +6,7 @@ import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-
 import { isApproved } from "@/shared/lib/rbac/guards";
 import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export const deleteFlightPlanAction = actionClient
   .inputSchema(deleteFlightPlanSchema)
@@ -28,7 +29,7 @@ export const deleteFlightPlanAction = actionClient
       .maybeSingle();
 
     if (planFetchError) {
-      return { ok: false, message: planFetchError.message };
+      return { ok: false, message: describeActionError(planFetchError) };
     }
 
     if (!flightPlan || flightPlan.created_by !== actor.id) {
@@ -57,7 +58,7 @@ export const deleteFlightPlanAction = actionClient
       .eq("id", request.id);
 
     if (requestDeleteError) {
-      return { ok: false, message: requestDeleteError.message };
+      return { ok: false, message: describeActionError(requestDeleteError) };
     }
 
     if (request.weight_balance_id) {
@@ -67,7 +68,7 @@ export const deleteFlightPlanAction = actionClient
         .eq("id", request.weight_balance_id);
 
       if (wbDeleteError) {
-        return { ok: false, message: wbDeleteError.message };
+        return { ok: false, message: describeActionError(wbDeleteError) };
       }
     }
 
@@ -77,7 +78,7 @@ export const deleteFlightPlanAction = actionClient
       .eq("id", parsedInput.flightPlanId);
 
     if (planDeleteError) {
-      return { ok: false, message: planDeleteError.message };
+      return { ok: false, message: describeActionError(planDeleteError) };
     }
 
     return { ok: true, message: "Flight plan deleted." };

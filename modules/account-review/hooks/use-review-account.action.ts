@@ -3,7 +3,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useAction } from "next-safe-action/hooks";
 
-import { toastActionResult } from "@/shared/lib/action-toast";
+import { toastActionError, toastActionResult } from "@/shared/lib/action-toast";
 import { ACCOUNT_REVIEW_QUERY_KEYS } from "@/modules/account-review/queries/query-keys";
 import { APPROVAL_STATUS, ROLE } from "@/shared/lib/rbac/config";
 import type { AccountRequestRole } from "@/shared/lib/rbac/config";
@@ -24,6 +24,7 @@ export function useReviewAccount({
 }) {
   const queryClient = useQueryClient();
   const approve = useAction(approveAccountRequestAction, {
+    onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);
 
@@ -47,6 +48,7 @@ export function useReviewAccount({
     },
   });
   const reject = useAction(rejectAccountRequestAction, {
+    onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);
 

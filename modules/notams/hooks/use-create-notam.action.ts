@@ -5,12 +5,13 @@ import { useAction } from "next-safe-action/hooks";
 
 import { createNotamAction } from "@/modules/notams/actions/create-notam";
 import { NOTAMS_QUERY_KEYS } from "@/modules/notams/queries/query-keys";
-import { toastActionResult } from "@/shared/lib/action-toast";
+import { toastActionError, toastActionResult } from "@/shared/lib/action-toast";
 
 export function useCreateNotam({ onSaved }: { onSaved?: () => void } = {}) {
   const queryClient = useQueryClient();
 
   return useAction(createNotamAction, {
+    onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);
 

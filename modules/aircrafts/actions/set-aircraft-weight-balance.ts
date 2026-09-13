@@ -5,6 +5,7 @@ import { canManageAircrafts } from "@/modules/aircrafts/utils/aircraft-permissio
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export const setAircraftWeightBalanceAction = actionClient
   .inputSchema(setAircraftWeightBalanceSchema)
@@ -28,7 +29,7 @@ export const setAircraftWeightBalanceAction = actionClient
       .maybeSingle();
 
     if (aircraftError) {
-      return { ok: false, message: aircraftError.message };
+      return { ok: false, message: describeActionError(aircraftError) };
     }
 
     if (!aircraft) {
@@ -48,7 +49,7 @@ export const setAircraftWeightBalanceAction = actionClient
       .maybeSingle();
 
     if (fetchError) {
-      return { ok: false, message: fetchError.message };
+      return { ok: false, message: describeActionError(fetchError) };
     }
 
     let error;
@@ -69,7 +70,7 @@ export const setAircraftWeightBalanceAction = actionClient
     }
 
     if (error) {
-      return { ok: false, message: error.message };
+      return { ok: false, message: describeActionError(error) };
     }
 
     return { ok: true, message: "Weight and balance configurations saved." };

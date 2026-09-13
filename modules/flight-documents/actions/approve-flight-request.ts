@@ -16,6 +16,7 @@ import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-
 import { isApproved } from "@/shared/lib/rbac/guards";
 import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export const approveFlightRequestAction = actionClient
   .inputSchema(approveFlightRequestSchema)
@@ -40,7 +41,7 @@ export const approveFlightRequestAction = actionClient
       .maybeSingle();
 
     if (planError) {
-      return { ok: false, message: planError.message };
+      return { ok: false, message: describeActionError(planError) };
     }
 
     const request = flightPlan?.flight_requests;
@@ -91,7 +92,7 @@ export const approveFlightRequestAction = actionClient
       .eq("user_id", actor.id);
 
     if (licensesError) {
-      return { ok: false, message: licensesError.message };
+      return { ok: false, message: describeActionError(licensesError) };
     }
 
     if (!(licenses ?? []).some((license) => isLicenseValid(license))) {
@@ -139,7 +140,7 @@ export const approveFlightRequestAction = actionClient
       .eq("id", flightPlan.id);
 
     if (planUpdateError) {
-      return { ok: false, message: planUpdateError.message };
+      return { ok: false, message: describeActionError(planUpdateError) };
     }
 
     if (request.weight_balance_id) {
@@ -153,7 +154,7 @@ export const approveFlightRequestAction = actionClient
         .eq("id", request.weight_balance_id);
 
       if (wbUpdateError) {
-        return { ok: false, message: wbUpdateError.message };
+        return { ok: false, message: describeActionError(wbUpdateError) };
       }
     }
 
@@ -204,7 +205,7 @@ export const approveFlightRequestAction = actionClient
         };
       }
 
-      return { ok: false, message: journeyError.message };
+      return { ok: false, message: describeActionError(journeyError) };
     }
 
     const { error: updateError } = await supabase
@@ -219,7 +220,7 @@ export const approveFlightRequestAction = actionClient
       .eq("id", request.id);
 
     if (updateError) {
-      return { ok: false, message: updateError.message };
+      return { ok: false, message: describeActionError(updateError) };
     }
 
     return { ok: true, message: "Flight request approved." };

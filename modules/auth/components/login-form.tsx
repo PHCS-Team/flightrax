@@ -9,7 +9,7 @@ import { useForm } from "react-hook-form";
 
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
-import { toastActionResult } from "@/shared/lib/action-toast";
+import { toastActionError, toastActionResult } from "@/shared/lib/action-toast";
 import type { ProfileRole } from "@/shared/lib/rbac/types";
 import { loginAction } from "@/modules/auth/actions/login";
 import { PasswordInput } from "@/modules/auth/components/password-input";
@@ -29,6 +29,7 @@ export function LoginForm({ role }: { role: ProfileRole }) {
     defaultValues: { email: "", password: "", role },
   });
   const { execute, isExecuting } = useAction(loginAction, {
+    onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);
 

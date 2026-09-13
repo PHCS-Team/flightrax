@@ -5,6 +5,7 @@ import { canManageAircrafts } from "@/modules/aircrafts/utils/aircraft-permissio
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export const setAircraftTypeWbSpecsAction = actionClient
   .inputSchema(setAircraftTypeWbSpecsSchema)
@@ -34,7 +35,7 @@ export const setAircraftTypeWbSpecsAction = actionClient
       .maybeSingle();
 
     if (updateError) {
-      return { ok: false, message: updateError.message };
+      return { ok: false, message: describeActionError(updateError) };
     }
 
     if (!aircraftType) {
@@ -47,7 +48,7 @@ export const setAircraftTypeWbSpecsAction = actionClient
       .eq("aircraft_type_key", parsedInput.typeKey);
 
     if (deleteError) {
-      return { ok: false, message: deleteError.message };
+      return { ok: false, message: describeActionError(deleteError) };
     }
 
     if (parsedInput.baggageAreas.length > 0) {
@@ -62,7 +63,7 @@ export const setAircraftTypeWbSpecsAction = actionClient
         );
 
       if (insertError) {
-        return { ok: false, message: insertError.message };
+        return { ok: false, message: describeActionError(insertError) };
       }
     }
 

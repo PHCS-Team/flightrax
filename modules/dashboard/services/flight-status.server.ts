@@ -8,6 +8,7 @@ import { isApproved } from "@/shared/lib/rbac/guards";
 import { AIRCRAFT_PHOTOS_BUCKET } from "@/shared/lib/storage/buckets";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 import type { PaginatedResponse } from "@/shared/types/pagination";
+import { describeActionError } from "@/shared/lib/action-error";
 
 const STATUS_GROUPS = ["active", "arrived", "on_ground"] as const;
 
@@ -32,7 +33,7 @@ export async function getDashboardFlightStatusPage(
   });
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(describeActionError(error));
   }
 
   const rows = data ?? [];

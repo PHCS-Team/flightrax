@@ -16,6 +16,7 @@ import {
 } from "@/modules/flight-documents/services/flight-plan-filer.server";
 import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export const updateFlightPlanAction = actionClient
   .inputSchema(updateFlightPlanSchema)
@@ -38,7 +39,7 @@ export const updateFlightPlanAction = actionClient
       .maybeSingle();
 
     if (planFetchError) {
-      return { ok: false, message: planFetchError.message };
+      return { ok: false, message: describeActionError(planFetchError) };
     }
 
     if (!flightPlan || flightPlan.created_by !== actor.id) {
@@ -170,7 +171,7 @@ export const updateFlightPlanAction = actionClient
       .eq("id", parsedInput.flightPlanId);
 
     if (updateError) {
-      return { ok: false, message: updateError.message };
+      return { ok: false, message: describeActionError(updateError) };
     }
 
     const { error: requestUpdateError } = await supabase
@@ -179,7 +180,7 @@ export const updateFlightPlanAction = actionClient
       .eq("flight_plan_id", parsedInput.flightPlanId);
 
     if (requestUpdateError) {
-      return { ok: false, message: requestUpdateError.message };
+      return { ok: false, message: describeActionError(requestUpdateError) };
     }
 
     return { ok: true, message: "Flight plan updated." };

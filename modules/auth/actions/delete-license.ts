@@ -5,6 +5,7 @@ import { removeLicenseImages } from "@/modules/auth/utils/license";
 import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 import { createClient } from "@/shared/lib/supabase/server";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export const deleteLicenseAction = actionClient
   .inputSchema(deleteLicenseSchema)
@@ -28,7 +29,7 @@ export const deleteLicenseAction = actionClient
       .maybeSingle();
 
     if (fetchError) {
-      return { ok: false, message: fetchError.message };
+      return { ok: false, message: describeActionError(fetchError) };
     }
 
     if (!existing) {
@@ -42,7 +43,7 @@ export const deleteLicenseAction = actionClient
       .eq("user_id", user.id);
 
     if (deleteError) {
-      return { ok: false, message: deleteError.message };
+      return { ok: false, message: describeActionError(deleteError) };
     }
 
     await removeLicenseImages(supabase, [

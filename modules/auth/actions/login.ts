@@ -6,6 +6,7 @@ import { APPROVAL_STATUS } from "@/shared/lib/rbac/config";
 import { getDefaultRedirectForProfile } from "@/shared/lib/rbac/routes";
 import { loginSchema } from "@/modules/auth/schemas/login-schema";
 import { getProfileAccessByUserId } from "@/modules/auth/queries/profile";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export const loginAction = actionClient
   .inputSchema(loginSchema)
@@ -17,7 +18,7 @@ export const loginAction = actionClient
     });
 
     if (error) {
-      return { ok: false, message: error.message };
+      return { ok: false, message: describeActionError(error) };
     }
 
     if (!data.user) {

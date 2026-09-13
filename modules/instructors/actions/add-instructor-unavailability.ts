@@ -7,6 +7,7 @@ import { hasPermission } from "@/shared/lib/rbac/config";
 import { isApproved } from "@/shared/lib/rbac/guards";
 import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
+import { describeActionError } from "@/shared/lib/action-error";
 
 const EXCLUSION_VIOLATION = "23P01";
 
@@ -81,7 +82,7 @@ export const addInstructorUnavailabilityAction = actionClient
         };
       }
 
-      return { ok: false, message: error.message };
+      return { ok: false, message: describeActionError(error) };
     }
 
     return { ok: true, message: "Unavailability period added." };

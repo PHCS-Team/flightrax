@@ -7,6 +7,7 @@ import { ROLE } from "@/shared/lib/rbac/config";
 import { isApproved } from "@/shared/lib/rbac/guards";
 import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export const cancelFlightAction = actionClient
   .inputSchema(cancelFlightSchema)
@@ -29,7 +30,7 @@ export const cancelFlightAction = actionClient
       .maybeSingle();
 
     if (journeyError) {
-      return { ok: false, message: journeyError.message };
+      return { ok: false, message: describeActionError(journeyError) };
     }
 
     if (!journey) {
@@ -81,7 +82,7 @@ export const cancelFlightAction = actionClient
       .maybeSingle();
 
     if (updateError) {
-      return { ok: false, message: updateError.message };
+      return { ok: false, message: describeActionError(updateError) };
     }
 
     if (!updated) {

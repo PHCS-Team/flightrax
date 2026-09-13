@@ -11,6 +11,7 @@ import { getProfileAccessByUserId } from "@/modules/auth/queries/profile";
 import { rejectedAccountResubmissionSchema } from "@/modules/auth/schemas/rejected-account-resubmission-schema";
 import { submitAccountRequest } from "@/modules/auth/services/account-request.server";
 import { ACCOUNT_DOCUMENT_BUCKET } from "@/shared/lib/storage/buckets";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export const resubmitRejectedAccountAction = actionClient
   .inputSchema(rejectedAccountResubmissionSchema)
@@ -22,7 +23,7 @@ export const resubmitRejectedAccountAction = actionClient
     } = await supabase.auth.getUser();
 
     if (userError) {
-      return { ok: false, message: userError.message };
+      return { ok: false, message: describeActionError(userError) };
     }
 
     if (!user) {
@@ -35,7 +36,10 @@ export const resubmitRejectedAccountAction = actionClient
     const profile = await getProfileAccessByUserId(user.id);
 
     if (!profile) {
-      return { ok: false, message: "No FlightraX profile exists for this account." };
+      return {
+        ok: false,
+        message: "No FlightraX profile exists for this account.",
+      };
     }
 
     if (
@@ -61,7 +65,7 @@ export const resubmitRejectedAccountAction = actionClient
           .maybeSingle();
 
       if (currentRequestError) {
-        return { ok: false, message: currentRequestError.message };
+        return { ok: false, message: describeActionError(currentRequestError) };
       }
 
       oldDocumentPath = currentRequest?.id_document_path ?? null;
@@ -77,7 +81,7 @@ export const resubmitRejectedAccountAction = actionClient
       .eq("id", user.id);
 
     if (profileError) {
-      return { ok: false, message: profileError.message };
+      return { ok: false, message: describeActionError(profileError) };
     }
 
     const requestError = await submitAccountRequest({

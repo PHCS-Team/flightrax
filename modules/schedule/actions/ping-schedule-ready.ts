@@ -4,6 +4,7 @@ import { pingScheduleReadySchema } from "@/modules/schedule/schemas/schedule-sch
 import { getScheduleManager } from "@/modules/schedule/services/schedule-manager.server";
 import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
+import { describeActionError } from "@/shared/lib/action-error";
 
 export const pingScheduleReadyAction = actionClient
   .inputSchema(pingScheduleReadySchema)
@@ -24,7 +25,7 @@ export const pingScheduleReadyAction = actionClient
     });
 
     if (error) {
-      return { ok: false, message: error.message };
+      return { ok: false, message: describeActionError(error) };
     }
 
     return {

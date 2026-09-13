@@ -5,12 +5,15 @@ import { useAction } from "next-safe-action/hooks";
 
 import { deleteAircraftAction } from "@/modules/aircrafts/actions/delete-aircraft";
 import { AIRCRAFTS_QUERY_KEYS } from "@/modules/aircrafts/queries/query-keys";
-import { toastActionResult } from "@/shared/lib/action-toast";
+import { toastActionError, toastActionResult } from "@/shared/lib/action-toast";
 
-export function useDeleteAircraft({ onDeleted }: { onDeleted?: () => void } = {}) {
+export function useDeleteAircraft({
+  onDeleted,
+}: { onDeleted?: () => void } = {}) {
   const queryClient = useQueryClient();
 
   return useAction(deleteAircraftAction, {
+    onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);
 

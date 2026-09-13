@@ -19,7 +19,7 @@ import {
   AUTH_MODE_CONFIG,
 } from "@/modules/auth/utils/auth-role-config";
 import { Button } from "@/shared/components/ui/button";
-import { toastActionResult } from "@/shared/lib/action-toast";
+import { toastActionError, toastActionResult } from "@/shared/lib/action-toast";
 import { ROLE } from "@/shared/lib/rbac/config";
 
 export function SuperadminRegisterForm() {
@@ -35,6 +35,7 @@ export function SuperadminRegisterForm() {
     },
   });
   const { execute, isExecuting } = useAction(registerSuperadminAction, {
+    onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);
 
@@ -96,7 +97,7 @@ export function SuperadminRegisterForm() {
         {isExecuting ? "Creating account..." : "Create superadmin account"}
       </Button>
       <p className="text-center text-sm text-primary-foreground/70">
-        {modeConfig.switchPrompt} {" "}
+        {modeConfig.switchPrompt}{" "}
         <Link
           className="font-semibold text-primary-foreground underline-offset-4 transition hover:text-primary-foreground/80 hover:underline"
           href={`/${modeConfig.switchMode}/${ROLE.SUPERADMIN}`}
