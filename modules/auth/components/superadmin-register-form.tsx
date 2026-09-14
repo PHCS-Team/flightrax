@@ -47,7 +47,7 @@ export function SuperadminRegisterForm() {
   const errors = form.formState.errors;
 
   return (
-    <form
+    <form noValidate
       className="space-y-5"
       onSubmit={form.handleSubmit((values) => execute(values))}
     >

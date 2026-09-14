@@ -41,7 +41,7 @@ export function LoginForm({ role }: { role: ProfileRole }) {
   });
 
   return (
-    <form
+    <form noValidate
       className="space-y-5"
       onSubmit={form.handleSubmit((values) => execute(values))}
     >

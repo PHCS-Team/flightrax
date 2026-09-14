@@ -48,8 +48,10 @@ export function getDefaultRedirectForProfile(profile: RouteAccessProfile) {
 }
 
 export function getRequiredPermission(pathname: string) {
-  return PROTECTED_ROUTES.find((route) => pathname.startsWith(route.prefix))
-    ?.permission;
+  return PROTECTED_ROUTES.find(
+    (route) =>
+      pathname === route.prefix || pathname.startsWith(`${route.prefix}/`),
+  )?.permission;
 }
 
 export function canAccessPath(profile: RouteAccessProfile, pathname: string) {

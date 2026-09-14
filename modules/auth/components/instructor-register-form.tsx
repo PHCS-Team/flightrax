@@ -54,7 +54,7 @@ export function InstructorRegisterForm() {
   });
 
   return (
-    <form
+    <form noValidate
       className="space-y-5"
       onSubmit={form.handleSubmit((values) => execute(values))}
     >
