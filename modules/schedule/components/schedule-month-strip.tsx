@@ -32,7 +32,7 @@ export function ScheduleMonthStrip({
         >
           <ChevronLeftIcon className="size-4" />
         </button>
-        <p className="min-w-36 text-center text-sm font-semibold text-primary-foreground">
+        <p className="min-w-32 text-center text-sm font-semibold text-primary-foreground">
           {formatMonthLabel(month)}
         </p>
         <button
