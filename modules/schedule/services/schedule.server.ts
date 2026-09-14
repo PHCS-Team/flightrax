@@ -25,7 +25,7 @@ const AIRCRAFT_SELECT =
 const ENTRY_SELECT =
   "id, aircraft_id, starts_at, ends_at, session_type, label, pilot:profiles!schedule_entries_pilot_profile_id_fkey(id, full_name), instructor:profiles!schedule_entries_instructor_profile_id_fkey(id, full_name)";
 
-async function requireViewer() {
+export async function requireScheduleViewer() {
   const viewer = await getCurrentAuthorizationProfile();
 
   if (
@@ -43,7 +43,7 @@ async function requireViewer() {
 // type, and every entry that touches that day (including ones that started
 // the day before or run past midnight).
 export async function getScheduleDay(date: string): Promise<ScheduleDay> {
-  await requireViewer();
+  await requireScheduleViewer();
 
   const supabase = createAdminClient();
   const [aircraftResult, entriesResult, pingResult] = await Promise.all([
@@ -120,7 +120,7 @@ export async function getScheduleDay(date: string): Promise<ScheduleDay> {
 // Anyone who can be written on the board: approved students and
 // instructors. Board position, not role, decides which line they go on.
 export async function getSchedulePeople(): Promise<SchedulePersonOption[]> {
-  await requireViewer();
+  await requireScheduleViewer();
 
   const supabase = createAdminClient();
   const { data, error } = await supabase

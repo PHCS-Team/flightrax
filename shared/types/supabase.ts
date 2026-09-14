@@ -1172,6 +1172,97 @@ export type Database = {
           },
         ]
       }
+      schedule_upload_sheets: {
+        Row: {
+          board_date: string | null
+          created_at: string
+          grid: Json
+          id: string
+          name: string
+          position: number
+          upload_id: string
+        }
+        Insert: {
+          board_date?: string | null
+          created_at?: string
+          grid: Json
+          id?: string
+          name: string
+          position: number
+          upload_id: string
+        }
+        Update: {
+          board_date?: string | null
+          created_at?: string
+          grid?: Json
+          id?: string
+          name?: string
+          position?: number
+          upload_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "schedule_upload_sheets_upload_id_fkey"
+            columns: ["upload_id"]
+            isOneToOne: false
+            referencedRelation: "schedule_uploads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      schedule_uploads: {
+        Row: {
+          content_type: string
+          created_at: string
+          ends_on: string
+          file_name: string
+          id: string
+          label: string | null
+          sheet_count: number
+          size_bytes: number
+          starts_on: string
+          storage_path: string
+          updated_at: string
+          uploaded_by: string
+        }
+        Insert: {
+          content_type: string
+          created_at?: string
+          ends_on: string
+          file_name: string
+          id?: string
+          label?: string | null
+          sheet_count?: number
+          size_bytes: number
+          starts_on: string
+          storage_path: string
+          updated_at?: string
+          uploaded_by: string
+        }
+        Update: {
+          content_type?: string
+          created_at?: string
+          ends_on?: string
+          file_name?: string
+          id?: string
+          label?: string | null
+          sheet_count?: number
+          size_bytes?: number
+          starts_on?: string
+          storage_path?: string
+          updated_at?: string
+          uploaded_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "schedule_uploads_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       student_profiles: {
         Row: {
           created_at: string
@@ -1501,6 +1592,10 @@ export type Database = {
       notification_person_name: {
         Args: { p_profile_id: string }
         Returns: string
+      }
+      notify_schedule_file_uploaded: {
+        Args: { p_upload_id: string }
+        Returns: number
       }
       notify_schedule_ready: {
         Args: { p_actor_id: string; p_date: string }

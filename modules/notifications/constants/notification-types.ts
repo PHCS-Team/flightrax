@@ -35,6 +35,7 @@ export const NOTIFICATION_TYPES = [
   "aircraft_status_changed",
   "instructor_unavailable",
   "schedule_ready",
+  "schedule_file_uploaded",
 ] as const;
 
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number];

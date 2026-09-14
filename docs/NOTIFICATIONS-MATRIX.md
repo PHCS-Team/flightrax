@@ -214,6 +214,7 @@ students have flights with that instructor was rejected as over-complication.
 | Event | Source | Audience | Message |
 | --- | --- | --- | --- |
 | `schedule_ready` | `pingScheduleReadyAction` (admin presses **Ping everyone**) | `EVERYONE` | "Flight schedule for \<Dy, Mon D\> is ready" / "\<Name\> posted the board. Open it and file your flight request." → `/schedule?date=YYYY-MM-DD` |
+| `schedule_file_uploaded` | `uploadScheduleFileAction` (admin uploads an Excel workbook on the **Files** tab) | `EVERYONE` | "Flight schedule for \<Mon D-D\> is up" / "\<Name\> uploaded \<label or file name\>. Open it to see your schedule and file your flight request." → `/schedule/uploads/<id>` |
 
 Schedule entries are **never** announced individually. The admin is usually still editing
 when an entry lands, and a stream of "entry added" would be noise (Rule D's spirit). The
@@ -228,6 +229,12 @@ the sender.
 
 `createScheduleEntryAction`, `updateScheduleEntryAction` and `deleteScheduleEntryAction`
 produce no notification.
+
+An uploaded workbook is different: the school finished it in Excel before it reached the
+app, so there is nothing to wait for and no ping button. `notify_schedule_file_uploaded()`
+runs at the end of `uploadScheduleFileAction`, after the row and its parsed sheets are all
+in, so a failed upload never announces itself. The link opens the workbook viewer, not the
+calendar. `deleteScheduleUploadAction` produces no notification.
 
 ---
 
@@ -344,6 +351,7 @@ behaviour — but none of it has been run on a device.
 | 2 | Read path, bell badge, panel, `/notifications` page, mark-read | **Delivered** — `modules/notifications/` |
 | 3 | Triggers emitting the 16 events | **Delivered** — `20260910000000_*` … `20260910030000_*` |
 | 4 | `schedule_ready` — 17th type, `schedule_pings`, `notify_schedule_ready()` called by `pingScheduleReadyAction` | **Delivered** — `20260913030000_*` |
+| 5 | `schedule_file_uploaded` — 18th type, `notify_schedule_file_uploaded()` called by `uploadScheduleFileAction` | **Delivered** — `20260914020000_*` |
 
 **Actor propagation.** Triggers cannot use `auth.uid()`: every write in this app goes
 through the service-role admin client, so it is null. The actor is instead read from the

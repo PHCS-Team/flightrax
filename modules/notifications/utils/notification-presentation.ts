@@ -6,6 +6,7 @@ import {
   CircleCheckIcon,
   ClipboardCheckIcon,
   Clock3Icon,
+  FileSpreadsheetIcon,
   MegaphoneIcon,
   OctagonXIcon,
   PlaneLandingIcon,
@@ -49,6 +50,7 @@ const PRESENTATION: Record<NotificationType, Presentation> = {
   aircraft_status_changed: { icon: WrenchIcon, tone: "default" },
   instructor_unavailable: { icon: CalendarOffIcon, tone: "default" },
   schedule_ready: { icon: CalendarCheckIcon, tone: "success" },
+  schedule_file_uploaded: { icon: FileSpreadsheetIcon, tone: "success" },
 };
 
 const FALLBACK: Presentation = { icon: BellIcon, tone: "default" };
