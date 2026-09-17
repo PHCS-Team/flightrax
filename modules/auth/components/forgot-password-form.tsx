@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { MailCheckIcon, TriangleAlertIcon } from "lucide-react";
-import { useAction } from "next-safe-action/hooks";
+import { useOneShotAction } from "@/shared/hooks/use-guarded-action";
 import { useForm } from "react-hook-form";
 
 import { requestPasswordResetAction } from "@/modules/auth/actions/request-password-reset";
@@ -30,7 +30,7 @@ export function ForgotPasswordForm({
     resolver: zodResolver(requestPasswordResetSchema),
     defaultValues: { email: "" },
   });
-  const { execute, isExecuting } = useAction(requestPasswordResetAction, {
+  const { execute, isExecuting } = useOneShotAction(requestPasswordResetAction, {
     onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       if (data?.ok) {

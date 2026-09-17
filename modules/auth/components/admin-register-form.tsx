@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useAction } from "next-safe-action/hooks";
+import { useOneShotAction } from "@/shared/hooks/use-guarded-action";
 import { useForm, useWatch } from "react-hook-form";
 
 import { registerAdminAction } from "@/modules/auth/actions/register-admin";
@@ -43,7 +43,7 @@ export function AdminRegisterForm() {
       adminDepartment: undefined,
     },
   });
-  const { execute, isExecuting } = useAction(registerAdminAction, {
+  const { execute, isExecuting } = useOneShotAction(registerAdminAction, {
     onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);

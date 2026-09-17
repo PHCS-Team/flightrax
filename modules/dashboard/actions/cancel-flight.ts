@@ -25,7 +25,7 @@ export const cancelFlightAction = actionClient
 
     const { data: journey, error: journeyError } = await supabase
       .from("flight_journeys")
-      .select("id, status, flight_requests!inner(requested_by)")
+      .select("id, status, cancelled_by, flight_requests!inner(requested_by)")
       .eq("flight_request_id", parsedInput.flightRequestId)
       .maybeSingle();
 
@@ -47,6 +47,21 @@ export const cancelFlightAction = actionClient
         ok: false,
         message: "You can only cancel your own flights.",
       };
+    }
+
+    if (journey.status === "cancelled" && journey.cancelled_by === actor.id) {
+      const passcodeCheck = await verifyProfilePasscode(
+        actor.id,
+        parsedInput.passcode,
+      );
+
+      return passcodeCheck.ok
+        ? {
+            ok: true,
+            message:
+              "Flight cancelled — the aircraft is free for a new request.",
+          }
+        : passcodeCheck;
     }
 
     // A flight in the air must be terminated, and an arrived one is

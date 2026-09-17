@@ -1,7 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { useAction } from "next-safe-action/hooks";
+import { useGuardedAction } from "@/shared/hooks/use-guarded-action";
 
 import {
   removeProfilePhotoAction,
@@ -19,7 +19,7 @@ export function useProfilePhoto({
 }) {
   const queryClient = useQueryClient();
 
-  const upload = useAction(uploadProfilePhotoAction, {
+  const upload = useGuardedAction(uploadProfilePhotoAction, {
     onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);
@@ -33,7 +33,7 @@ export function useProfilePhoto({
     },
   });
 
-  const remove = useAction(removeProfilePhotoAction, {
+  const remove = useGuardedAction(removeProfilePhotoAction, {
     onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);

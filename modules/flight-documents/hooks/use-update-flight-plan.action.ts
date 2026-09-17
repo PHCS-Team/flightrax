@@ -1,7 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { useAction } from "next-safe-action/hooks";
+import { useGuardedAction } from "@/shared/hooks/use-guarded-action";
 
 import { updateFlightPlanAction } from "@/modules/flight-documents/actions/update-flight-plan";
 import { FLIGHT_DOCUMENTS_QUERY_KEYS } from "@/modules/flight-documents/queries/query-keys";
@@ -12,7 +12,7 @@ export function useUpdateFlightPlan({
 }: { onSaved?: () => void } = {}) {
   const queryClient = useQueryClient();
 
-  return useAction(updateFlightPlanAction, {
+  return useGuardedAction(updateFlightPlanAction, {
     onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);

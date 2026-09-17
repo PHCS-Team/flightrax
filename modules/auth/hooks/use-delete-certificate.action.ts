@@ -1,7 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { useAction } from "next-safe-action/hooks";
+import { useGuardedAction } from "@/shared/hooks/use-guarded-action";
 
 import { deleteCertificateAction } from "@/modules/auth/actions/delete-certificate";
 import { CERTIFICATE_QUERY_KEYS } from "@/modules/auth/queries/certificates";
@@ -12,7 +12,7 @@ export function useDeleteCertificate({
 }: { onSaved?: () => void } = {}) {
   const queryClient = useQueryClient();
 
-  return useAction(deleteCertificateAction, {
+  return useGuardedAction(deleteCertificateAction, {
     onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);

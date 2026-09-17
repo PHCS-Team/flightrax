@@ -6,6 +6,10 @@ import { getDefaultRedirectForProfile } from "@/shared/lib/rbac/routes";
 import { registerBaseProfile } from "@/modules/auth/actions/register-base";
 import { getProfileAccessByUserId } from "@/modules/auth/queries/profile";
 import { superadminRegisterSchema } from "@/modules/auth/schemas/register-schema";
+import {
+  EXISTING_ACCOUNT_MESSAGE,
+  isExistingAccountSignUp,
+} from "@/modules/auth/utils/sign-up";
 import { describeActionError } from "@/shared/lib/action-error";
 
 export const registerSuperadminAction = actionClient
@@ -28,6 +32,10 @@ export const registerSuperadminAction = actionClient
         message: "Check your email to confirm your account before signing in.",
         redirectTo: `/login/${ROLE.SUPERADMIN}`,
       };
+    }
+
+    if (isExistingAccountSignUp(data.user)) {
+      return { ok: false, message: EXISTING_ACCOUNT_MESSAGE };
     }
 
     const profile = await getProfileAccessByUserId(data.user.id);

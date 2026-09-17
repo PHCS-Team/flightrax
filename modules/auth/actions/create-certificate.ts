@@ -10,6 +10,7 @@ import { createAdminClient } from "@/shared/lib/supabase/admin";
 import { createClient } from "@/shared/lib/supabase/server";
 import type { Database } from "@/shared/types/supabase";
 import { describeActionError } from "@/shared/lib/action-error";
+import { duplicateSubmissionCutoff } from "@/shared/lib/duplicate-submission";
 
 export const createCertificateAction = actionClient
   .inputSchema(createCertificateSchema)
@@ -22,6 +23,24 @@ export const createCertificateAction = actionClient
 
     if (userError || !user) {
       return { ok: false, message: "Sign in before adding a certificate." };
+    }
+
+    const adminSupabase = createAdminClient();
+    const { data: duplicate, error: duplicateError } = await adminSupabase
+      .from("certificates")
+      .select("id")
+      .eq("user_id", user.id)
+      .eq("title", parsedInput.title)
+      .gte("created_at", duplicateSubmissionCutoff())
+      .limit(1)
+      .maybeSingle();
+
+    if (duplicateError) {
+      return { ok: false, message: describeActionError(duplicateError) };
+    }
+
+    if (duplicate) {
+      return { ok: true, message: "Certificate added." };
     }
 
     const image = parsedInput.image
@@ -47,7 +66,6 @@ export const createCertificateAction = actionClient
         }),
       };
 
-    const adminSupabase = createAdminClient();
     const { error: insertError } = await adminSupabase
       .from("certificates")
       .insert(insertPayload);

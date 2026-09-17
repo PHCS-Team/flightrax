@@ -8,6 +8,7 @@ import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 import { SCHEDULE_FILES_BUCKET } from "@/shared/lib/storage/buckets";
 import { describeActionError } from "@/shared/lib/action-error";
+import { duplicateSubmissionCutoff } from "@/shared/lib/duplicate-submission";
 
 function safeFileName(name: string): string {
   const base = name.replace(/\.xlsx$/i, "").replace(/[^A-Za-z0-9._-]+/g, "-");
@@ -25,6 +26,28 @@ export const uploadScheduleFileAction = actionClient
         ok: false,
         message: "You do not have permission to upload schedule files.",
       };
+    }
+
+    const supabase = createAdminClient();
+    const fileName = safeFileName(parsedInput.file.name);
+    const { data: duplicateUpload, error: duplicateError } = await supabase
+      .from("schedule_uploads")
+      .select("id")
+      .eq("uploaded_by", actor.id)
+      .eq("file_name", fileName)
+      .eq("starts_on", parsedInput.startsOn)
+      .eq("ends_on", parsedInput.endsOn)
+      .eq("size_bytes", parsedInput.file.size)
+      .gte("created_at", duplicateSubmissionCutoff())
+      .limit(1)
+      .maybeSingle();
+
+    if (duplicateError) {
+      return { ok: false, message: describeActionError(duplicateError) };
+    }
+
+    if (duplicateUpload) {
+      return { ok: true, message: "This schedule file is already uploaded." };
     }
 
     const bytes = await parsedInput.file.arrayBuffer();
@@ -53,9 +76,7 @@ export const uploadScheduleFileAction = actionClient
       };
     }
 
-    const supabase = createAdminClient();
     const uploadId = crypto.randomUUID();
-    const fileName = safeFileName(parsedInput.file.name);
     const storagePath = `${uploadId}/${fileName}`;
     const { error: uploadError } = await supabase.storage
       .from(SCHEDULE_FILES_BUCKET)

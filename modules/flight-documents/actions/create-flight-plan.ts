@@ -19,6 +19,7 @@ import {
 import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 import { describeActionError } from "@/shared/lib/action-error";
+import { duplicateSubmissionCutoff } from "@/shared/lib/duplicate-submission";
 
 export const createFlightPlanAction = actionClient
   .inputSchema(createFlightPlanSchema)
@@ -59,7 +60,10 @@ export const createFlightPlanAction = actionClient
     if (profileError || !filerProfile) {
       return {
         ok: false,
-        message: profileError?.message ?? "Unable to load your profile.",
+        message: describeActionError(
+          profileError,
+          "Your profile could not be loaded.",
+        ),
       };
     }
 
@@ -137,6 +141,31 @@ export const createFlightPlanAction = actionClient
             "The selected flight instructor is unavailable on the date of flight — choose another instructor.",
         };
       }
+    }
+
+    const { data: recentDuplicate, error: duplicateError } = await supabase
+      .from("flight_plans")
+      .select("id, flight_requests!inner(status)")
+      .eq("created_by", filerProfile.id)
+      .eq("aircraft_id", aircraft.id)
+      .eq("dof_raw", parsedInput.dofRaw)
+      .eq("departure_time_raw", parsedInput.departureTimeRaw)
+      .eq("flight_requests.status", "draft")
+      .gte("created_at", duplicateSubmissionCutoff())
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (duplicateError) {
+      return { ok: false, message: describeActionError(duplicateError) };
+    }
+
+    if (recentDuplicate) {
+      return {
+        ok: true,
+        message: "Flight plan created successfully.",
+        flightPlanId: recentDuplicate.id,
+      };
     }
 
     const flightPlanRow = {
@@ -222,7 +251,7 @@ export const createFlightPlanAction = actionClient
     };
 
     let flightPlan: { id: string } | null = null;
-    let planError: { message: string } | null = null;
+    let planError: { code?: string; message: string } | null = null;
 
     for (let attempt = 0; attempt < 5 && !flightPlan; attempt++) {
       const { data, error } = await supabase
@@ -246,7 +275,10 @@ export const createFlightPlanAction = actionClient
     if (!flightPlan) {
       return {
         ok: false,
-        message: planError?.message ?? "Unable to create the flight plan.",
+        message: describeActionError(
+          planError,
+          "The flight plan could not be created. Please try again.",
+        ),
       };
     }
 

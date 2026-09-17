@@ -2,6 +2,7 @@ import "server-only";
 
 import { scryptSync, timingSafeEqual } from "node:crypto";
 
+import { describeActionError } from "@/shared/lib/action-error";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 
 export function verifyPasscodeHash(
@@ -38,7 +39,7 @@ export async function verifyProfilePasscode(
     .maybeSingle();
 
   if (error) {
-    return { ok: false, message: error.message };
+    return { ok: false, message: describeActionError(error) };
   }
 
   if (!data?.passcode_hash) {

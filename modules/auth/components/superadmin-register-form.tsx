@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useAction } from "next-safe-action/hooks";
+import { useOneShotAction } from "@/shared/hooks/use-guarded-action";
 import { useForm } from "react-hook-form";
 
 import { registerSuperadminAction } from "@/modules/auth/actions/register-superadmin";
@@ -34,7 +34,7 @@ export function SuperadminRegisterForm() {
       fullName: "",
     },
   });
-  const { execute, isExecuting } = useAction(registerSuperadminAction, {
+  const { execute, isExecuting } = useOneShotAction(registerSuperadminAction, {
     onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);

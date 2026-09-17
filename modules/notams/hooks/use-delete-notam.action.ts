@@ -1,7 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { useAction } from "next-safe-action/hooks";
+import { useGuardedAction } from "@/shared/hooks/use-guarded-action";
 
 import { deleteNotamAction } from "@/modules/notams/actions/delete-notam";
 import { NOTAMS_QUERY_KEYS } from "@/modules/notams/queries/query-keys";
@@ -10,7 +10,7 @@ import { toastActionError, toastActionResult } from "@/shared/lib/action-toast";
 export function useDeleteNotam({ onDeleted }: { onDeleted?: () => void } = {}) {
   const queryClient = useQueryClient();
 
-  return useAction(deleteNotamAction, {
+  return useGuardedAction(deleteNotamAction, {
     onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);

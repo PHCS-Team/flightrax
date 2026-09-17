@@ -1,7 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { useAction } from "next-safe-action/hooks";
+import { useGuardedAction } from "@/shared/hooks/use-guarded-action";
 
 import { toastActionError, toastActionResult } from "@/shared/lib/action-toast";
 import { ACCOUNT_REVIEW_QUERY_KEYS } from "@/modules/account-review/queries/query-keys";
@@ -23,7 +23,7 @@ export function useReviewAccount({
   requestType: AccountRequestRole;
 }) {
   const queryClient = useQueryClient();
-  const approve = useAction(approveAccountRequestAction, {
+  const approve = useGuardedAction(approveAccountRequestAction, {
     onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);
@@ -47,7 +47,7 @@ export function useReviewAccount({
       }
     },
   });
-  const reject = useAction(rejectAccountRequestAction, {
+  const reject = useGuardedAction(rejectAccountRequestAction, {
     onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);

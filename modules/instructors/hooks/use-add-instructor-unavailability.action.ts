@@ -1,7 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { useAction } from "next-safe-action/hooks";
+import { useGuardedAction } from "@/shared/hooks/use-guarded-action";
 
 import { addInstructorUnavailabilityAction } from "@/modules/instructors/actions/add-instructor-unavailability";
 import { INSTRUCTORS_QUERY_KEYS } from "@/modules/instructors/queries/query-keys";
@@ -12,7 +12,7 @@ export function useAddInstructorUnavailability({
 }: { onAdded?: () => void } = {}) {
   const queryClient = useQueryClient();
 
-  return useAction(addInstructorUnavailabilityAction, {
+  return useGuardedAction(addInstructorUnavailabilityAction, {
     onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);

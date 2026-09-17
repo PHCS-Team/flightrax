@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { KeyRoundIcon } from "lucide-react";
-import { useAction } from "next-safe-action/hooks";
+import { useGuardedAction } from "@/shared/hooks/use-guarded-action";
 import { useForm } from "react-hook-form";
 
 import { changePasswordAction } from "@/modules/auth/actions/change-password";
@@ -30,7 +30,7 @@ export function ChangePasswordDialog() {
       confirmPassword: "",
     },
   });
-  const { execute, isExecuting } = useAction(changePasswordAction, {
+  const { execute, isExecuting } = useGuardedAction(changePasswordAction, {
     onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);

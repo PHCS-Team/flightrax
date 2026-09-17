@@ -107,7 +107,7 @@ export function FlightRequestReviewActions({
             ? "Enter your 4-digit security passcode to approve this flight request."
             : "Enter your 4-digit security passcode to reject this flight request."
         }
-        isVerifying={verifyPasscode.status === "executing"}
+        isVerifying={verifyPasscode.isExecuting}
         onOpenChange={setPasscodeOpen}
         onVerified={handleVerified}
         open={passcodeOpen}

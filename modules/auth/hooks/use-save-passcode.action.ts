@@ -1,6 +1,6 @@
 "use client";
 
-import { useAction } from "next-safe-action/hooks";
+import { useGuardedAction } from "@/shared/hooks/use-guarded-action";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { savePasscodeAction } from "@/modules/auth/actions/save-passcode";
@@ -10,7 +10,7 @@ import { toastActionError, toastActionResult } from "@/shared/lib/action-toast";
 export function useSavePasscode() {
   const queryClient = useQueryClient();
 
-  return useAction(savePasscodeAction, {
+  return useGuardedAction(savePasscodeAction, {
     onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       queryClient.invalidateQueries({

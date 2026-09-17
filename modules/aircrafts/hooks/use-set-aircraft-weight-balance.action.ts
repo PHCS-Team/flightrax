@@ -1,7 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { useAction } from "next-safe-action/hooks";
+import { useGuardedAction } from "@/shared/hooks/use-guarded-action";
 
 import { setAircraftWeightBalanceAction } from "@/modules/aircrafts/actions/set-aircraft-weight-balance";
 import { AIRCRAFTS_QUERY_KEYS } from "@/modules/aircrafts/queries/query-keys";
@@ -12,7 +12,7 @@ export function useSetAircraftWeightBalance({
 }: { onSaved?: () => void } = {}) {
   const queryClient = useQueryClient();
 
-  return useAction(setAircraftWeightBalanceAction, {
+  return useGuardedAction(setAircraftWeightBalanceAction, {
     onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);

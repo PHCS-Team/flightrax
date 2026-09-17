@@ -3,13 +3,17 @@
 import { actionClient } from "@/shared/lib/safe-action";
 import {
   APPROVAL_STATUS,
+  ROLE_LABELS,
   requiresAccountApproval,
 } from "@/shared/lib/rbac/config";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 import { createClient } from "@/shared/lib/supabase/server";
 import { getProfileAccessByUserId } from "@/modules/auth/queries/profile";
 import { rejectedAccountResubmissionSchema } from "@/modules/auth/schemas/rejected-account-resubmission-schema";
-import { submitAccountRequest } from "@/modules/auth/services/account-request.server";
+import {
+  isIdNumberRegistered,
+  submitAccountRequest,
+} from "@/modules/auth/services/account-request.server";
 import { ACCOUNT_DOCUMENT_BUCKET } from "@/shared/lib/storage/buckets";
 import { describeActionError } from "@/shared/lib/action-error";
 
@@ -42,13 +46,34 @@ export const resubmitRejectedAccountAction = actionClient
       };
     }
 
-    if (
-      !requiresAccountApproval(profile.role) ||
-      profile.approval_status !== APPROVAL_STATUS.REJECTED
-    ) {
+    if (!requiresAccountApproval(profile.role)) {
       return {
         ok: false,
         message: "Only rejected account requests can be resubmitted.",
+      };
+    }
+
+    if (profile.approval_status === APPROVAL_STATUS.PENDING) {
+      return {
+        ok: true,
+        message:
+          "Your verification details were already resubmitted and are pending campus approval.",
+      };
+    }
+
+    if (profile.approval_status !== APPROVAL_STATUS.REJECTED) {
+      return {
+        ok: false,
+        message: "Only rejected account requests can be resubmitted.",
+      };
+    }
+
+    if (
+      await isIdNumberRegistered(profile.role, parsedInput.idNumber, user.id)
+    ) {
+      return {
+        ok: false,
+        message: `This ${ROLE_LABELS[profile.role].toLowerCase()} ID number is already registered to another account.`,
       };
     }
 

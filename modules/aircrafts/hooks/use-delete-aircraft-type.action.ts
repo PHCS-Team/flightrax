@@ -1,7 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { useAction } from "next-safe-action/hooks";
+import { useGuardedAction } from "@/shared/hooks/use-guarded-action";
 
 import { deleteAircraftTypeAction } from "@/modules/aircrafts/actions/delete-aircraft-type";
 import { AIRCRAFTS_QUERY_KEYS } from "@/modules/aircrafts/queries/query-keys";
@@ -13,7 +13,7 @@ export function useDeleteAircraftType({
 }: { onDeleted?: () => void } = {}) {
   const queryClient = useQueryClient();
 
-  return useAction(deleteAircraftTypeAction, {
+  return useGuardedAction(deleteAircraftTypeAction, {
     onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);

@@ -1,7 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { useAction } from "next-safe-action/hooks";
+import { useOneShotAction } from "@/shared/hooks/use-guarded-action";
 
 import { rejectFlightRequestAction } from "@/modules/flight-documents/actions/reject-flight-request";
 import { FLIGHT_DOCUMENTS_QUERY_KEYS } from "@/modules/flight-documents/queries/query-keys";
@@ -12,7 +12,7 @@ export function useRejectFlightRequest({
 }: { onRejected?: () => void } = {}) {
   const queryClient = useQueryClient();
 
-  return useAction(rejectFlightRequestAction, {
+  return useOneShotAction(rejectFlightRequestAction, {
     onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);

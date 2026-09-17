@@ -4,6 +4,8 @@ import { createScheduleEntrySchema } from "@/modules/schedule/schemas/schedule-s
 import {
   describeScheduleWriteError,
   getScheduleManager,
+  isScheduleEntryAlreadyPosted,
+  SCHEDULE_OVERLAP_VIOLATION,
 } from "@/modules/schedule/services/schedule-manager.server";
 import { toInstant } from "@/modules/schedule/utils/schedule-time";
 import { SCHEDULE_SESSION_TYPE_META } from "@/modules/schedule/constants/session-types";
@@ -25,7 +27,7 @@ export const createScheduleEntryAction = actionClient
     const needsPeople =
       SCHEDULE_SESSION_TYPE_META[parsedInput.sessionType].needsPeople;
     const supabase = createAdminClient();
-    const { error } = await supabase.from("schedule_entries").insert({
+    const entry = {
       aircraft_id: parsedInput.aircraftId,
       starts_at: toInstant(parsedInput.date, parsedInput.startTime),
       ends_at: toInstant(parsedInput.date, parsedInput.endTime),
@@ -38,9 +40,17 @@ export const createScheduleEntryAction = actionClient
         : null,
       label: needsPeople ? null : parsedInput.label || null,
       created_by: actor.id,
-    });
+    };
+    const { error } = await supabase.from("schedule_entries").insert(entry);
 
     if (error) {
+      if (
+        error.code === SCHEDULE_OVERLAP_VIOLATION &&
+        (await isScheduleEntryAlreadyPosted(entry))
+      ) {
+        return { ok: true, message: "Entry posted." };
+      }
+
       return { ok: false, message: describeScheduleWriteError(error) };
     }
 

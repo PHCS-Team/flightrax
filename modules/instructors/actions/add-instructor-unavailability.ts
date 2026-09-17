@@ -52,6 +52,14 @@ export const addInstructorUnavailabilityAction = actionClient
       .limit(1)
       .maybeSingle();
 
+    if (
+      overlapping &&
+      overlapping.starts_on === parsedInput.startsOn &&
+      overlapping.ends_on === parsedInput.endsOn
+    ) {
+      return { ok: true, message: "Unavailability period added." };
+    }
+
     if (overlapping) {
       const range =
         overlapping.starts_on === overlapping.ends_on

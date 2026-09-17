@@ -1,7 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { useAction } from "next-safe-action/hooks";
+import { useGuardedAction } from "@/shared/hooks/use-guarded-action";
 
 import { deleteScheduleEntryAction } from "@/modules/schedule/actions/delete-schedule-entry";
 import { SCHEDULE_QUERY_KEYS } from "@/modules/schedule/queries/query-keys";
@@ -12,7 +12,7 @@ export function useDeleteScheduleEntry({
 }: { onDeleted?: () => void } = {}) {
   const queryClient = useQueryClient();
 
-  return useAction(deleteScheduleEntryAction, {
+  return useGuardedAction(deleteScheduleEntryAction, {
     onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);

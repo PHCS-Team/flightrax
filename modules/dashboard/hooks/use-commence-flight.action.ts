@@ -1,7 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { useAction } from "next-safe-action/hooks";
+import { useGuardedAction } from "@/shared/hooks/use-guarded-action";
 
 import { commenceFlightAction } from "@/modules/dashboard/actions/commence-flight";
 import { DASHBOARD_QUERY_KEYS } from "@/modules/dashboard/queries/query-keys";
@@ -17,7 +17,7 @@ export function useCommenceFlight({
 } = {}) {
   const queryClient = useQueryClient();
 
-  return useAction(commenceFlightAction, {
+  return useGuardedAction(commenceFlightAction, {
     onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       if (data && "code" in data && data.code === "EARLIER_SCHEDULED") {

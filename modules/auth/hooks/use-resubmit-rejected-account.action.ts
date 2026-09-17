@@ -1,6 +1,6 @@
 "use client";
 
-import { useAction } from "next-safe-action/hooks";
+import { useOneShotAction } from "@/shared/hooks/use-guarded-action";
 
 import { resubmitRejectedAccountAction } from "@/modules/auth/actions/resubmit-rejected-account";
 import { toastActionError, toastActionResult } from "@/shared/lib/action-toast";
@@ -10,7 +10,7 @@ export function useResubmitRejectedAccount({
 }: {
   onResubmitted?: () => void;
 } = {}) {
-  return useAction(resubmitRejectedAccountAction, {
+  return useOneShotAction(resubmitRejectedAccountAction, {
     onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);

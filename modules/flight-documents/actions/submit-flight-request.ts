@@ -41,6 +41,10 @@ export const submitFlightRequestAction = actionClient
 
     const request = flightPlan.flight_requests;
 
+    if (request?.status === "pending_approval") {
+      return { ok: true, message: "Flight request submitted for approval." };
+    }
+
     if (
       !request ||
       !EDITABLE_FLIGHT_REQUEST_STATUSES.some(
@@ -68,17 +72,27 @@ export const submitFlightRequestAction = actionClient
       }
     }
 
-    const { error: updateError } = await supabase
+    const { data: submitted, error: updateError } = await supabase
       .from("flight_requests")
       .update({
         status: "pending_approval",
         rejected_reason: null,
         rejected_by: null,
       })
-      .eq("id", request.id);
+      .eq("id", request.id)
+      .in("status", [...EDITABLE_FLIGHT_REQUEST_STATUSES])
+      .select("id")
+      .maybeSingle();
 
     if (updateError) {
       return { ok: false, message: describeActionError(updateError) };
+    }
+
+    if (!submitted) {
+      return {
+        ok: false,
+        message: "Only draft or rejected requests can be submitted.",
+      };
     }
 
     return { ok: true, message: "Flight request submitted for approval." };

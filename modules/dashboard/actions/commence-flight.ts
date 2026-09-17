@@ -26,7 +26,7 @@ export const commenceFlightAction = actionClient
     const { data: journey, error: journeyError } = await supabase
       .from("flight_journeys")
       .select(
-        "id, status, aircraft_id, dof_date, dof_at, flight_requests!inner(requested_by, instructor_profile_id, instructor:profiles!flight_requests_instructor_profile_id_fkey(full_name), flight_plans!inner(pilot_name, pilot_in_command_id, pilot_in_command_name, aircraft_identification))",
+        "id, status, commenced_by, aircraft_id, dof_date, dof_at, flight_requests!inner(requested_by, instructor_profile_id, instructor:profiles!flight_requests_instructor_profile_id_fkey(full_name), flight_plans!inner(pilot_name, pilot_in_command_id, pilot_in_command_name, aircraft_identification))",
       )
       .eq("flight_request_id", parsedInput.flightRequestId)
       .maybeSingle();
@@ -49,6 +49,17 @@ export const commenceFlightAction = actionClient
         ok: false,
         message: "You can only commence your own flights.",
       };
+    }
+
+    if (journey.status === "active" && journey.commenced_by === actor.id) {
+      const passcodeCheck = await verifyProfilePasscode(
+        actor.id,
+        parsedInput.passcode,
+      );
+
+      return passcodeCheck.ok
+        ? { ok: true, message: "Flight commenced." }
+        : passcodeCheck;
     }
 
     if (journey.status !== "scheduled") {

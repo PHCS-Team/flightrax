@@ -1,7 +1,8 @@
 import "server-only";
 
-import { APPROVAL_STATUS } from "@/shared/lib/rbac/config";
+import { APPROVAL_STATUS, ROLE_LABELS } from "@/shared/lib/rbac/config";
 import type { AccountRequestRole } from "@/shared/lib/rbac/config";
+import { describeActionError } from "@/shared/lib/action-error";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 import { createClient } from "@/shared/lib/supabase/server";
 import { ACCOUNT_DOCUMENT_BUCKET } from "@/shared/lib/storage/buckets";
@@ -13,6 +14,54 @@ type SubmitAccountRequestInput = {
   idNumber: string;
   idDocument: File | null;
 };
+
+const UNIQUE_VIOLATION = "23505";
+
+export function idNumberTakenMessage(role: AccountRequestRole): string {
+  return `This ${ROLE_LABELS[role].toLowerCase()} ID number is already registered. If you have already signed up, sign in instead.`;
+}
+
+// Checked before the auth account is created. A second registration with
+// the same ID number — most often the same person tapping Register again on
+// a slow connection — would otherwise create a second auth user and then
+// fail on account_requests_id_number_key, stranding that user with no
+// verification details.
+export async function isIdNumberRegistered(
+  role: AccountRequestRole,
+  idNumber: string,
+  exceptProfileId?: string,
+): Promise<boolean> {
+  const adminSupabase = createAdminClient();
+  let query = adminSupabase
+    .from("account_requests")
+    .select("profile_id")
+    .eq("request_type", role)
+    .eq("id_number", idNumber)
+    .limit(1);
+
+  if (exceptProfileId) {
+    query = query.neq("profile_id", exceptProfileId);
+  }
+
+  const { data, error } = await query.maybeSingle();
+
+  if (error) {
+    throw new Error(describeActionError(error));
+  }
+
+  return Boolean(data);
+}
+
+function describeRequestError(
+  error: { code?: string; message: string },
+  role: AccountRequestRole,
+): string {
+  if (error.code === UNIQUE_VIOLATION) {
+    return idNumberTakenMessage(role);
+  }
+
+  return describeActionError(error);
+}
 
 // Resets the user's account request to a fresh pending submission, uploading
 // the verification document when one is provided (resubmissions may keep the
@@ -41,7 +90,7 @@ export async function submitAccountRequest({
       })
       .eq("profile_id", userId);
 
-    return requestError?.message ?? null;
+    return requestError ? describeRequestError(requestError, role) : null;
   }
 
   const documentPath = getAccountIdDocumentPath(userId, idDocument.type);
@@ -53,7 +102,7 @@ export async function submitAccountRequest({
     });
 
   if (uploadError) {
-    return uploadError.message;
+    return describeActionError(uploadError);
   }
 
   const { error: requestError } = await adminSupabase
@@ -83,7 +132,7 @@ export async function submitAccountRequest({
       .from(ACCOUNT_DOCUMENT_BUCKET)
       .remove([documentPath]);
 
-    return requestError.message;
+    return describeRequestError(requestError, role);
   }
 
   return null;

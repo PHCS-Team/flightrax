@@ -43,7 +43,7 @@ export function SelfApproveAction({ flightPlanId }: { flightPlanId: string }) {
 
       <PasscodeGatewayDialog
         description="Enter your 4-digit security passcode to approve your own flight request."
-        isVerifying={verifyPasscode.status === "executing"}
+        isVerifying={verifyPasscode.isExecuting}
         onOpenChange={setPasscodeOpen}
         onVerified={(passcode) => {
           setVerifiedPasscode(passcode);

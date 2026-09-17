@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
-import { useAction } from "next-safe-action/hooks";
+import { useOneShotAction } from "@/shared/hooks/use-guarded-action";
 import { useForm } from "react-hook-form";
 
 import { Button } from "@/shared/components/ui/button";
@@ -28,7 +28,7 @@ export function LoginForm({ role }: { role: ProfileRole }) {
     resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "", role },
   });
-  const { execute, isExecuting } = useAction(loginAction, {
+  const { execute, isExecuting } = useOneShotAction(loginAction, {
     onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);

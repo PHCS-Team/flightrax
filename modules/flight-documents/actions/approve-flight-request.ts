@@ -35,7 +35,7 @@ export const approveFlightRequestAction = actionClient
     const { data: flightPlan, error: planError } = await supabase
       .from("flight_plans")
       .select(
-        "id, aircraft_id, dof_resolved, pilot_in_command_id, flight_requests(id, status, weight_balance_id, instructor_profile_id)",
+        "id, aircraft_id, dof_resolved, pilot_in_command_id, flight_requests(id, status, approved_by, weight_balance_id, instructor_profile_id)",
       )
       .eq("id", parsedInput.flightPlanId)
       .maybeSingle();
@@ -50,7 +50,10 @@ export const approveFlightRequestAction = actionClient
       return { ok: false, message: "Flight plan not found." };
     }
 
-    if (request.status !== "pending_approval") {
+    const alreadyApprovedByActor =
+      request.status === "approved" && request.approved_by === actor.id;
+
+    if (request.status !== "pending_approval" && !alreadyApprovedByActor) {
       return {
         ok: false,
         message: "Only requests pending approval can be approved.",
@@ -64,6 +67,10 @@ export const approveFlightRequestAction = actionClient
 
     if (!passcodeCheck.ok) {
       return passcodeCheck;
+    }
+
+    if (alreadyApprovedByActor) {
+      return { ok: true, message: "Flight request approved." };
     }
 
     const { data: approverProfile, error: profileError } = await supabase

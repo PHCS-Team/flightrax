@@ -1,7 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { useAction } from "next-safe-action/hooks";
+import { useGuardedAction } from "@/shared/hooks/use-guarded-action";
 
 import { createScheduleEntryAction } from "@/modules/schedule/actions/create-schedule-entry";
 import { SCHEDULE_QUERY_KEYS } from "@/modules/schedule/queries/query-keys";
@@ -12,7 +12,7 @@ export function useCreateScheduleEntry({
 }: { onSaved?: () => void } = {}) {
   const queryClient = useQueryClient();
 
-  return useAction(createScheduleEntryAction, {
+  return useGuardedAction(createScheduleEntryAction, {
     onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);

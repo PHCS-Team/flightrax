@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
-import { useAction } from "next-safe-action/hooks";
+import { useOneShotAction } from "@/shared/hooks/use-guarded-action";
 import { useForm } from "react-hook-form";
 
 import { resetPasswordAction } from "@/modules/auth/actions/reset-password";
@@ -20,7 +20,7 @@ export function ResetPasswordForm() {
     resolver: zodResolver(resetPasswordSchema),
     defaultValues: { password: "", confirmPassword: "" },
   });
-  const { execute, isExecuting } = useAction(resetPasswordAction, {
+  const { execute, isExecuting } = useOneShotAction(resetPasswordAction, {
     onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);

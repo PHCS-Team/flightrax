@@ -37,6 +37,13 @@ export const cancelFlightRequestAction = actionClient
 
     const request = flightPlan.flight_requests;
 
+    if (request?.status === "draft") {
+      return {
+        ok: true,
+        message: "Request cancelled — it is back to draft for editing.",
+      };
+    }
+
     if (!request || request.status !== "pending_approval") {
       return {
         ok: false,
@@ -44,13 +51,24 @@ export const cancelFlightRequestAction = actionClient
       };
     }
 
-    const { error: updateError } = await supabase
+    const { data: withdrawn, error: updateError } = await supabase
       .from("flight_requests")
       .update({ status: "draft" })
-      .eq("id", request.id);
+      .eq("id", request.id)
+      .eq("status", "pending_approval")
+      .select("id")
+      .maybeSingle();
 
     if (updateError) {
       return { ok: false, message: describeActionError(updateError) };
+    }
+
+    if (!withdrawn) {
+      return {
+        ok: false,
+        message:
+          "This request was already reviewed and can no longer be cancelled.",
+      };
     }
 
     return {

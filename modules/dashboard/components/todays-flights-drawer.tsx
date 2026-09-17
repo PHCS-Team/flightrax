@@ -252,7 +252,7 @@ export function TodaysFlightsDrawer({
         description={
           pendingAction ? PASSCODE_DESCRIPTIONS[pendingAction.type] : ""
         }
-        isVerifying={verifyPasscode.status === "executing"}
+        isVerifying={verifyPasscode.isExecuting}
         onOpenChange={(nextOpen) => {
           if (!nextOpen) {
             setPendingAction(null);

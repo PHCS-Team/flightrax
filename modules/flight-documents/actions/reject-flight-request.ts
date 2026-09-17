@@ -29,7 +29,7 @@ export const rejectFlightRequestAction = actionClient
     const { data: flightPlan, error: planError } = await supabase
       .from("flight_plans")
       .select(
-        "id, pilot_in_command_id, flight_requests(id, status, instructor_profile_id)",
+        "id, pilot_in_command_id, flight_requests(id, status, rejected_by, instructor_profile_id)",
       )
       .eq("id", parsedInput.flightPlanId)
       .maybeSingle();
@@ -68,7 +68,10 @@ export const rejectFlightRequestAction = actionClient
       };
     }
 
-    if (request.status !== "pending_approval") {
+    const alreadyRejectedByActor =
+      request.status === "rejected" && request.rejected_by === actor.id;
+
+    if (request.status !== "pending_approval" && !alreadyRejectedByActor) {
       return {
         ok: false,
         message: "Only requests pending approval can be rejected.",
@@ -84,7 +87,11 @@ export const rejectFlightRequestAction = actionClient
       return passcodeCheck;
     }
 
-    const { error: updateError } = await supabase
+    if (alreadyRejectedByActor) {
+      return { ok: true, message: "Flight request rejected." };
+    }
+
+    const { data: rejected, error: updateError } = await supabase
       .from("flight_requests")
       .update({
         status: "rejected",
@@ -93,10 +100,20 @@ export const rejectFlightRequestAction = actionClient
         approved_by: null,
         approved_at: null,
       })
-      .eq("id", request.id);
+      .eq("id", request.id)
+      .eq("status", "pending_approval")
+      .select("id")
+      .maybeSingle();
 
     if (updateError) {
       return { ok: false, message: describeActionError(updateError) };
+    }
+
+    if (!rejected) {
+      return {
+        ok: false,
+        message: "Only requests pending approval can be rejected.",
+      };
     }
 
     return { ok: true, message: "Flight request rejected." };

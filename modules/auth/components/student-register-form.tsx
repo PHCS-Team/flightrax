@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useAction } from "next-safe-action/hooks";
+import { useOneShotAction } from "@/shared/hooks/use-guarded-action";
 import { useForm, useWatch } from "react-hook-form";
 
 import { ROLE } from "@/shared/lib/rbac/config";
@@ -37,7 +37,7 @@ export function StudentRegisterForm() {
       idNumber: "",
     },
   });
-  const { execute, isExecuting } = useAction(registerStudentAction, {
+  const { execute, isExecuting } = useOneShotAction(registerStudentAction, {
     onError: ({ error }) => toastActionError(error),
     onSuccess: ({ data }) => {
       toastActionResult(data);

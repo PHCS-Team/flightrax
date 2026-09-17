@@ -25,7 +25,7 @@ export const terminateFlightAction = actionClient
 
     const { data: journey, error: journeyError } = await supabase
       .from("flight_journeys")
-      .select("id, status, flight_requests!inner(requested_by)")
+      .select("id, status, terminated_by, flight_requests!inner(requested_by)")
       .eq("flight_request_id", parsedInput.flightRequestId)
       .maybeSingle();
 
@@ -47,6 +47,17 @@ export const terminateFlightAction = actionClient
         ok: false,
         message: "You can only terminate your own flights.",
       };
+    }
+
+    if (journey.status === "arrived" && journey.terminated_by === actor.id) {
+      const passcodeCheck = await verifyProfilePasscode(
+        actor.id,
+        parsedInput.passcode,
+      );
+
+      return passcodeCheck.ok
+        ? { ok: true, message: "Flight terminated — marked as arrived." }
+        : passcodeCheck;
     }
 
     if (journey.status !== "active") {

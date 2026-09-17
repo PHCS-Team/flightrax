@@ -1,9 +1,9 @@
 "use client";
 
-import { useAction } from "next-safe-action/hooks";
+import { useGuardedAction } from "@/shared/hooks/use-guarded-action";
 
 import { verifyPasscodeAction } from "@/shared/lib/passcode-action";
 
 export function useVerifyPasscode() {
-  return useAction(verifyPasscodeAction);
+  return useGuardedAction(verifyPasscodeAction);
 }

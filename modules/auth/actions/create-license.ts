@@ -24,6 +24,27 @@ export const createLicenseAction = actionClient
       return { ok: false, message: "Sign in before adding a license." };
     }
 
+    const adminSupabase = createAdminClient();
+    const { data: existingLicense, error: existingError } = await adminSupabase
+      .from("licenses")
+      .select("id")
+      .eq("user_id", user.id)
+      .eq("license_type", parsedInput.license_type)
+      .eq("license_number", parsedInput.license_number)
+      .limit(1)
+      .maybeSingle();
+
+    if (existingError) {
+      return { ok: false, message: describeActionError(existingError) };
+    }
+
+    if (existingLicense) {
+      return {
+        ok: false,
+        message: "This license is already on your account.",
+      };
+    }
+
     const idFront = parsedInput.idFront
       ? await uploadLicenseImage(
           supabase,
@@ -69,7 +90,6 @@ export const createLicenseAction = actionClient
       }),
     };
 
-    const adminSupabase = createAdminClient();
     const { error: insertError } = await adminSupabase
       .from("licenses")
       .insert(insertPayload);
