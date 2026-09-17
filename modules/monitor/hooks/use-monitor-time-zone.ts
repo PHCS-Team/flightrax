@@ -11,18 +11,18 @@ import {
 
 function readStoredZone(): MonitorTimeZone {
   try {
-    return window.localStorage.getItem(MONITOR_TIME_ZONE_STORAGE_KEY) === "local"
-      ? "local"
-      : "zulu";
+    return window.localStorage.getItem(MONITOR_TIME_ZONE_STORAGE_KEY) === "zulu"
+      ? "zulu"
+      : "local";
   } catch {
-    return "zulu";
+    return "local";
   }
 }
 
-// Tab toggles zulu ↔ Philippine time on the TV. The choice survives a
-// reload so a screen set up once stays that way.
+// The TV opens in Philippine time; Tab toggles to zulu and back. The
+// choice survives a reload so a screen set up once stays that way.
 export function useMonitorTimeZone(): MonitorTimeZone {
-  const [zone, setZone] = useState<MonitorTimeZone>("zulu");
+  const [zone, setZone] = useState<MonitorTimeZone>("local");
   const zoneRef = useRef(zone);
 
   useEffect(() => {
@@ -30,7 +30,7 @@ export function useMonitorTimeZone(): MonitorTimeZone {
   }, [zone]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- reads the stored zone once after hydration; the server render must stay zulu.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reads the stored zone once after hydration; the server render must stay in Philippine time.
     setZone(readStoredZone());
   }, []);
 
