@@ -6,6 +6,7 @@ import { parseAsStringLiteral, useQueryState } from "nuqs";
 
 import { AccountReviewList } from "@/modules/account-review/components/account-review-list";
 import { AccountReviewMetrics } from "@/modules/account-review/components/account-review-metrics";
+import { useAccountRequestsRealtime } from "@/modules/account-review/hooks/use-account-requests-realtime";
 import { useAccountReview } from "@/modules/account-review/hooks/use-account-review.query";
 import { matchesReviewSearch } from "@/modules/account-review/utils/search";
 import { LoadingScreen } from "@/shared/components/layout/loading-screen";
@@ -24,6 +25,7 @@ export function AccountReviewClientSurface() {
   );
   const [search, setSearch] = useState("");
   const { error, isPending, requests } = useAccountReview(type);
+  useAccountRequestsRealtime();
   const filteredRequests = useMemo(
     () => requests.filter((request) => matchesReviewSearch(request, search)),
     [requests, search],

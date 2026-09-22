@@ -7,6 +7,7 @@ import { BellIcon } from "lucide-react";
 
 import { NotificationsPanel } from "@/modules/notifications/components/notifications-panel";
 import { useNotificationsRealtime } from "@/modules/notifications/hooks/use-notifications-realtime";
+import { useRefreshOnNotificationOpen } from "@/modules/notifications/hooks/use-refresh-on-notification-open";
 import { useUnreadNotificationCount } from "@/modules/notifications/hooks/use-unread-notification-count.query";
 import { Button } from "@/shared/components/ui/button";
 import {
@@ -43,6 +44,7 @@ export function NotificationsBell({ userId }: { userId: string | undefined }) {
   const { unreadCount } = useUnreadNotificationCount();
 
   useNotificationsRealtime(userId);
+  useRefreshOnNotificationOpen();
 
   return (
     <>

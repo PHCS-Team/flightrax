@@ -83,7 +83,7 @@ function SelectContent({
         <SelectScrollUpButton />
         <SelectPrimitive.Viewport
           data-position={position}
-          className="w-full scroll-my-1"
+          className="w-full scroll-my-1 overscroll-contain"
         >
           {children}
         </SelectPrimitive.Viewport>

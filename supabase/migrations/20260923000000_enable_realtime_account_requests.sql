@@ -1,0 +1,11 @@
+-- A registration or resubmission must show on Account Review without a
+-- refresh. During the client presentation an admin sat on the page while
+-- someone registered, and the request stayed hidden until the app was
+-- reopened; the iOS app has no pull-to-refresh to recover.
+--
+-- Budget (Rule 19): a few registrations and reviews per day, delivered only
+-- to the Flight Ops admins who have Account Review open — well under the
+-- free-tier message quota. Delivery follows the existing "Approved staff can
+-- read account requests" policy, so only approved admins and the applicant
+-- themselves can receive a row; only the Account Review page subscribes.
+alter publication supabase_realtime add table public.account_requests;

@@ -1,5 +1,6 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -10,6 +11,7 @@ import { useMarkAllNotificationsRead } from "@/modules/notifications/hooks/use-m
 import { useMarkNotificationRead } from "@/modules/notifications/hooks/use-mark-notification-read.action";
 import { useNotifications } from "@/modules/notifications/hooks/use-notifications.query";
 import type { AppNotification } from "@/modules/notifications/types/notification";
+import { isCurrentPath } from "@/modules/notifications/utils/is-current-path";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 
@@ -39,6 +41,7 @@ export function NotificationsPanel({
   unreadCount: number;
 }) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { error, isPending, notifications } = useNotifications();
   const markRead = useMarkNotificationRead();
   const markAllRead = useMarkAllNotificationsRead();
@@ -51,6 +54,10 @@ export function NotificationsPanel({
     onNavigate();
 
     if (notification.href) {
+      if (isCurrentPath(notification.href)) {
+        void queryClient.invalidateQueries();
+      }
+
       router.push(notification.href);
     }
   };
@@ -71,7 +78,7 @@ export function NotificationsPanel({
         </Button>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto">
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
         {isPending ? (
           <PanelLoading />
         ) : error ? (

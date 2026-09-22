@@ -158,7 +158,7 @@ export function AircraftsTable({
                 </button>
               </PopoverTrigger>
               <PopoverContent align="start" className="w-80 p-3" side="bottom">
-                <div className="max-h-72 space-y-3 overflow-y-auto pr-1">
+                <div className="max-h-72 space-y-3 overflow-y-auto overscroll-contain pr-1">
                   <div className="space-y-2 rounded-lg border bg-muted/30 p-2.5">
                     <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
                       Aircraft Type Specifications
@@ -245,7 +245,7 @@ export function AircraftsTable({
                 </button>
               </PopoverTrigger>
               <PopoverContent align="start" className="w-80 p-3" side="bottom">
-                <div className="max-h-72 space-y-3 overflow-y-auto pr-1">
+                <div className="max-h-72 space-y-3 overflow-y-auto overscroll-contain pr-1">
                   <div className="rounded-lg border bg-muted/30 p-2.5">
                     <p className="text-sm font-medium text-foreground/90">
                       Basic empty weight{" "}

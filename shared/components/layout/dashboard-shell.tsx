@@ -18,6 +18,7 @@ import { EnableNotificationsAction } from "@/modules/notifications/components/en
 import { NotificationPermissionGate } from "@/modules/notifications/components/notification-permission-gate";
 import { NotificationsBell } from "@/modules/notifications/components/notifications-bell";
 import { InstallAppAction } from "@/shared/components/layout/install-app-action";
+import { useNavigationDepthTracker } from "@/shared/hooks/use-back-navigation";
 import {
   Avatar,
   AvatarFallback,
@@ -109,6 +110,7 @@ function AppInfoCard() {
 
 export function DashboardShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  useNavigationDepthTracker();
   const { data: profile = null } = useDashboardProfile();
   const [desktopCollapsed, setDesktopCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);

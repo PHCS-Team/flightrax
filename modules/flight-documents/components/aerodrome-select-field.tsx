@@ -71,7 +71,7 @@ export function AerodromeSelectField({
           </span>
         )}
       </label>
-      <Popover onOpenChange={setOpen} open={open}>
+      <Popover modal onOpenChange={setOpen} open={open}>
         <PopoverTrigger
           aria-invalid={Boolean(error)}
           aria-required={required || undefined}

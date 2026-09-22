@@ -119,15 +119,16 @@ self.addEventListener("notificationclick", (event) => {
       .then((clientList) => {
         for (const client of clientList) {
           if (client.url.endsWith(href) && "focus" in client) {
+            client.postMessage({ type: "notification-opened", href });
             return client.focus();
           }
         }
 
         for (const client of clientList) {
           if ("navigate" in client && "focus" in client) {
-            return client.navigate(href).then((navigated) =>
-              navigated ? navigated.focus() : undefined,
-            );
+            return client
+              .navigate(href)
+              .then((navigated) => (navigated ? navigated.focus() : undefined));
           }
         }
 

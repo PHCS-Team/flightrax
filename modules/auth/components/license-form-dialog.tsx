@@ -331,7 +331,7 @@ export function LicenseFormDialog({
             <label className="text-sm font-semibold text-foreground">
               Ratings
             </label>
-            <Popover>
+            <Popover modal>
               <PopoverTrigger
                 aria-invalid={Boolean(errors.ratings)}
                 className={cn(

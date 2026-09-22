@@ -51,7 +51,7 @@ export function SchedulePersonField({
       <label className="text-sm font-semibold text-foreground" htmlFor={id}>
         {label}
       </label>
-      <Popover onOpenChange={setOpen} open={open}>
+      <Popover modal onOpenChange={setOpen} open={open}>
         <PopoverTrigger
           aria-invalid={Boolean(error)}
           className={cn(
