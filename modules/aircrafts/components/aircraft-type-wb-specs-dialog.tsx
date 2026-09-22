@@ -4,7 +4,10 @@ import { PlusIcon, ScaleIcon, Trash2Icon } from "lucide-react";
 import { useState } from "react";
 
 import { useSetAircraftTypeWbSpecs } from "@/modules/aircrafts/hooks/use-set-aircraft-type-wb-specs.action";
-import { DECIMAL_NUMBER_PATTERN } from "@/shared/validations/number-patterns";
+import {
+  DECIMAL_NUMBER_PATTERN,
+  SIGNED_DECIMAL_NUMBER_PATTERN,
+} from "@/shared/validations/number-patterns";
 import type { AircraftType } from "@/modules/aircrafts/types/aircraft-type";
 import { ConfirmationDialog } from "@/shared/components/layout/confirmation-dialog";
 import { DialogSectionHeader } from "@/shared/components/layout/dialog-section-header";
@@ -118,7 +121,7 @@ function WbSpecsForm({
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
 
-    const scalars = [usableFuelArm, fiAndStudentArm, maximumTakeoffWeight];
+    const arms = [usableFuelArm, fiAndStudentArm];
     const areas = baggageArms.map((arm) => arm.trim());
 
     if (!/^[A-Z0-9]{2,4}$/.test(icaoDesignator)) {
@@ -126,14 +129,18 @@ function WbSpecsForm({
       return;
     }
 
-    if (
-      scalars.some(
-        (value) => !DECIMAL_NUMBER_PATTERN.test(value.trim()) || Number(value) <= 0,
-      )
-    ) {
+    if (arms.some((value) => !SIGNED_DECIMAL_NUMBER_PATTERN.test(value.trim()))) {
       setError(
-        "Enter a valid positive number for the ARMs and maximum takeoff weight.",
+        "Enter a valid number for each ARM. Use a negative ARM for a station forward of the datum.",
       );
+      return;
+    }
+
+    if (
+      !DECIMAL_NUMBER_PATTERN.test(maximumTakeoffWeight.trim()) ||
+      Number(maximumTakeoffWeight) <= 0
+    ) {
+      setError("Enter a valid positive maximum takeoff weight.");
       return;
     }
 
@@ -143,8 +150,8 @@ function WbSpecsForm({
         return;
       }
 
-      if (areas.some((arm) => !DECIMAL_NUMBER_PATTERN.test(arm) || Number(arm) <= 0)) {
-        setError("Enter a valid positive ARM for every baggage area.");
+      if (areas.some((arm) => !SIGNED_DECIMAL_NUMBER_PATTERN.test(arm))) {
+        setError("Enter a valid ARM for every baggage area.");
         return;
       }
 
@@ -202,6 +209,7 @@ function WbSpecsForm({
       </h3>
       <div className="grid gap-4 sm:grid-cols-2">
         <SpecField
+          allowNegative
           hint="in"
           id="type-usable-fuel-arm"
           isExecuting={isExecuting}
@@ -210,6 +218,7 @@ function WbSpecsForm({
           value={usableFuelArm}
         />
         <SpecField
+          allowNegative
           hint="in"
           id="type-fi-and-student-arm"
           isExecuting={isExecuting}
@@ -277,7 +286,6 @@ function WbSpecsForm({
                   className="flex-1 border-border bg-muted/30 text-[#121212] placeholder:text-muted-foreground/55"
                   disabled={isExecuting}
                   id={`baggage-area-arm-${index}`}
-                  min={0}
                   onChange={(event) =>
                     setBaggageArms((prev) =>
                       prev.map((value, i) =>
@@ -351,6 +359,7 @@ function WbSpecsForm({
 }
 
 function SpecField({
+  allowNegative = false,
   disabled = false,
   hint,
   id,
@@ -360,6 +369,7 @@ function SpecField({
   required = true,
   value,
 }: {
+  allowNegative?: boolean;
   disabled?: boolean;
   hint: string;
   id: string;
@@ -382,7 +392,7 @@ function SpecField({
         className="border-border bg-muted/30 text-[#121212] placeholder:text-muted-foreground/55 disabled:cursor-default"
         disabled={disabled || isExecuting}
         id={id}
-        min={0}
+        min={allowNegative ? undefined : 0}
         onChange={(event) => onChange(event.target.value)}
         placeholder="0.00"
         step="any"

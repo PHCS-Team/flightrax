@@ -8,7 +8,10 @@ import { z } from "zod";
 
 import type { AircraftWeightBalance } from "@/modules/aircrafts/types/aircraft-weight-balance";
 import { useSetAircraftWeightBalance } from "@/modules/aircrafts/hooks/use-set-aircraft-weight-balance.action";
-import { DECIMAL_NUMBER_PATTERN } from "@/shared/validations/number-patterns";
+import {
+  DECIMAL_NUMBER_PATTERN,
+  SIGNED_DECIMAL_NUMBER_PATTERN,
+} from "@/shared/validations/number-patterns";
 import { DialogSectionHeader } from "@/shared/components/layout/dialog-section-header";
 import { Button } from "@/shared/components/ui/button";
 import {
@@ -27,11 +30,11 @@ const weightBalanceFormSchema = z.object({
   basicEmptyWeightArm: z
     .string()
     .min(1, "Enter basic ARM.")
-    .regex(DECIMAL_NUMBER_PATTERN, "Enter a valid number."),
+    .regex(SIGNED_DECIMAL_NUMBER_PATTERN, "Enter a valid number."),
   basicEmptyWeightMoment: z
     .string()
     .min(1, "Enter basic moment.")
-    .regex(DECIMAL_NUMBER_PATTERN, "Enter a valid number."),
+    .regex(SIGNED_DECIMAL_NUMBER_PATTERN, "Enter a valid number."),
 });
 
 type WeightBalanceFormValues = z.infer<typeof weightBalanceFormSchema>;
@@ -151,6 +154,7 @@ export function AircraftWeightBalanceDialog({
               required
             />
             <WbField
+              allowNegative
               error={errors.basicEmptyWeightArm?.message}
               hint="in"
               id="basic-empty-weight-arm"
@@ -159,6 +163,7 @@ export function AircraftWeightBalanceDialog({
               required
             />
             <WbField
+              allowNegative
               error={errors.basicEmptyWeightMoment?.message}
               hint="lbs-in"
               id="basic-empty-weight-moment"
@@ -216,6 +221,7 @@ export function AircraftWeightBalanceDialog({
 }
 
 function WbField({
+  allowNegative = false,
   error,
   hint,
   id,
@@ -224,6 +230,7 @@ function WbField({
   register,
   required = false,
 }: {
+  allowNegative?: boolean;
   error?: string;
   hint: string;
   id: string;
@@ -257,7 +264,7 @@ function WbField({
         aria-invalid={Boolean(error)}
         aria-required={required || undefined}
         id={id}
-        min={0}
+        min={allowNegative ? undefined : 0}
         placeholder="0.00"
         step="any"
         type="number"

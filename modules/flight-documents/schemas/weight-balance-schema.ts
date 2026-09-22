@@ -1,6 +1,9 @@
 import { z } from "zod";
 
-import { DECIMAL_NUMBER_PATTERN } from "@/shared/validations/number-patterns";
+import {
+  DECIMAL_NUMBER_PATTERN,
+  SIGNED_DECIMAL_NUMBER_PATTERN,
+} from "@/shared/validations/number-patterns";
 
 const weightSchema = (label: string) =>
   z
@@ -9,16 +12,23 @@ const weightSchema = (label: string) =>
     .min(1, `Enter ${label}.`)
     .regex(DECIMAL_NUMBER_PATTERN, "Enter a valid number.");
 
+const momentSchema = (label: string) =>
+  z
+    .string()
+    .trim()
+    .min(1, `Enter ${label}.`)
+    .regex(SIGNED_DECIMAL_NUMBER_PATTERN, "Enter a valid number.");
+
 export const weightBalanceFormSchema = z.object({
   usableFuelWeight: weightSchema("usable fuel weight"),
-  usableFuelMoment: weightSchema("usable fuel moment"),
+  usableFuelMoment: momentSchema("usable fuel moment"),
   fiAndStudentWeight: weightSchema("FI + student weight"),
-  fiAndStudentMoment: weightSchema("FI + student moment"),
+  fiAndStudentMoment: momentSchema("FI + student moment"),
   baggageEntries: z.array(
     z.object({
       position: z.number().int().positive(),
       weight: weightSchema("baggage weight"),
-      moment: weightSchema("baggage moment"),
+      moment: momentSchema("baggage moment"),
     }),
   ),
   balanceStatus: z.enum(["balanced", "nose_heavy", "tail_heavy"], {

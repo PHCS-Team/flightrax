@@ -401,7 +401,6 @@ function EditableRow({
               aria-label={`${label} moment`}
               className={INPUT_TEXT_CLASS}
               disabled={isSubmitting}
-              min={0}
               placeholder="0.00"
               step="any"
               type="number"

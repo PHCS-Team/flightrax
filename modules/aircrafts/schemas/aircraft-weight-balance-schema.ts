@@ -4,12 +4,12 @@ const weightBalanceFormSchema = z.object({
   basicEmptyWeight: z.coerce
     .number()
     .positive("Basic empty weight must be positive."),
-  basicEmptyWeightArm: z.coerce
-    .number()
-    .positive("Basic empty weight arm must be positive."),
-  basicEmptyWeightMoment: z.coerce
-    .number()
-    .positive("Basic empty weight moment must be positive."),
+  basicEmptyWeightArm: z.coerce.number({
+    message: "Enter the basic empty weight arm.",
+  }),
+  basicEmptyWeightMoment: z.coerce.number({
+    message: "Enter the basic empty weight moment.",
+  }),
 });
 
 export type WeightBalanceFormValues = z.infer<typeof weightBalanceFormSchema>;

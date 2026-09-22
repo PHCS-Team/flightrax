@@ -22,12 +22,12 @@ export const setAircraftTypeWbSpecsSchema = z
   .object({
     typeKey: z.string().min(1, "Choose an aircraft type."),
     icaoDesignator: icaoDesignatorSchema,
-    usableFuelArm: z.coerce
-      .number()
-      .positive("Usable fuel arm must be positive."),
-    fiAndStudentArm: z.coerce
-      .number()
-      .positive("FI and student arm must be positive."),
+    usableFuelArm: z.coerce.number({
+      message: "Enter the usable fuel arm.",
+    }),
+    fiAndStudentArm: z.coerce.number({
+      message: "Enter the FI and student arm.",
+    }),
     maximumTakeoffWeight: z.coerce
       .number()
       .positive("Maximum takeoff weight must be positive."),
@@ -37,7 +37,7 @@ export const setAircraftTypeWbSpecsSchema = z
     baggageAreas: z
       .array(
         z.object({
-          arm: z.coerce.number().positive("Baggage area arm must be positive."),
+          arm: z.coerce.number({ message: "Enter the baggage area arm." }),
         }),
       )
       .max(6, "A type can have at most 6 baggage areas."),
