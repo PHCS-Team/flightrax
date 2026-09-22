@@ -73,7 +73,7 @@ const HELP_SECTIONS = [
       {
         term: "Cruising Level",
         detail:
-          "VFR for uncontrolled VFR flight, or F + 3 digits (flight level), A + 3 digits (altitude in hundreds of feet, e.g. A045 = 4,500 ft), S/M + 4 digits (metric).",
+          "Enter VFR, or a level like A0015.",
       },
       {
         term: "Total EET",

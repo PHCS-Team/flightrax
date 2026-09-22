@@ -12,9 +12,9 @@ import { cn } from "@/shared/lib/utils";
 
 const VARIANT_CLASSES = {
   destructive:
-    "border-destructive/40 bg-destructive text-white enabled:hover:bg-destructive/90",
+    "border-white/50 bg-destructive text-white enabled:hover:bg-destructive/90",
   primary:
-    "border-primary-foreground/30 bg-primary text-primary-foreground enabled:hover:bg-primary/90",
+    "border-primary-foreground/50 bg-primary text-primary-foreground enabled:hover:bg-primary/90",
 } as const;
 
 // Round floating action button anchored to the bottom-right corner.
@@ -42,7 +42,7 @@ export function FloatingActionButton({
           <button
             aria-label={label}
             className={cn(
-              "fixed bottom-6 right-6 z-30 inline-flex size-12 cursor-pointer items-center justify-center rounded-full border shadow-lg transition enabled:hover:shadow-xl disabled:cursor-default disabled:opacity-60",
+              "fixed bottom-6 right-6 z-30 inline-flex size-16 cursor-pointer items-center justify-center rounded-full border-2 shadow-xl shadow-black/30 transition enabled:hover:shadow-2xl enabled:active:scale-95 disabled:cursor-default disabled:opacity-60",
               VARIANT_CLASSES[variant],
               className,
             )}
@@ -50,7 +50,7 @@ export function FloatingActionButton({
             onClick={onClick}
             type="button"
           >
-            <Icon className="size-5" />
+            <Icon className="size-7" />
           </button>
         </TooltipTrigger>
         <TooltipContent side="left">

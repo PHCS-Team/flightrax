@@ -4,6 +4,7 @@ import { AdminRegisterForm } from "@/modules/auth/components/admin-register-form
 import { AuthShell } from "@/modules/auth/components/auth-shell";
 import { InstructorRegisterForm } from "@/modules/auth/components/instructor-register-form";
 import { LoginForm } from "@/modules/auth/components/login-form";
+import { LogoutSuccessToast } from "@/modules/auth/components/logout-success-toast";
 import { StudentRegisterForm } from "@/modules/auth/components/student-register-form";
 import { SuperadminRegisterForm } from "@/modules/auth/components/superadmin-register-form";
 import {
@@ -30,7 +31,12 @@ export function RoleAuthPage({
       title={config.title[mode]}
       description={modeConfig.selectedDescription}
     >
-      {mode === AUTH_MODE.LOGIN && <LoginForm role={role} />}
+      {mode === AUTH_MODE.LOGIN && (
+        <>
+          <LogoutSuccessToast />
+          <LoginForm role={role} />
+        </>
+      )}
       {mode === AUTH_MODE.REGISTER && role === ROLE.STUDENT && (
         <StudentRegisterForm />
       )}

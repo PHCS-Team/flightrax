@@ -39,6 +39,7 @@ import {
 } from "@/shared/components/ui/tooltip";
 import { appMetadata } from "@/shared/lib/app-metadata";
 import { getAvatarFallback } from "@/shared/lib/avatar-fallback";
+import { getSidebarRoleLabel } from "@/shared/lib/rbac/config";
 import { cn } from "@/shared/lib/utils";
 
 const copyTransition = {
@@ -115,6 +116,9 @@ export function DashboardShell({ children }: { children: ReactNode }) {
   const [desktopCollapsed, setDesktopCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const navigationSections = getDashboardNavigation(profile);
+  const roleLabel = profile
+    ? getSidebarRoleLabel(profile.role, profile.admin_department)
+    : "\u00a0";
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
     {},
   );
@@ -170,8 +174,8 @@ export function DashboardShell({ children }: { children: ReactNode }) {
                 <span className="block text-lg font-semibold tracking-tight">
                   FlightraX
                 </span>
-                <span className="text-xs uppercase tracking-[0.24em] text-primary-foreground/70">
-                  Ops control
+                <span className="block whitespace-normal text-xs leading-snug uppercase tracking-[0.12em] text-primary-foreground/70">
+                  {roleLabel}
                 </span>
               </span>
               <motion.span
@@ -187,8 +191,8 @@ export function DashboardShell({ children }: { children: ReactNode }) {
                 <span className="block text-lg font-semibold tracking-tight">
                   FlightraX
                 </span>
-                <span className="text-xs uppercase tracking-[0.24em] text-primary-foreground/70">
-                  Ops control
+                <span className="block whitespace-normal text-xs leading-snug uppercase tracking-[0.12em] text-primary-foreground/70">
+                  {roleLabel}
                 </span>
               </motion.span>
             </Link>
@@ -452,7 +456,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
             </div>
           </header>
 
-          <main className="min-w-0 lg:pb-8">{children}</main>
+          <main className="min-w-0 pb-28">{children}</main>
 
           <NotificationPermissionGate />
         </div>

@@ -1,10 +1,13 @@
 "use client";
 
-import { PenLineIcon } from "lucide-react";
+import Image from "next/image";
+import { useState } from "react";
+import { PenLineIcon, PencilIcon } from "lucide-react";
 
 import { SignaturePad } from "@/modules/auth/components/signature-pad";
 import { useSaveSignature } from "@/modules/auth/hooks/use-save-signature.action";
 import { GlassSurface } from "@/shared/components/layout/glass-surface";
+import { Button } from "@/shared/components/ui/button";
 import { ROLE } from "@/shared/lib/rbac/config";
 import type { Profile } from "@/shared/lib/rbac/types";
 
@@ -44,13 +47,57 @@ function SignaturePadSlot({
 }: {
   currentSignature: string | null | undefined;
 }) {
-  const { execute, isExecuting } = useSaveSignature();
+  const [isEditing, setIsEditing] = useState(false);
+  const { execute, isExecuting } = useSaveSignature({
+    onSaved: () => setIsEditing(false),
+  });
+
+  if (currentSignature && !isEditing) {
+    return (
+      <SavedSignature
+        onEdit={() => setIsEditing(true)}
+        signature={currentSignature}
+      />
+    );
+  }
 
   return (
     <SignaturePad
-      currentSignature={currentSignature ?? null}
       isSaving={isExecuting}
+      onCancel={currentSignature ? () => setIsEditing(false) : undefined}
       onSave={(svg) => execute({ signature: svg })}
     />
+  );
+}
+
+function SavedSignature({
+  onEdit,
+  signature,
+}: {
+  onEdit: () => void;
+  signature: string;
+}) {
+  return (
+    <div className="space-y-3">
+      <p className="text-sm font-semibold text-primary-foreground/90">
+        Signature
+      </p>
+      <div className="relative h-48 w-full overflow-hidden rounded-lg border border-border bg-white">
+        <Image
+          alt="Your saved signature"
+          className="object-contain p-3"
+          fill
+          src={`data:image/svg+xml,${encodeURIComponent(signature)}`}
+          unoptimized
+        />
+      </div>
+      <p className="-mt-1.5 text-xs text-primary-foreground/60">
+        Locked so it can&apos;t be changed by accident.
+      </p>
+      <Button className="w-full" onClick={onEdit} type="button">
+        <PencilIcon className="size-4" />
+        Edit signature
+      </Button>
+    </div>
   );
 }

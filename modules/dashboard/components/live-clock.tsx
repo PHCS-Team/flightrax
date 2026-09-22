@@ -1,7 +1,8 @@
 "use client";
 
-import { format } from "date-fns";
 import { useSyncExternalStore } from "react";
+
+import { formatHeaderClock } from "@/modules/dashboard/utils/format";
 
 function subscribeToClock(callback: () => void) {
   const timer = setInterval(callback, 1000);
@@ -17,9 +18,6 @@ function getClockServerSnapshot() {
   return 0;
 }
 
-// Live local date/time — useSyncExternalStore keeps it hydration-safe
-// and self-contained, no library needed. Mobile shows time only; the
-// full date joins on wider screens.
 export function LiveClock() {
   const seconds = useSyncExternalStore(
     subscribeToClock,
@@ -31,11 +29,12 @@ export function LiveClock() {
     return null;
   }
 
-  const now = new Date(seconds * 1000);
+  const clock = formatHeaderClock(new Date(seconds * 1000));
 
   return (
-    <p className="whitespace-nowrap text-xs font-medium tabular-nums text-primary-foreground/70">
-      <span>{format(now, "MMM d, yyyy · h:mm:ss a")}</span>
+    <p className="max-w-48 text-right text-xs font-medium tabular-nums text-primary-foreground/70 sm:max-w-none">
+      <span className="whitespace-nowrap">{clock.philippine}</span>{" "}
+      <span className="whitespace-nowrap">{clock.utc}</span>
     </p>
   );
 }

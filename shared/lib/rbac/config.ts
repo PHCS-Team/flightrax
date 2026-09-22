@@ -161,3 +161,27 @@ export const ADMIN_DEPARTMENT_LABELS = {
   [ADMIN_DEPARTMENT.AIR_TRAFFIC_CONTROLLER]: "Air Traffic Controller",
   [ADMIN_DEPARTMENT.SAFETY_PERSONNEL]: "Safety Personnel",
 } satisfies Record<AdminDepartment, string>;
+
+const SIDEBAR_ROLE_LABELS = {
+  [ROLE.STUDENT]: "Student",
+  [ROLE.INSTRUCTOR]: "Flight Instructor",
+  [ROLE.ADMIN]: "Admin",
+  [ROLE.SUPERADMIN]: "Super Admin",
+} satisfies Record<ProfileRole, string>;
+
+const SIDEBAR_DEPARTMENT_LABELS = {
+  [ADMIN_DEPARTMENT.FLIGHT_OPERATIONS_PERSONNEL]: "Flight Operations",
+  [ADMIN_DEPARTMENT.AIR_TRAFFIC_CONTROLLER]: "Air Traffic Control",
+  [ADMIN_DEPARTMENT.SAFETY_PERSONNEL]: "Safety Personnel",
+} satisfies Record<AdminDepartment, string>;
+
+export function getSidebarRoleLabel(
+  role: ProfileRole,
+  department: AdminDepartment | null,
+) {
+  if (role === ROLE.ADMIN && department) {
+    return SIDEBAR_DEPARTMENT_LABELS[department];
+  }
+
+  return SIDEBAR_ROLE_LABELS[role];
+}

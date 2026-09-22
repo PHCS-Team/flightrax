@@ -58,3 +58,32 @@ export function formatElapsedHm(fromIso: string): string {
   return `${hours}:${String(minutes).padStart(2, "0")}`;
 }
 
+const PHILIPPINE_CLOCK = new Intl.DateTimeFormat("en-US", {
+  timeZone: "Asia/Manila",
+  weekday: "short",
+  day: "numeric",
+  month: "short",
+  year: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+  hourCycle: "h23",
+});
+
+const UTC_CLOCK = new Intl.DateTimeFormat("en-US", {
+  timeZone: "UTC",
+  hour: "numeric",
+  minute: "2-digit",
+  hour12: true,
+});
+
+// "Wed, 23 Sep 2026 19:05 PHT (11:05 AM UTC)", in PHT whatever the device time zone.
+export function formatHeaderClock(date: Date) {
+  const parts = Object.fromEntries(
+    PHILIPPINE_CLOCK.formatToParts(date).map((part) => [part.type, part.value]),
+  );
+
+  return {
+    philippine: `${parts.weekday}, ${parts.day} ${parts.month} ${parts.year} ${parts.hour}:${parts.minute} PHT`,
+    utc: `(${UTC_CLOCK.format(date)} UTC)`,
+  };
+}

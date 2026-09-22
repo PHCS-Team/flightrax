@@ -79,7 +79,7 @@ const flightPlanFormObjectSchema = z.object({
     .refine(
       (value) =>
         value === CRUISING_LEVEL_VFR || CRUISING_LEVEL_PATTERN.test(value),
-      "Use VFR, or F/A + 3 digits or S/M + 4 digits, e.g. A045.",
+      "Enter VFR, or a level like A0015.",
     ),
   route: z.string().trim(),
   destinationAerodrome: aerodromeSchema,

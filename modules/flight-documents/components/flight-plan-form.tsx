@@ -460,7 +460,7 @@ export function FlightPlanForm({
           />
           <FpTextField
             error={errors.cruisingLevel?.message}
-            helper="VFR, or e.g. A045 = 4,500 ft"
+            helper="Enter VFR, or a level like A0015"
             id="fp-cruising-level"
             label="Cruising Level"
             placeholder="VFR"

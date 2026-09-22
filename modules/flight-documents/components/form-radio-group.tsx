@@ -40,7 +40,7 @@ export function FormRadioGroup<T extends FieldValues>({
           >
             <Checkbox
               checked={field.value === option.value}
-              className="mt-0.5 cursor-pointer rounded-full"
+              className="mt-0.5 cursor-pointer rounded-full sm:size-5"
               onCheckedChange={() => field.onChange(option.value)}
             />
             <span>{option.label}</span>

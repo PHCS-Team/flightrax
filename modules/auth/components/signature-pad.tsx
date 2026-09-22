@@ -7,14 +7,14 @@ import SignaturePadLib from "signature_pad";
 import { Button } from "@/shared/components/ui/button";
 
 type SignaturePadProps = {
-  currentSignature?: string | null;
+  onCancel?: () => void;
   onSave: (svg: string) => void;
   isSaving: boolean;
   label?: string;
 };
 
 export function SignaturePad({
-  currentSignature,
+  onCancel,
   onSave,
   isSaving,
   label = "Signature",
@@ -69,14 +69,6 @@ export function SignaturePad({
       padRef.current = null;
     };
   }, []);
-
-  useEffect(() => {
-    const pad = padRef.current;
-    if (!pad || !currentSignature) return;
-
-    const svgDataUrl = `data:image/svg+xml,${encodeURIComponent(currentSignature)}`;
-    pad.fromDataURL(svgDataUrl);
-  }, [currentSignature]);
 
   function handleUndo() {
     const pad = padRef.current;
@@ -142,14 +134,27 @@ export function SignaturePad({
           </Button>
         </div>
       </div>
-      <Button
-        className="w-full"
-        disabled={isSaving}
-        onClick={handleSave}
-        type="button"
-      >
-        {isSaving ? "Saving..." : "Save signature"}
-      </Button>
+      <div className="flex gap-2">
+        {onCancel && (
+          <Button
+            className="flex-1"
+            disabled={isSaving}
+            onClick={onCancel}
+            type="button"
+            variant="outline"
+          >
+            Cancel
+          </Button>
+        )}
+        <Button
+          className="flex-1"
+          disabled={isSaving || !canUndo}
+          onClick={handleSave}
+          type="button"
+        >
+          {isSaving ? "Saving..." : "Save signature"}
+        </Button>
+      </div>
     </div>
   );
 }

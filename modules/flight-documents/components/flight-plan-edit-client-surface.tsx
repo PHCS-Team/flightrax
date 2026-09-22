@@ -179,7 +179,7 @@ export function FlightPlanEditClientSurface({
 
       {isRejected && (
         <RejectionReasonAction
-          className="bottom-19 sm:bottom-24"
+          className="bottom-28"
           reason={flightPlan.rejectedReason ?? ""}
         />
       )}

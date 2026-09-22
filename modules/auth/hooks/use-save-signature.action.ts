@@ -7,7 +7,9 @@ import { saveSignatureAction } from "@/modules/auth/actions/save-signature";
 import { AUTH_QUERY_KEYS } from "@/modules/auth/queries/dashboard-profile";
 import { toastActionError, toastActionResult } from "@/shared/lib/action-toast";
 
-export function useSaveSignature() {
+export function useSaveSignature({
+  onSaved,
+}: { onSaved?: () => void } = {}) {
   const queryClient = useQueryClient();
 
   return useGuardedAction(saveSignatureAction, {
@@ -19,6 +21,7 @@ export function useSaveSignature() {
         queryClient.invalidateQueries({
           queryKey: AUTH_QUERY_KEYS.currentDashboardProfile,
         });
+        onSaved?.();
       }
     },
   });

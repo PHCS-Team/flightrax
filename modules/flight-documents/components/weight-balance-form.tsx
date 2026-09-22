@@ -135,7 +135,7 @@ export function WeightBalanceForm({
             arm={givens.usableFuelArm}
             form={form}
             isSubmitting={isSubmitting}
-            label="Usable Fuel"
+            label="Total Usable Fuel"
             momentName="usableFuelMoment"
             weightName="usableFuelWeight"
           />
@@ -174,7 +174,7 @@ export function WeightBalanceForm({
                 "flex items-center gap-2 sm:flex-col sm:items-start sm:gap-1",
               )}
             >
-              <p className="text-sm font-bold text-foreground">Total</p>
+              <p className="text-sm font-bold text-foreground">Total Weight</p>
               <span
                 className={cn(
                   "inline-flex w-fit items-center rounded-full border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide",

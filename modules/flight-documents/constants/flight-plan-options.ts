@@ -54,7 +54,7 @@ export const DEPARTURE_TIME_PATTERN = /^([01]\d|2[0-3])[0-5]\d$/;
 export const CRUISING_SPEED_PATTERN = /^(K\d{4}|N\d{4}|M\d{3})$/;
 
 // Cruising level: F/A + 3 digits, S/M + 4 digits, or the literal VFR.
-export const CRUISING_LEVEL_PATTERN = /^(F\d{3}|S\d{4}|A\d{3}|M\d{4})$/;
+export const CRUISING_LEVEL_PATTERN = /^(F\d{3,4}|S\d{4}|A\d{3,4}|M\d{4})$/;
 export const CRUISING_LEVEL_VFR = "VFR";
 
 // Persons on board: 3 digits, or TBN (to be notified).

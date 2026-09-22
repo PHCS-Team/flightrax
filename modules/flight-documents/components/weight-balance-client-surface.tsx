@@ -147,7 +147,7 @@ export function WeightBalanceClientSurface({
 
       {context.requestStatus === "rejected" && context.rejectedReason && (
         <RejectionReasonAction
-          className="bottom-24"
+          className="bottom-28"
           reason={context.rejectedReason}
         />
       )}
