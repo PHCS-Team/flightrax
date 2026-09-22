@@ -137,7 +137,7 @@ export function WeightBalanceClientSurface({
           readOnly={readOnly}
           submitLabel={
             context.weightBalanceId
-              ? "Save and submit"
+              ? "Save and continue"
               : "Save weight and balance"
           }
         />
