@@ -1,3 +1,5 @@
+import type { ExpiredCredential } from "@/shared/types/credentials";
+
 import type { ScheduleSessionType } from "@/modules/schedule/constants/session-types";
 import type { Database } from "@/shared/types/supabase";
 
@@ -40,4 +42,5 @@ export type ScheduleDay = {
 
 export type SchedulePersonOption = SchedulePerson & {
   roleLabel: string;
+  expiredCredentials: ExpiredCredential[];
 };

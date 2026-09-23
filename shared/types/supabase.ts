@@ -290,6 +290,50 @@ export type Database = {
           },
         ]
       }
+      certificate_images: {
+        Row: {
+          certificate_id: string
+          created_at: string
+          id: string
+          image_content_type: string
+          image_path: string
+          image_size_bytes: number
+          image_uploaded_at: string
+          position: number
+          updated_at: string
+        }
+        Insert: {
+          certificate_id: string
+          created_at?: string
+          id?: string
+          image_content_type: string
+          image_path: string
+          image_size_bytes: number
+          image_uploaded_at?: string
+          position: number
+          updated_at?: string
+        }
+        Update: {
+          certificate_id?: string
+          created_at?: string
+          id?: string
+          image_content_type?: string
+          image_path?: string
+          image_size_bytes?: number
+          image_uploaded_at?: string
+          position?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "certificate_images_certificate_id_fkey"
+            columns: ["certificate_id"]
+            isOneToOne: false
+            referencedRelation: "certificates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       certificates: {
         Row: {
           created_at: string

@@ -10,6 +10,7 @@ import {
 import { toInstant } from "@/modules/schedule/utils/schedule-time";
 import { SCHEDULE_SESSION_TYPE_META } from "@/modules/schedule/constants/session-types";
 import { actionClient } from "@/shared/lib/safe-action";
+import { findExpiredCredentialBlock } from "@/shared/lib/aviation/expired-credentials.server";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 
 export const createScheduleEntryAction = actionClient
@@ -26,6 +27,17 @@ export const createScheduleEntryAction = actionClient
 
     const needsPeople =
       SCHEDULE_SESSION_TYPE_META[parsedInput.sessionType].needsPeople;
+    if (needsPeople) {
+      const credentialBlock = await findExpiredCredentialBlock([
+        { id: parsedInput.pilotProfileId, role: "pilot" },
+        { id: parsedInput.instructorProfileId, role: "instructor" },
+      ]);
+
+      if (credentialBlock) {
+        return { ok: false, message: credentialBlock };
+      }
+    }
+
     const supabase = createAdminClient();
     const entry = {
       aircraft_id: parsedInput.aircraftId,

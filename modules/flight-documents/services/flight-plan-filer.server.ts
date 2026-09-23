@@ -8,6 +8,7 @@ import {
   canCommandAsPic,
   isInstructorRole,
 } from "@/modules/flight-documents/utils/flight-request-eligibility";
+import { getExpiredCredentialsByProfile } from "@/shared/lib/aviation/expired-credentials.server";
 import { isLicenseValid } from "@/shared/lib/aviation/license-validity";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { isApproved } from "@/shared/lib/rbac/guards";
@@ -37,6 +38,7 @@ export async function getFlightPlanFilerContext(): Promise<FlightPlanFilerContex
     isLicenseValid(license),
   );
   const canSetSelfAsPic = canCommandAsPic(viewer.role, licenses ?? []);
+  const expiredByProfile = await getExpiredCredentialsByProfile([viewer.id]);
 
   return {
     profile: {
@@ -55,6 +57,7 @@ export async function getFlightPlanFilerContext(): Promise<FlightPlanFilerContex
     hasSignature: Boolean(viewer.signature_svg?.trim()),
     hasValidLicense,
     canSetSelfAsPic,
+    expiredCredentials: expiredByProfile.get(viewer.id) ?? [],
   };
 }
 
@@ -81,6 +84,7 @@ export async function getFlightPlanPicOptions(): Promise<
   }
 
   const instructorIds = (data ?? []).map((row) => row.profiles.id);
+  const expiredByProfile = await getExpiredCredentialsByProfile(instructorIds);
   const today = new Date().toISOString().slice(0, 10);
   const { data: unavailabilityRows, error: unavailabilityError } =
     instructorIds.length > 0
@@ -113,6 +117,7 @@ export async function getFlightPlanPicOptions(): Promise<
       id: row.profiles.id,
       fullName: row.profiles.full_name,
       unavailabilities: unavailabilitiesByProfile.get(row.profiles.id) ?? [],
+      expiredCredentials: expiredByProfile.get(row.profiles.id) ?? [],
     }))
     .sort((a, b) => a.fullName.localeCompare(b.fullName));
 }

@@ -17,6 +17,7 @@ import {
 } from "@/shared/lib/rbac/config";
 import { isApproved } from "@/shared/lib/rbac/guards";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
+import { getExpiredCredentialsByProfile } from "@/shared/lib/aviation/expired-credentials.server";
 import { describeActionError } from "@/shared/lib/action-error";
 
 const AIRCRAFT_SELECT =
@@ -134,11 +135,16 @@ export async function getSchedulePeople(): Promise<SchedulePersonOption[]> {
     throw new Error(describeActionError(error));
   }
 
+  const expiredByProfile = await getExpiredCredentialsByProfile(
+    (data ?? []).map((row) => row.profiles.id),
+  );
+
   return (data ?? [])
     .map((row) => ({
       id: row.profiles.id,
       fullName: row.profiles.full_name,
       roleLabel: ROLE_LABELS[row.profiles.role],
+      expiredCredentials: expiredByProfile.get(row.profiles.id) ?? [],
     }))
     .sort((a, b) => a.fullName.localeCompare(b.fullName));
 }

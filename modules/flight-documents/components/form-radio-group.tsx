@@ -32,10 +32,10 @@ export function FormRadioGroup<T extends FieldValues>({
       <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
         {label}
       </p>
-      <div className="grid gap-1.5">
+      <div className="grid gap-1">
         {options.map((option) => (
           <label
-            className="flex cursor-pointer items-start gap-2 text-sm text-foreground"
+            className="flex cursor-pointer items-start gap-2.5 py-1 text-sm text-foreground sm:py-0.5"
             key={option.value}
           >
             <Checkbox

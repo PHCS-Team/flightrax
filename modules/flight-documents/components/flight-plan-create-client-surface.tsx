@@ -13,6 +13,10 @@ import { FlightPlanSavingDialog } from "@/modules/flight-documents/components/fl
 import { useCreateFlightPlan } from "@/modules/flight-documents/hooks/use-create-flight-plan.action";
 import { useFlightPlanAircraft } from "@/modules/flight-documents/hooks/use-flight-plan-aircraft.query";
 import { useFlightPlanFilerContext } from "@/modules/flight-documents/hooks/use-filer-context.query";
+import {
+  describeFilerBlockers,
+  isFilerReady,
+} from "@/modules/flight-documents/utils/filer-readiness";
 import { EmptyState } from "@/shared/components/layout/empty-state";
 import { GlassSurface } from "@/shared/components/layout/glass-surface";
 import { LoadingScreen } from "@/shared/components/layout/loading-screen";
@@ -51,10 +55,7 @@ export function FlightPlanCreateClientSurface() {
     );
   }
 
-  if (
-    filerContext &&
-    (!filerContext.hasSignature || !filerContext.hasValidLicense)
-  ) {
+  if (filerContext && !isFilerReady(filerContext)) {
     return (
       <EmptyState
         action={
@@ -62,16 +63,7 @@ export function FlightPlanCreateClientSurface() {
             Go to account settings
           </Button>
         }
-        description={[
-          !filerContext.hasSignature
-            ? "Set your signature — saving a flight plan automatically signs it."
-            : null,
-          !filerContext.hasValidLicense
-            ? "Add an active, non-expired license to your account."
-            : null,
-        ]
-          .filter(Boolean)
-          .join(" ")}
+        description={describeFilerBlockers(filerContext).join(" ")}
         icon={<PlaneIcon className="size-7" />}
         title="Set This Data First"
       />

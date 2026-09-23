@@ -11,6 +11,10 @@ import { PlanCodeSearchInput } from "@/modules/flight-documents/components/plan-
 import { useFlightPlanFilerContext } from "@/modules/flight-documents/hooks/use-filer-context.query";
 import { useFlightRequestsRealtime } from "@/modules/flight-documents/hooks/use-flight-requests-realtime";
 import { useOwnFlightRequests } from "@/modules/flight-documents/hooks/use-flight-requests.query";
+import {
+  describeFilerBlockers,
+  isFilerReady,
+} from "@/modules/flight-documents/utils/filer-readiness";
 import { useInfiniteScrollSentinel } from "@/shared/hooks/use-infinite-scroll-sentinel";
 import { EmptyState } from "@/shared/components/layout/empty-state";
 import { FloatingActionButton } from "@/shared/components/layout/floating-action-button";
@@ -58,9 +62,7 @@ export function FlightDocumentsClientSurface() {
   useFlightRequestsRealtime();
   const sentinelRef = useInfiniteScrollSentinel(list);
   const { filerContext } = useFlightPlanFilerContext();
-  const canFile = Boolean(
-    filerContext?.hasSignature && filerContext?.hasValidLicense,
-  );
+  const canFile = Boolean(filerContext && isFilerReady(filerContext));
 
   if (!list.isPending && !hasLoadedOnce) {
     setHasLoadedOnce(true);
@@ -116,8 +118,7 @@ export function FlightDocumentsClientSurface() {
 
       {filerContext && !canFile && (
         <FlightPlanFilerNotice
-          hasSignature={filerContext.hasSignature}
-          hasValidLicense={filerContext.hasValidLicense}
+          blockers={describeFilerBlockers(filerContext)}
         />
       )}
 

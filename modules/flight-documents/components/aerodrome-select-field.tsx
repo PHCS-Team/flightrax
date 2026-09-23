@@ -86,7 +86,7 @@ export function AerodromeSelectField({
             <span className="min-w-0 truncate text-left font-medium uppercase text-[#121212]">
               {value}
               {selectedName && (
-                <span className="ml-1.5 font-normal normal-case text-muted-foreground">
+                <span className="ml-1.5 font-normal normal-case text-[#121212]/55">
                   — {selectedName}
                 </span>
               )}
@@ -96,11 +96,11 @@ export function AerodromeSelectField({
               None
             </span>
           ) : (
-            <span className="min-w-0 truncate text-left text-muted-foreground">
+            <span className="min-w-0 truncate text-left text-[#121212]/55">
               Choose aerodrome
             </span>
           )}
-          <ChevronDownIcon className="size-4 shrink-0 text-muted-foreground" />
+          <ChevronDownIcon className="size-4 shrink-0 text-[#121212]/45" />
         </PopoverTrigger>
         <PopoverContent
           align="start"

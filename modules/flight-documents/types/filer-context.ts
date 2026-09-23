@@ -1,3 +1,4 @@
+import type { ExpiredCredential } from "@/shared/types/credentials";
 import type { Database } from "@/shared/types/supabase";
 
 // License row shape used for the Other Information auto-fill and the
@@ -26,6 +27,9 @@ export type FlightPlanFilerContext = {
   hasValidLicense: boolean;
   // True when the filer holds an active, non-expired PPL license.
   canSetSelfAsPic: boolean;
+  // Licenses and certificates on the filer's account that have lapsed —
+  // any one of them blocks filing.
+  expiredCredentials: ExpiredCredential[];
 };
 
 export type PicUnavailability = {
@@ -38,4 +42,5 @@ export type FlightPlanPicOption = {
   id: string;
   fullName: string;
   unavailabilities: PicUnavailability[];
+  expiredCredentials: ExpiredCredential[];
 };

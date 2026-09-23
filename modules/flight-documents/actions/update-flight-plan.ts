@@ -8,6 +8,7 @@ import {
   resolveDof,
   resolveDofDate,
 } from "@/modules/flight-documents/utils/flight-plan-time";
+import { findExpiredCredentialBlock } from "@/shared/lib/aviation/expired-credentials.server";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { isApproved } from "@/shared/lib/rbac/guards";
 import {
@@ -58,6 +59,16 @@ export const updateFlightPlanAction = actionClient
         ok: false,
         message: "Only draft or rejected flight plans can be edited.",
       };
+    }
+
+    const credentialBlock = await findExpiredCredentialBlock([
+      { id: actor.id, role: "self" },
+      { id: parsedInput.pilotInCommandId, role: "pilot in command" },
+      { id: parsedInput.instructorId, role: "flight instructor" },
+    ]);
+
+    if (credentialBlock) {
+      return { ok: false, message: credentialBlock };
     }
 
     const dofDate = resolveDofDate(parsedInput.dofRaw);

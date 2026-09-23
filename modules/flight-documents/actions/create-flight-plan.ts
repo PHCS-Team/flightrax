@@ -9,6 +9,7 @@ import {
   resolveDofDate,
 } from "@/modules/flight-documents/utils/flight-plan-time";
 import { generatePlanCode } from "@/modules/flight-documents/utils/generate-plan-code";
+import { findExpiredCredentialBlock } from "@/shared/lib/aviation/expired-credentials.server";
 import { isLicenseValid } from "@/shared/lib/aviation/license-validity";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { isApproved } from "@/shared/lib/rbac/guards";
@@ -106,6 +107,16 @@ export const createFlightPlanAction = actionClient
       hasNoExpiry: license.has_no_expiry,
       status: license.status,
     }));
+
+    const credentialBlock = await findExpiredCredentialBlock([
+      { id: actor.id, role: "self" },
+      { id: parsedInput.pilotInCommandId, role: "pilot in command" },
+      { id: parsedInput.instructorId, role: "flight instructor" },
+    ]);
+
+    if (credentialBlock) {
+      return { ok: false, message: credentialBlock };
+    }
 
     const dofDate = resolveDofDate(parsedInput.dofRaw);
 

@@ -48,12 +48,15 @@ import {
   SelectValue,
 } from "@/shared/components/ui/select";
 import { Switch } from "@/shared/components/ui/switch";
+import { PersonSelectField } from "@/shared/components/person-select-field";
 import { Textarea } from "@/shared/components/ui/textarea";
+import { describeExpiredCredentials } from "@/shared/lib/aviation/expired-credentials";
 import { cn } from "@/shared/lib/utils";
 
-const INPUT_TEXT_CLASS = "text-[#121212] uppercase placeholder:normal-case";
+const INPUT_TEXT_CLASS =
+  "text-[#121212] uppercase placeholder:normal-case placeholder:text-[#121212]/55";
 const TEXTAREA_CLASS =
-  "border-primary-foreground/20 bg-primary-foreground/95 text-[#121212] uppercase placeholder:normal-case placeholder:text-muted-foreground";
+  "border-primary-foreground/20 bg-primary-foreground/95 text-[#121212] uppercase placeholder:normal-case placeholder:text-[#121212]/55";
 
 export function getFlightPlanFormDefaults(): FlightPlanFormValues {
   return {
@@ -324,6 +327,30 @@ export function FlightPlanForm({
       ) ?? null
     );
   }
+
+  const crewOptions = picOptions.map((option) => {
+    const expired = option.expiredCredentials;
+    const unavailability = getPicUnavailability(option.id);
+
+    if (expired.length > 0) {
+      return {
+        id: option.id,
+        fullName: option.fullName,
+        note: describeExpiredCredentials(expired),
+        disabled: true,
+      };
+    }
+
+    return {
+      id: option.id,
+      fullName: option.fullName,
+      note: unavailability
+        ? `Unavailable until ${format(parseISO(unavailability.endsOn), "MMM d, yyyy")}`
+        : undefined,
+      noteTone: "muted" as const,
+      disabled: Boolean(unavailability),
+    };
+  });
 
   function handlePicSelect(picId: string) {
     const pic = picOptions.find((option) => option.id === picId);
@@ -683,53 +710,17 @@ export function FlightPlanForm({
               value={filerContext?.profile.fullName ?? ""}
             />
           ) : (
-            <Select
+            <PersonSelectField
               disabled={!dofDate}
-              onValueChange={handlePicSelect}
-              value={pilotInCommandId || undefined}
-            >
-              <SelectTrigger
-                aria-invalid={Boolean(errors.pilotInCommandId)}
-                className={cn(
-                  INPUT_TEXT_CLASS,
-                  "uppercase placeholder:normal-case",
-                )}
-                id="fp-pilot-in-command"
-              >
-                <SelectValue placeholder="Choose a flight instructor" />
-              </SelectTrigger>
-              <SelectContent>
-                {picOptions.map((option) => {
-                  const unavailability = getPicUnavailability(option.id);
-
-                  return (
-                    <SelectItem
-                      disabled={Boolean(unavailability)}
-                      key={option.id}
-                      value={option.id}
-                    >
-                      <span className="flex items-center gap-2">
-                        {option.fullName}
-                        {unavailability && (
-                          <span className="text-xs text-muted-foreground">
-                            Unavailable until{" "}
-                            {format(
-                              parseISO(unavailability.endsOn),
-                              "MMM d, yyyy",
-                            )}
-                          </span>
-                        )}
-                      </span>
-                    </SelectItem>
-                  );
-                })}
-              </SelectContent>
-            </Select>
-          )}
-          {errors.pilotInCommandId && (
-            <p className="text-sm text-destructive">
-              {errors.pilotInCommandId.message}
-            </p>
+              error={errors.pilotInCommandId?.message}
+              id="fp-pilot-in-command"
+              onChange={handlePicSelect}
+              options={crewOptions}
+              placeholder="Choose a flight instructor"
+              searchPlaceholder="Search instructor..."
+              triggerClassName="border-primary-foreground/20 bg-primary-foreground/95 uppercase"
+              value={pilotInCommandId}
+            />
           )}
         </div>
 
@@ -766,58 +757,22 @@ export function FlightPlanForm({
               value={form.getValues("pilotInCommandName")}
             />
           ) : (
-            <Select
+            <PersonSelectField
               disabled={!dofDate}
-              onValueChange={handleInstructorSelect}
-              value={instructorId || undefined}
-            >
-              <SelectTrigger
-                aria-invalid={Boolean(errors.instructorId)}
-                className={cn(
-                  INPUT_TEXT_CLASS,
-                  "uppercase placeholder:normal-case",
-                )}
-                id="fp-instructor"
-              >
-                <SelectValue placeholder="Choose a flight instructor" />
-              </SelectTrigger>
-              <SelectContent>
-                {picOptions.map((option) => {
-                  const unavailability = getPicUnavailability(option.id);
-
-                  return (
-                    <SelectItem
-                      disabled={Boolean(unavailability)}
-                      key={option.id}
-                      value={option.id}
-                    >
-                      <span className="flex items-center gap-2">
-                        {option.fullName}
-                        {unavailability && (
-                          <span className="text-xs text-muted-foreground">
-                            Unavailable until{" "}
-                            {format(
-                              parseISO(unavailability.endsOn),
-                              "MMM d, yyyy",
-                            )}
-                          </span>
-                        )}
-                      </span>
-                    </SelectItem>
-                  );
-                })}
-              </SelectContent>
-            </Select>
+              error={errors.instructorId?.message}
+              id="fp-instructor"
+              onChange={handleInstructorSelect}
+              options={crewOptions}
+              placeholder="Choose a flight instructor"
+              searchPlaceholder="Search instructor..."
+              triggerClassName="border-primary-foreground/20 bg-primary-foreground/95 uppercase"
+              value={instructorId}
+            />
           )}
           {!dofDate && !isInstructorSameAsPic && (
             <p className="text-xs text-muted-foreground">
               Enter the Date of Filing first — instructor availability depends
               on the flight date.
-            </p>
-          )}
-          {errors.instructorId && (
-            <p className="text-sm text-destructive">
-              {errors.instructorId.message}
             </p>
           )}
         </div>
@@ -1070,7 +1025,7 @@ function FpBooleanCheckbox({
   const { field } = useController({ control, name });
 
   return (
-    <label className="flex cursor-pointer items-center gap-2 text-sm text-foreground">
+    <label className="flex cursor-pointer items-center gap-2.5 py-1 text-sm text-foreground sm:py-0.5">
       <Checkbox
         checked={Boolean(field.value)}
         className="cursor-pointer"
