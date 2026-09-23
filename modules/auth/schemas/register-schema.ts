@@ -20,6 +20,10 @@ const baseRegisterSchema = z.object({
   password: z.string().min(8, "Password must be at least 8 characters."),
   confirmPassword: z.string().min(8, "Re-enter your password."),
   fullName: fullNameSchema,
+  acceptedTerms: z.boolean().refine((value) => value, {
+    message:
+      "Accept the Terms and Conditions and the Privacy Policy to continue.",
+  }),
 });
 const passwordMatchSchema = baseRegisterSchema.superRefine((value, context) => {
   if (value.password !== value.confirmPassword) {

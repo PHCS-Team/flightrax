@@ -10,6 +10,7 @@ import { registerAdminAction } from "@/modules/auth/actions/register-admin";
 import { AuthFieldLabel } from "@/modules/auth/components/auth-field-label";
 import {
   RegisterFormSection,
+  RegisterTermsField,
   RegisterPasswordField,
   RegisterTextField,
 } from "@/modules/auth/components/register-form-parts";
@@ -36,6 +37,7 @@ export function AdminRegisterForm() {
   const form = useForm<AdminRegisterInput>({
     resolver: zodResolver(adminRegisterSchema),
     defaultValues: {
+      acceptedTerms: false,
       email: "",
       password: "",
       confirmPassword: "",
@@ -54,13 +56,18 @@ export function AdminRegisterForm() {
     },
   });
   const errors = form.formState.errors;
+  const acceptedTerms = useWatch({
+    control: form.control,
+    name: "acceptedTerms",
+  });
   const selectedAdminDepartment = useWatch({
     control: form.control,
     name: "adminDepartment",
   });
 
   return (
-    <form noValidate
+    <form
+      noValidate
       className="space-y-5"
       onSubmit={form.handleSubmit((values) => execute(values))}
     >
@@ -147,6 +154,14 @@ export function AdminRegisterForm() {
           )}
         </div>
       </RegisterFormSection>
+      <RegisterTermsField
+        checked={acceptedTerms}
+        error={errors.acceptedTerms}
+        id="admin-register-terms"
+        onCheckedChange={(value) =>
+          form.setValue("acceptedTerms", value, { shouldValidate: true })
+        }
+      />
       <Button
         className="mt-3 h-12 w-full px-7 font-bold uppercase"
         disabled={isExecuting}

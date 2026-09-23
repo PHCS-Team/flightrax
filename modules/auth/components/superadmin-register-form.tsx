@@ -4,11 +4,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useOneShotAction } from "@/shared/hooks/use-guarded-action";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 
 import { registerSuperadminAction } from "@/modules/auth/actions/register-superadmin";
 import {
   RegisterFormSection,
+  RegisterTermsField,
   RegisterPasswordField,
   RegisterTextField,
 } from "@/modules/auth/components/register-form-parts";
@@ -28,6 +29,7 @@ export function SuperadminRegisterForm() {
   const form = useForm<SuperadminRegisterInput>({
     resolver: zodResolver(superadminRegisterSchema),
     defaultValues: {
+      acceptedTerms: false,
       email: "",
       password: "",
       confirmPassword: "",
@@ -45,9 +47,14 @@ export function SuperadminRegisterForm() {
     },
   });
   const errors = form.formState.errors;
+  const acceptedTerms = useWatch({
+    control: form.control,
+    name: "acceptedTerms",
+  });
 
   return (
-    <form noValidate
+    <form
+      noValidate
       className="space-y-5"
       onSubmit={form.handleSubmit((values) => execute(values))}
     >
@@ -89,6 +96,14 @@ export function SuperadminRegisterForm() {
           registration={form.register("confirmPassword")}
         />
       </RegisterFormSection>
+      <RegisterTermsField
+        checked={acceptedTerms}
+        error={errors.acceptedTerms}
+        id="superadmin-register-terms"
+        onCheckedChange={(value) =>
+          form.setValue("acceptedTerms", value, { shouldValidate: true })
+        }
+      />
       <Button
         className="h-12 w-full px-7 font-bold uppercase"
         disabled={isExecuting}

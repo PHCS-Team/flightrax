@@ -10,6 +10,7 @@ import { registerInstructorAction } from "@/modules/auth/actions/register-instru
 import { AccountVerificationFields } from "@/modules/auth/components/account-verification-fields";
 import {
   RegisterFormSection,
+  RegisterTermsField,
   RegisterPasswordField,
   RegisterTextField,
 } from "@/modules/auth/components/register-form-parts";
@@ -30,6 +31,7 @@ export function InstructorRegisterForm() {
   const form = useForm<InstructorRegisterInput>({
     resolver: zodResolver(instructorRegisterSchema),
     defaultValues: {
+      acceptedTerms: false,
       email: "",
       password: "",
       confirmPassword: "",
@@ -48,13 +50,18 @@ export function InstructorRegisterForm() {
     },
   });
   const errors = form.formState.errors;
+  const acceptedTerms = useWatch({
+    control: form.control,
+    name: "acceptedTerms",
+  });
   const idDocument = useWatch({
     control: form.control,
     name: "idDocument",
   });
 
   return (
-    <form noValidate
+    <form
+      noValidate
       className="space-y-5"
       onSubmit={form.handleSubmit((values) => execute(values))}
     >
@@ -119,6 +126,14 @@ export function InstructorRegisterForm() {
           role={ROLE.INSTRUCTOR}
         />
       </RegisterFormSection>
+      <RegisterTermsField
+        checked={acceptedTerms}
+        error={errors.acceptedTerms}
+        id="instructor-register-terms"
+        onCheckedChange={(value) =>
+          form.setValue("acceptedTerms", value, { shouldValidate: true })
+        }
+      />
       <Button
         className="mt-3 h-12 w-full px-7 font-bold uppercase"
         disabled={isExecuting}
