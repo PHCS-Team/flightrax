@@ -18,6 +18,7 @@ import {
   TooltipTrigger,
 } from "@/shared/components/ui/tooltip";
 import { cn } from "@/shared/lib/utils";
+import { CLOCK_TIME_PATTERN } from "@/shared/lib/clock-time";
 
 export function ScheduleUploadListItem({
   chipIndex,
@@ -54,7 +55,7 @@ export function ScheduleUploadListItem({
         </p>
         <p className="truncate text-xs text-primary-foreground/55">
           {upload.uploadedByName ? `${upload.uploadedByName} · ` : ""}
-          {format(new Date(upload.createdAt), "MMM d, h:mm a")}
+          {format(new Date(upload.createdAt), `MMM d, ${CLOCK_TIME_PATTERN}`)}
         </p>
       </Link>
       {onDelete && (

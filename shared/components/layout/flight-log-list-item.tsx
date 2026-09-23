@@ -6,6 +6,7 @@ import Link from "next/link";
 
 import { cn } from "@/shared/lib/utils";
 import type { FlightLogEntry } from "@/shared/types/flight-log";
+import { CLOCK_TIME_PATTERN } from "@/shared/lib/clock-time";
 
 const LOG_STATUS_PILLS: Record<
   FlightLogEntry["journeyStatus"],
@@ -47,15 +48,15 @@ function formatDuration(
 function journeyLine(log: FlightLogEntry): string {
   if (log.journeyStatus === "cancelled") {
     return log.cancelledAt
-      ? `Cancelled ${format(new Date(log.cancelledAt), "MMM d, yyyy · h:mm a")}`
+      ? `Cancelled ${format(new Date(log.cancelledAt), `MMM d, yyyy · ${CLOCK_TIME_PATTERN}`)}`
       : "Cancelled";
   }
 
   const departed = log.commencedAt
-    ? format(new Date(log.commencedAt), "h:mm a")
+    ? format(new Date(log.commencedAt), CLOCK_TIME_PATTERN)
     : "—";
   const arrived = log.terminatedAt
-    ? format(new Date(log.terminatedAt), "h:mm a")
+    ? format(new Date(log.terminatedAt), CLOCK_TIME_PATTERN)
     : "—";
   const duration = formatDuration(log.commencedAt, log.terminatedAt);
 

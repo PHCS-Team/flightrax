@@ -7,6 +7,7 @@ import { useState } from "react";
 import { DialogSectionHeader } from "@/shared/components/layout/dialog-section-header";
 import { FloatingActionButton } from "@/shared/components/layout/floating-action-button";
 import { Dialog, DialogContent } from "@/shared/components/ui/dialog";
+import { CLOCK_TIME_PATTERN } from "@/shared/lib/clock-time";
 
 export function RejectionReasonAction({
   className,
@@ -47,7 +48,7 @@ export function RejectionReasonAction({
             <p className="text-xs text-muted-foreground">
               Rejected{rejectedByName ? ` by ${rejectedByName}` : ""}
               {rejectedAt
-                ? ` on ${format(new Date(rejectedAt), "MMM d, yyyy · h:mm a")}`
+                ? ` on ${format(new Date(rejectedAt), `MMM d, yyyy · ${CLOCK_TIME_PATTERN}`)}`
                 : ""}
             </p>
           )}

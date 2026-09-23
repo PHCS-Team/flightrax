@@ -144,8 +144,9 @@ export function formatTimeLabel(time: string): string {
   const rest = minutes % 60;
   const suffix = hours < 12 ? "AM" : "PM";
   const clock = hours % 12 === 0 ? 12 : hours % 12;
+  const padded = String(rest).padStart(2, "0");
 
-  return `${clock}:${String(rest).padStart(2, "0")} ${suffix}`;
+  return `${clock}:${padded} ${suffix} (${String(hours).padStart(2, "0")}:${padded})`;
 }
 
 // Column header for the hour starting at `hour`: "6-7AM", "11AM-12PM".

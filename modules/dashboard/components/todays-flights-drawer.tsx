@@ -44,6 +44,7 @@ import {
   SheetTitle,
 } from "@/shared/components/ui/sheet";
 import { cn } from "@/shared/lib/utils";
+import { CLOCK_TIME_PATTERN } from "@/shared/lib/clock-time";
 
 const PAGE_SIZE = 5;
 const SEARCH_DEBOUNCE_MS = 300;
@@ -287,7 +288,7 @@ export function TodaysFlightsDrawer({
                 <p className="font-semibold uppercase text-foreground">
                   {earlierBlock.aircraftIdentification}
                   {earlierBlock.dofAt &&
-                    ` · ${format(new Date(earlierBlock.dofAt), "h:mm a")}`}
+                    ` · ${format(new Date(earlierBlock.dofAt), CLOCK_TIME_PATTERN)}`}
                 </p>
                 <p className="text-sm uppercase text-muted-foreground">
                   Trainee: {formatShortPersonName(earlierBlock.traineeName)}

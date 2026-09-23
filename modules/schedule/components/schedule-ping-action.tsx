@@ -15,6 +15,7 @@ import {
 import { ConfirmationDialog } from "@/shared/components/layout/confirmation-dialog";
 import { FloatingActionButton } from "@/shared/components/layout/floating-action-button";
 import { Button } from "@/shared/components/ui/button";
+import { CLOCK_TIME_PATTERN } from "@/shared/lib/clock-time";
 
 export function SchedulePingAction() {
   const [date] = useQueryState(
@@ -62,7 +63,7 @@ export function SchedulePingAction() {
         title="Ping Everyone?"
         warning={
           lastPing
-            ? `A ping for ${dateLabel} already went out at ${format(new Date(lastPing.sentAt), "h:mm a")}${lastPing.sentByName ? ` by ${lastPing.sentByName}` : ""}. Sending again notifies everyone a second time.`
+            ? `A ping for ${dateLabel} already went out at ${format(new Date(lastPing.sentAt), CLOCK_TIME_PATTERN)}${lastPing.sentByName ? ` by ${lastPing.sentByName}` : ""}. Sending again notifies everyone a second time.`
             : undefined
         }
       />

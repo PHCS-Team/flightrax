@@ -1,9 +1,10 @@
 import { format } from "date-fns";
+import { CLOCK_TIME_PATTERN } from "@/shared/lib/clock-time";
 
 // Display formatting for the flight status board.
 
 // Filed zulu departure time (HHMM, e.g. "1130") → the viewer's local
-// time in readable form, e.g. "7:30 PM". Resolved against the current
+// time in readable form, e.g. "7:30 PM (19:30)". Resolved against the current
 // zulu date, which is the board's flight date.
 export function formatZuluTimeToLocal(hhmm: string): string {
   if (!/^\d{4}$/.test(hhmm)) {
@@ -21,7 +22,7 @@ export function formatZuluTimeToLocal(hhmm: string): string {
     ),
   );
 
-  return format(date, "h:mm a");
+  return format(date, CLOCK_TIME_PATTERN);
 }
 
 // Elapsed span between two ISO timestamps, e.g. "1h 24m".
@@ -43,9 +44,9 @@ export function formatDurationBetween(
   return `${Math.floor(totalMinutes / 60)}h ${totalMinutes % 60}m`;
 }
 
-// ISO timestamp → the viewer's local time of day, e.g. "3:45 PM".
+// ISO timestamp → the viewer's local time of day, e.g. "3:45 PM (15:45)".
 export function formatTimeOfDay(iso: string): string {
-  return format(new Date(iso), "h:mm a");
+  return format(new Date(iso), CLOCK_TIME_PATTERN);
 }
 
 // Elapsed time since an ISO timestamp as H:MM, e.g. "1:03".

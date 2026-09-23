@@ -14,6 +14,7 @@ import {
   TooltipTrigger,
 } from "@/shared/components/ui/tooltip";
 import { cn } from "@/shared/lib/utils";
+import { CLOCK_TIME_PATTERN } from "@/shared/lib/clock-time";
 
 const PILL_CLASS =
   "inline-flex h-5 shrink-0 items-center rounded-full border px-2 text-[10px] font-medium uppercase tracking-wide";
@@ -61,7 +62,7 @@ export function NotamListItem({
           </span>
         )}
         <span className="ml-auto shrink-0 text-[11px] text-primary-foreground/60">
-          {format(new Date(notam.createdAt), "MMM d · h:mm a")}
+          {format(new Date(notam.createdAt), `MMM d · ${CLOCK_TIME_PATTERN}`)}
         </span>
         {canDelete && (
           <Tooltip>
@@ -101,10 +102,7 @@ export function NotamListItem({
         {" · "}
         {expired ? "Expired" : "Expires"}{" "}
         <span className="font-semibold text-primary-foreground/85">
-          {format(
-            new Date(notam.expiresAt),
-            "MMM d, yyyy",
-          )}
+          {format(new Date(notam.expiresAt), "MMM d, yyyy")}
         </span>
       </p>
     </GlassSurface>

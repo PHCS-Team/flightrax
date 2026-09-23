@@ -5,9 +5,12 @@ import { format } from "date-fns";
 import { ReviewSection } from "@/modules/flight-documents/components/flight-request-review-primitives";
 import type { FlightJourneyDetails } from "@/modules/flight-documents/types/flight-request";
 import { GlassSurface } from "@/shared/components/layout/glass-surface";
+import { CLOCK_TIME_PATTERN } from "@/shared/lib/clock-time";
 
 function formatMoment(iso: string | null): string {
-  return iso ? format(new Date(iso), "MMM d, yyyy · h:mm a") : "—";
+  return iso
+    ? format(new Date(iso), `MMM d, yyyy · ${CLOCK_TIME_PATTERN}`)
+    : "—";
 }
 
 function formatDuration(
