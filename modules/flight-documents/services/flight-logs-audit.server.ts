@@ -47,7 +47,7 @@ export async function getFlightLogsAuditPage(
   let query = supabase
     .from("flight_journeys")
     .select(
-      "id, status, dof_date, commenced_at, terminated_at, cancelled_at, flight_requests!inner(flight_plans!inner(id, aircraft_identification, departure_aerodrome, destination_aerodrome, pilot_name, pilot_in_command_name, aircrafts(photo_path)))",
+      "id, status, dof_date, commenced_at, terminated_at, cancelled_at, commenced_by_profile:profiles!flight_journeys_commenced_by_fkey(full_name), terminated_by_profile:profiles!flight_journeys_terminated_by_fkey(full_name), cancelled_by_profile:profiles!flight_journeys_cancelled_by_fkey(full_name), flight_requests!inner(approved_at, approved_by_profile:profiles!flight_requests_approved_by_fkey(full_name), flight_plans!inner(id, aircraft_identification, departure_aerodrome, destination_aerodrome, pilot_name, pilot_in_command_name, aircrafts(photo_path)))",
       { count: "exact" },
     )
     .in("status", statuses);
@@ -61,8 +61,12 @@ export async function getFlightLogsAuditPage(
     );
   }
 
+  // The sweep cancels several journeys in one statement, so they share an
+  // updated_at; without a tie-breaker the ties order arbitrarily per query
+  // and a row can repeat across pages.
   const { data, error, count } = await query
     .order("updated_at", { ascending: false })
+    .order("id", { ascending: false })
     .range(from, to);
 
   if (error) {
@@ -85,8 +89,14 @@ export async function getFlightLogsAuditPage(
         destinationAerodrome: plan.destination_aerodrome ?? "",
         dofDate: row.dof_date,
         commencedAt: row.commenced_at,
+        commencedByName: row.commenced_by_profile?.full_name ?? null,
         terminatedAt: row.terminated_at,
+        terminatedByName: row.terminated_by_profile?.full_name ?? null,
         cancelledAt: row.cancelled_at,
+        cancelledByName: row.cancelled_by_profile?.full_name ?? null,
+        approvedAt: row.flight_requests.approved_at,
+        approvedByName:
+          row.flight_requests.approved_by_profile?.full_name ?? null,
         photoUrl: plan.aircrafts?.photo_path
           ? storage.getPublicUrl(plan.aircrafts.photo_path).data.publicUrl
           : null,

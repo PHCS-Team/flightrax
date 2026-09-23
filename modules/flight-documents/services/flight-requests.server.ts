@@ -65,6 +65,7 @@ export async function getOwnFlightRequestsPage(
 
   const { data, error } = await listQuery
     .order("updated_at", { ascending: false })
+    .order("id", { ascending: false })
     .range(from, to);
 
   if (error) {
@@ -172,6 +173,7 @@ export async function getReviewFlightRequestsPage(
 
   const { data, error } = await listQuery
     .order("updated_at", { ascending: false })
+    .order("id", { ascending: false })
     .range(from, to);
 
   if (error) {

@@ -30,6 +30,7 @@ export const NOTIFICATION_TYPES = [
   "flight_commenced",
   "flight_arrived",
   "flight_cancelled",
+  "flight_delayed",
   "flight_no_show",
   "notam_posted",
   "aircraft_status_changed",

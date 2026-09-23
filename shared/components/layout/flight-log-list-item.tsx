@@ -62,6 +62,35 @@ function journeyLine(log: FlightLogEntry): string {
   return `Departed ${departed} → Arrived ${arrived}${duration ? ` · ${duration}` : ""}`;
 }
 
+// Who acted on the flight, kept to one line for a list row; the flight log
+// page shows each action with its timestamp.
+function actorLine(log: FlightLogEntry): string | null {
+  const parts: string[] = [];
+
+  if (log.approvedByName) {
+    parts.push(`Approved by ${log.approvedByName}`);
+  }
+
+  if (log.journeyStatus === "cancelled") {
+    // The no-show sweep cancels without a person, leaving cancelled_by null.
+    parts.push(
+      log.cancelledByName
+        ? `Cancelled by ${log.cancelledByName}`
+        : "Cancelled automatically — no-show",
+    );
+  } else {
+    if (log.commencedByName) {
+      parts.push(`Commenced by ${log.commencedByName}`);
+    }
+
+    if (log.terminatedByName) {
+      parts.push(`Terminated by ${log.terminatedByName}`);
+    }
+  }
+
+  return parts.length > 0 ? parts.join(" · ") : null;
+}
+
 export function FlightLogListItem({
   href,
   log,
@@ -77,11 +106,12 @@ export function FlightLogListItem({
         {log.photoUrl && (
           <div
             aria-hidden="true"
-            className="absolute inset-0 -z-20 bg-cover bg-center opacity-60 transition-transform duration-300 group-hover:scale-105"
+            className="absolute inset-0 -z-20 bg-cover bg-center opacity-45 transition-transform duration-300 group-hover:scale-105"
             style={{ backgroundImage: `url(${log.photoUrl})` }}
           />
         )}
-        <div className="absolute inset-0 -z-10 bg-linear-to-r from-primary/70 via-primary/35 to-primary/0" />
+        <div className="absolute inset-0 -z-10 bg-primary/40" />
+        <div className="absolute inset-0 -z-10 bg-linear-to-r from-primary/95 via-primary/70 to-primary/25" />
 
         <div className="grid min-w-0 gap-1">
           <div className="flex min-w-0 items-center gap-2">
@@ -104,6 +134,11 @@ export function FlightLogListItem({
           <p className="truncate text-xs text-primary-foreground/70">
             {journeyLine(log)}
           </p>
+          {actorLine(log) && (
+            <p className="truncate text-xs text-primary-foreground/60">
+              {actorLine(log)}
+            </p>
+          )}
         </div>
 
         <div className="mt-3 text-sm md:mt-0 md:text-right">

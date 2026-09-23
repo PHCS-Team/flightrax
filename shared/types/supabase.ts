@@ -395,6 +395,7 @@ export type Database = {
           commenced_at: string | null
           commenced_by: string | null
           created_at: string
+          delay_warned_at: string | null
           dof_at: string | null
           dof_date: string | null
           flight_request_id: string
@@ -411,6 +412,7 @@ export type Database = {
           commenced_at?: string | null
           commenced_by?: string | null
           created_at?: string
+          delay_warned_at?: string | null
           dof_at?: string | null
           dof_date?: string | null
           flight_request_id: string
@@ -427,6 +429,7 @@ export type Database = {
           commenced_at?: string | null
           commenced_by?: string | null
           created_at?: string
+          delay_warned_at?: string | null
           dof_at?: string | null
           dof_date?: string | null
           flight_request_id?: string
@@ -710,6 +713,7 @@ export type Database = {
           flight_plan_id: string
           id: string
           instructor_profile_id: string
+          rejected_at: string | null
           rejected_by: string | null
           rejected_reason: string | null
           requested_by: string
@@ -724,6 +728,7 @@ export type Database = {
           flight_plan_id: string
           id?: string
           instructor_profile_id: string
+          rejected_at?: string | null
           rejected_by?: string | null
           rejected_reason?: string | null
           requested_by: string
@@ -738,6 +743,7 @@ export type Database = {
           flight_plan_id?: string
           id?: string
           instructor_profile_id?: string
+          rejected_at?: string | null
           rejected_by?: string | null
           rejected_reason?: string | null
           requested_by?: string

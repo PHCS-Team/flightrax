@@ -25,7 +25,11 @@ import {
   type NotificationType,
 } from "@/modules/notifications/constants/notification-types";
 
-export type NotificationTone = "default" | "success" | "destructive";
+export type NotificationTone =
+  | "default"
+  | "success"
+  | "warning"
+  | "destructive";
 
 type Presentation = {
   icon: LucideIcon;
@@ -45,6 +49,7 @@ const PRESENTATION: Record<NotificationType, Presentation> = {
   flight_commenced: { icon: PlaneTakeoffIcon, tone: "default" },
   flight_arrived: { icon: PlaneLandingIcon, tone: "success" },
   flight_cancelled: { icon: BanIcon, tone: "destructive" },
+  flight_delayed: { icon: Clock3Icon, tone: "warning" },
   flight_no_show: { icon: Clock3Icon, tone: "destructive" },
   notam_posted: { icon: MegaphoneIcon, tone: "default" },
   aircraft_status_changed: { icon: WrenchIcon, tone: "default" },

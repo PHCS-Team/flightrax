@@ -11,7 +11,12 @@ export type FlightLogEntry = {
   destinationAerodrome: string;
   dofDate: string | null;
   commencedAt: string | null;
+  commencedByName: string | null;
   terminatedAt: string | null;
+  terminatedByName: string | null;
   cancelledAt: string | null;
+  cancelledByName: string | null;
+  approvedAt: string | null;
+  approvedByName: string | null;
   photoUrl: string | null;
 };

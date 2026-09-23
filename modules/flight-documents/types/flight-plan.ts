@@ -55,6 +55,8 @@ export type FlightPlanForEdit = {
   isOwner: boolean;
   requestStatus: FlightRequestStatus;
   rejectedReason: string | null;
+  rejectedAt: string | null;
+  rejectedByName: string | null;
   aircraft: FlightPlanAircraftOption;
   values: FlightPlanFormValues;
 };

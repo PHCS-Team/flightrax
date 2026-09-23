@@ -97,6 +97,7 @@ export const rejectFlightRequestAction = actionClient
         status: "rejected",
         rejected_reason: parsedInput.reason,
         rejected_by: actor.id,
+        rejected_at: new Date().toISOString(),
         approved_by: null,
         approved_at: null,
       })

@@ -27,12 +27,15 @@ export async function getAccountFlightLogsPage(
   const { data, error, count } = await supabase
     .from("flight_journeys")
     .select(
-      "id, status, dof_date, commenced_at, terminated_at, cancelled_at, flight_requests!inner(requested_by, flight_plans!inner(id, aircraft_identification, departure_aerodrome, destination_aerodrome, aircrafts(photo_path)))",
+      "id, status, dof_date, commenced_at, terminated_at, cancelled_at, commenced_by_profile:profiles!flight_journeys_commenced_by_fkey(full_name), terminated_by_profile:profiles!flight_journeys_terminated_by_fkey(full_name), cancelled_by_profile:profiles!flight_journeys_cancelled_by_fkey(full_name), flight_requests!inner(requested_by, approved_at, approved_by_profile:profiles!flight_requests_approved_by_fkey(full_name), flight_plans!inner(id, aircraft_identification, departure_aerodrome, destination_aerodrome, aircrafts(photo_path)))",
       { count: "exact" },
     )
     .in("status", ["arrived", "standby", "cancelled"])
     .eq("flight_requests.requested_by", viewer.id)
+    // Journeys swept in one statement share an updated_at, so the ties need
+    // a stable tie-breaker or a row can repeat across pages.
     .order("updated_at", { ascending: false })
+    .order("id", { ascending: false })
     .range(from, to);
 
   if (error) {
@@ -55,8 +58,14 @@ export async function getAccountFlightLogsPage(
         destinationAerodrome: plan.destination_aerodrome ?? "",
         dofDate: row.dof_date,
         commencedAt: row.commenced_at,
+        commencedByName: row.commenced_by_profile?.full_name ?? null,
         terminatedAt: row.terminated_at,
+        terminatedByName: row.terminated_by_profile?.full_name ?? null,
         cancelledAt: row.cancelled_at,
+        cancelledByName: row.cancelled_by_profile?.full_name ?? null,
+        approvedAt: row.flight_requests.approved_at,
+        approvedByName:
+          row.flight_requests.approved_by_profile?.full_name ?? null,
         photoUrl: plan.aircrafts?.photo_path
           ? storage.getPublicUrl(plan.aircrafts.photo_path).data.publicUrl
           : null,

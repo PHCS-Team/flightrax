@@ -89,6 +89,7 @@ export const submitFlightRequestAction = actionClient
         status: "pending_approval",
         rejected_reason: null,
         rejected_by: null,
+        rejected_at: null,
       })
       .eq("id", request.id)
       .in("status", [...EDITABLE_FLIGHT_REQUEST_STATUSES])

@@ -10,12 +10,14 @@ const ICON_TONE = {
   panel: {
     default: "border-border bg-muted text-foreground",
     success: "border-emerald-600/20 bg-emerald-600/10 text-emerald-700",
+    warning: "border-amber-600/25 bg-amber-500/10 text-amber-700",
     destructive: "border-destructive/20 bg-destructive/10 text-destructive",
   },
   page: {
     default:
       "border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground",
     success: "border-emerald-300/30 bg-emerald-300/15 text-emerald-200",
+    warning: "border-amber-300/30 bg-amber-300/15 text-amber-200",
     destructive: "border-red-300/30 bg-red-300/15 text-red-200",
   },
 } as const;

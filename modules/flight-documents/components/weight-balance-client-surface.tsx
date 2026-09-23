@@ -162,6 +162,8 @@ export function WeightBalanceClientSurface({
         <RejectionReasonAction
           className="bottom-28"
           reason={context.rejectedReason}
+          rejectedAt={context.rejectedAt}
+          rejectedByName={context.rejectedByName}
         />
       )}
 

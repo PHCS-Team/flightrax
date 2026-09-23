@@ -56,6 +56,11 @@ export type FlightRequestReviewListItem = FlightRequestListItem & {
 export type FlightJourneyDetails = {
   status: JourneyStatus;
   commencedAt: string | null;
+  commencedByName: string | null;
   terminatedAt: string | null;
+  terminatedByName: string | null;
   cancelledAt: string | null;
+  cancelledByName: string | null;
+  approvedAt: string | null;
+  approvedByName: string | null;
 };

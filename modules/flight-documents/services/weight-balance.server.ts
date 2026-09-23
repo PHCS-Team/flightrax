@@ -15,7 +15,7 @@ import { createAdminClient } from "@/shared/lib/supabase/admin";
 import { describeActionError } from "@/shared/lib/action-error";
 
 const WEIGHT_BALANCE_CONTEXT_SELECT =
-  "id, aircraft_id, aircraft_identification, aircraft_type_designator, type_of_aircraft, aircraft_color_and_marking, created_by, pilot_in_command_id, flight_requests(id, status, rejected_reason, weight_balance_id, instructor_profile_id), aircrafts(registration_number, aircraft_type, photo_path, aircraft_weight_balance_configs(basic_empty_weight, basic_empty_weight_arm, basic_empty_weight_moment), aircraft_types!inner(type, usable_fuel_arm, fi_and_student_arm, maximum_takeoff_weight, baggage_area_max_weight, aircraft_type_baggage_areas(position, arm)))";
+  "id, aircraft_id, aircraft_identification, aircraft_type_designator, type_of_aircraft, aircraft_color_and_marking, created_by, pilot_in_command_id, flight_requests(id, status, rejected_reason, rejected_at, weight_balance_id, instructor_profile_id, rejected_by_profile:profiles!flight_requests_rejected_by_fkey(full_name)), aircrafts(registration_number, aircraft_type, photo_path, aircraft_weight_balance_configs(basic_empty_weight, basic_empty_weight_arm, basic_empty_weight_moment), aircraft_types!inner(type, usable_fuel_arm, fi_and_student_arm, maximum_takeoff_weight, baggage_area_max_weight, aircraft_type_baggage_areas(position, arm)))";
 
 export async function getWeightBalanceContext(
   flightPlanId: string,
@@ -141,6 +141,8 @@ export async function getWeightBalanceContext(
     pilotInCommandId: data.pilot_in_command_id,
     instructorProfileId: data.flight_requests.instructor_profile_id,
     rejectedReason: data.flight_requests.rejected_reason,
+    rejectedAt: data.flight_requests.rejected_at,
+    rejectedByName: data.flight_requests.rejected_by_profile?.full_name ?? null,
     requestId: data.flight_requests.id,
     requestStatus: data.flight_requests.status as FlightRequestStatus,
     weightBalanceId: data.flight_requests.weight_balance_id,

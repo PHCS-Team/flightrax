@@ -41,6 +41,8 @@ export type WeightBalanceContext = {
   pilotInCommandId: string | null;
   instructorProfileId: string | null;
   rejectedReason: string | null;
+  rejectedAt: string | null;
+  rejectedByName: string | null;
   requestId: string;
   requestStatus: FlightRequestStatus;
   weightBalanceId: string | null;

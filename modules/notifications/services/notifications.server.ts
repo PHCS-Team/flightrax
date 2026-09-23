@@ -44,6 +44,7 @@ export async function getNotificationsPage(
     .select(LIST_COLUMNS, { count: "exact" })
     .eq("user_id", userId)
     .order("created_at", { ascending: false })
+    .order("id", { ascending: false })
     .range(from, to);
 
   if (error) {

@@ -26,7 +26,7 @@ export async function getFlightJourneyDetails(
   const { data, error } = await supabase
     .from("flight_journeys")
     .select(
-      "status, commenced_at, terminated_at, cancelled_at, flight_requests!inner(flight_plan_id, requested_by)",
+      "status, commenced_at, terminated_at, cancelled_at, commenced_by_profile:profiles!flight_journeys_commenced_by_fkey(full_name), terminated_by_profile:profiles!flight_journeys_terminated_by_fkey(full_name), cancelled_by_profile:profiles!flight_journeys_cancelled_by_fkey(full_name), flight_requests!inner(flight_plan_id, requested_by, approved_at, approved_by_profile:profiles!flight_requests_approved_by_fkey(full_name))",
     )
     .eq("flight_requests.flight_plan_id", flightPlanId)
     .maybeSingle();
@@ -48,7 +48,13 @@ export async function getFlightJourneyDetails(
   return {
     status: data.status as JourneyStatus,
     commencedAt: data.commenced_at,
+    commencedByName: data.commenced_by_profile?.full_name ?? null,
     terminatedAt: data.terminated_at,
+    terminatedByName: data.terminated_by_profile?.full_name ?? null,
     cancelledAt: data.cancelled_at,
+    cancelledByName: data.cancelled_by_profile?.full_name ?? null,
+    approvedAt: data.flight_requests.approved_at,
+    approvedByName:
+      data.flight_requests.approved_by_profile?.full_name ?? null,
   };
 }

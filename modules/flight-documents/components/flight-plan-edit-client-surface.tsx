@@ -182,6 +182,8 @@ export function FlightPlanEditClientSurface({
         <RejectionReasonAction
           className="bottom-28"
           reason={flightPlan.rejectedReason ?? ""}
+          rejectedAt={flightPlan.rejectedAt}
+          rejectedByName={flightPlan.rejectedByName}
         />
       )}
 

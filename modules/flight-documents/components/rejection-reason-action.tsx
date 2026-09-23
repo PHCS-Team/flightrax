@@ -1,5 +1,6 @@
 "use client";
 
+import { format } from "date-fns";
 import { MessageSquareWarningIcon } from "lucide-react";
 import { useState } from "react";
 
@@ -10,9 +11,13 @@ import { Dialog, DialogContent } from "@/shared/components/ui/dialog";
 export function RejectionReasonAction({
   className,
   reason,
+  rejectedAt,
+  rejectedByName,
 }: {
   className?: string;
   reason: string;
+  rejectedAt?: string | null;
+  rejectedByName?: string | null;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -38,6 +43,14 @@ export function RejectionReasonAction({
               {reason}
             </p>
           </div>
+          {(rejectedByName || rejectedAt) && (
+            <p className="text-xs text-muted-foreground">
+              Rejected{rejectedByName ? ` by ${rejectedByName}` : ""}
+              {rejectedAt
+                ? ` on ${format(new Date(rejectedAt), "MMM d, yyyy · h:mm a")}`
+                : ""}
+            </p>
+          )}
         </DialogContent>
       </Dialog>
     </>
