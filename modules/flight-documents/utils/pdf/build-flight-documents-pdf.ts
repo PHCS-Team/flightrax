@@ -3,6 +3,8 @@ import { PDFDocument } from "pdf-lib";
 import type {
   FlightDocumentKind,
   FlightDocumentsExport,
+  FlightPlanExport,
+  WeightBalanceExport,
 } from "@/modules/flight-documents/types/flight-documents-export";
 import {
   buildFlightPlanPdf,
@@ -54,6 +56,23 @@ export async function buildFlightDocumentsPdf(
   doc.addPage(sheetPage);
 
   return { bytes: await doc.save(), fileName: `${code}-flight-documents.pdf` };
+}
+
+// Preview of what is on the form right now, before anything is saved.
+export async function buildFlightPlanDraftPdf(
+  flightPlan: FlightPlanExport,
+): Promise<{ bytes: Uint8Array; fileName: string }> {
+  const doc = await buildFlightPlanPdf(await loadFormBytes(), flightPlan);
+
+  return { bytes: await doc.save(), fileName: "flight-plan-draft.pdf" };
+}
+
+export async function buildWeightBalanceDraftPdf(
+  sheet: WeightBalanceExport,
+): Promise<{ bytes: Uint8Array; fileName: string }> {
+  const doc = await buildWeightBalancePdf(sheet);
+
+  return { bytes: await doc.save(), fileName: "weight-and-balance-draft.pdf" };
 }
 
 export { PDFDocument };

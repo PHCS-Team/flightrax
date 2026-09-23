@@ -73,7 +73,7 @@ const HELP_SECTIONS = [
       {
         term: "Cruising Level",
         detail:
-          "Enter VFR, or a level like A0015.",
+          "Enter VFR, or a level like A0015 for 1,500 ft.",
       },
       {
         term: "Total EET",

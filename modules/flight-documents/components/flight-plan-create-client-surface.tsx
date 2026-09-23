@@ -97,6 +97,7 @@ export function FlightPlanCreateClientSurface() {
           <FlightPlanForm
             cancelLabel="Back to flight documents"
             isSubmitting={createFlightPlan.isExecuting}
+            previewAircraft={aircraft}
             onCancel={() => router.push("/flight-documents")}
             onSubmit={(values) =>
               createFlightPlan.execute({ ...values, aircraftId: aircraft.id })

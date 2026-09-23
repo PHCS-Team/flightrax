@@ -10,6 +10,8 @@ import { WeightBalanceReviewCard } from "@/modules/flight-documents/components/w
 import { useFlightPlanFilerContext } from "@/modules/flight-documents/hooks/use-filer-context.query";
 import { useOwnFlightPlanForEdit } from "@/modules/flight-documents/hooks/use-flight-plan.query";
 import { useWeightBalanceContext } from "@/modules/flight-documents/hooks/use-weight-balance-context.query";
+import { FlightDocumentsPreviewAction } from "@/modules/flight-documents/components/flight-documents-preview-action";
+import { useSavedDocumentBuilder } from "@/modules/flight-documents/hooks/use-flight-documents-preview";
 import { canActOnFlightRequest } from "@/modules/flight-documents/utils/flight-request-eligibility";
 import { EmptyState } from "@/shared/components/layout/empty-state";
 import { LoadingScreen } from "@/shared/components/layout/loading-screen";
@@ -23,6 +25,7 @@ export function FlightRequestReviewClientSurface({
   const router = useRouter();
   const flightPlanQuery = useOwnFlightPlanForEdit(flightPlanId);
   const weightBalanceQuery = useWeightBalanceContext(flightPlanId);
+  const buildSavedDocument = useSavedDocumentBuilder(flightPlanId);
   const { filerContext } = useFlightPlanFilerContext();
 
   if (flightPlanQuery.isPending || weightBalanceQuery.isPending) {
@@ -76,19 +79,32 @@ export function FlightRequestReviewClientSurface({
         <WeightBalanceReviewCard context={weightBalanceQuery.context} />
       </div>
 
-      <FlightRequestReviewActions
-        canReview={Boolean(
-          filerContext &&
+      <div className="px-3 pb-1 pt-2 sm:px-0 sm:pb-0 sm:pt-0 sm:flex sm:justify-end">
+        <FlightDocumentsPreviewAction
+          buildDocument={buildSavedDocument}
+          className="w-full sm:w-auto"
+          kinds={
+            weightBalanceQuery.context?.existing ? ["both"] : ["flight-plan"]
+          }
+          label="View document"
+        />
+      </div>
+
+      <div className="mt-1 border-t border-primary-foreground/15 pt-2 sm:mt-0 sm:border-0 sm:pt-0">
+        <FlightRequestReviewActions
+          canReview={Boolean(
+            filerContext &&
             canActOnFlightRequest({
               viewerId: filerContext.profile.id,
               viewerCanCommandAsPic: filerContext.canSetSelfAsPic,
               pilotInCommandId: flightPlan.values.pilotInCommandId || null,
               instructorProfileId: flightPlan.values.instructorId || null,
             }),
-        )}
-        flightPlanId={flightPlanId}
-        requestStatus={flightPlan.requestStatus}
-      />
+          )}
+          flightPlanId={flightPlanId}
+          requestStatus={flightPlan.requestStatus}
+        />
+      </div>
     </div>
   );
 }

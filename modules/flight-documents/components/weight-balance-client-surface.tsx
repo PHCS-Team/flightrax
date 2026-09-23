@@ -17,6 +17,8 @@ import { useFlightPlanFilerContext } from "@/modules/flight-documents/hooks/use-
 import { canActOnFlightRequest } from "@/modules/flight-documents/utils/flight-request-eligibility";
 import { useSaveWeightBalance } from "@/modules/flight-documents/hooks/use-save-weight-balance.action";
 import { useSubmitFlightRequest } from "@/modules/flight-documents/hooks/use-submit-flight-request.action";
+import { FlightDocumentsPreviewAction } from "@/modules/flight-documents/components/flight-documents-preview-action";
+import { useSavedDocumentBuilder } from "@/modules/flight-documents/hooks/use-flight-documents-preview";
 import { useWeightBalanceContext } from "@/modules/flight-documents/hooks/use-weight-balance-context.query";
 import { EmptyState } from "@/shared/components/layout/empty-state";
 import { GlassSurface } from "@/shared/components/layout/glass-surface";
@@ -31,17 +33,18 @@ export function WeightBalanceClientSurface({
   const router = useRouter();
   const [savedDialogOpen, setSavedDialogOpen] = useState(false);
   const { context, error, isPending } = useWeightBalanceContext(flightPlanId);
+  const buildSavedDocument = useSavedDocumentBuilder(flightPlanId);
   const { filerContext } = useFlightPlanFilerContext();
   const canSelfApprove = Boolean(
     context &&
-      filerContext &&
-      filerContext.hasValidLicense &&
-      canActOnFlightRequest({
-        viewerId: filerContext.profile.id,
-        viewerCanCommandAsPic: filerContext.canSetSelfAsPic,
-        pilotInCommandId: context.pilotInCommandId,
-        instructorProfileId: context.instructorProfileId,
-      }),
+    filerContext &&
+    filerContext.hasValidLicense &&
+    canActOnFlightRequest({
+      viewerId: filerContext.profile.id,
+      viewerCanCommandAsPic: filerContext.canSetSelfAsPic,
+      pilotInCommandId: context.pilotInCommandId,
+      instructorProfileId: context.instructorProfileId,
+    }),
   );
   const saveWeightBalance = useSaveWeightBalance({
     onSaved: () => setSavedDialogOpen(true),
@@ -125,6 +128,16 @@ export function WeightBalanceClientSurface({
       <GlassSurface className="p-4 sm:p-6">
         <WeightBalanceForm
           cancelLabel="Back to flight plan"
+          documentAction={
+            context.existing ? (
+              <FlightDocumentsPreviewAction
+                buildDocument={buildSavedDocument}
+                className="sm:mr-auto"
+                kinds={["weight-balance"]}
+                label="View form"
+              />
+            ) : null
+          }
           defaultValues={context.existing ?? undefined}
           givens={context.givens}
           isSubmitting={saveWeightBalance.isExecuting}

@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format, parseISO } from "date-fns";
 import { InfoIcon, PenLineIcon } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   useController,
   useForm,
@@ -25,7 +25,6 @@ import { AerodromeSelectField } from "@/modules/flight-documents/components/aero
 import { FormRadioGroup } from "@/modules/flight-documents/components/form-radio-group";
 import { FLIGHT_PLAN_FORM_DEFAULTS } from "@/modules/flight-documents/constants/flight-plan-form-defaults";
 import { useFlightPlanFilerContext } from "@/modules/flight-documents/hooks/use-filer-context.query";
-import { useRatingOptions } from "@/shared/hooks/use-rating-options.query";
 import { useFlightPlanPicOptions } from "@/modules/flight-documents/hooks/use-pic-options.query";
 import {
   flightPlanFormSchema,
@@ -36,6 +35,8 @@ import {
   syncAerodromeLines,
   syncDofLine,
 } from "@/modules/flight-documents/utils/build-other-information";
+import { toLicenseShortForm } from "@/modules/flight-documents/utils/format-license-line";
+import { FlightDocumentsPreviewAction } from "@/modules/flight-documents/components/flight-documents-preview-action";
 import { resolveDofDate } from "@/modules/flight-documents/utils/flight-plan-time";
 import { Button } from "@/shared/components/ui/button";
 import { Checkbox } from "@/shared/components/ui/checkbox";
@@ -51,6 +52,7 @@ import { Switch } from "@/shared/components/ui/switch";
 import { PersonSelectField } from "@/shared/components/person-select-field";
 import { Textarea } from "@/shared/components/ui/textarea";
 import { describeExpiredCredentials } from "@/shared/lib/aviation/expired-credentials";
+import { useRatingOptions } from "@/shared/hooks/use-rating-options.query";
 import { cn } from "@/shared/lib/utils";
 
 const INPUT_TEXT_CLASS =
@@ -91,11 +93,18 @@ export function FlightPlanForm({
   onCancel,
   onReadOnlyAction,
   onSubmit,
+  previewAircraft,
   readOnly = false,
   readOnlyActionLabel,
   submitLabel,
 }: {
   cancelLabel?: string;
+  previewAircraft?: {
+    colorMarkings: string;
+    registrationMark: string;
+    typeIcaoDesignator: string;
+    typeName: string;
+  };
   defaultValues?: FlightPlanFormValues;
   isSubmitting: boolean;
   onCancel: () => void;
@@ -112,6 +121,28 @@ export function FlightPlanForm({
   const errors = form.formState.errors;
   const { filerContext } = useFlightPlanFilerContext();
   const { ratingOptions } = useRatingOptions();
+  const buildDraftDocument = useCallback(async () => {
+    const { buildFlightPlanDraftPdf } =
+      await import("@/modules/flight-documents/utils/pdf/build-flight-documents-pdf");
+
+    return buildFlightPlanDraftPdf({
+      planCode: "",
+      requestStatus: "draft",
+      aircraftIdentification: previewAircraft?.registrationMark ?? "",
+      aircraftTypeName: previewAircraft?.typeName ?? "",
+      aircraftTypeDesignator: previewAircraft?.typeIcaoDesignator ?? "",
+      aircraftColorMarkings: previewAircraft?.colorMarkings ?? "",
+      filedByName: filerContext?.profile.fullName ?? "",
+      pilotSignatureSvg: null,
+      pilotLicenses: (filerContext?.licenses ?? []).map((license) =>
+        toLicenseShortForm(license, ratingOptions),
+      ),
+      representativeName: null,
+      representativeSignatureSvg: null,
+      representativeLicenses: [],
+      values: form.getValues(),
+    });
+  }, [filerContext, form, previewAircraft, ratingOptions]);
   const { picOptions } = useFlightPlanPicOptions();
   const hasDinghy = useWatch({
     control: form.control,
@@ -487,7 +518,7 @@ export function FlightPlanForm({
           />
           <FpTextField
             error={errors.cruisingLevel?.message}
-            helper="Enter VFR, or a level like A0015"
+            helper="Enter VFR, or a level like A0015 for 1,500 ft"
             id="fp-cruising-level"
             label="Cruising Level"
             placeholder="VFR"
@@ -787,6 +818,14 @@ export function FlightPlanForm({
       </fieldset>
 
       <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+        {previewAircraft && (
+          <FlightDocumentsPreviewAction
+            buildDocument={buildDraftDocument}
+            className="border-border bg-transparent text-foreground hover:bg-muted hover:text-foreground sm:mr-auto"
+            kinds={["flight-plan"]}
+            label="View form"
+          />
+        )}
         <Button
           disabled={isSubmitting}
           onClick={onCancel}

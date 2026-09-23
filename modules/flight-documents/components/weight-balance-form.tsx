@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PenLineIcon, RotateCwIcon } from "lucide-react";
 import { useEffect, useState } from "react";
+import type { ReactNode } from "react";
 import {
   useForm,
   useWatch,
@@ -55,6 +56,7 @@ export function getWeightBalanceFormDefaults(
 export function WeightBalanceForm({
   cancelLabel = "Cancel",
   defaultValues,
+  documentAction,
   givens,
   isSubmitting,
   onCancel,
@@ -64,6 +66,7 @@ export function WeightBalanceForm({
 }: {
   cancelLabel?: string;
   defaultValues?: WeightBalanceFormValues;
+  documentAction?: ReactNode;
   givens: WeightBalanceGivens;
   isSubmitting: boolean;
   onCancel: () => void;
@@ -248,6 +251,7 @@ export function WeightBalanceForm({
       </fieldset>
 
       <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+        {documentAction}
         <Button
           disabled={isSubmitting}
           onClick={onCancel}

@@ -126,6 +126,7 @@ export function FlightPlanEditClientSurface({
       <GlassSurface className="p-4 sm:p-6">
         <FlightPlanForm
           cancelLabel="Back to flight documents"
+          previewAircraft={flightPlan.aircraft}
           defaultValues={flightPlan.values}
           isSubmitting={updateFlightPlan.isExecuting}
           onCancel={() => router.push("/flight-documents")}
