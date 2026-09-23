@@ -7,15 +7,17 @@ import { useForm, useWatch } from "react-hook-form";
 
 import { useCreateCertificate } from "@/modules/auth/hooks/use-create-certificate.action";
 import { useUpdateCertificate } from "@/modules/auth/hooks/use-update-certificate.action";
-import { useCertificateImage } from "@/shared/hooks/use-certificate-image.query";
+import { useCertificateImages } from "@/shared/hooks/use-certificate-images.query";
 import { CertificateDeleteConfirmation } from "@/modules/auth/components/certificate-delete-confirmation";
 import { certificateFormSchema } from "@/modules/auth/schemas/certificate-schema";
 import type { CertificateFormInput } from "@/modules/auth/schemas/certificate-schema";
 import type { Certificate } from "@/shared/types/certificate";
 import {
+  CERTIFICATE_EXTRA_IMAGE_MAX_COUNT,
   CERTIFICATE_IMAGE_MAX_BYTES,
   CERTIFICATE_IMAGE_TYPES,
 } from "@/modules/auth/utils/certificate";
+import { ImageGalleryUploadField } from "@/shared/components/image-gallery-upload-field";
 import { ImageUploadField } from "@/shared/components/image-upload-field";
 import { DialogSectionHeader } from "@/shared/components/layout/dialog-section-header";
 import { Button } from "@/shared/components/ui/button";
@@ -30,6 +32,7 @@ import { Input } from "@/shared/components/ui/input";
 import { Textarea } from "@/shared/components/ui/textarea";
 
 const CERTIFICATE_PHOTO_HELPER_TEXT = `JPG, PNG, or WebP only. Maximum file size is ${CERTIFICATE_IMAGE_MAX_BYTES / 1024 / 1024} MB. New uploads replace the current image.`;
+const CERTIFICATE_EXTRA_PHOTO_HELPER_TEXT = `Optional. Up to ${CERTIFICATE_EXTRA_IMAGE_MAX_COUNT} more images, e.g. the back or extra pages.`;
 
 function getDefaultValues(
   certificate?: Certificate | null,
@@ -40,6 +43,8 @@ function getDefaultValues(
     has_no_expiry: certificate?.has_no_expiry ?? false,
     expiry_date: certificate?.expiry_date ?? "",
     image: undefined,
+    additionalImages: [],
+    removeImageIds: [],
   };
 }
 
@@ -65,10 +70,13 @@ export function CertificateFormDialog({
   const updateCertificate = useUpdateCertificate({
     onSaved: () => handleSaved(),
   });
-  const { data: existingImage } = useCertificateImage(
+  const { data: existingImages } = useCertificateImages(
     certificate?.id ?? "",
     open && isEditing,
   );
+  const mainImage = existingImages?.images.find((image) => image.isMain);
+  const extraImages =
+    existingImages?.images.filter((image) => !image.isMain) ?? [];
   const errors = form.formState.errors;
   const hasNoExpiry = useWatch({
     control: form.control,
@@ -77,6 +85,14 @@ export function CertificateFormDialog({
   const selectedImage = useWatch({
     control: form.control,
     name: "image",
+  });
+  const selectedExtraImages = useWatch({
+    control: form.control,
+    name: "additionalImages",
+  });
+  const removedImageIds = useWatch({
+    control: form.control,
+    name: "removeImageIds",
   });
   const expiryDate = useWatch({ control: form.control, name: "expiry_date" });
   const isExecuting =
@@ -207,7 +223,7 @@ export function CertificateFormDialog({
                 }
                 placeholder="Select expiry date"
                 value={expiryDate}
-                />
+              />
             )}
             {errors.expiry_date && (
               <p
@@ -250,13 +266,11 @@ export function CertificateFormDialog({
 
           <ImageUploadField
             accept={CERTIFICATE_IMAGE_TYPES}
-            currentImageUrl={
-              isEditing ? (existingImage?.imageUrl ?? null) : null
-            }
+            currentImageUrl={isEditing ? (mainImage?.url ?? null) : null}
             errorText={errors.image?.message}
             helperText={CERTIFICATE_PHOTO_HELPER_TEXT}
             id={`${dialogId}-image`}
-            label="Certificate Image"
+            label="Main Image"
             onChange={(file) =>
               form.setValue("image", file ?? undefined, {
                 shouldDirty: true,
@@ -267,10 +281,42 @@ export function CertificateFormDialog({
             value={selectedImage ?? null}
           />
 
+          <ImageGalleryUploadField
+            accept={CERTIFICATE_IMAGE_TYPES}
+            disabled={isExecuting}
+            errorText={errors.additionalImages?.message}
+            files={selectedExtraImages ?? []}
+            helperText={CERTIFICATE_EXTRA_PHOTO_HELPER_TEXT}
+            id={`${dialogId}-additional-images`}
+            label="Additional Images"
+            maxFiles={CERTIFICATE_EXTRA_IMAGE_MAX_COUNT}
+            onFilesChange={(files) =>
+              form.setValue("additionalImages", files, {
+                shouldDirty: true,
+                shouldValidate: true,
+              })
+            }
+            onToggleRemove={(imageId) =>
+              form.setValue(
+                "removeImageIds",
+                (removedImageIds ?? []).includes(imageId)
+                  ? (removedImageIds ?? []).filter((id) => id !== imageId)
+                  : [...(removedImageIds ?? []), imageId],
+                { shouldDirty: true },
+              )
+            }
+            removedIds={removedImageIds ?? []}
+            savedImages={extraImages.map((image) => ({
+              id: image.id,
+              url: image.url,
+            }))}
+          />
+
           {isEditing && (
             <div className="flex flex-col gap-2 rounded-lg border border-destructive/30 bg-destructive/5 p-3 sm:flex-row sm:items-center sm:justify-between sm:rounded-2xl">
               <p className="text-xs text-muted-foreground">
-                Removing this certificate deletes its photos and cannot be undone.
+                Removing this certificate deletes its photos and cannot be
+                undone.
               </p>
               <Button
                 className="shrink-0 border-destructive/40 bg-background text-destructive hover:bg-destructive/10 hover:text-destructive"

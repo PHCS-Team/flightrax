@@ -5,6 +5,9 @@ import { getImageStoragePath } from "@/shared/lib/storage/image-path";
 import type { Database } from "@/shared/types/supabase";
 
 export const CERTIFICATE_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
+export const CERTIFICATE_IMAGE_MAX_COUNT = 5;
+export const CERTIFICATE_EXTRA_IMAGE_MAX_COUNT =
+  CERTIFICATE_IMAGE_MAX_COUNT - 1;
 export const CERTIFICATE_IMAGE_TYPES = [
   "image/jpeg",
   "image/png",

@@ -23,7 +23,7 @@ export const deleteCertificateAction = actionClient
     const adminSupabase = createAdminClient();
     const { data: existing, error: fetchError } = await adminSupabase
       .from("certificates")
-      .select("id, image_path")
+      .select("id, image_path, certificate_images(image_path)")
       .eq("id", parsedInput.certificateId)
       .eq("user_id", user.id)
       .maybeSingle();
@@ -46,7 +46,10 @@ export const deleteCertificateAction = actionClient
       return { ok: false, message: describeActionError(deleteError) };
     }
 
-    await removeCertificateImages(supabase, [existing.image_path]);
+    await removeCertificateImages(supabase, [
+      existing.image_path,
+      ...existing.certificate_images.map((image) => image.image_path),
+    ]);
 
     return { ok: true, message: "Certificate deleted." };
   });

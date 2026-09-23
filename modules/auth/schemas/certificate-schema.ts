@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import {
+  CERTIFICATE_EXTRA_IMAGE_MAX_COUNT,
   CERTIFICATE_IMAGE_MAX_BYTES,
   CERTIFICATE_IMAGE_TYPES,
 } from "@/modules/auth/utils/certificate";
@@ -11,33 +12,48 @@ const certificateImageFileSchema = z.custom<File | null | undefined>(
   "Choose a certificate image.",
 );
 
-function validateCertificateImage(
-  value: File | null | undefined,
-  context: z.RefinementCtx,
-) {
-  if (!value) {
-    return;
-  }
+const additionalImagesSchema = z
+  .array(
+    z.custom<File>(
+      (value) => typeof File !== "undefined" && value instanceof File,
+    ),
+  )
+  .max(
+    CERTIFICATE_EXTRA_IMAGE_MAX_COUNT,
+    `Attach up to ${CERTIFICATE_EXTRA_IMAGE_MAX_COUNT} extra images.`,
+  )
+  .optional();
 
+function validateImageFile(
+  file: File,
+  path: string,
+  context: z.RefinementCtx,
+): boolean {
   if (
     !CERTIFICATE_IMAGE_TYPES.includes(
-      value.type as (typeof CERTIFICATE_IMAGE_TYPES)[number],
+      file.type as (typeof CERTIFICATE_IMAGE_TYPES)[number],
     )
   ) {
     context.addIssue({
       code: "custom",
-      path: ["image"],
+      path: [path],
       message: "Upload a JPG, PNG, or WebP image.",
     });
+
+    return false;
   }
 
-  if (value.size > CERTIFICATE_IMAGE_MAX_BYTES) {
+  if (file.size > CERTIFICATE_IMAGE_MAX_BYTES) {
     context.addIssue({
       code: "custom",
-      path: ["image"],
-      message: "Certificate image must be 5 MB or smaller.",
+      path: [path],
+      message: `Each image must be ${CERTIFICATE_IMAGE_MAX_BYTES / 1024 / 1024} MB or smaller.`,
     });
+
+    return false;
   }
+
+  return true;
 }
 
 function validateCertificate(
@@ -45,6 +61,7 @@ function validateCertificate(
     has_no_expiry?: boolean;
     expiry_date?: string;
     image?: File | null | undefined;
+    additionalImages?: readonly File[];
   },
   context: z.RefinementCtx,
 ) {
@@ -58,7 +75,15 @@ function validateCertificate(
     }
   }
 
-  validateCertificateImage(value.image, context);
+  if (value.image) {
+    validateImageFile(value.image, "image", context);
+  }
+
+  for (const file of value.additionalImages ?? []) {
+    if (!validateImageFile(file, "additionalImages", context)) {
+      return;
+    }
+  }
 }
 
 export const certificateFieldsSchema = z.object({
@@ -71,6 +96,8 @@ export const certificateFieldsSchema = z.object({
 export const certificateFormSchema = certificateFieldsSchema
   .extend({
     image: certificateImageFileSchema.optional(),
+    additionalImages: additionalImagesSchema,
+    removeImageIds: z.array(z.string().uuid()).optional(),
   })
   .superRefine(validateCertificate);
 
@@ -90,6 +117,8 @@ export const updateCertificateSchema = z
   .object({
     certificateId: z.string().uuid(),
     image: certificateImageFileSchema.optional(),
+    additionalImages: additionalImagesSchema,
+    removeImageIds: z.array(z.string().uuid()).optional(),
   })
   .merge(certificateFieldsSchema.partial())
   .superRefine(validateCertificate);

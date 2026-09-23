@@ -5,6 +5,16 @@ export type CertificateRow =
 
 export type Certificate = CertificateRow;
 
-export type CertificateImageUrl = {
-  imageUrl: string | null;
+export type CertificateImageRow =
+  Database["public"]["Tables"]["certificate_images"]["Row"];
+
+export type CertificateImage = {
+  id: string;
+  position: number;
+  url: string | null;
+  isMain: boolean;
+};
+
+export type CertificateImages = {
+  images: CertificateImage[];
 };

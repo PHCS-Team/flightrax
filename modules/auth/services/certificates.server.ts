@@ -4,7 +4,7 @@ import { cache } from "react";
 
 import type {
   Certificate,
-  CertificateImageUrl,
+  CertificateImages,
 } from "@/shared/types/certificate";
 import { CERTIFICATE_IMAGES_BUCKET } from "@/shared/lib/storage/buckets";
 import { createClient } from "@/shared/lib/supabase/server";
@@ -42,27 +42,56 @@ export const getOwnCertificates = cache(
   },
 );
 
-export async function getCertificateImageSignedUrl(
+export async function getCertificateImageSignedUrls(
   certificateId: string,
-): Promise<CertificateImageUrl | null> {
+): Promise<CertificateImages | null> {
   const supabase = await createClient();
-  const { data, error } = await supabase
+  const { data: certificate, error } = await supabase
     .from("certificates")
-    .select("image_path")
+    .select("id, image_path")
     .eq("id", certificateId)
     .maybeSingle();
 
-  if (error || !data) {
+  if (error || !certificate) {
     return null;
   }
 
-  if (!data.image_path) {
-    return { imageUrl: null };
+  const { data: extras, error: extrasError } = await supabase
+    .from("certificate_images")
+    .select("id, image_path")
+    .eq("certificate_id", certificateId)
+    .order("position", { ascending: true });
+
+  if (extrasError) {
+    throw new Error(describeActionError(extrasError));
   }
 
-  const { data: signed } = await supabase.storage
-    .from(CERTIFICATE_IMAGES_BUCKET)
-    .createSignedUrl(data.image_path, CERTIFICATE_IMAGE_URL_EXPIRY_SECONDS);
+  // The main image lives on the certificate row; the rest follow it.
+  const sources = [
+    ...(certificate.image_path
+      ? [{ id: "main", path: certificate.image_path, isMain: true }]
+      : []),
+    ...(extras ?? []).map((row) => ({
+      id: row.id,
+      path: row.image_path,
+      isMain: false,
+    })),
+  ];
 
-  return { imageUrl: signed?.signedUrl ?? null };
+  const images = await Promise.all(
+    sources.map(async (source, index) => {
+      const { data: signed } = await supabase.storage
+        .from(CERTIFICATE_IMAGES_BUCKET)
+        .createSignedUrl(source.path, CERTIFICATE_IMAGE_URL_EXPIRY_SECONDS);
+
+      return {
+        id: source.id,
+        position: index + 1,
+        isMain: source.isMain,
+        url: signed?.signedUrl ?? null,
+      };
+    }),
+  );
+
+  return { images };
 }
