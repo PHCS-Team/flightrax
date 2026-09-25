@@ -2,7 +2,13 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format, parseISO } from "date-fns";
-import { InfoIcon, PenLineIcon } from "lucide-react";
+import {
+  InfoIcon,
+  MinusIcon,
+  PenLineIcon,
+  PlusIcon,
+  XIcon,
+} from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   useController,
@@ -37,7 +43,11 @@ import {
 } from "@/modules/flight-documents/utils/build-other-information";
 import { toLicenseShortForm } from "@/modules/flight-documents/utils/format-license-line";
 import { FlightDocumentsPreviewAction } from "@/modules/flight-documents/components/flight-documents-preview-action";
-import { resolveDofDate } from "@/modules/flight-documents/utils/flight-plan-time";
+import {
+  addHourToHhmm,
+  isValidDateOfFlight,
+  resolveDateOfFlight,
+} from "@/modules/flight-documents/utils/flight-plan-time";
 import { Button } from "@/shared/components/ui/button";
 import { Checkbox } from "@/shared/components/ui/checkbox";
 import { Input } from "@/shared/components/ui/input";
@@ -64,6 +74,7 @@ export function getFlightPlanFormDefaults(): FlightPlanFormValues {
   return {
     addressee: "",
     dofRaw: "",
+    dateOfFlightRaw: "",
     originator: "",
     departureTimeRaw: "",
     cruisingSpeed: "",
@@ -133,7 +144,7 @@ export function FlightPlanForm({
       aircraftTypeDesignator: previewAircraft?.typeIcaoDesignator ?? "",
       aircraftColorMarkings: previewAircraft?.colorMarkings ?? "",
       filedByName: filerContext?.profile.fullName ?? "",
-      pilotSignatureSvg: null,
+      pilotSignatureSvg: filerContext?.signatureSvg ?? null,
       pilotLicenses: (filerContext?.licenses ?? []).map((license) =>
         toLicenseShortForm(license, ratingOptions),
       ),
@@ -149,6 +160,10 @@ export function FlightPlanForm({
     name: "dinghiesHasDinghy",
   });
   const dofRaw = useWatch({ control: form.control, name: "dofRaw" });
+  const dateOfFlightRaw = useWatch({
+    control: form.control,
+    name: "dateOfFlightRaw",
+  });
   const [
     departureAerodrome,
     destinationAerodrome,
@@ -198,7 +213,7 @@ export function FlightPlanForm({
       "otherRemarks",
       buildOtherInformation(
         {
-          dofRaw,
+          dateOfFlightRaw,
           departureAerodrome,
           destinationAerodrome,
           firstAlternateAerodrome,
@@ -210,7 +225,7 @@ export function FlightPlanForm({
       { shouldDirty: false },
     );
   }, [
-    dofRaw,
+    dateOfFlightRaw,
     ratingOptions,
     departureAerodrome,
     destinationAerodrome,
@@ -271,6 +286,28 @@ export function FlightPlanForm({
 
     previousDofRef.current = dofRaw;
 
+    if (!DOF_PATTERN.test(dofRaw ?? "")) {
+      return;
+    }
+
+    const departureTime = addHourToHhmm(dofRaw.slice(2, 6));
+
+    if (form.getValues("departureTimeRaw") !== departureTime) {
+      form.setValue("departureTimeRaw", departureTime, {
+        shouldDirty: true,
+      });
+    }
+  }, [dofRaw, form]);
+
+  const previousDateOfFlightRef = useRef(defaultValues?.dateOfFlightRaw ?? "");
+
+  useEffect(() => {
+    if (previousDateOfFlightRef.current === dateOfFlightRaw) {
+      return;
+    }
+
+    previousDateOfFlightRef.current = dateOfFlightRaw;
+
     if (form.getValues("pilotInCommandId")) {
       form.setValue("pilotInCommandId", "", { shouldDirty: true });
       form.setValue("pilotInCommandName", "", { shouldDirty: true });
@@ -280,23 +317,17 @@ export function FlightPlanForm({
       form.setValue("instructorId", "", { shouldDirty: true });
     }
 
-    if (!DOF_PATTERN.test(dofRaw ?? "")) {
+    if (!isValidDateOfFlight(dateOfFlightRaw ?? "")) {
       return;
     }
 
-    if (form.getValues("departureTimeRaw") !== dofRaw.slice(2, 6)) {
-      form.setValue("departureTimeRaw", dofRaw.slice(2, 6), {
-        shouldDirty: true,
-      });
-    }
-
     const currentText = form.getValues("otherRemarks");
-    const syncedText = syncDofLine(currentText, dofRaw);
+    const syncedText = syncDofLine(currentText, dateOfFlightRaw);
 
     if (syncedText !== currentText) {
       form.setValue("otherRemarks", syncedText, { shouldDirty: true });
     }
-  }, [dofRaw, form]);
+  }, [dateOfFlightRaw, form]);
 
   function setPilotInCommand(id: string, name: string, isInstructor: boolean) {
     const followsPic =
@@ -331,6 +362,17 @@ export function FlightPlanForm({
     setPilotInCommand("", "", false);
   }
 
+  function stepPersonsOnBoard(delta: number) {
+    const current = form.getValues("personsOnBoard");
+    const parsed = /^\d{1,3}$/.test(current) ? Number(current) : 0;
+    const next = Math.min(999, Math.max(1, parsed + delta));
+
+    form.setValue("personsOnBoard", String(next).padStart(3, "0"), {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+  }
+
   function handleSameAsPicToggle(enabled: boolean) {
     form.setValue("instructorId", enabled ? pilotInCommandId : "", {
       shouldDirty: true,
@@ -341,8 +383,8 @@ export function FlightPlanForm({
     form.setValue("instructorId", id, { shouldDirty: true });
   }
 
-  const dofDate = DOF_PATTERN.test(dofRaw ?? "")
-    ? resolveDofDate(dofRaw)
+  const dofDate = isValidDateOfFlight(dateOfFlightRaw ?? "")
+    ? resolveDateOfFlight(dateOfFlightRaw)
     : null;
 
   function getPicUnavailability(optionId: string) {
@@ -414,7 +456,7 @@ export function FlightPlanForm({
           />
           <FpTextField
             error={errors.dofRaw?.message}
-            helper="DD = day (local date), HHMM = time in zulu — e.g. 280100 = the 28th at 0100Z (9:00 AM)"
+            helper="When this plan is filed, not the flight date: DD = day (local date), HHMM = time in zulu — e.g. 280100 = the 28th at 0100Z (9:00 AM)"
             id="fp-dof"
             maxLength={6}
             label="Date of Filing"
@@ -434,7 +476,7 @@ export function FlightPlanForm({
         </div>
 
         <SectionHeading title="Section 2 — Flight Information" />
-        <div className="grid gap-4 sm:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <FpSelectField
             control={form.control}
             error={errors.flightRules?.message}
@@ -497,7 +539,7 @@ export function FlightPlanForm({
           />
           <FpTextField
             error={errors.departureTimeRaw?.message}
-            helper="HHMM in zulu — auto-filled from the DOF, edit if it differs"
+            helper="HHMM in zulu — auto-filled one hour after the filing time, edit if it differs"
             id="fp-departure-time"
             maxLength={4}
             label="Departure Time"
@@ -575,9 +617,21 @@ export function FlightPlanForm({
             optional
           />
         </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <FpTextField
+            error={errors.dateOfFlightRaw?.message}
+            helper="YYMMDD — e.g. 260922 for 22 Sep 2026. Auto-fills the DOF/ line in Other Information."
+            id="fp-date-of-flight"
+            label="Date of Flight"
+            maxLength={6}
+            placeholder="260922"
+            register={form.register("dateOfFlightRaw")}
+            required
+          />
+        </div>
         <FpTextareaField
           error={errors.otherRemarks?.message}
-          helper="Auto-filled from your DOF, departure point, and licenses — edit as needed"
+          helper="Auto-filled from your date of flight, departure point, and licenses — edit as needed"
           id="fp-other-information"
           label="Other Information"
           register={form.register("otherRemarks", {
@@ -592,36 +646,81 @@ export function FlightPlanForm({
         <div className="grid gap-4 sm:grid-cols-2">
           <FpTextField
             error={errors.endurance?.message}
-            helper="HHMM"
+            helper="HHMM — fill in after your fuel check. Required before submitting for approval."
             id="fp-endurance"
             maxLength={4}
             label="Endurance"
+            optional
             placeholder="0430"
             register={form.register("endurance")}
-            required
           />
-          <FpTextField
-            error={errors.personsOnBoard?.message}
-            helper="3 digits (e.g. 002) or TBN"
-            id="fp-persons-on-board"
-            maxLength={3}
-            label="Persons on Board"
-            placeholder="002"
-            register={form.register("personsOnBoard")}
-            required
-          />
+          <div className="grid content-start gap-2">
+            <label
+              className="text-sm font-semibold text-foreground"
+              htmlFor="fp-persons-on-board"
+            >
+              Persons on Board
+              <span className="ml-1 text-secondary">*</span>
+            </label>
+            <div className="flex items-center gap-2">
+              <Button
+                aria-label="Decrease persons on board"
+                className="h-9 w-9 shrink-0 p-0 md:h-10 md:w-10"
+                disabled={isSubmitting}
+                onClick={() => stepPersonsOnBoard(-1)}
+                type="button"
+                variant="outline"
+              >
+                <MinusIcon className="size-4" />
+              </Button>
+              <Input
+                aria-invalid={Boolean(errors.personsOnBoard?.message)}
+                aria-required
+                className={cn(
+                  INPUT_TEXT_CLASS,
+                  "text-center uppercase placeholder:normal-case",
+                )}
+                id="fp-persons-on-board"
+                maxLength={3}
+                placeholder="002"
+                {...form.register("personsOnBoard")}
+              />
+              <Button
+                aria-label="Increase persons on board"
+                className="h-9 w-9 shrink-0 p-0 md:h-10 md:w-10"
+                disabled={isSubmitting}
+                onClick={() => stepPersonsOnBoard(1)}
+                type="button"
+                variant="outline"
+              >
+                <PlusIcon className="size-4" />
+              </Button>
+            </div>
+            {!errors.personsOnBoard?.message && (
+              <p className="text-xs text-muted-foreground">
+                3 digits (e.g. 002) or TBN
+              </p>
+            )}
+            {errors.personsOnBoard?.message && (
+              <p className="text-sm text-destructive">
+                {errors.personsOnBoard.message}
+              </p>
+            )}
+          </div>
         </div>
         <div className="grid gap-2">
           <p className="text-sm font-semibold text-foreground">
             Emergency &amp; Survival Equipment
             <span className="ml-1.5 text-xs font-normal text-muted-foreground">
-              Tick all that apply — you can select multiple per category
+              Everything is carried unless crossed out — mark ✗ on equipment
+              NOT on board, as on the printed form
             </span>
           </p>
         </div>
         <div className="-mt-4 grid gap-4 rounded-lg border border-primary-foreground/15 bg-primary-foreground/5 p-3 sm:grid-cols-3">
           <FpCheckboxColumn
             control={form.control}
+            crossOut
             items={[
               { label: "U — UHF", name: "emergencyRadioUhf" },
               { label: "V — VHF", name: "emergencyRadioVhf" },
@@ -631,6 +730,7 @@ export function FlightPlanForm({
           />
           <FpCheckboxColumn
             control={form.control}
+            crossOut
             items={[
               { label: "P — Polar", name: "survivalPolar" },
               { label: "D — Desert", name: "survivalDesert" },
@@ -641,6 +741,7 @@ export function FlightPlanForm({
           />
           <FpCheckboxColumn
             control={form.control}
+            crossOut
             items={[
               { label: "L — Light", name: "jacketLight" },
               { label: "F — Fluorescent", name: "jacketFluorescent" },
@@ -725,10 +826,7 @@ export function FlightPlanForm({
           </div>
           {!filerContext?.canSetSelfAsPic && (
             <p className="text-xs text-muted-foreground">
-              {filerContext?.profile.role === "instructor" ||
-              filerContext?.profile.role === "superadmin"
-                ? "Setting yourself as PIC requires an active, non-expired license."
-                : "Setting yourself as PIC requires an active, non-expired PPL license."}
+              Setting yourself as PIC requires an active, non-expired license.
             </p>
           )}
           {isSelfPic ? (
@@ -802,7 +900,7 @@ export function FlightPlanForm({
           )}
           {!dofDate && !isInstructorSameAsPic && (
             <p className="text-xs text-muted-foreground">
-              Enter the Date of Filing first — instructor availability depends
+              Enter the Date of Flight first — instructor availability depends
               on the flight date.
             </p>
           )}
@@ -1026,10 +1124,12 @@ function FpSelectField({
 
 function FpCheckboxColumn({
   control,
+  crossOut = false,
   items,
   label,
 }: {
   control: Control<FlightPlanFormValues>;
+  crossOut?: boolean;
   items: { label: string; name: FieldPath<FlightPlanFormValues> }[];
   label: string;
 }) {
@@ -1039,16 +1139,61 @@ function FpCheckboxColumn({
         {label}
       </p>
       <div className="grid gap-1.5">
-        {items.map((item) => (
-          <FpBooleanCheckbox
-            control={control}
-            key={item.name}
-            label={item.label}
-            name={item.name}
-          />
-        ))}
+        {items.map((item) =>
+          crossOut ? (
+            <FpCrossOutCheckbox
+              control={control}
+              key={item.name}
+              label={item.label}
+              name={item.name}
+            />
+          ) : (
+            <FpBooleanCheckbox
+              control={control}
+              key={item.name}
+              label={item.label}
+              name={item.name}
+            />
+          ),
+        )}
       </div>
     </div>
+  );
+}
+
+function FpCrossOutCheckbox({
+  control,
+  label,
+  name,
+}: {
+  control: Control<FlightPlanFormValues>;
+  label: string;
+  name: FieldPath<FlightPlanFormValues>;
+}) {
+  const { field } = useController({ control, name });
+  const crossed = !field.value;
+
+  return (
+    <label className="flex cursor-pointer items-center gap-2.5 py-1 text-sm text-foreground sm:py-0.5">
+      <button
+        aria-checked={crossed}
+        aria-label={`Cross out ${label}`}
+        className={cn(
+          "flex size-4 shrink-0 cursor-pointer items-center justify-center rounded-[4px] border shadow-xs transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-default disabled:opacity-60",
+          crossed
+            ? "border-foreground/70 bg-foreground/10 text-foreground"
+            : "border-input bg-background/80",
+        )}
+        onClick={() => field.onChange(!field.value)}
+        role="checkbox"
+        type="button"
+      >
+        {crossed && <XIcon className="size-3" strokeWidth={3} />}
+      </button>
+      <span className={cn(crossed && "text-muted-foreground line-through")}>
+        {label}
+      </span>
+    </label>
   );
 }
 

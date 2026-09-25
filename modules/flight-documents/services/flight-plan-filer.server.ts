@@ -5,6 +5,7 @@ import type {
   FlightPlanPicOption,
 } from "@/modules/flight-documents/types/filer-context";
 import {
+  canBePic,
   canCommandAsPic,
   isInstructorRole,
 } from "@/modules/flight-documents/utils/flight-request-eligibility";
@@ -37,7 +38,8 @@ export async function getFlightPlanFilerContext(): Promise<FlightPlanFilerContex
   const hasValidLicense = (licenses ?? []).some((license) =>
     isLicenseValid(license),
   );
-  const canSetSelfAsPic = canCommandAsPic(viewer.role, licenses ?? []);
+  const canSetSelfAsPic = canBePic(licenses ?? []);
+  const canApproveAsPic = canCommandAsPic(viewer.role, licenses ?? []);
   const expiredByProfile = await getExpiredCredentialsByProfile([viewer.id]);
 
   return {
@@ -55,8 +57,10 @@ export async function getFlightPlanFilerContext(): Promise<FlightPlanFilerContex
       status: license.status,
     })),
     hasSignature: Boolean(viewer.signature_svg?.trim()),
+    signatureSvg: viewer.signature_svg?.trim() ? viewer.signature_svg : null,
     hasValidLicense,
     canSetSelfAsPic,
+    canApproveAsPic,
     expiredCredentials: expiredByProfile.get(viewer.id) ?? [],
   };
 }

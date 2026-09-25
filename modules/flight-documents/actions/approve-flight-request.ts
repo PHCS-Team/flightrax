@@ -10,6 +10,7 @@ import {
   canActOnFlightRequest,
   canCommandAsPic,
 } from "@/modules/flight-documents/utils/flight-request-eligibility";
+import { resolveFlightInstant } from "@/modules/flight-documents/utils/flight-plan-time";
 import { isLicenseValid } from "@/shared/lib/aviation/license-validity";
 import { verifyProfilePasscode } from "@/shared/lib/passcode";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
@@ -35,7 +36,7 @@ export const approveFlightRequestAction = actionClient
     const { data: flightPlan, error: planError } = await supabase
       .from("flight_plans")
       .select(
-        "id, aircraft_id, dof_resolved, pilot_in_command_id, flight_requests(id, status, approved_by, weight_balance_id, instructor_profile_id)",
+        "id, aircraft_id, dof_resolved, date_of_flight_resolved, departure_time_raw, pilot_in_command_id, flight_requests(id, status, approved_by, weight_balance_id, instructor_profile_id)",
       )
       .eq("id", parsedInput.flightPlanId)
       .maybeSingle();
@@ -173,10 +174,18 @@ export const approveFlightRequestAction = actionClient
       }
     }
 
-    if (flightPlan.aircraft_id && flightPlan.dof_resolved) {
+    const flightInstant =
+      flightPlan.date_of_flight_resolved && flightPlan.departure_time_raw
+        ? resolveFlightInstant(
+            flightPlan.date_of_flight_resolved,
+            flightPlan.departure_time_raw,
+          )
+        : flightPlan.dof_resolved;
+
+    if (flightPlan.aircraft_id && flightInstant) {
       const dofConflict = await getAircraftDofConflict(
         flightPlan.aircraft_id,
-        flightPlan.dof_resolved,
+        flightInstant,
         request.id,
       );
 
@@ -184,7 +193,7 @@ export const approveFlightRequestAction = actionClient
         return {
           ok: false,
           message: buildAircraftDofConflictMessage(
-            flightPlan.dof_resolved,
+            flightInstant,
             dofConflict.filedByName,
           ),
         };
@@ -198,7 +207,7 @@ export const approveFlightRequestAction = actionClient
           flight_request_id: request.id,
           status: "scheduled",
           aircraft_id: flightPlan.aircraft_id,
-          dof_at: flightPlan.dof_resolved,
+          dof_at: flightInstant,
         },
         { onConflict: "flight_request_id" },
       );

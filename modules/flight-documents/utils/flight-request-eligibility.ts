@@ -11,9 +11,18 @@ export function isInstructorRole(role: AppRole): boolean {
   return role === ROLE.INSTRUCTOR || role === ROLE.SUPERADMIN;
 }
 
-// Who may act as pilot in command — and, by the client's rule, approve or
-// reject a request they are PIC on: an instructor with any valid license,
-// or a student holding a valid PPL.
+// Who may be named pilot in command on a flight plan: anyone holding any
+// valid license, SPL students included. Being PIC does not by itself grant
+// approval rights — see canCommandAsPic.
+export function canBePic(
+  licenses: readonly (LicenseValidityInput & { license_type: string })[],
+): boolean {
+  return licenses.some((license) => isLicenseValid(license));
+}
+
+// Who may approve or reject a request they are PIC on: an instructor with
+// any valid license, or a student holding a valid PPL. An SPL-only student
+// can be PIC but never approves their own flight.
 export function canCommandAsPic(
   role: AppRole,
   licenses: readonly (LicenseValidityInput & { license_type: string })[],

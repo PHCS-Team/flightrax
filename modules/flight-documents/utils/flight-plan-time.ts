@@ -88,10 +88,52 @@ export function resolveDof(dofRaw: string): string {
   return new Date(instant).toISOString();
 }
 
-// DDHHMM → the local calendar date it names, as YYYY-MM-DD. This is the
-// day availability and "today" checks compare against.
-export function resolveDofDate(dofRaw: string): string {
-  return new Date(resolveDofDayUtcMs(dofRaw)).toISOString().slice(0, 10);
+// Date of flight is ICAO YYMMDD (Item 18 DOF/): 260922 = 22 Sep 2026.
+export function isValidDateOfFlight(raw: string): boolean {
+  if (!/^\d{6}$/.test(raw)) {
+    return false;
+  }
+
+  const year = 2000 + Number(raw.slice(0, 2));
+  const month = Number(raw.slice(2, 4));
+  const day = Number(raw.slice(4, 6));
+  const date = new Date(Date.UTC(year, month - 1, day));
+
+  return (
+    date.getUTCFullYear() === year &&
+    date.getUTCMonth() === month - 1 &&
+    date.getUTCDate() === day
+  );
+}
+
+// YYMMDD to YYYY-MM-DD (the named local calendar date, no zone math).
+export function resolveDateOfFlight(raw: string): string {
+  return `20${raw.slice(0, 2)}-${raw.slice(2, 4)}-${raw.slice(4, 6)}`;
+}
+
+// The instant during the local (operations) calendar day dateIso when
+// the zulu clock reads HHMM, with the same windowing as resolveDof.
+export function resolveFlightInstant(dateIso: string, hhmm: string): string {
+  const [year, month, day] = dateIso.split("-").map(Number);
+  const dayUtcMs = Date.UTC(year, month - 1, day);
+  const hour = Number(hhmm.slice(0, 2));
+  const minute = Number(hhmm.slice(2, 4));
+  const offsetMs = getTimeZoneOffsetMs(
+    new Date(dayUtcMs),
+    OPERATIONS_TIME_ZONE,
+  );
+  const localDayStart = dayUtcMs - offsetMs;
+  const localDayEnd = localDayStart + DAY_MS;
+
+  let instant = dayUtcMs + hour * 60 * 60 * 1000 + minute * 60 * 1000;
+
+  if (instant >= localDayEnd) {
+    instant -= DAY_MS;
+  } else if (instant < localDayStart) {
+    instant += DAY_MS;
+  }
+
+  return new Date(instant).toISOString();
 }
 
 // ISO instant → its local (operations) calendar date as YYYY-MM-DD.
@@ -99,6 +141,14 @@ export function toOperationsDate(iso: string): string {
   const zoned = getZonedParts(new Date(iso), OPERATIONS_TIME_ZONE);
 
   return `${zoned.year}-${String(zoned.month).padStart(2, "0")}-${String(zoned.day).padStart(2, "0")}`;
+}
+
+// HHMM plus one hour, wrapping midnight on the 24-hour clock (2330
+// becomes 0030 — there is no 2400).
+export function addHourToHhmm(hhmm: string): string {
+  const hour = (Number(hhmm.slice(0, 2)) + 1) % 24;
+
+  return `${String(hour).padStart(2, "0")}${hhmm.slice(2, 4)}`;
 }
 
 // HHMM zulu → postgres time value.

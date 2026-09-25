@@ -22,11 +22,18 @@ export type FlightPlanFilerContext = {
   // True when the filer has a registered signature — required to file,
   // because saving auto-signs the plan with it.
   hasSignature: boolean;
+  // The registered signature itself, so the draft preview can render the
+  // form exactly as it will print once saved.
+  signatureSvg: string | null;
   // True when the filer holds at least one active, non-expired license —
   // required to file a flight plan.
   hasValidLicense: boolean;
-  // True when the filer holds an active, non-expired PPL license.
+  // True when the filer holds any active, non-expired license — enough to
+  // be named PIC (SPL included), not enough to approve.
   canSetSelfAsPic: boolean;
+  // True when the filer may approve a request they are PIC on: instructor
+  // with any valid license, or student with a valid PPL.
+  canApproveAsPic: boolean;
   // Licenses and certificates on the filer's account that have lapsed —
   // any one of them blocks filing.
   expiredCredentials: ExpiredCredential[];

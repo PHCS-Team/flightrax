@@ -243,7 +243,10 @@ function drawSignatureColumn(
   }
 
   const width = column.x1 - column.x0;
-  const drewSignature = drawSignature(page, signatureSvg, {
+
+  // The signature, when present, fills the space above the underscore
+  // line; the name always sits on the line like the license column.
+  drawSignature(page, signatureSvg, {
     x: column.x0,
     top: y(SIGNATURE_LINE_TOP - 28),
     width,
@@ -255,7 +258,7 @@ function drawSignatureColumn(
 
   page.drawText(label, {
     x: column.x0 + (width - fonts.sans.widthOfTextAtSize(label, size)) / 2,
-    y: y(SIGNATURE_LINE_TOP - (drewSignature ? 1 : 10)),
+    y: y(SIGNATURE_LINE_TOP - 1),
     size,
     font: fonts.sans,
     color: INK,

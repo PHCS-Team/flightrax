@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckIcon } from "lucide-react";
+import { XIcon } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -162,13 +162,20 @@ export function ReviewChecklistField({
               className={cn(
                 "mt-0.5 flex size-4.5 shrink-0 items-center justify-center rounded-lg border",
                 item.checked
-                  ? "border-primary-foreground bg-primary-foreground"
-                  : "border-primary-foreground/40",
+                  ? "border-primary-foreground/60"
+                  : "border-primary-foreground/40 bg-primary-foreground/10",
               )}
             >
-              {item.checked && <CheckIcon className="size-3 text-primary" />}
+              {!item.checked && (
+                <XIcon
+                  className="size-3 text-primary-foreground/70"
+                  strokeWidth={3}
+                />
+              )}
             </span>
-            <span>{item.label}</span>
+            <span className={cn(!item.checked && "line-through")}>
+              {item.label}
+            </span>
           </div>
         ))}
       </div>

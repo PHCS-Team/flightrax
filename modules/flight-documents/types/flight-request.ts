@@ -41,6 +41,7 @@ export type FlightRequestListItem = {
   destinationAerodrome: string;
   dofRaw: string;
   dofResolved: string;
+  dateOfFlightRaw: string | null;
   departureTimeRaw: string;
   createdAt: string;
   updatedAt: string;

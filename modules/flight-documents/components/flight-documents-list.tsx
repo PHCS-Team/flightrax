@@ -55,7 +55,7 @@ export function FlightDocumentsList({
             <span>
               DOF{" "}
               <span className="font-semibold text-primary-foreground/90">
-                {request.dofRaw}
+                {request.dateOfFlightRaw || request.dofRaw}
               </span>
             </span>
             <span>

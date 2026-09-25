@@ -85,7 +85,7 @@ export function FlightPlanReviewCard({
 
       <ReviewSection title="Section 2 — Flight Information">
         <div className="grid gap-4">
-          <div className="grid gap-4 sm:grid-cols-4">
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <ReviewField
               label="Flight Rules"
               value={optionLabel(FLIGHT_RULES_OPTIONS, values.flightRules)}
@@ -152,6 +152,10 @@ export function FlightPlanReviewCard({
             <ReviewField
               label="Second Alternate Aerodrome"
               value={values.secondAlternateAerodrome}
+            />
+            <ReviewField
+              label="Date of Flight"
+              value={values.dateOfFlightRaw}
             />
             <ReviewField
               className="sm:col-span-2"

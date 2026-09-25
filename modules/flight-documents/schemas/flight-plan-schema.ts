@@ -6,12 +6,14 @@ import {
   CRUISING_SPEED_PATTERN,
   DEPARTURE_TIME_PATTERN,
 } from "@/modules/flight-documents/constants/flight-plan-options";
+import { isValidDateOfFlight } from "@/modules/flight-documents/utils/flight-plan-time";
 
 // Strict DDHHMM: day 01-31, then HHMM in zulu.
 const DOF_STRICT_PATTERN = /^(0[1-9]|[12]\d|3[01])([01]\d|2[0-3])[0-5]\d$/;
 
 // Durations (EET, endurance): HHMM where hours may run 00-99.
 const DURATION_PATTERN = /^\d{2}[0-5]\d$/;
+const OPTIONAL_DURATION_PATTERN = /^(\d{2}[0-5]\d)?$/;
 
 const AERODROME_PATTERN = /^[A-Za-z]{4}$/;
 const OPTIONAL_AERODROME_PATTERN = /^([A-Za-z]{4})?$/;
@@ -89,13 +91,24 @@ const flightPlanFormObjectSchema = z.object({
     .regex(DURATION_PATTERN, "Enter total EET as HHMM, e.g. 0130."),
   firstAlternateAerodrome: optionalAerodromeSchema,
   secondAlternateAerodrome: optionalAerodromeSchema,
+  dateOfFlightRaw: z
+    .string()
+    .trim()
+    .regex(
+      /^\d{6}$/,
+      "Enter the date of flight as YYMMDD, e.g. 260922 for 22 Sep 2026.",
+    )
+    .refine(
+      isValidDateOfFlight,
+      "Enter a real calendar date as YYMMDD, e.g. 260922 for 22 Sep 2026.",
+    ),
   otherRemarks: z.string().trim(),
 
   // Section 3
   endurance: z
     .string()
     .trim()
-    .regex(DURATION_PATTERN, "Enter endurance as HHMM, e.g. 0430."),
+    .regex(OPTIONAL_DURATION_PATTERN, "Enter endurance as HHMM, e.g. 0430."),
   personsOnBoard: z
     .string()
     .trim()

@@ -5,8 +5,8 @@ import { updateFlightPlanSchema } from "@/modules/flight-documents/schemas/fligh
 import {
   hhmmToInterval,
   hhmmToTime,
+  resolveDateOfFlight,
   resolveDof,
-  resolveDofDate,
 } from "@/modules/flight-documents/utils/flight-plan-time";
 import { findExpiredCredentialBlock } from "@/shared/lib/aviation/expired-credentials.server";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
@@ -71,7 +71,7 @@ export const updateFlightPlanAction = actionClient
       return { ok: false, message: credentialBlock };
     }
 
-    const dofDate = resolveDofDate(parsedInput.dofRaw);
+    const dofDate = resolveDateOfFlight(parsedInput.dateOfFlightRaw);
 
     if (parsedInput.pilotInCommandId !== actor.id) {
       const unavailableUntil = await getPicUnavailabilityEndsOn(
@@ -115,6 +115,10 @@ export const updateFlightPlanAction = actionClient
           : null,
         dof_raw: parsedInput.dofRaw,
         dof_resolved: resolveDof(parsedInput.dofRaw),
+        date_of_flight_raw: parsedInput.dateOfFlightRaw,
+        date_of_flight_resolved: resolveDateOfFlight(
+          parsedInput.dateOfFlightRaw,
+        ),
         originator: parsedInput.originator
           ? parsedInput.originator.toUpperCase()
           : null,

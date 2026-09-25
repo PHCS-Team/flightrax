@@ -116,7 +116,7 @@ export function FlightPlanEditClientSurface({
             filerContext.hasValidLicense &&
             canActOnFlightRequest({
               viewerId: filerContext.profile.id,
-              viewerCanCommandAsPic: filerContext.canSetSelfAsPic,
+              viewerCanCommandAsPic: filerContext.canApproveAsPic,
               pilotInCommandId: flightPlan.values.pilotInCommandId || null,
               instructorProfileId: flightPlan.values.instructorId || null,
             }) && <SelfApproveAction flightPlanId={flightPlanId} />}

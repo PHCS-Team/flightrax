@@ -11,7 +11,7 @@ import {
 import type { RatingOption } from "@/shared/types/rating-option";
 
 export type OtherInformationInput = {
-  dofRaw: string;
+  dateOfFlightRaw: string;
   departureAerodrome: string;
   destinationAerodrome: string;
   firstAlternateAerodrome: string;
@@ -155,7 +155,7 @@ export function buildOtherInformation(
     .filter(Boolean)
     .join(" | ");
 
-  const lines = [`DOF/ ${input.dofRaw}`];
+  const lines = [`DOF/ ${input.dateOfFlightRaw}`];
 
   const pushAerodromeLine = (prefix: AerodromeLinePrefix, code: string) => {
     const value = aerodromeLineValue(code);

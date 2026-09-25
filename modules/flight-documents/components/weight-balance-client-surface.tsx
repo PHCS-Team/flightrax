@@ -41,7 +41,7 @@ export function WeightBalanceClientSurface({
     filerContext.hasValidLicense &&
     canActOnFlightRequest({
       viewerId: filerContext.profile.id,
-      viewerCanCommandAsPic: filerContext.canSetSelfAsPic,
+      viewerCanCommandAsPic: filerContext.canApproveAsPic,
       pilotInCommandId: context.pilotInCommandId,
       instructorProfileId: context.instructorProfileId,
     }),

@@ -493,6 +493,8 @@ export type Database = {
           created_by: string
           cruising_level: string
           cruising_speed: string
+          date_of_flight_raw: string | null
+          date_of_flight_resolved: string | null
           departure_aerodrome: string
           departure_time_raw: string
           departure_time_resolved: string
@@ -556,6 +558,8 @@ export type Database = {
           created_by: string
           cruising_level: string
           cruising_speed: string
+          date_of_flight_raw?: string | null
+          date_of_flight_resolved?: string | null
           departure_aerodrome?: string
           departure_time_raw: string
           departure_time_resolved: string
@@ -619,6 +623,8 @@ export type Database = {
           created_by?: string
           cruising_level?: string
           cruising_speed?: string
+          date_of_flight_raw?: string | null
+          date_of_flight_resolved?: string | null
           departure_aerodrome?: string
           departure_time_raw?: string
           departure_time_resolved?: string

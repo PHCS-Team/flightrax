@@ -27,7 +27,7 @@ export const submitFlightRequestAction = actionClient
     const { data: flightPlan, error: planError } = await supabase
       .from("flight_plans")
       .select(
-        "id, aircraft_id, dof_resolved, created_by, pilot_in_command_id, flight_requests(id, status, weight_balance_id, instructor_profile_id)",
+        "id, aircraft_id, dof_resolved, created_by, pilot_in_command_id, endurance, flight_requests(id, status, weight_balance_id, instructor_profile_id)",
       )
       .eq("id", parsedInput.flightPlanId)
       .maybeSingle();
@@ -62,6 +62,14 @@ export const submitFlightRequestAction = actionClient
       return {
         ok: false,
         message: "File the Weight & Balance before submitting for approval.",
+      };
+    }
+
+    if (!flightPlan.endurance) {
+      return {
+        ok: false,
+        message:
+          "You forgot to provide the endurance. Open the flight plan form and fill in Endurance under Section 3, then submit again.",
       };
     }
 

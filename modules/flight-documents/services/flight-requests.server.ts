@@ -17,7 +17,7 @@ import type { PaginatedResponse } from "@/shared/types/pagination";
 import { describeActionError } from "@/shared/lib/action-error";
 
 const FLIGHT_REQUEST_LIST_SELECT =
-  "id, status, rejected_reason, flight_plan_id, weight_balance_id, created_at, updated_at, flight_plans!inner(plan_code, aircraft_identification, type_of_aircraft, departure_aerodrome, destination_aerodrome, dof_raw, dof_resolved, departure_time_raw, aircrafts(photo_path))";
+  "id, status, rejected_reason, flight_plan_id, weight_balance_id, created_at, updated_at, flight_plans!inner(plan_code, aircraft_identification, type_of_aircraft, departure_aerodrome, destination_aerodrome, dof_raw, dof_resolved, date_of_flight_raw, departure_time_raw, aircrafts(photo_path))";
 
 export async function getOwnFlightRequestsPage(
   page: number,
@@ -92,6 +92,7 @@ export async function getOwnFlightRequestsPage(
       destinationAerodrome: row.flight_plans.destination_aerodrome,
       dofRaw: row.flight_plans.dof_raw,
       dofResolved: row.flight_plans.dof_resolved,
+      dateOfFlightRaw: row.flight_plans.date_of_flight_raw,
       departureTimeRaw: row.flight_plans.departure_time_raw,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
@@ -105,7 +106,7 @@ export async function getOwnFlightRequestsPage(
 }
 
 const FLIGHT_REQUEST_REVIEW_SELECT =
-  "id, status, rejected_reason, flight_plan_id, weight_balance_id, created_at, updated_at, profiles!flight_requests_requested_by_fkey(full_name), instructor:profiles!flight_requests_instructor_profile_id_fkey(full_name), flight_plans!inner(plan_code, aircraft_identification, type_of_aircraft, departure_aerodrome, destination_aerodrome, dof_raw, dof_resolved, departure_time_raw, pilot_in_command_id, pilot_in_command_name, aircrafts(photo_path))";
+  "id, status, rejected_reason, flight_plan_id, weight_balance_id, created_at, updated_at, profiles!flight_requests_requested_by_fkey(full_name), instructor:profiles!flight_requests_instructor_profile_id_fkey(full_name), flight_plans!inner(plan_code, aircraft_identification, type_of_aircraft, departure_aerodrome, destination_aerodrome, dof_raw, dof_resolved, date_of_flight_raw, departure_time_raw, pilot_in_command_id, pilot_in_command_name, aircrafts(photo_path))";
 
 export async function getReviewFlightRequestsPage(
   page: number,
@@ -200,6 +201,7 @@ export async function getReviewFlightRequestsPage(
       destinationAerodrome: row.flight_plans.destination_aerodrome,
       dofRaw: row.flight_plans.dof_raw,
       dofResolved: row.flight_plans.dof_resolved,
+      dateOfFlightRaw: row.flight_plans.date_of_flight_raw,
       departureTimeRaw: row.flight_plans.departure_time_raw,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
