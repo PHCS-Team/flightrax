@@ -14,7 +14,7 @@ export function ScheduleHeaderAction({ canManage }: { canManage: boolean }) {
 
   return (
     <div className="flex items-center gap-2">
-      <ScheduleLegendAction className="sm:hidden" />
+      <ScheduleLegendAction className="xl:hidden" />
       {canManage && <SchedulePingAction />}
     </div>
   );

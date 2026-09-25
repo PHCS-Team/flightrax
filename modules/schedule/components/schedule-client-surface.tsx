@@ -79,9 +79,9 @@ export function ScheduleClientSurface({ canManage }: { canManage: boolean }) {
   return (
     <TooltipProvider>
       <div className="sm:space-y-4">
-        <div className="flex flex-col gap-3 px-2.5 pt-2.5 pb-3 sm:flex-row sm:items-center sm:justify-between sm:px-0 sm:py-0">
+        <div className="flex flex-col gap-3 px-2.5 pt-2.5 pb-3 sm:px-0 sm:py-0 xl:flex-row xl:items-center xl:justify-between">
           <ScheduleDayStrip date={activeDate} onChange={setDate} />
-          <ScheduleLegendAction className="hidden sm:flex" />
+          <ScheduleLegendAction className="hidden xl:flex" />
         </div>
 
         {day.isPending || !day.data ? (

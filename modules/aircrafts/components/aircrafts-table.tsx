@@ -387,7 +387,7 @@ export function AircraftsTable({
   return (
     <TooltipProvider>
       <GlassSurface className="space-y-3 sm:space-y-4 py-3 sm:py-4">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-2.5 sm:px-4">
+        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-3 px-2.5 sm:px-4">
           <div className="flex gap-2 sm:flex-1 sm:items-center">
             <div className="min-w-0 flex-1 sm:max-w-sm">
               <Input
