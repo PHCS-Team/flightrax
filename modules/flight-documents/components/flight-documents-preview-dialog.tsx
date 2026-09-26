@@ -46,7 +46,7 @@ export function FlightDocumentsPreviewDialog({
 
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
-      <DialogContent className="top-0 left-0 h-dvh max-h-dvh w-screen max-w-none translate-x-0 translate-y-0 gap-0 rounded-none p-0 sm:top-1/2 sm:left-1/2 sm:h-auto sm:max-h-[calc(100dvh-2rem)] sm:max-w-3xl sm:-translate-x-1/2 sm:-translate-y-1/2 sm:gap-4 sm:rounded-xl sm:p-6">
+      <DialogContent className="top-0 left-0 h-dvh max-h-dvh w-screen max-w-none translate-x-0 translate-y-0 gap-0 rounded-none p-0 sm:top-1/2 sm:left-1/2 sm:h-[calc(100dvh-2rem)] sm:max-h-[calc(100dvh-2rem)] sm:max-w-3xl sm:-translate-x-1/2 sm:-translate-y-1/2 sm:gap-4 sm:rounded-xl sm:p-6">
         <div className="flex h-full min-h-0 flex-col">
           <div className="shrink-0 border-b bg-popover p-3 pr-12 sm:border-0 sm:p-0 sm:pr-8">
             <DialogSectionHeader
@@ -93,18 +93,11 @@ export function FlightDocumentsPreviewDialog({
                 <p className="text-sm text-destructive">{error}</p>
               </div>
             ) : document ? (
-              <>
-                <iframe
-                  className="hidden h-[60dvh] w-full bg-white sm:block"
-                  src={document.url}
-                  title={`${KIND_LABELS[kind]} preview`}
-                />
-                <PdfDocumentView
-                  bytes={document.bytes}
-                  className="h-full sm:hidden"
-                  label={KIND_LABELS[kind]}
-                />
-              </>
+              <PdfDocumentView
+                bytes={document.bytes}
+                className="h-full"
+                label={KIND_LABELS[kind]}
+              />
             ) : null}
           </div>
 

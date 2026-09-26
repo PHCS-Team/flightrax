@@ -18,6 +18,23 @@ function clampZoom(value: number) {
   return Math.min(Math.max(value, MIN_ZOOM), MAX_ZOOM);
 }
 
+function ensurePromiseWithResolvers() {
+  if (typeof Promise.withResolvers === "function") {
+    return;
+  }
+
+  Promise.withResolvers = function withResolvers<T>() {
+    let resolve!: (value: T | PromiseLike<T>) => void;
+    let reject!: (reason?: unknown) => void;
+    const promise = new Promise<T>((res, rej) => {
+      resolve = res;
+      reject = rej;
+    });
+
+    return { promise, resolve, reject };
+  };
+}
+
 // Draws the PDF inside the app. An installed PWA cannot rely on the phone's
 // PDF viewer: opening a blob URL from standalone mode lands on a blank page
 // or throws the user out of the app.
@@ -48,7 +65,9 @@ export function PdfDocumentView({
       }
 
       try {
-        const pdfjs = await import("pdfjs-dist");
+        // Legacy build: the modern one needs globals older iOS lacks.
+        ensurePromiseWithResolvers();
+        const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
 
         pdfjs.GlobalWorkerOptions.workerSrc = "/pdf/pdf.worker.min.mjs";
 
