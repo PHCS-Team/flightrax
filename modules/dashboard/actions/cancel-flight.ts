@@ -1,6 +1,7 @@
 "use server";
 
 import { cancelFlightSchema } from "@/modules/dashboard/schemas/todays-flight-schema";
+import { isFlightParticipant } from "@/modules/dashboard/utils/flight-participation";
 import { verifyProfilePasscode } from "@/shared/lib/passcode";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { ROLE } from "@/shared/lib/rbac/config";
@@ -25,7 +26,9 @@ export const cancelFlightAction = actionClient
 
     const { data: journey, error: journeyError } = await supabase
       .from("flight_journeys")
-      .select("id, status, cancelled_by, flight_requests!inner(requested_by)")
+      .select(
+        "id, status, cancelled_by, flight_requests!inner(requested_by, instructor_profile_id, flight_plans!inner(pilot_in_command_id))",
+      )
       .eq("flight_request_id", parsedInput.flightRequestId)
       .maybeSingle();
 
@@ -37,15 +40,20 @@ export const cancelFlightAction = actionClient
       return { ok: false, message: "Flight journey not found." };
     }
 
-    // Requesters cancel their own flights; instructors and superadmins
-    // can cancel any.
-    const canManageAll =
-      actor.role === ROLE.INSTRUCTOR || actor.role === ROLE.SUPERADMIN;
+    // Only the people on the flight — filer, PIC, or assigned
+    // instructor — may cancel it. Superadmins may cancel any.
+    const isParticipant = isFlightParticipant(actor.id, {
+      requestedBy: journey.flight_requests.requested_by,
+      pilotInCommandId:
+        journey.flight_requests.flight_plans.pilot_in_command_id,
+      instructorProfileId: journey.flight_requests.instructor_profile_id,
+    });
 
-    if (!canManageAll && journey.flight_requests.requested_by !== actor.id) {
+    if (actor.role !== ROLE.SUPERADMIN && !isParticipant) {
       return {
         ok: false,
-        message: "You can only cancel your own flights.",
+        message:
+          "Only the filer, pilot in command, or assigned instructor of this flight can cancel it.",
       };
     }
 

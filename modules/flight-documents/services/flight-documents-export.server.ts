@@ -16,7 +16,7 @@ import { createAdminClient } from "@/shared/lib/supabase/admin";
 import { describeActionError } from "@/shared/lib/action-error";
 
 const EXPORT_SELECT =
-  "plan_code, dof_resolved, date_of_flight_resolved, updated_at, pilot_signature, pilot_licenses, authorized_representative_name, authorized_representative_signature, authorized_representative_licenses, aircraft_type_designator, flight_requests(weight_balance_id)";
+  "plan_code, dof_resolved, date_of_flight_resolved, updated_at, pilot_in_command_name, pilot_signature, pilot_licenses, authorized_representative_name, authorized_representative_signature, authorized_representative_licenses, aircraft_type_designator, flight_requests(weight_balance_id)";
 
 const WEIGHT_BALANCE_EXPORT_SELECT =
   "basic_empty_weight, basic_empty_weight_arm, basic_empty_weight_moment, usable_fuel_weight, usable_fuel_arm, usable_fuel_moment, fi_and_student_weight, fi_and_student_arm, fi_and_student_moment, total_weight, total_moment, total_cg, maximum_takeoff_weight, max_baggage_weight, weight_status, balance_status, prepared_by_name, prepared_by_signature, verified_by_name, verified_by_signature, updated_at, weight_balance_baggage_entries(position, weight, arm, moment)";
@@ -157,7 +157,7 @@ export async function getFlightDocumentsExport(
       aircraftTypeName: flightPlan.aircraft.typeName,
       aircraftTypeDesignator: data.aircraft_type_designator ?? "",
       aircraftColorMarkings: flightPlan.aircraft.colorMarkings,
-      filedByName: flightPlan.filedByName,
+      pilotName: data.pilot_in_command_name ?? "",
       pilotSignatureSvg: data.pilot_signature,
       pilotLicenses: toLicenseSnapshots(data.pilot_licenses).map((license) =>
         toLicenseShortForm(license, ratingOptions),

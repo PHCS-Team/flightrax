@@ -19,17 +19,16 @@ export async function getTodaysFlightsPage(
     throw new Error("You do not have permission to view today's flights.");
   }
 
-  // Instructors and superadmins see every flight; everyone else only
-  // the requests they filed.
-  const seesAll =
-    viewer.role === ROLE.INSTRUCTOR || viewer.role === ROLE.SUPERADMIN;
+  // Everyone sees only the flights they belong to — filed by them, PIC,
+  // or assigned instructor. Only superadmins see every flight.
+  const seesAll = viewer.role === ROLE.SUPERADMIN;
 
   const supabase = createAdminClient();
   const { data, error } = await supabase.rpc("get_todays_flights", {
     p_page: page,
     p_page_size: pageSize,
     ...(search.trim() ? { p_search: search.trim() } : {}),
-    ...(seesAll ? {} : { p_requested_by: viewer.id }),
+    ...(seesAll ? {} : { p_participant: viewer.id }),
   });
 
   if (error) {

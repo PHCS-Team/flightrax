@@ -41,7 +41,6 @@ import {
   syncAerodromeLines,
   syncDofLine,
 } from "@/modules/flight-documents/utils/build-other-information";
-import { toLicenseShortForm } from "@/modules/flight-documents/utils/format-license-line";
 import { FlightDocumentsPreviewAction } from "@/modules/flight-documents/components/flight-documents-preview-action";
 import {
   addHourToHhmm,
@@ -143,17 +142,15 @@ export function FlightPlanForm({
       aircraftTypeName: previewAircraft?.typeName ?? "",
       aircraftTypeDesignator: previewAircraft?.typeIcaoDesignator ?? "",
       aircraftColorMarkings: previewAircraft?.colorMarkings ?? "",
-      filedByName: filerContext?.profile.fullName ?? "",
-      pilotSignatureSvg: filerContext?.signatureSvg ?? null,
-      pilotLicenses: (filerContext?.licenses ?? []).map((license) =>
-        toLicenseShortForm(license, ratingOptions),
-      ),
+      pilotName: "",
+      pilotSignatureSvg: null,
+      pilotLicenses: [],
       representativeName: null,
       representativeSignatureSvg: null,
       representativeLicenses: [],
       values: form.getValues(),
     });
-  }, [filerContext, form, previewAircraft, ratingOptions]);
+  }, [form, previewAircraft]);
   const { picOptions } = useFlightPlanPicOptions();
   const hasDinghy = useWatch({
     control: form.control,

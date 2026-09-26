@@ -22,9 +22,6 @@ export type FlightPlanFilerContext = {
   // True when the filer has a registered signature — required to file,
   // because saving auto-signs the plan with it.
   hasSignature: boolean;
-  // The registered signature itself, so the draft preview can render the
-  // form exactly as it will print once saved.
-  signatureSvg: string | null;
   // True when the filer holds at least one active, non-expired license —
   // required to file a flight plan.
   hasValidLicense: boolean;

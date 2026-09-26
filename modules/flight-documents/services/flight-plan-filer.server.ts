@@ -57,7 +57,6 @@ export async function getFlightPlanFilerContext(): Promise<FlightPlanFilerContex
       status: license.status,
     })),
     hasSignature: Boolean(viewer.signature_svg?.trim()),
-    signatureSvg: viewer.signature_svg?.trim() ? viewer.signature_svg : null,
     hasValidLicense,
     canSetSelfAsPic,
     canApproveAsPic,
@@ -124,6 +123,57 @@ export async function getFlightPlanPicOptions(): Promise<
       expiredCredentials: expiredByProfile.get(row.profiles.id) ?? [],
     }))
     .sort((a, b) => a.fullName.localeCompare(b.fullName));
+}
+
+// The pilot column of the printed form belongs to the PIC: their
+// registered signature and licenses, snapshotted at save time.
+export async function getPicSnapshot(picId: string): Promise<{
+  signatureSvg: string | null;
+  licenses: {
+    licenseType: string;
+    licenseNumber: string;
+    ratings: string[];
+    expiryDate: string | null;
+    hasNoExpiry: boolean;
+    status: string;
+  }[];
+}> {
+  const supabase = createAdminClient();
+  const [profileResult, licensesResult] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("signature_svg")
+      .eq("id", picId)
+      .maybeSingle(),
+    supabase
+      .from("licenses")
+      .select(
+        "license_type, license_number, ratings, expiry_date, has_no_expiry, status",
+      )
+      .eq("user_id", picId),
+  ]);
+
+  if (profileResult.error) {
+    throw new Error(describeActionError(profileResult.error));
+  }
+
+  if (licensesResult.error) {
+    throw new Error(describeActionError(licensesResult.error));
+  }
+
+  return {
+    signatureSvg: profileResult.data?.signature_svg?.trim()
+      ? profileResult.data.signature_svg
+      : null,
+    licenses: (licensesResult.data ?? []).map((license) => ({
+      licenseType: license.license_type,
+      licenseNumber: license.license_number,
+      ratings: license.ratings,
+      expiryDate: license.expiry_date,
+      hasNoExpiry: license.has_no_expiry,
+      status: license.status,
+    })),
+  };
 }
 
 export async function isInstructorProfile(profileId: string): Promise<boolean> {

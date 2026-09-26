@@ -1595,7 +1595,7 @@ export type Database = {
         Args: {
           p_page?: number
           p_page_size?: number
-          p_requested_by?: string
+          p_participant?: string
           p_search?: string
         }
         Returns: {

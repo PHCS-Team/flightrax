@@ -1,6 +1,7 @@
 "use server";
 
 import { commenceFlightSchema } from "@/modules/dashboard/schemas/todays-flight-schema";
+import { isFlightParticipant } from "@/modules/dashboard/utils/flight-participation";
 import { verifyProfilePasscode } from "@/shared/lib/passcode";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { ROLE } from "@/shared/lib/rbac/config";
@@ -41,13 +42,20 @@ export const commenceFlightAction = actionClient
 
     const plan = journey.flight_requests.flight_plans;
 
-    const canManageAll =
-      actor.role === ROLE.INSTRUCTOR || actor.role === ROLE.SUPERADMIN;
+    // Only the people on the flight — filer, PIC, or assigned
+    // instructor — may commence it. Superadmins may commence any.
+    const isSuperadmin = actor.role === ROLE.SUPERADMIN;
+    const isParticipant = isFlightParticipant(actor.id, {
+      requestedBy: journey.flight_requests.requested_by,
+      pilotInCommandId: plan.pilot_in_command_id,
+      instructorProfileId: journey.flight_requests.instructor_profile_id,
+    });
 
-    if (!canManageAll && journey.flight_requests.requested_by !== actor.id) {
+    if (!isSuperadmin && !isParticipant) {
       return {
         ok: false,
-        message: "You can only commence your own flights.",
+        message:
+          "Only the filer, pilot in command, or assigned instructor of this flight can commence it.",
       };
     }
 
@@ -124,7 +132,7 @@ export const commenceFlightAction = actionClient
       const { data: earlier, error: earlierError } = await supabase
         .from("flight_journeys")
         .select(
-          "id, dof_at, flight_request_id, flight_requests!inner(requested_by, flight_plans!inner(aircraft_identification, pilot_name))",
+          "id, dof_at, flight_request_id, flight_requests!inner(requested_by, instructor_profile_id, flight_plans!inner(aircraft_identification, pilot_name, pilot_in_command_id))",
         )
         .eq("aircraft_id", journey.aircraft_id ?? "")
         .eq("dof_date", journey.dof_date ?? "")
@@ -151,7 +159,14 @@ export const commenceFlightAction = actionClient
             dofAt: earlier.dof_at,
             traineeName: earlier.flight_requests.flight_plans.pilot_name ?? "",
             canCancel:
-              canManageAll || earlier.flight_requests.requested_by === actor.id,
+              isSuperadmin ||
+              isFlightParticipant(actor.id, {
+                requestedBy: earlier.flight_requests.requested_by,
+                pilotInCommandId:
+                  earlier.flight_requests.flight_plans.pilot_in_command_id,
+                instructorProfileId:
+                  earlier.flight_requests.instructor_profile_id,
+              }),
           },
         };
       }

@@ -12,6 +12,7 @@ import { findExpiredCredentialBlock } from "@/shared/lib/aviation/expired-creden
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { isApproved } from "@/shared/lib/rbac/guards";
 import {
+  getPicSnapshot,
   getPicUnavailabilityEndsOn,
   isInstructorProfile,
 } from "@/modules/flight-documents/services/flight-plan-filer.server";
@@ -107,6 +108,8 @@ export const updateFlightPlanAction = actionClient
       }
     }
 
+    const picSnapshot = await getPicSnapshot(parsedInput.pilotInCommandId);
+
     const { error: updateError } = await supabase
       .from("flight_plans")
       .update({
@@ -182,6 +185,10 @@ export const updateFlightPlanAction = actionClient
         remarks: parsedInput.remarks ? parsedInput.remarks.toUpperCase() : null,
         pilot_in_command_id: parsedInput.pilotInCommandId,
         pilot_in_command_name: parsedInput.pilotInCommandName.toUpperCase(),
+        // Re-snapshot in case the PIC changed: the printed pilot column
+        // belongs to the PIC, not the filer.
+        pilot_signature: picSnapshot.signatureSvg,
+        pilot_licenses: picSnapshot.licenses,
       })
       .eq("id", parsedInput.flightPlanId);
 

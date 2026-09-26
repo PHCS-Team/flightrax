@@ -21,7 +21,9 @@ export type FlightPlanExport = {
   /** ICAO Doc 8643 designator printed in Item 9. */
   aircraftTypeDesignator: string;
   aircraftColorMarkings: string;
-  filedByName: string;
+  // The printed pilot column: the PIC's name, signature, and licenses.
+  // Blank during form creation/editing previews.
+  pilotName: string;
   pilotSignatureSvg: string | null;
   pilotLicenses: ExportLicense[];
   representativeName: string | null;

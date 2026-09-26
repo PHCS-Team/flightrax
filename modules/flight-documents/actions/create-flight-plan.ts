@@ -14,6 +14,7 @@ import { isLicenseValid } from "@/shared/lib/aviation/license-validity";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { isApproved } from "@/shared/lib/rbac/guards";
 import {
+  getPicSnapshot,
   getPicUnavailabilityEndsOn,
   isInstructorProfile,
 } from "@/modules/flight-documents/services/flight-plan-filer.server";
@@ -99,15 +100,6 @@ export const createFlightPlanAction = actionClient
       };
     }
 
-    const pilotLicenses = (licenses ?? []).map((license) => ({
-      licenseType: license.license_type,
-      licenseNumber: license.license_number,
-      ratings: license.ratings,
-      expiryDate: license.expiry_date,
-      hasNoExpiry: license.has_no_expiry,
-      status: license.status,
-    }));
-
     const credentialBlock = await findExpiredCredentialBlock([
       { id: actor.id, role: "self" },
       { id: parsedInput.pilotInCommandId, role: "pilot in command" },
@@ -153,6 +145,8 @@ export const createFlightPlanAction = actionClient
         };
       }
     }
+
+    const picSnapshot = await getPicSnapshot(parsedInput.pilotInCommandId);
 
     const { data: recentDuplicate, error: duplicateError } = await supabase
       .from("flight_plans")
@@ -258,8 +252,9 @@ export const createFlightPlanAction = actionClient
       pilot_in_command_name: parsedInput.pilotInCommandName.toUpperCase(),
       filed_by_id: filerProfile.id,
       pilot_name: filerProfile.full_name.toUpperCase(),
-      pilot_signature: filerProfile.signature_svg,
-      pilot_licenses: pilotLicenses,
+      // The printed pilot column belongs to the PIC, not the filer.
+      pilot_signature: picSnapshot.signatureSvg,
+      pilot_licenses: picSnapshot.licenses,
       created_by: filerProfile.id,
     };
 

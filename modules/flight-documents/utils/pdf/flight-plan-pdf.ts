@@ -372,7 +372,7 @@ export async function buildFlightPlanPdf(
   drawBoxText(page, fonts.sans, values.pilotInCommandName.toUpperCase(), BOXES.pilotInCommand, { size: 10 });
 
   // Signature block
-  drawSignatureColumn(page, fonts, SIGNATURE_COLUMNS.pilot, flightPlan.filedByName, flightPlan.pilotSignatureSvg);
+  drawSignatureColumn(page, fonts, SIGNATURE_COLUMNS.pilot, flightPlan.pilotName, flightPlan.pilotSignatureSvg);
   drawSmallLine(page, fonts.sansBold, formatLicenseLine(flightPlan.pilotLicenses), SIGNATURE_COLUMNS.pilotLicense);
   drawSignatureColumn(page, fonts, SIGNATURE_COLUMNS.representative, flightPlan.representativeName, flightPlan.representativeSignatureSvg);
   drawSmallLine(page, fonts.sansBold, formatLicenseLine(flightPlan.representativeLicenses), SIGNATURE_COLUMNS.representativeLicense);
