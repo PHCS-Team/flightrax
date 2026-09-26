@@ -7,11 +7,13 @@ import {
   getAdminDepartment,
   getEffectiveApprovalStatus,
 } from "@/shared/lib/rbac/profile";
+import { APP_SETTING_KEYS } from "@/shared/lib/app-settings";
 import {
   canAccessPath,
   getDefaultRedirectForProfile,
   isAuthPath,
   isProtectedPath,
+  isSuperadminMinimalPath,
   type RouteAccessProfile,
 } from "@/shared/lib/rbac/routes";
 import type { Database } from "@/shared/types/supabase";
@@ -115,6 +117,22 @@ export async function updateSession(request: NextRequest) {
 
   if (isProtectedPath(pathname) && !canAccessPath(profile, pathname)) {
     return NextResponse.redirect(new URL(getDefaultRedirectForProfile(profile), request.url));
+  }
+
+  if (
+    profile.role === "superadmin" &&
+    isProtectedPath(pathname) &&
+    !isSuperadminMinimalPath(pathname)
+  ) {
+    const { data: setting } = await supabase
+      .from("app_settings")
+      .select("value")
+      .eq("key", APP_SETTING_KEYS.superadminFullNavigation)
+      .maybeSingle();
+
+    if (setting?.value !== true) {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
   }
 
   return response;

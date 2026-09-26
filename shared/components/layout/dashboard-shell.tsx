@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 import { useDashboardProfile } from "@/modules/auth/hooks/use-dashboard-profile.query";
+import { useAppSettings } from "@/shared/hooks/use-app-settings.query";
 import { EnableNotificationsAction } from "@/modules/notifications/components/enable-notifications-action";
 import { NotificationPermissionGate } from "@/modules/notifications/components/notification-permission-gate";
 import { NotificationsBell } from "@/modules/notifications/components/notifications-bell";
@@ -113,9 +114,12 @@ export function DashboardShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   useNavigationDepthTracker();
   const { data: profile = null } = useDashboardProfile();
+  const appSettings = useAppSettings();
   const [desktopCollapsed, setDesktopCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const navigationSections = getDashboardNavigation(profile);
+  const navigationSections = getDashboardNavigation(profile, {
+    superadminFullNavigation: appSettings.superadminFullNavigation,
+  });
   const roleLabel = profile
     ? getSidebarRoleLabel(profile.role, profile.admin_department)
     : "\u00a0";

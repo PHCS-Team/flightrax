@@ -25,7 +25,7 @@ import { INSTRUCTORS_VIEW } from "@/modules/instructors/constants/permissions";
 import { NOTAMS_VIEW } from "@/modules/notams/constants/permissions";
 import { SCHEDULE_VIEW } from "@/modules/schedule/constants/permissions";
 import { STUDENTS_VIEW } from "@/modules/students/constants/permissions";
-import { hasPermission } from "@/shared/lib/rbac/config";
+import { hasPermission, ROLE } from "@/shared/lib/rbac/config";
 import { SYSTEM_MANAGE } from "@/shared/lib/rbac/permissions";
 import type { Permission, Profile } from "@/shared/lib/rbac/types";
 
@@ -164,15 +164,27 @@ const DASHBOARD_NAVIGATION: DashboardNavigation = [
   DASHBOARD_NAVIGATION_ITEMS.notams,
 ];
 
+// Nav ids a superadmin keeps when superadmin_full_navigation is off.
+const SUPERADMIN_MINIMAL_NAV_IDS: readonly DashboardNavigationItemId[] = [
+  "home",
+  "instructors",
+  "students",
+];
+
 export function getDashboardNavigation(
   profile: Pick<Profile, "admin_department" | "role"> | null,
+  options: { superadminFullNavigation?: boolean } = {},
 ): DashboardNavigation {
   if (!profile) {
     return [];
   }
 
+  const minimalSuperadmin =
+    profile.role === ROLE.SUPERADMIN && !options.superadminFullNavigation;
+
   const canSee = (item: DashboardNavigationItem) =>
-    hasPermission(profile.role, item.permission, profile.admin_department);
+    hasPermission(profile.role, item.permission, profile.admin_department) &&
+    (!minimalSuperadmin || SUPERADMIN_MINIMAL_NAV_IDS.includes(item.id));
 
   return DASHBOARD_NAVIGATION.flatMap<DashboardNavigationSection>((section) => {
     if (isNavigationItem(section)) {

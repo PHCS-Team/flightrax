@@ -68,6 +68,22 @@ export function canAccessPath(profile: RouteAccessProfile, pathname: string) {
   return hasPermission(profile.role, permission, profile.admin_department);
 }
 
+// Routes a superadmin keeps when superadmin_full_navigation is off:
+// Home, their own account pages, and the Users pages.
+const SUPERADMIN_MINIMAL_PREFIXES = [
+  "/dashboard",
+  "/account",
+  "/notifications",
+  "/instructors",
+  "/students",
+];
+
+export function isSuperadminMinimalPath(pathname: string) {
+  return SUPERADMIN_MINIMAL_PREFIXES.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+  );
+}
+
 export function isProtectedPath(pathname: string) {
   return (
     AUTH_REQUIRED_ROUTES.some((route) => pathname === route) ||
