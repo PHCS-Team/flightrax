@@ -1,6 +1,7 @@
 // Parent query keys shared across module boundaries so one module can
 // invalidate another module's cached lists without importing from it.
 export const STUDENTS_PARENT_QUERY_KEY = ["students"] as const;
+export const ADMINS_PARENT_QUERY_KEY = ["admins"] as const;
 
 // Ratings are derived from aircraft types; the aircrafts module invalidates
 // this after any type change so license pickers and labels refresh.

@@ -1,5 +1,6 @@
 import { ACCOUNT_VIEW } from "@/modules/auth/constants/permissions";
 import { ACCOUNT_REVIEW } from "@/modules/account-review/constants/permissions";
+import { ADMINS_VIEW } from "@/modules/admins/constants/permissions";
 import { INSTRUCTORS_VIEW } from "@/modules/instructors/constants/permissions";
 import { STUDENTS_VIEW } from "@/modules/students/constants/permissions";
 import { DASHBOARD_VIEW } from "@/modules/dashboard/constants/permissions";
@@ -31,6 +32,7 @@ const PROTECTED_ROUTES: Array<{ prefix: string; permission: Permission }> = [
   { prefix: "/notifications", permission: DASHBOARD_VIEW },
   { prefix: "/aircrafts", permission: SYSTEM_MANAGE },
   { prefix: "/students", permission: STUDENTS_VIEW },
+  { prefix: "/admins", permission: ADMINS_VIEW },
   { prefix: "/account-review", permission: ACCOUNT_REVIEW },
 ];
 const AUTH_REQUIRED_ROUTES = ["/pending-approval"];
@@ -76,6 +78,7 @@ const SUPERADMIN_MINIMAL_PREFIXES = [
   "/notifications",
   "/instructors",
   "/students",
+  "/admins",
 ];
 
 export function isSuperadminMinimalPath(pathname: string) {

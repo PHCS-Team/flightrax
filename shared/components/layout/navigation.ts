@@ -8,6 +8,7 @@ import {
   NotebookTextIcon,
   PlaneIcon,
   PlaneTakeoffIcon,
+  ShieldCheckIcon,
   UserCheckIcon,
   UsersIcon,
   UsersRoundIcon,
@@ -15,6 +16,7 @@ import {
 } from "lucide-react";
 
 import { ACCOUNT_REVIEW } from "@/modules/account-review/constants/permissions";
+import { ADMINS_VIEW } from "@/modules/admins/constants/permissions";
 import { DASHBOARD_VIEW } from "@/modules/dashboard/constants/permissions";
 import {
   FLIGHT_DOCUMENTS_VIEW,
@@ -37,6 +39,7 @@ export type DashboardNavigationItemId =
   | "instructors"
   | "schedule"
   | "students"
+  | "admins"
   | "accountReview"
   | "aircrafts"
   | "notams";
@@ -114,6 +117,13 @@ const DASHBOARD_NAVIGATION_ITEMS = {
     label: "Students",
     permission: STUDENTS_VIEW,
   },
+  admins: {
+    href: "/admins",
+    icon: ShieldCheckIcon,
+    id: "admins",
+    label: "Admins",
+    permission: ADMINS_VIEW,
+  },
   accountReview: {
     href: "/account-review",
     icon: UserCheckIcon,
@@ -157,6 +167,7 @@ const DASHBOARD_NAVIGATION: DashboardNavigation = [
     items: [
       DASHBOARD_NAVIGATION_ITEMS.instructors,
       DASHBOARD_NAVIGATION_ITEMS.students,
+      DASHBOARD_NAVIGATION_ITEMS.admins,
       DASHBOARD_NAVIGATION_ITEMS.accountReview,
     ],
   },
@@ -169,6 +180,7 @@ const SUPERADMIN_MINIMAL_NAV_IDS: readonly DashboardNavigationItemId[] = [
   "home",
   "instructors",
   "students",
+  "admins",
 ];
 
 export function getDashboardNavigation(

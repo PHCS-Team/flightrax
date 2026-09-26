@@ -7,6 +7,7 @@ import {
   INSTRUCTORS_MANAGE,
   INSTRUCTORS_VIEW,
 } from "@/modules/instructors/constants/permissions";
+import { ADMINS_VIEW } from "@/modules/admins/constants/permissions";
 import { STUDENTS_VIEW } from "@/modules/students/constants/permissions";
 import { DASHBOARD_VIEW } from "@/modules/dashboard/constants/permissions";
 import {
@@ -63,6 +64,7 @@ export type Permission =
   | typeof NOTAMS_VIEW
   | typeof NOTAMS_MANAGE
   | typeof STUDENTS_VIEW
+  | typeof ADMINS_VIEW
   | typeof ACCOUNT_REVIEW
   | typeof CREDENTIALS_VIEW_DETAILS
   | typeof SYSTEM_MANAGE;
