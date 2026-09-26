@@ -14,7 +14,7 @@ const PROFILE_DETAIL_SELECT =
 const PROFILE_VIEWER_SELECT =
   "*, account_requests!account_requests_profile_id_fkey(approval_status), admin_profiles!admin_profiles_profile_id_fkey(department)";
 const PROFILE_ACCESS_SELECT =
-  "id, email, full_name, role, created_at, updated_at, signature_svg, passcode_hash, profile_photo_path, profile_photo_content_type, profile_photo_size_bytes, profile_photo_uploaded_at, account_requests!account_requests_profile_id_fkey(approval_status), admin_profiles!admin_profiles_profile_id_fkey(department)";
+  "id, email, full_name, role, created_at, updated_at, signature_svg, passcode_hash, must_change_password, profile_photo_path, profile_photo_content_type, profile_photo_size_bytes, profile_photo_uploaded_at, account_requests!account_requests_profile_id_fkey(approval_status), admin_profiles!admin_profiles_profile_id_fkey(department)";
 
 function getPublicProfilePhotoUrl(
   supabase: Awaited<ReturnType<typeof createClient>>,

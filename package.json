@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit",
+    "seed:superadmin": "node scripts/seed-superadmin.mjs",
     "supabase:types": "supabase gen types typescript --project-id \"$SUPABASE_PROJECT_ID\" --schema public > shared/types/supabase.ts",
     "supabase:types:local": "npx supabase gen types typescript --local --schema public > shared/types/supabase.ts",
     "supabase:migration:new": "npx supabase migration new",

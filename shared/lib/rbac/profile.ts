@@ -75,6 +75,7 @@ export function normalizeProfile(
     profile_photo_url: profilePhotoUrl,
     signature_svg: row.signature_svg,
     passcode_hash: row.passcode_hash,
+    must_change_password: row.must_change_password,
     role: row.role,
     created_at: row.created_at,
     updated_at: row.updated_at,

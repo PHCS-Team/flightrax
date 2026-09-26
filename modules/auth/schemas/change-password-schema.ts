@@ -1,8 +1,23 @@
 import { z } from "zod";
 
+export const setInitialPasswordSchema = z
+  .object({
+    newPassword: z.string().min(8, "New password must be at least 8 characters."),
+    confirmPassword: z.string().min(8, "Confirm your new password."),
+  })
+  .superRefine((value, context) => {
+    if (value.newPassword !== value.confirmPassword) {
+      context.addIssue({
+        code: "custom",
+        path: ["confirmPassword"],
+        message: "Passwords do not match.",
+      });
+    }
+  });
+
 export const changePasswordSchema = z
   .object({
-    currentPassword: z.string().min(8, "Enter your current password."),
+    currentPassword: z.string().min(1, "Enter your current password."),
     newPassword: z.string().min(8, "New password must be at least 8 characters."),
     confirmPassword: z.string().min(8, "Confirm your new password."),
   })

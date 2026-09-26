@@ -1,6 +1,9 @@
 import type { z } from "zod";
 
-import type { changePasswordSchema } from "@/modules/auth/schemas/change-password-schema";
+import type {
+  changePasswordSchema,
+  setInitialPasswordSchema,
+} from "@/modules/auth/schemas/change-password-schema";
 import type { loginSchema } from "@/modules/auth/schemas/login-schema";
 import type {
   requestPasswordResetSchema,
@@ -18,6 +21,7 @@ import type { profilePhotoSchema } from "@/modules/auth/schemas/profile-photo-sc
 export type LoginInput = z.infer<typeof loginSchema>;
 export type AdminRegisterInput = z.infer<typeof adminRegisterSchema>;
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
+export type SetInitialPasswordInput = z.infer<typeof setInitialPasswordSchema>;
 export type InstructorRegisterInput = z.infer<typeof instructorRegisterSchema>;
 export type StudentRegisterInput = z.infer<typeof studentRegisterSchema>;
 export type SuperadminRegisterInput = z.infer<typeof superadminRegisterSchema>;

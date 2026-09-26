@@ -1048,6 +1048,7 @@ export type Database = {
           email: string
           full_name: string
           id: string
+          must_change_password: boolean
           passcode_hash: string | null
           profile_photo_content_type: string | null
           profile_photo_path: string | null
@@ -1062,6 +1063,7 @@ export type Database = {
           email: string
           full_name: string
           id: string
+          must_change_password?: boolean
           passcode_hash?: string | null
           profile_photo_content_type?: string | null
           profile_photo_path?: string | null
@@ -1076,6 +1078,7 @@ export type Database = {
           email?: string
           full_name?: string
           id?: string
+          must_change_password?: boolean
           passcode_hash?: string | null
           profile_photo_content_type?: string | null
           profile_photo_path?: string | null
