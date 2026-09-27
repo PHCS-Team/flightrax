@@ -134,15 +134,15 @@ export function InstructorsTable({
               <p className="text-sm text-primary-foreground/65">
                 ID Number: {instructor.instructorIdNumber}
               </p>
-              <p className="mt-0.5 flex items-center gap-1 text-sm text-primary-foreground/65">
-                <WeightIcon
-                  aria-hidden="true"
-                  className="size-3.5 shrink-0 text-primary-foreground/50"
-                />
+              <p className="mt-1">
                 {instructor.weightLbs !== null ? (
-                  `${formatWeight(instructor.weightLbs)} lbs`
+                  <span className="inline-flex items-center gap-1 rounded-full border border-primary-foreground/30 bg-primary-foreground/15 px-2 py-0.5 text-xs font-semibold text-primary-foreground">
+                    <WeightIcon aria-hidden="true" className="size-3" />
+                    {formatWeight(instructor.weightLbs)} lbs
+                  </span>
                 ) : (
-                  <span className="italic text-primary-foreground/45">
+                  <span className="inline-flex items-center gap-1 rounded-full border border-dashed border-amber-300/50 bg-amber-300/10 px-2 py-0.5 text-xs font-medium text-amber-200/90">
+                    <WeightIcon aria-hidden="true" className="size-3" />
                     Weight not set
                   </span>
                 )}

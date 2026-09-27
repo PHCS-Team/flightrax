@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { WeightIcon } from "lucide-react";
 import { useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 
 import { useUpdateWeight } from "@/modules/auth/hooks/use-update-weight.action";
 import {
@@ -19,14 +19,8 @@ import {
   DialogFooter,
 } from "@/shared/components/ui/dialog";
 import { Input } from "@/shared/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/shared/components/ui/select";
-import { formatWeight, lbsToKg } from "@/shared/lib/weight";
+import { cn } from "@/shared/lib/utils";
+import { formatWeight, kgToLbs, lbsToKg } from "@/shared/lib/weight";
 
 export function AccountWeightSection({
   weightLbs,
@@ -110,10 +104,29 @@ function WeightFormDialog({
   const form = useForm<UpdateWeightInput>({
     resolver: zodResolver(updateWeightSchema),
     defaultValues: {
-      weight: hasWeight ? formatWeight(weightLbs) : "",
-      unit: "lbs",
+      weight: hasWeight ? formatWeight(lbsToKg(weightLbs)) : "",
+      unit: "kg",
     },
   });
+  const unit = useWatch({ control: form.control, name: "unit" });
+
+  function switchUnit(nextUnit: UpdateWeightInput["unit"]) {
+    if (nextUnit === unit) {
+      return;
+    }
+
+    const current = Number(form.getValues("weight"));
+
+    if (form.getValues("weight").trim() !== "" && Number.isFinite(current)) {
+      form.setValue(
+        "weight",
+        formatWeight(nextUnit === "kg" ? lbsToKg(current) : kgToLbs(current)),
+        { shouldValidate: form.formState.isSubmitted },
+      );
+    }
+
+    form.setValue("unit", nextUnit);
+  }
 
   async function handleSubmit(values: UpdateWeightInput) {
     const result = await executeAsync(values);
@@ -148,35 +161,44 @@ function WeightFormDialog({
                 autoFocus
                 id="account-weight-value"
                 inputMode="decimal"
-                placeholder="e.g. 165"
+                placeholder="e.g. 70"
                 {...form.register("weight")}
               />
             </div>
             <div className="grid content-start gap-2">
-              <label
-                className="text-sm font-semibold text-foreground"
-                htmlFor="account-weight-unit"
+              <p className="text-sm font-semibold text-foreground">Unit</p>
+              <div
+                aria-label="Weight unit"
+                className="grid h-9 grid-cols-2 gap-1 rounded-lg border border-input bg-muted/40 p-1 md:h-10"
+                role="group"
               >
-                Unit
-              </label>
-              <Controller
-                control={form.control}
-                name="unit"
-                render={({ field }) => (
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <SelectTrigger
-                      className="w-32"
-                      id="account-weight-unit"
-                    >
-                      <SelectValue placeholder="Unit" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="lbs">Pounds (lbs)</SelectItem>
-                      <SelectItem value="kg">Kilograms (kg)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                )}
-              />
+                <button
+                  aria-pressed={unit === "kg"}
+                  className={cn(
+                    "cursor-pointer touch-manipulation rounded-md px-4 text-sm font-semibold transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                    unit === "kg"
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                  onClick={() => switchUnit("kg")}
+                  type="button"
+                >
+                  kg
+                </button>
+                <button
+                  aria-pressed={unit === "lbs"}
+                  className={cn(
+                    "cursor-pointer touch-manipulation rounded-md px-4 text-sm font-semibold transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                    unit === "lbs"
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                  onClick={() => switchUnit("lbs")}
+                  type="button"
+                >
+                  lbs
+                </button>
+              </div>
             </div>
           </div>
           {form.formState.errors.weight && (
