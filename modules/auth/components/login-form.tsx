@@ -10,6 +10,7 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { toastActionError, toastActionResult } from "@/shared/lib/action-toast";
+import { PUBLIC_AUTH_ROLES } from "@/shared/lib/rbac/config";
 import type { ProfileRole } from "@/shared/lib/rbac/types";
 import { loginAction } from "@/modules/auth/actions/login";
 import { PasswordInput } from "@/modules/auth/components/password-input";
@@ -87,15 +88,17 @@ export function LoginForm({ role }: { role: ProfileRole }) {
       >
         {isExecuting ? "Signing in..." : "Sign in"}
       </Button>
-      <p className="text-center text-sm text-primary-foreground/70">
-        {modeConfig.switchPrompt}{" "}
-        <Link
-          className="font-semibold text-primary-foreground underline-offset-4 transition hover:text-primary-foreground/80 hover:underline"
-          href={`/${modeConfig.switchMode}/${role}`}
-        >
-          {modeConfig.switchLabel}
-        </Link>
-      </p>
+      {(PUBLIC_AUTH_ROLES as readonly ProfileRole[]).includes(role) && (
+        <p className="text-center text-sm text-primary-foreground/70">
+          {modeConfig.switchPrompt}{" "}
+          <Link
+            className="font-semibold text-primary-foreground underline-offset-4 transition hover:text-primary-foreground/80 hover:underline"
+            href={`/${modeConfig.switchMode}/${role}`}
+          >
+            {modeConfig.switchLabel}
+          </Link>
+        </p>
+      )}
     </form>
   );
 }

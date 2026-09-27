@@ -1,14 +1,10 @@
 import { z } from "zod";
 
-import { ADMIN_DEPARTMENTS } from "@/shared/lib/rbac/config";
 import {
   ID_DOCUMENT_MAX_BYTES,
   ID_DOCUMENT_TYPES,
 } from "@/modules/auth/utils/account-document";
 
-const adminDepartmentSchema = z.enum(ADMIN_DEPARTMENTS, {
-  message: "Choose your department.",
-});
 export const fullNameSchema = z
   .string()
   .trim()
@@ -24,15 +20,6 @@ const baseRegisterSchema = z.object({
     message:
       "Accept the Terms and Conditions and the Privacy Policy to continue.",
   }),
-});
-const passwordMatchSchema = baseRegisterSchema.superRefine((value, context) => {
-  if (value.password !== value.confirmPassword) {
-    context.addIssue({
-      code: "custom",
-      path: ["confirmPassword"],
-      message: "Passwords do not match.",
-    });
-  }
 });
 export const idDocumentSchema = z.custom<File>(
   (value) => typeof File !== "undefined" && value instanceof File,
@@ -84,19 +71,3 @@ const verifiedRegisterSchema = baseRegisterSchema
 export const studentRegisterSchema = verifiedRegisterSchema;
 
 export const instructorRegisterSchema = verifiedRegisterSchema;
-
-export const superadminRegisterSchema = passwordMatchSchema;
-
-export const adminRegisterSchema = baseRegisterSchema
-  .extend({
-    adminDepartment: adminDepartmentSchema,
-  })
-  .superRefine((value, context) => {
-    if (value.password !== value.confirmPassword) {
-      context.addIssue({
-        code: "custom",
-        path: ["confirmPassword"],
-        message: "Passwords do not match.",
-      });
-    }
-  });

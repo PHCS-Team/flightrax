@@ -20,7 +20,7 @@ export async function getAdminsPage(
   let query = supabase
     .from("profiles")
     .select(
-      "id, email, full_name, profile_photo_path, admin_profiles!admin_profiles_profile_id_fkey(department)",
+      "id, email, full_name, profile_photo_path, must_change_password, admin_profiles!admin_profiles_profile_id_fkey(department)",
       { count: "exact" },
     )
     .eq("role", ROLE.ADMIN);
@@ -50,6 +50,7 @@ export async function getAdminsPage(
       email: row.email,
       fullName: row.full_name,
       department: row.admin_profiles?.department ?? null,
+      mustChangePassword: row.must_change_password,
       profilePhotoUrl: row.profile_photo_path
         ? storage.from(PROFILE_PHOTO_BUCKET).getPublicUrl(row.profile_photo_path)
             .data.publicUrl

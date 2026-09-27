@@ -10,21 +10,17 @@ import type {
   resetPasswordSchema,
 } from "@/modules/auth/schemas/password-reset-schema";
 import type {
-  adminRegisterSchema,
   instructorRegisterSchema,
   studentRegisterSchema,
-  superadminRegisterSchema,
 } from "@/modules/auth/schemas/register-schema";
 import type { rejectedAccountResubmissionSchema } from "@/modules/auth/schemas/rejected-account-resubmission-schema";
 import type { profilePhotoSchema } from "@/modules/auth/schemas/profile-photo-schema";
 
 export type LoginInput = z.infer<typeof loginSchema>;
-export type AdminRegisterInput = z.infer<typeof adminRegisterSchema>;
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
 export type SetInitialPasswordInput = z.infer<typeof setInitialPasswordSchema>;
 export type InstructorRegisterInput = z.infer<typeof instructorRegisterSchema>;
 export type StudentRegisterInput = z.infer<typeof studentRegisterSchema>;
-export type SuperadminRegisterInput = z.infer<typeof superadminRegisterSchema>;
 export type RejectedAccountResubmissionInput = z.infer<
   typeof rejectedAccountResubmissionSchema
 >;

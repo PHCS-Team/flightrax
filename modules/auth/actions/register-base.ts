@@ -1,14 +1,13 @@
 "use server";
 
 import { createClient } from "@/shared/lib/supabase/server";
-import type { AdminDepartment, ProfileRole } from "@/shared/lib/rbac/types";
+import type { ProfileRole } from "@/shared/lib/rbac/types";
 
 type RegisterBaseProfileInput = {
   email: string;
   password: string;
   fullName: string;
   role: ProfileRole;
-  adminDepartment?: AdminDepartment;
 };
 
 export async function registerBaseProfile(input: RegisterBaseProfileInput) {
@@ -21,7 +20,6 @@ export async function registerBaseProfile(input: RegisterBaseProfileInput) {
       data: {
         full_name: input.fullName,
         requested_role: input.role,
-        admin_department: input.adminDepartment ?? "",
       },
     },
   });

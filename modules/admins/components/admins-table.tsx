@@ -7,7 +7,19 @@ import {
   type ColumnDef,
   type PaginationState,
 } from "@tanstack/react-table";
+import { KeyRoundIcon } from "lucide-react";
+import { useState } from "react";
 
+import { AdminCredentialsDialog } from "@/modules/admins/components/admin-credentials-dialog";
+import { useRegenerateAdminPassword } from "@/modules/admins/hooks/use-regenerate-admin-password.action";
+import { ConfirmationDialog } from "@/shared/components/layout/confirmation-dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/shared/components/ui/tooltip";
+import type { AdminCredentials } from "@/modules/admins/types/admin";
 import {
   Avatar,
   AvatarFallback,
@@ -48,6 +60,15 @@ export function AdminsTable({
   totalCount: number;
   totalPages: number;
 }) {
+  const [pendingRegenerate, setPendingRegenerate] =
+    useState<AdminAccount | null>(null);
+  const [credentials, setCredentials] = useState<AdminCredentials | null>(null);
+  const regeneratePassword = useRegenerateAdminPassword({
+    onRegenerated: (regenerated) => {
+      setPendingRegenerate(null);
+      setCredentials(regenerated);
+    },
+  });
   const columns = [
     {
       accessorKey: "fullName",
@@ -95,6 +116,41 @@ export function AdminsTable({
         );
       },
     },
+    {
+      id: "password",
+      header: "Password",
+      cell: ({ row }) =>
+        row.original.mustChangePassword ? (
+          <span className="inline-flex items-center rounded-full border border-secondary/60 bg-secondary/25 px-2.5 py-0.5 text-sm text-primary-foreground whitespace-nowrap">
+            Temp password
+          </span>
+        ) : (
+          <span className="inline-flex items-center rounded-full border border-success/40 bg-success/20 px-2.5 py-0.5 text-sm text-primary-foreground whitespace-nowrap">
+            Updated
+          </span>
+        ),
+    },
+    {
+      id: "actions",
+      header: "",
+      cell: ({ row }) => (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              aria-label={`Regenerate temp password for ${row.original.fullName}`}
+              className="inline-flex size-9 cursor-pointer items-center justify-center rounded-full text-primary-foreground/70 transition hover:bg-primary-foreground/10 hover:text-primary-foreground"
+              onClick={() => setPendingRegenerate(row.original)}
+              type="button"
+            >
+              <KeyRoundIcon className="size-4" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Regenerate Temp Password</p>
+          </TooltipContent>
+        </Tooltip>
+      ),
+    },
   ] satisfies ColumnDef<AdminAccount>[];
 
   const pagination: PaginationState = {
@@ -118,6 +174,7 @@ export function AdminsTable({
   });
 
   return (
+    <TooltipProvider>
     <GlassSurface className="space-y-3 sm:space-y-4 py-3 sm:py-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between px-2.5 sm:px-4">
         <Input
@@ -221,6 +278,39 @@ export function AdminsTable({
           </Button>
         </div>
       </div>
+
+      <ConfirmationDialog
+        confirmLabel="Regenerate password"
+        confirmingLabel="Regenerating..."
+        description={`This replaces ${pendingRegenerate?.fullName ?? "this admin"}'s current password with a new temporary one — their old password stops working immediately, and you will get a new message to send them.`}
+        icon={KeyRoundIcon}
+        isConfirming={regeneratePassword.isExecuting}
+        onConfirm={() => {
+          if (pendingRegenerate) {
+            regeneratePassword.execute({ adminId: pendingRegenerate.id });
+          }
+        }}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPendingRegenerate(null);
+          }
+        }}
+        open={Boolean(pendingRegenerate)}
+        title="Regenerate Temp Password?"
+      />
+
+      {credentials && (
+        <AdminCredentialsDialog
+          credentials={credentials}
+          onOpenChange={(open) => {
+            if (!open) {
+              setCredentials(null);
+            }
+          }}
+          open
+        />
+      )}
     </GlassSurface>
+    </TooltipProvider>
   );
 }

@@ -55,7 +55,15 @@ export const AUTH_MODE_CONFIG = {
   }
 >;
 
-export const AUTH_ROLE_CONFIG = {
+// Register titles exist only for roles with self-registration.
+type AuthRoleConfig = {
+  label: string;
+  eyebrow: string;
+  icon: LucideIcon;
+  title: { [AUTH_MODE.LOGIN]: string; [AUTH_MODE.REGISTER]?: string };
+};
+
+export const AUTH_ROLE_CONFIG: Record<ProfileRole, AuthRoleConfig> = {
   [ROLE.STUDENT]: {
     label: "Student",
     eyebrow: "Campus Access",
@@ -80,7 +88,6 @@ export const AUTH_ROLE_CONFIG = {
     icon: ShieldCheckIcon,
     title: {
       [AUTH_MODE.LOGIN]: "Admin Sign In",
-      [AUTH_MODE.REGISTER]: "Create Department Admin Access",
     },
   },
   [ROLE.SUPERADMIN]: {
@@ -89,15 +96,6 @@ export const AUTH_ROLE_CONFIG = {
     icon: CrownIcon,
     title: {
       [AUTH_MODE.LOGIN]: "Superadmin Sign In",
-      [AUTH_MODE.REGISTER]: "Create Superadmin Access",
     },
   },
-} satisfies Record<
-  ProfileRole,
-  {
-    label: string;
-    eyebrow: string;
-    icon: LucideIcon;
-    title: Record<AuthMode, string>;
-  }
->;
+};

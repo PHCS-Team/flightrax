@@ -11,7 +11,7 @@ const ROLE_LOGIN_PATHS = {
   [ROLE.STUDENT]: "/login/student",
   [ROLE.INSTRUCTOR]: "/login/instructor",
   [ROLE.ADMIN]: "/login/admin",
-  [ROLE.SUPERADMIN]: "/login",
+  [ROLE.SUPERADMIN]: "/login/superadmin",
 } satisfies Record<ProfileRole, string>;
 
 export async function logoutAction() {
