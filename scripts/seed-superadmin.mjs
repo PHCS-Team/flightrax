@@ -1,5 +1,5 @@
 // Ensures the superadmin account exists (create-or-reset, safe to
-// re-run). New databases get superadmin.flightrax@gmail.com with the
+// re-run). New databases get flightraxteam@gmail.com with the
 // default password and must_change_password set, so the app forces a
 // password change on first login. If the account already exists, its
 // password is reset to the default and the forced-change flag is set
@@ -13,7 +13,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { readFileSync } from "node:fs";
 
-const DEFAULT_EMAIL = "superadmin.flightrax@gmail.com";
+const DEFAULT_EMAIL = "flightraxteam@gmail.com";
 const DEFAULT_PASSWORD = "root1234";
 const DEFAULT_FULL_NAME = "FlightraX Superadmin";
 
