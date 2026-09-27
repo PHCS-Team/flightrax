@@ -1075,6 +1075,7 @@ export type Database = {
           role: Database["public"]["Enums"]["app_role"]
           signature_svg: string | null
           updated_at: string
+          weight_lbs: number | null
         }
         Insert: {
           created_at?: string
@@ -1090,6 +1091,7 @@ export type Database = {
           role: Database["public"]["Enums"]["app_role"]
           signature_svg?: string | null
           updated_at?: string
+          weight_lbs?: number | null
         }
         Update: {
           created_at?: string
@@ -1105,6 +1107,7 @@ export type Database = {
           role?: Database["public"]["Enums"]["app_role"]
           signature_svg?: string | null
           updated_at?: string
+          weight_lbs?: number | null
         }
         Relationships: []
       }

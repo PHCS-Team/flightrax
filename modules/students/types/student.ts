@@ -11,6 +11,7 @@ export type ApprovedStudent = {
   email: string;
   fullName: string;
   studentIdNumber: string;
+  weightLbs: number | null;
   profilePhotoUrl: string | null;
   licenses: LicenseSummary[];
   certificates: CertificateSummary[];
@@ -22,6 +23,6 @@ export type ApprovedStudentRow = Pick<
 > & {
   profiles: Pick<
     ProfileRow,
-    "email" | "full_name" | "profile_photo_path" | "role"
+    "email" | "full_name" | "profile_photo_path" | "role" | "weight_lbs"
   > | null;
 };

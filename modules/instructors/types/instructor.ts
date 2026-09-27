@@ -17,6 +17,7 @@ export type ApprovedInstructor = {
   email: string;
   fullName: string;
   instructorIdNumber: string;
+  weightLbs: number | null;
   profilePhotoUrl: string | null;
   licenses: LicenseSummary[];
   certificates: CertificateSummary[];
@@ -29,6 +30,6 @@ export type ApprovedInstructorRow = Pick<
 > & {
   profiles: Pick<
     ProfileRow,
-    "email" | "full_name" | "profile_photo_path" | "role"
+    "email" | "full_name" | "profile_photo_path" | "role" | "weight_lbs"
   > | null;
 };

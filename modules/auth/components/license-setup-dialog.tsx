@@ -51,6 +51,10 @@ export function LicenseSetupDialog({
               <CheckIcon className="mt-0.5 size-4 shrink-0 text-primary" />
               Rating (optional)
             </li>
+            <li className="flex items-start gap-2 text-sm text-muted-foreground">
+              <CheckIcon className="mt-0.5 size-4 shrink-0 text-primary" />
+              Body weight — set it under Profile while you are there
+            </li>
           </ul>
         </div>
         <DialogFooter className="-mx-6 -mb-6 mt-2 sm:justify-end">

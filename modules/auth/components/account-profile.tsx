@@ -6,6 +6,7 @@ import { AccountLicenseSection } from "@/modules/auth/components/account-license
 import { AccountLogSection } from "@/modules/auth/components/account-log-section";
 import { AccountPasscodeSection } from "@/modules/auth/components/account-passcode-section";
 import { AccountSignatureSection } from "@/modules/auth/components/account-signature-section";
+import { AccountWeightSection } from "@/modules/auth/components/account-weight-section";
 import { NotificationSettingsCard } from "@/shared/components/layout/notification-settings-card";
 import { ProfilePhotoUploader } from "@/modules/auth/components/profile-photo-uploader";
 import { parseDisplayName } from "@/modules/auth/utils/display-name";
@@ -81,6 +82,7 @@ export function AccountProfile({ profile }: { profile: Profile }) {
                     passcodeHash={profile.passcode_hash}
                   />
                 )}
+                <AccountWeightSection weightLbs={profile.weight_lbs} />
                 <NotificationSettingsCard />
               </div>
             </div>

@@ -141,7 +141,7 @@ export async function getApprovedInstructorsPage(
   let query = supabase
     .from("account_requests")
     .select(
-      "approval_status, profile_id, id_number, profiles!account_requests_profile_id_fkey(email, full_name, profile_photo_path, role)",
+      "approval_status, profile_id, id_number, profiles!account_requests_profile_id_fkey(email, full_name, profile_photo_path, role, weight_lbs)",
       { count: "exact" },
     )
     .eq("request_type", ROLE.INSTRUCTOR)
@@ -184,6 +184,7 @@ export async function getApprovedInstructorsPage(
       email: row.profiles?.email ?? "Unknown email",
       fullName: row.profiles?.full_name ?? "Unknown instructor",
       instructorIdNumber: row.id_number ?? "Missing ID number",
+      weightLbs: row.profiles?.weight_lbs ?? null,
       profilePhotoUrl: row.profiles?.profile_photo_path
         ? storage
             .from(PROFILE_PHOTO_BUCKET)

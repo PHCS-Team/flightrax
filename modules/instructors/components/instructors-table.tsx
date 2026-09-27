@@ -7,7 +7,7 @@ import {
   type ColumnDef,
   type PaginationState,
 } from "@tanstack/react-table";
-import { CalendarOffIcon } from "lucide-react";
+import { CalendarOffIcon, WeightIcon } from "lucide-react";
 import { useState } from "react";
 
 import { ManageAvailabilityDialog } from "@/modules/instructors/components/manage-availability-dialog";
@@ -34,6 +34,7 @@ import {
 } from "@/shared/components/ui/table";
 import { getAvatarFallback } from "@/shared/lib/avatar-fallback";
 import { cn } from "@/shared/lib/utils";
+import { formatWeight } from "@/shared/lib/weight";
 import {
   Tooltip,
   TooltipContent,
@@ -132,6 +133,19 @@ export function InstructorsTable({
               </p>
               <p className="text-sm text-primary-foreground/65">
                 ID Number: {instructor.instructorIdNumber}
+              </p>
+              <p className="mt-0.5 flex items-center gap-1 text-sm text-primary-foreground/65">
+                <WeightIcon
+                  aria-hidden="true"
+                  className="size-3.5 shrink-0 text-primary-foreground/50"
+                />
+                {instructor.weightLbs !== null ? (
+                  `${formatWeight(instructor.weightLbs)} lbs`
+                ) : (
+                  <span className="italic text-primary-foreground/45">
+                    Weight not set
+                  </span>
+                )}
               </p>
             </div>
           </div>

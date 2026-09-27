@@ -7,6 +7,7 @@ import {
   type ColumnDef,
   type PaginationState,
 } from "@tanstack/react-table";
+import { WeightIcon } from "lucide-react";
 import { useState } from "react";
 
 import {
@@ -27,6 +28,7 @@ import {
 } from "@/shared/components/ui/table";
 import { getAvatarFallback } from "@/shared/lib/avatar-fallback";
 import { cn } from "@/shared/lib/utils";
+import { formatWeight } from "@/shared/lib/weight";
 import { CertificateTags } from "@/shared/components/certificate-tags";
 import { CertificateDetailsDialog } from "@/shared/components/certificate-details-dialog";
 import { LicenseTags } from "@/shared/components/license-tags";
@@ -88,6 +90,19 @@ export function StudentsTable({
               </p>
               <p className="text-sm text-primary-foreground/65">
                 ID Number: {student.studentIdNumber}
+              </p>
+              <p className="mt-0.5 flex items-center gap-1 text-sm text-primary-foreground/65">
+                <WeightIcon
+                  aria-hidden="true"
+                  className="size-3.5 shrink-0 text-primary-foreground/50"
+                />
+                {student.weightLbs !== null ? (
+                  `${formatWeight(student.weightLbs)} lbs`
+                ) : (
+                  <span className="italic text-primary-foreground/45">
+                    Weight not set
+                  </span>
+                )}
               </p>
             </div>
           </div>
