@@ -145,9 +145,6 @@ export function FlightPlanForm({
       pilotName: "",
       pilotSignatureSvg: null,
       pilotLicenses: [],
-      representativeName: null,
-      representativeSignatureSvg: null,
-      representativeLicenses: [],
       values: form.getValues(),
     });
   }, [form, previewAircraft]);

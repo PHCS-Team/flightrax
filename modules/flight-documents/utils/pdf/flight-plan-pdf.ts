@@ -105,13 +105,11 @@ const INDICATORS = {
 // Signature block: four columns above the underscored lines (baseline of
 // the line text ≈ 862 from the top; captions start at 866).
 const SIGNATURE_LINE_TOP = 861;
-// The form offers "pilot OR duly authorized representative": the export
-// fills exactly one side with the approver, so at most one pair prints.
+// The form offers "pilot OR duly authorized representative": the pilot
+// side always carries the PIC and the representative side never prints.
 const SIGNATURE_COLUMNS = {
   pilot: { x0: 29, x1: 140 },
   pilotLicense: { x0: 150, x1: 290 },
-  representative: { x0: 305, x1: 458 },
-  representativeLicense: { x0: 466, x1: 590 },
 } as const;
 
 const y = (topLeftY: number) => PAGE_HEIGHT - topLeftY;
@@ -376,8 +374,6 @@ export async function buildFlightPlanPdf(
   // Signature block
   drawSignatureColumn(page, fonts, SIGNATURE_COLUMNS.pilot, flightPlan.pilotName, flightPlan.pilotSignatureSvg);
   drawSmallLine(page, fonts.sansBold, formatLicenseLine(flightPlan.pilotLicenses), SIGNATURE_COLUMNS.pilotLicense);
-  drawSignatureColumn(page, fonts, SIGNATURE_COLUMNS.representative, flightPlan.representativeName ?? "", flightPlan.representativeSignatureSvg);
-  drawSmallLine(page, fonts.sansBold, formatLicenseLine(flightPlan.representativeLicenses), SIGNATURE_COLUMNS.representativeLicense);
 
   // Anything not yet approved prints as a draft, like the sample scan.
   if (flightPlan.requestStatus !== "approved") {

@@ -21,15 +21,11 @@ export type FlightPlanExport = {
   /** ICAO Doc 8643 designator printed in Item 9. */
   aircraftTypeDesignator: string;
   aircraftColorMarkings: string;
-  // Signature block: the approver signs. When the approver is the PIC
-  // they fill the pilot column; otherwise they fill the representative
-  // column. Both stay blank until the request is approved.
+  // Signature block: always the pilot in command, from the snapshot taken
+  // at filing. The duly authorized representative column is never printed.
   pilotName: string;
   pilotSignatureSvg: string | null;
   pilotLicenses: ExportLicense[];
-  representativeName: string | null;
-  representativeSignatureSvg: string | null;
-  representativeLicenses: ExportLicense[];
   values: FlightPlanFormValues;
 };
 
