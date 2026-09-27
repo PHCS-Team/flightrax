@@ -149,12 +149,16 @@ export async function getFlightDocumentsExport(
     }
   }
 
-  // The pilot column always carries the pilot in command, from the
-  // snapshot taken at filing. The duly authorized representative column
-  // is never printed.
-  const pilotLicenses = toLicenseSnapshots(data.pilot_licenses).map(
-    (license) => toLicenseShortForm(license, ratingOptions),
-  );
+  // No signature unless approved: the pilot column carries the pilot in
+  // command (from the filing snapshot) only once the request is approved.
+  // Draft, pending, and rejected plans print an empty signature block.
+  // The duly authorized representative column is never printed.
+  const isApproved = flightPlan.requestStatus === "approved";
+  const pilotLicenses = isApproved
+    ? toLicenseSnapshots(data.pilot_licenses).map((license) =>
+        toLicenseShortForm(license, ratingOptions),
+      )
+    : [];
 
   return {
     flightPlan: {
@@ -164,8 +168,8 @@ export async function getFlightDocumentsExport(
       aircraftTypeName: flightPlan.aircraft.typeName,
       aircraftTypeDesignator: data.aircraft_type_designator ?? "",
       aircraftColorMarkings: flightPlan.aircraft.colorMarkings,
-      pilotName: data.pilot_in_command_name ?? "",
-      pilotSignatureSvg: data.pilot_signature,
+      pilotName: isApproved ? (data.pilot_in_command_name ?? "") : "",
+      pilotSignatureSvg: isApproved ? data.pilot_signature : null,
       pilotLicenses,
       values: flightPlan.values,
     },

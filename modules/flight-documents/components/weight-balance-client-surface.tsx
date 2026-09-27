@@ -135,6 +135,11 @@ export function WeightBalanceClientSurface({
                 className="sm:mr-auto"
                 kinds={["weight-balance"]}
                 label="View form"
+                note={
+                  context.requestStatus === "approved"
+                    ? undefined
+                    : "The verifier's name and signature stay blank until this flight plan is approved."
+                }
               />
             ) : null
           }

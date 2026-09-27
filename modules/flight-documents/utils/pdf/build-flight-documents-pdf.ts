@@ -58,13 +58,20 @@ export async function buildFlightDocumentsPdf(
   return { bytes: await doc.save(), fileName: `${code}-flight-documents.pdf` };
 }
 
-// Preview of what is on the form right now, before anything is saved.
+// Preview of what is on the form right now. A saved plan carries its code
+// and pilot snapshot; an unsaved one previews with a draft name and a
+// blank signature block.
 export async function buildFlightPlanDraftPdf(
   flightPlan: FlightPlanExport,
 ): Promise<{ bytes: Uint8Array; fileName: string }> {
   const doc = await buildFlightPlanPdf(await loadFormBytes(), flightPlan);
 
-  return { bytes: await doc.save(), fileName: "flight-plan-draft.pdf" };
+  return {
+    bytes: await doc.save(),
+    fileName: flightPlan.planCode
+      ? `${flightPlan.planCode}-flight-plan.pdf`
+      : "flight-plan-draft.pdf",
+  };
 }
 
 export async function buildWeightBalanceDraftPdf(

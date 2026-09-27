@@ -79,17 +79,6 @@ export function FlightRequestReviewClientSurface({
         <WeightBalanceReviewCard context={weightBalanceQuery.context} />
       </div>
 
-      <div className="px-3 pb-1 pt-2 sm:px-0 sm:pb-0 sm:pt-0 sm:flex sm:justify-end">
-        <FlightDocumentsPreviewAction
-          buildDocument={buildSavedDocument}
-          className="w-full sm:w-auto"
-          kinds={
-            weightBalanceQuery.context?.existing ? ["both"] : ["flight-plan"]
-          }
-          label="View document"
-        />
-      </div>
-
       <div className="mt-1 border-t border-primary-foreground/15 pt-2 sm:mt-0 sm:border-0 sm:pt-0">
         <FlightRequestReviewActions
           canReview={Boolean(
@@ -101,6 +90,23 @@ export function FlightRequestReviewClientSurface({
               instructorProfileId: flightPlan.values.instructorId || null,
             }),
           )}
+          documentAction={
+            <FlightDocumentsPreviewAction
+              buildDocument={buildSavedDocument}
+              className="w-full sm:mr-auto sm:w-auto"
+              kinds={
+                weightBalanceQuery.context?.existing
+                  ? ["both"]
+                  : ["flight-plan"]
+              }
+              label="View document"
+              note={
+                flightPlan.requestStatus === "approved"
+                  ? undefined
+                  : "The pilot's name and signature stay blank until this flight plan is approved."
+              }
+            />
+          }
           flightPlanId={flightPlanId}
           requestStatus={flightPlan.requestStatus}
         />

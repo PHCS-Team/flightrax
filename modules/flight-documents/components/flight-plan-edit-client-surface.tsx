@@ -126,6 +126,7 @@ export function FlightPlanEditClientSurface({
       <GlassSurface className="p-4 sm:p-6">
         <FlightPlanForm
           cancelLabel="Back to flight documents"
+          flightPlanId={flightPlanId}
           previewAircraft={flightPlan.aircraft}
           defaultValues={flightPlan.values}
           isSubmitting={updateFlightPlan.isExecuting}
@@ -140,6 +141,7 @@ export function FlightPlanEditClientSurface({
           }
           readOnly={readOnly}
           readOnlyActionLabel="View Weight & Balance"
+          requestStatus={flightPlan.requestStatus}
           submitLabel="Save and continue to Weight & Balance"
         />
       </GlassSurface>

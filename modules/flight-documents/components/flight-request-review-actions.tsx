@@ -2,7 +2,7 @@
 
 import { ArrowLeftIcon, CheckIcon, XIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 
 import { RejectRequestDialog } from "@/modules/flight-documents/components/reject-request-dialog";
 import { useApproveFlightRequest } from "@/modules/flight-documents/hooks/use-approve-flight-request.action";
@@ -15,10 +15,12 @@ import { Button } from "@/shared/components/ui/button";
 
 export function FlightRequestReviewActions({
   canReview,
+  documentAction,
   flightPlanId,
   requestStatus,
 }: {
   canReview: boolean;
+  documentAction?: ReactNode;
   flightPlanId: string;
   requestStatus: FlightRequestStatus;
 }) {
@@ -38,7 +40,8 @@ export function FlightRequestReviewActions({
 
   if (requestStatus !== "pending_approval") {
     return (
-      <div className="flex flex-col-reverse gap-2 p-4 sm:flex-row sm:justify-end sm:p-0">
+      <div className="flex flex-col-reverse gap-2 p-4 sm:flex-row sm:items-center sm:justify-end sm:p-0">
+        {documentAction}
         <Button
           className="border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground"
           onClick={() => router.push("/flight-requests")}
@@ -78,7 +81,8 @@ export function FlightRequestReviewActions({
             approve or reject this request.
           </p>
         )}
-        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-end">
+          {documentAction}
           <Button
             className="border-red-200/25 bg-red-200/10 text-red-100 hover:bg-red-200/15 hover:text-red-50 disabled:cursor-default"
             disabled={!canReview || rejectRequest.isExecuting}

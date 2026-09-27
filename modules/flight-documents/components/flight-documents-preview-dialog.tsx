@@ -1,6 +1,6 @@
 "use client";
 
-import { DownloadIcon, FileTextIcon } from "lucide-react";
+import { DownloadIcon, FileTextIcon, TriangleAlertIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { PdfDocumentView } from "@/modules/flight-documents/components/pdf-document-view";
@@ -27,12 +27,14 @@ export function FlightDocumentsPreviewDialog({
   buildDocument,
   initialKind,
   kinds,
+  note,
   onOpenChange,
   open,
 }: {
   buildDocument: DocumentBuilder;
   initialKind: FlightDocumentKind;
   kinds: FlightDocumentKind[];
+  note?: string;
   onOpenChange: (open: boolean) => void;
   open: boolean;
 }) {
@@ -80,6 +82,13 @@ export function FlightDocumentsPreviewDialog({
               </div>
             )}
           </div>
+
+          {note && (
+            <div className="mx-3 mt-3 flex shrink-0 items-start gap-2 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 sm:mx-0 sm:mt-4">
+              <TriangleAlertIcon className="mt-0.5 size-4 shrink-0 text-amber-600" />
+              <p className="text-sm font-semibold text-amber-900">{note}</p>
+            </div>
+          )}
 
           <div className="min-h-0 flex-1 overflow-hidden bg-muted/60 sm:mt-4 sm:rounded-2xl sm:border sm:bg-muted/40">
             {isBuilding ? (

@@ -7,6 +7,7 @@ import {
   MinusIcon,
   PenLineIcon,
   PlusIcon,
+  TriangleAlertIcon,
   XIcon,
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -30,7 +31,11 @@ import {
 import { AerodromeSelectField } from "@/modules/flight-documents/components/aerodrome-select-field";
 import { FormRadioGroup } from "@/modules/flight-documents/components/form-radio-group";
 import { FLIGHT_PLAN_FORM_DEFAULTS } from "@/modules/flight-documents/constants/flight-plan-form-defaults";
+import { useQueryClient } from "@tanstack/react-query";
+
 import { useFlightPlanFilerContext } from "@/modules/flight-documents/hooks/use-filer-context.query";
+import { flightDocumentsExportQueryOptions } from "@/modules/flight-documents/queries/flight-documents-export";
+import type { FlightRequestStatus } from "@/modules/flight-documents/types/flight-request";
 import { useFlightPlanPicOptions } from "@/modules/flight-documents/hooks/use-pic-options.query";
 import {
   flightPlanFormSchema,
@@ -99,6 +104,7 @@ export function getFlightPlanFormDefaults(): FlightPlanFormValues {
 export function FlightPlanForm({
   cancelLabel = "Cancel",
   defaultValues,
+  flightPlanId,
   isSubmitting,
   onCancel,
   onReadOnlyAction,
@@ -106,6 +112,7 @@ export function FlightPlanForm({
   previewAircraft,
   readOnly = false,
   readOnlyActionLabel,
+  requestStatus = "draft",
   submitLabel,
 }: {
   cancelLabel?: string;
@@ -116,12 +123,14 @@ export function FlightPlanForm({
     typeName: string;
   };
   defaultValues?: FlightPlanFormValues;
+  flightPlanId?: string;
   isSubmitting: boolean;
   onCancel: () => void;
   onReadOnlyAction?: () => void;
   onSubmit: (values: FlightPlanFormValues) => void;
   readOnly?: boolean;
   readOnlyActionLabel?: string;
+  requestStatus?: FlightRequestStatus;
   submitLabel: string;
 }) {
   const form = useForm<FlightPlanFormValues>({
@@ -129,11 +138,23 @@ export function FlightPlanForm({
     defaultValues: defaultValues ?? getFlightPlanFormDefaults(),
   });
   const errors = form.formState.errors;
+  const queryClient = useQueryClient();
   const { filerContext } = useFlightPlanFilerContext();
   const { ratingOptions } = useRatingOptions();
   const buildDraftDocument = useCallback(async () => {
     const { buildFlightPlanDraftPdf } =
       await import("@/modules/flight-documents/utils/pdf/build-flight-documents-pdf");
+
+    if (flightPlanId) {
+      const documents = await queryClient.fetchQuery(
+        flightDocumentsExportQueryOptions(flightPlanId),
+      );
+
+      return buildFlightPlanDraftPdf({
+        ...documents.flightPlan,
+        values: form.getValues(),
+      });
+    }
 
     return buildFlightPlanDraftPdf({
       planCode: "",
@@ -147,7 +168,7 @@ export function FlightPlanForm({
       pilotLicenses: [],
       values: form.getValues(),
     });
-  }, [form, previewAircraft]);
+  }, [flightPlanId, form, previewAircraft, queryClient]);
   const { picOptions } = useFlightPlanPicOptions();
   const hasDinghy = useWatch({
     control: form.control,
@@ -900,13 +921,26 @@ export function FlightPlanForm({
           )}
         </div>
 
-        <div className="flex items-start gap-1.5 rounded-lg border border-primary-foreground/15 bg-primary-foreground/5 px-3 py-2 text-xs text-muted-foreground">
-          <PenLineIcon className="mt-0.5 size-3.5 shrink-0" />
-          <p>
-            Saving this flight plan automatically signs it with your registered
-            signature from account settings.
-          </p>
-        </div>
+        {requestStatus === "approved" ? (
+          <div className="flex items-start gap-1.5 rounded-lg border border-primary-foreground/15 bg-primary-foreground/5 px-3 py-2 text-xs text-muted-foreground">
+            <PenLineIcon className="mt-0.5 size-3.5 shrink-0" />
+            <p>
+              This flight plan is approved: the printed form carries the pilot
+              in command&apos;s name, signature, and license.
+            </p>
+          </div>
+        ) : (
+          <div className="flex items-start gap-2.5 rounded-lg border border-amber-400/60 bg-amber-50 px-3.5 py-3">
+            <TriangleAlertIcon className="mt-0.5 size-5 shrink-0 text-amber-600" />
+            <p className="text-sm font-semibold text-amber-900">
+              No signature until approved. The Pilot&apos;s Name and Signature
+              block on the printed form stays BLANK while this flight plan is a
+              draft, pending, or rejected. It fills in automatically with the
+              pilot in command&apos;s name, signature, and license the moment
+              the plan is APPROVED.
+            </p>
+          </div>
+        )}
       </fieldset>
 
       <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
@@ -916,6 +950,11 @@ export function FlightPlanForm({
             className="border-border bg-transparent text-foreground hover:bg-muted hover:text-foreground sm:mr-auto"
             kinds={["flight-plan"]}
             label="View form"
+            note={
+              requestStatus === "approved"
+                ? undefined
+                : "The pilot's name and signature stay blank until this flight plan is approved."
+            }
           />
         )}
         <Button

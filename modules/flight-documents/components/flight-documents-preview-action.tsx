@@ -14,11 +14,13 @@ export function FlightDocumentsPreviewAction({
   className,
   kinds,
   label = "View document",
+  note,
 }: {
   buildDocument: DocumentBuilder;
   className?: string;
   kinds: FlightDocumentKind[];
   label?: string;
+  note?: string;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -42,6 +44,7 @@ export function FlightDocumentsPreviewAction({
           buildDocument={buildDocument}
           initialKind={kinds[0]}
           kinds={kinds}
+          note={note}
           onOpenChange={setOpen}
           open
         />
