@@ -1168,26 +1168,28 @@ function FpCrossOutCheckbox({
   const crossed = !field.value;
 
   return (
-    <label className="flex cursor-pointer items-center gap-2.5 py-1 text-sm text-foreground sm:py-0.5">
-      <button
-        aria-checked={crossed}
-        aria-label={`Cross out ${label}`}
+    <button
+      aria-checked={crossed}
+      aria-label={`Cross out ${label}`}
+      className="flex w-full cursor-pointer touch-manipulation items-center gap-2.5 rounded-lg py-1.5 pr-2 text-left text-sm text-foreground transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring sm:py-0.5"
+      onClick={() => field.onChange(!field.value)}
+      role="checkbox"
+      type="button"
+    >
+      <span
         className={cn(
-          "flex size-4 shrink-0 cursor-pointer items-center justify-center rounded-[4px] border shadow-xs transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-default disabled:opacity-60",
+          "flex size-6 shrink-0 items-center justify-center rounded-lg border shadow-xs transition-colors sm:size-4.5",
           crossed
             ? "border-foreground/70 bg-foreground/10 text-foreground"
             : "border-input bg-background/80",
         )}
-        onClick={() => field.onChange(!field.value)}
-        role="checkbox"
-        type="button"
       >
-        {crossed && <XIcon className="size-3" strokeWidth={3} />}
-      </button>
+        {crossed && <XIcon className="size-4 sm:size-3.5" strokeWidth={3} />}
+      </span>
       <span className={cn(crossed && "text-muted-foreground line-through")}>
         {label}
       </span>
-    </label>
+    </button>
   );
 }
 

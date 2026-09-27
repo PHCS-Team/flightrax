@@ -78,9 +78,23 @@ export async function updateSession(request: NextRequest) {
 
   const {
     data: { user },
+    error: userError,
   } = await supabase.auth.getUser();
 
   if (!user) {
+    // A transient auth-server failure is not a sign-out: fail open and let
+    // the page/action-level auth checks decide, instead of bouncing a
+    // signed-in user back to the login page.
+    const transientAuthFailure =
+      userError !== null &&
+      userError !== undefined &&
+      (userError.name === "AuthRetryableFetchError" ||
+        (userError.status ?? 0) >= 500);
+
+    if (transientAuthFailure) {
+      return response;
+    }
+
     if (isProtectedPath(pathname)) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
@@ -88,11 +102,23 @@ export async function updateSession(request: NextRequest) {
     return response;
   }
 
-  const { data: profileRow } = await supabase
+  // Route gating below only applies to auth pages and protected pages.
+  // Everything else (public pages, /api/* — routes re-derive the actor
+  // themselves) skips the profile lookup entirely.
+  if (!isAuthPath(pathname) && !isProtectedPath(pathname)) {
+    return response;
+  }
+
+  const { data: profileRow, error: profileError } = await supabase
     .from("profiles")
     .select(MIDDLEWARE_PROFILE_SELECT)
     .eq("id", user.id)
     .maybeSingle();
+
+  if (profileError) {
+    return response;
+  }
+
   const profile = profileRow
     ? toRouteAccessProfile(profileRow as MiddlewareProfileRow)
     : null;
