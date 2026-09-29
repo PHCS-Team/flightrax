@@ -101,7 +101,10 @@ export function AircraftSelectDialog({
       }}
       open={open}
     >
-      <DialogContent className="flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-[calc(100vw-1rem)] flex-col overflow-hidden p-4 sm:w-full sm:max-w-lg sm:p-6">
+      <DialogContent
+        className="flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-[calc(100vw-1rem)] flex-col overflow-hidden p-4 sm:w-full sm:max-w-lg sm:p-6"
+        onOpenAutoFocus={(event) => event.preventDefault()}
+      >
         <DialogSectionHeader
           description="Choose the aircraft for this flight plan."
           icon={PlaneIcon}
@@ -150,7 +153,7 @@ export function AircraftSelectDialog({
         </div>
 
         <div
-          className="-mx-4 min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-4 sm:-mx-6 sm:px-6"
+          className="-mx-4 min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain px-4 sm:-mx-6 sm:px-6"
           ref={listRef}
         >
           {isPending ? (
@@ -210,8 +213,7 @@ export function AircraftSelectDialog({
                         </span>
                       </div>
                       <p className="truncate text-xs text-muted-foreground">
-                        {aircraft.typeName} &middot; No.{" "}
-                        {aircraft.registrationNumber}
+                        {aircraft.typeName}
                       </p>
                     </div>
                     {!aircraft.isAvailable && aircraft.unavailableReason ? (

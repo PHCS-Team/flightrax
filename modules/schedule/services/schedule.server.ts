@@ -23,6 +23,12 @@ import { describeActionError } from "@/shared/lib/action-error";
 const AIRCRAFT_SELECT =
   "id, registration_mark, aircraft_types!inner(icao_designator)";
 
+const TRAILING_TYPE_DESIGNATORS = ["P06T", "PMEN"];
+
+function typeRank(designator: string): number {
+  return TRAILING_TYPE_DESIGNATORS.indexOf(designator) + 1;
+}
+
 const ENTRY_SELECT =
   "id, aircraft_id, starts_at, ends_at, session_type, label, pilot:profiles!schedule_entries_pilot_profile_id_fkey(id, full_name), instructor:profiles!schedule_entries_instructor_profile_id_fkey(id, full_name)";
 
@@ -84,6 +90,7 @@ export async function getScheduleDay(date: string): Promise<ScheduleDay> {
     }))
     .sort(
       (a, b) =>
+        typeRank(a.typeDesignator) - typeRank(b.typeDesignator) ||
         a.typeDesignator.localeCompare(b.typeDesignator) ||
         a.registrationMark.localeCompare(b.registrationMark),
     );
