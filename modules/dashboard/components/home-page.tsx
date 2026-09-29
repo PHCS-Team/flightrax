@@ -19,7 +19,7 @@ export function HomePage() {
             Hello Aviator!
           </h1>
           <p className="mt-16 mb-8 hidden max-w-2xl text-lg leading-8 text-primary-foreground/82 sm:block md:text-xl md:leading-9">
-            FlightraX is WCC&apos;s web-based system for automated flight
+            FlightraX is a web-based system for automated flight
             scheduling, digital permission routing, public flight tracking
             monitors, and role-based approvals for students and flight
             instructors.
@@ -46,7 +46,7 @@ export function HomePage() {
 
         <aside className="hidden space-y-5 border-t-2 border-primary-foreground/15 pt-8 lg:block lg:border-l-2 lg:border-t-0 lg:pl-10 lg:pt-0">
           <p className="text-sm font-semibold uppercase tracking-[0.3em] text-primary-foreground/65">
-            Built for WCC
+            Built for Flight Schools
           </p>
           <div className="grid gap-5 text-primary-foreground">
             <div>

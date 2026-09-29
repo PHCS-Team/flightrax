@@ -1,5 +1,5 @@
 const DEFAULT_APP_VERSION = "0.1.0";
-const DEFAULT_APP_CREDITS = "WCC Flight Operations";
+const DEFAULT_APP_CREDITS = "Flight Operations";
 const DEFAULT_APP_CONTACT = "";
 
 type AppMetadata = {
