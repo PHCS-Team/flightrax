@@ -22,13 +22,13 @@ type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
 type AccountRequestRow = Database["public"]["Tables"]["account_requests"]["Row"];
 type AdminProfileRow = Database["public"]["Tables"]["admin_profiles"]["Row"];
 
-type MiddlewareProfileRow = Pick<ProfileRow, "role"> & {
+type MiddlewareProfileRow = Pick<ProfileRow, "role" | "deactivated_at"> & {
   account_requests: Pick<AccountRequestRow, "approval_status"> | null;
   admin_profiles: Pick<AdminProfileRow, "department"> | null;
 };
 
 const MIDDLEWARE_PROFILE_SELECT =
-  "role, account_requests!account_requests_profile_id_fkey(approval_status), admin_profiles!admin_profiles_profile_id_fkey(department)";
+  "role, deactivated_at, account_requests!account_requests_profile_id_fkey(approval_status), admin_profiles!admin_profiles_profile_id_fkey(department)";
 
 function toRouteAccessProfile(row: MiddlewareProfileRow): RouteAccessProfile {
   return {
@@ -119,9 +119,17 @@ export async function updateSession(request: NextRequest) {
     return response;
   }
 
-  const profile = profileRow
-    ? toRouteAccessProfile(profileRow as MiddlewareProfileRow)
-    : null;
+  const accessRow = profileRow as MiddlewareProfileRow | null;
+
+  // A deactivated account keeps a valid token until it expires; treat it as
+  // signed out so it can only reach the login page.
+  if (accessRow?.deactivated_at) {
+    return isProtectedPath(pathname)
+      ? NextResponse.redirect(new URL("/login", request.url))
+      : response;
+  }
+
+  const profile = accessRow ? toRouteAccessProfile(accessRow) : null;
 
   if (!profile) {
     if (isProtectedPath(pathname)) {

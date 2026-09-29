@@ -29,7 +29,7 @@ export const regenerateAdminPasswordAction = actionClient
     const supabase = createAdminClient();
     const { data: target, error: targetError } = await supabase
       .from("profiles")
-      .select("id, email, full_name, role")
+      .select("id, email, full_name, role, deactivated_at")
       .eq("id", parsedInput.adminId)
       .maybeSingle();
 
@@ -37,7 +37,7 @@ export const regenerateAdminPasswordAction = actionClient
       return { ok: false, message: describeActionError(targetError) };
     }
 
-    if (!target || target.role !== ROLE.ADMIN) {
+    if (!target || target.role !== ROLE.ADMIN || target.deactivated_at) {
       return { ok: false, message: "Admin account not found." };
     }
 

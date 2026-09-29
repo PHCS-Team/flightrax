@@ -7,10 +7,11 @@ import {
   type ColumnDef,
   type PaginationState,
 } from "@tanstack/react-table";
-import { KeyRoundIcon } from "lucide-react";
+import { KeyRoundIcon, UserXIcon } from "lucide-react";
 import { useState } from "react";
 
 import { AdminCredentialsDialog } from "@/modules/admins/components/admin-credentials-dialog";
+import { useDeactivateAdmin } from "@/modules/admins/hooks/use-deactivate-admin.action";
 import { useRegenerateAdminPassword } from "@/modules/admins/hooks/use-regenerate-admin-password.action";
 import { ConfirmationDialog } from "@/shared/components/layout/confirmation-dialog";
 import {
@@ -62,7 +63,12 @@ export function AdminsTable({
 }) {
   const [pendingRegenerate, setPendingRegenerate] =
     useState<AdminAccount | null>(null);
+  const [pendingDeactivate, setPendingDeactivate] =
+    useState<AdminAccount | null>(null);
   const [credentials, setCredentials] = useState<AdminCredentials | null>(null);
+  const deactivateAdmin = useDeactivateAdmin({
+    onDeactivated: () => setPendingDeactivate(null),
+  });
   const regeneratePassword = useRegenerateAdminPassword({
     onRegenerated: (regenerated) => {
       setPendingRegenerate(null);
@@ -134,21 +140,38 @@ export function AdminsTable({
       id: "actions",
       header: "",
       cell: ({ row }) => (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              aria-label={`Regenerate temp password for ${row.original.fullName}`}
-              className="inline-flex size-9 cursor-pointer items-center justify-center rounded-full text-primary-foreground/70 transition hover:bg-primary-foreground/10 hover:text-primary-foreground"
-              onClick={() => setPendingRegenerate(row.original)}
-              type="button"
-            >
-              <KeyRoundIcon className="size-4" />
-            </button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Regenerate Temp Password</p>
-          </TooltipContent>
-        </Tooltip>
+        <div className="flex items-center justify-end gap-1">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                aria-label={`Regenerate temp password for ${row.original.fullName}`}
+                className="inline-flex size-9 cursor-pointer items-center justify-center rounded-full text-primary-foreground/70 transition hover:bg-primary-foreground/10 hover:text-primary-foreground"
+                onClick={() => setPendingRegenerate(row.original)}
+                type="button"
+              >
+                <KeyRoundIcon className="size-4" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Regenerate Temp Password</p>
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                aria-label={`Deactivate ${row.original.fullName}`}
+                className="inline-flex size-9 cursor-pointer items-center justify-center rounded-full text-primary-foreground/70 transition hover:bg-destructive/20 hover:text-primary-foreground"
+                onClick={() => setPendingDeactivate(row.original)}
+                type="button"
+              >
+                <UserXIcon className="size-4" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Deactivate Admin</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
       ),
     },
   ] satisfies ColumnDef<AdminAccount>[];
@@ -297,6 +320,29 @@ export function AdminsTable({
         }}
         open={Boolean(pendingRegenerate)}
         title="Regenerate Temp Password?"
+      />
+
+      <ConfirmationDialog
+        confirmLabel="Deactivate admin"
+        confirmingLabel="Deactivating..."
+        description={`${pendingDeactivate?.fullName ?? "This admin"} will be signed out and can no longer sign in, and the account disappears from this list. Their name stays on the approvals, schedules, and NOTAMs they handled.`}
+        icon={UserXIcon}
+        isConfirming={deactivateAdmin.isExecuting}
+        key={pendingDeactivate?.id ?? "closed"}
+        onConfirm={() => {
+          if (pendingDeactivate) {
+            deactivateAdmin.execute({ adminId: pendingDeactivate.id });
+          }
+        }}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPendingDeactivate(null);
+          }
+        }}
+        open={Boolean(pendingDeactivate)}
+        title="Deactivate Admin?"
+        typeToConfirm="DEACTIVATE"
+        warning="This cannot be undone from the app."
       />
 
       {credentials && (

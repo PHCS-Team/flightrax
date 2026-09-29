@@ -23,7 +23,8 @@ export async function getAdminsPage(
       "id, email, full_name, profile_photo_path, must_change_password, admin_profiles!admin_profiles_profile_id_fkey(department)",
       { count: "exact" },
     )
-    .eq("role", ROLE.ADMIN);
+    .eq("role", ROLE.ADMIN)
+    .is("deactivated_at", null);
 
   if (search) {
     query = query.or(`full_name.ilike.%${search}%,email.ilike.%${search}%`);

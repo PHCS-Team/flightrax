@@ -14,3 +14,7 @@ export const createAdminSchema = z.object({
 export const regenerateAdminPasswordSchema = z.object({
   adminId: z.string().uuid(),
 });
+
+export const deactivateAdminSchema = z.object({
+  adminId: z.string().uuid(),
+});

@@ -77,6 +77,7 @@ export function normalizeProfile(
     passcode_hash: row.passcode_hash,
     must_change_password: row.must_change_password,
     weight_lbs: row.weight_lbs,
+    deactivated_at: row.deactivated_at,
     role: row.role,
     created_at: row.created_at,
     updated_at: row.updated_at,

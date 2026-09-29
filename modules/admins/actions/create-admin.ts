@@ -30,7 +30,7 @@ export const createAdminAccountAction = actionClient
 
     const { data: existing, error: lookupError } = await supabase
       .from("profiles")
-      .select("id")
+      .select("id, deactivated_at")
       .eq("email", parsedInput.email)
       .maybeSingle();
 
@@ -41,7 +41,9 @@ export const createAdminAccountAction = actionClient
     if (existing) {
       return {
         ok: false,
-        message: "An account with this email already exists.",
+        message: existing.deactivated_at
+          ? "This email belongs to a deactivated admin. Use a different email address."
+          : "An account with this email already exists.",
       };
     }
 
