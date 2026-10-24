@@ -2,7 +2,14 @@
 
 import { EDITABLE_FLIGHT_REQUEST_STATUSES } from "@/modules/flight-documents/constants/flight-request-options";
 import { submitFlightRequestSchema } from "@/modules/flight-documents/schemas/flight-request-schema";
-import { getAircraftStatusBlock } from "@/modules/flight-documents/services/journey-conflicts.server";
+import {
+  buildAircraftDofConflictMessage,
+  buildInstructorDofConflictMessage,
+  getAircraftDofConflict,
+  getAircraftStatusBlock,
+  getInstructorDofConflict,
+} from "@/modules/flight-documents/services/journey-conflicts.server";
+import { resolvePlanFlightInstant } from "@/modules/flight-documents/utils/flight-plan-time";
 import { findExpiredCredentialBlock } from "@/shared/lib/aviation/expired-credentials.server";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { isApproved } from "@/shared/lib/rbac/guards";
@@ -27,7 +34,7 @@ export const submitFlightRequestAction = actionClient
     const { data: flightPlan, error: planError } = await supabase
       .from("flight_plans")
       .select(
-        "id, aircraft_id, dof_resolved, created_by, pilot_in_command_id, endurance, flight_requests(id, status, weight_balance_id, instructor_profile_id)",
+        "id, aircraft_id, dof_resolved, date_of_flight_resolved, departure_time_raw, created_by, pilot_in_command_id, endurance, flight_requests(id, status, weight_balance_id, instructor_profile_id)",
       )
       .eq("id", parsedInput.flightPlanId)
       .maybeSingle();
@@ -88,6 +95,44 @@ export const submitFlightRequestAction = actionClient
 
       if (statusBlock) {
         return { ok: false, message: statusBlock };
+      }
+    }
+
+    const flightInstant = resolvePlanFlightInstant(flightPlan);
+
+    if (flightPlan.aircraft_id && flightInstant) {
+      const aircraftConflict = await getAircraftDofConflict(
+        flightPlan.aircraft_id,
+        flightInstant,
+        request.id,
+      );
+
+      if (aircraftConflict) {
+        return {
+          ok: false,
+          message: buildAircraftDofConflictMessage(
+            flightInstant,
+            aircraftConflict.filedByName,
+          ),
+        };
+      }
+    }
+
+    if (request.instructor_profile_id && flightInstant) {
+      const instructorConflict = await getInstructorDofConflict(
+        request.instructor_profile_id,
+        flightInstant,
+        request.id,
+      );
+
+      if (instructorConflict) {
+        return {
+          ok: false,
+          message: buildInstructorDofConflictMessage(
+            flightInstant,
+            instructorConflict.filedByName,
+          ),
+        };
       }
     }
 

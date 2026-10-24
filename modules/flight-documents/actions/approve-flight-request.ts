@@ -3,14 +3,17 @@
 import { approveFlightRequestSchema } from "@/modules/flight-documents/schemas/flight-request-schema";
 import {
   buildAircraftDofConflictMessage,
+  buildInstructorDofConflictMessage,
+  declineConflictingPendingRequests,
   getAircraftDofConflict,
   getAircraftStatusBlock,
+  getInstructorDofConflict,
 } from "@/modules/flight-documents/services/journey-conflicts.server";
 import {
   canActOnFlightRequest,
   canCommandAsPic,
 } from "@/modules/flight-documents/utils/flight-request-eligibility";
-import { resolveFlightInstant } from "@/modules/flight-documents/utils/flight-plan-time";
+import { resolvePlanFlightInstant } from "@/modules/flight-documents/utils/flight-plan-time";
 import { isLicenseValid } from "@/shared/lib/aviation/license-validity";
 import { verifyProfilePasscode } from "@/shared/lib/passcode";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
@@ -36,7 +39,7 @@ export const approveFlightRequestAction = actionClient
     const { data: flightPlan, error: planError } = await supabase
       .from("flight_plans")
       .select(
-        "id, aircraft_id, dof_resolved, date_of_flight_resolved, departure_time_raw, pilot_in_command_id, flight_requests(id, status, approved_by, weight_balance_id, instructor_profile_id)",
+        "id, aircraft_id, aircraft_identification, dof_resolved, date_of_flight_resolved, departure_time_raw, pilot_name, pilot_in_command_id, flight_requests(id, status, approved_by, weight_balance_id, instructor_profile_id)",
       )
       .eq("id", parsedInput.flightPlanId)
       .maybeSingle();
@@ -174,13 +177,7 @@ export const approveFlightRequestAction = actionClient
       }
     }
 
-    const flightInstant =
-      flightPlan.date_of_flight_resolved && flightPlan.departure_time_raw
-        ? resolveFlightInstant(
-            flightPlan.date_of_flight_resolved,
-            flightPlan.departure_time_raw,
-          )
-        : flightPlan.dof_resolved;
+    const flightInstant = resolvePlanFlightInstant(flightPlan);
 
     if (flightPlan.aircraft_id && flightInstant) {
       const dofConflict = await getAircraftDofConflict(
@@ -195,6 +192,24 @@ export const approveFlightRequestAction = actionClient
           message: buildAircraftDofConflictMessage(
             flightInstant,
             dofConflict.filedByName,
+          ),
+        };
+      }
+    }
+
+    if (request.instructor_profile_id && flightInstant) {
+      const instructorConflict = await getInstructorDofConflict(
+        request.instructor_profile_id,
+        flightInstant,
+        request.id,
+      );
+
+      if (instructorConflict) {
+        return {
+          ok: false,
+          message: buildInstructorDofConflictMessage(
+            flightInstant,
+            instructorConflict.filedByName,
           ),
         };
       }
@@ -238,6 +253,31 @@ export const approveFlightRequestAction = actionClient
 
     if (updateError) {
       return { ok: false, message: describeActionError(updateError) };
+    }
+
+    if (!flightInstant) {
+      return { ok: true, message: "Flight request approved." };
+    }
+
+    try {
+      const declined = await declineConflictingPendingRequests({
+        aircraftId: flightPlan.aircraft_id,
+        aircraftLabel: flightPlan.aircraft_identification,
+        approvedPilotName: flightPlan.pilot_name || "another pilot",
+        approvedRequestId: request.id,
+        declinedBy: actor.id,
+        flightInstant,
+        instructorId: request.instructor_profile_id,
+      });
+
+      if (declined > 0) {
+        return {
+          ok: true,
+          message: `Flight request approved. ${declined === 1 ? "1 other request" : `${declined} other requests`} for the same aircraft or instructor at this date and time ${declined === 1 ? "was" : "were"} automatically declined.`,
+        };
+      }
+    } catch (error) {
+      console.error("[approve-flight-request] decline sweep failed", error);
     }
 
     return { ok: true, message: "Flight request approved." };

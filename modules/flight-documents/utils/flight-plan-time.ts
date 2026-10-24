@@ -136,6 +136,24 @@ export function resolveFlightInstant(dateIso: string, hhmm: string): string {
   return new Date(instant).toISOString();
 }
 
+// The plan's scheduled departure instant: the date of flight at the
+// filed departure time, or the filing DOF for plans that predate the
+// separate date of flight. This is the slot approvals are matched on.
+export function resolvePlanFlightInstant(plan: {
+  date_of_flight_resolved: string | null;
+  departure_time_raw: string | null;
+  dof_resolved: string | null;
+}): string | null {
+  if (plan.date_of_flight_resolved && plan.departure_time_raw) {
+    return resolveFlightInstant(
+      plan.date_of_flight_resolved,
+      plan.departure_time_raw,
+    );
+  }
+
+  return plan.dof_resolved;
+}
+
 // ISO instant → its local (operations) calendar date as YYYY-MM-DD.
 export function toOperationsDate(iso: string): string {
   const zoned = getZonedParts(new Date(iso), OPERATIONS_TIME_ZONE);
