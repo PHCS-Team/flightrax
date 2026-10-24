@@ -1,8 +1,8 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { PlaneIcon } from "lucide-react";
-import { type ReactNode } from "react";
+import { PlaneIcon, TriangleAlertIcon } from "lucide-react";
+import { useState, type ReactNode } from "react";
 import { useForm, useWatch, type UseFormRegisterReturn } from "react-hook-form";
 
 import { useCreateAircraft } from "@/modules/aircrafts/hooks/use-create-aircraft.action";
@@ -11,9 +11,14 @@ import { useUpdateAircraft } from "@/modules/aircrafts/hooks/use-update-aircraft
 import { aircraftFormSchema } from "@/modules/aircrafts/schemas/aircraft-schema";
 import type {
   Aircraft,
+  AircraftEditSnapshot,
   AircraftFormInput,
 } from "@/modules/aircrafts/types/aircraft";
 import type { AircraftType } from "@/modules/aircrafts/types/aircraft-type";
+import {
+  aircraftToEditSnapshot,
+  getChangedAircraftFields,
+} from "@/modules/aircrafts/utils/aircraft-conflict";
 import {
   AIRCRAFT_PHOTO_MAX_BYTES,
   AIRCRAFT_PHOTO_TYPES,
@@ -40,7 +45,9 @@ import { Textarea } from "@/shared/components/ui/textarea";
 
 const AIRCRAFT_PHOTO_HELPER_TEXT = `JPG, PNG, or WebP only. Maximum file size is ${AIRCRAFT_PHOTO_MAX_BYTES / 1024 / 1024} MB. New uploads replace the current image.`;
 
-function getDefaultValues(aircraft?: Aircraft): AircraftFormInput {
+function getDefaultValues(
+  aircraft?: Aircraft | AircraftEditSnapshot,
+): AircraftFormInput {
   return {
     registrationNumber: aircraft?.registrationNumber ?? "",
     aircraftType: aircraft?.aircraftType ?? "",
@@ -70,10 +77,16 @@ export function AircraftFormDialog({
     resolver: zodResolver(aircraftFormSchema),
     defaultValues: getDefaultValues(aircraft),
   });
+  const [baseline, setBaseline] = useState<AircraftEditSnapshot | null>(() =>
+    aircraft ? aircraftToEditSnapshot(aircraft) : null,
+  );
+  const [conflict, setConflict] = useState<AircraftEditSnapshot | null>(null);
   const createAircraft = useCreateAircraft({
     onSaved: () => handleSaved(),
   });
   const updateAircraft = useUpdateAircraft({
+    onConflict: setConflict,
+    onDeleted: () => onOpenChange(false),
     onSaved: () => handleSaved(),
   });
   const { aircraftTypes } = useAircraftTypes();
@@ -96,18 +109,54 @@ export function AircraftFormDialog({
   function handleDialogOpenChange(nextOpen: boolean) {
     if (nextOpen) {
       form.reset(getDefaultValues(aircraft));
+      setBaseline(aircraft ? aircraftToEditSnapshot(aircraft) : null);
+      setConflict(null);
     }
 
     onOpenChange(nextOpen);
   }
 
-  function handleSubmit(values: AircraftFormInput) {
+  function saveAircraft(values: AircraftFormInput, expectedUpdatedAt: string) {
     if (aircraft) {
-      updateAircraft.execute({ ...values, aircraftId: aircraft.id });
+      updateAircraft.execute({
+        ...values,
+        aircraftId: aircraft.id,
+        expectedUpdatedAt,
+      });
+    }
+  }
+
+  function handleSubmit(values: AircraftFormInput) {
+    if (aircraft && baseline) {
+      saveAircraft(values, baseline.updatedAt);
       return;
     }
 
     createAircraft.execute(values);
+  }
+
+  function handleLoadLatest() {
+    if (!conflict) {
+      return;
+    }
+
+    form.reset(getDefaultValues(conflict));
+    setBaseline(conflict);
+    setConflict(null);
+  }
+
+  function handleOverwrite() {
+    if (!conflict) {
+      return;
+    }
+
+    const latest = conflict;
+
+    setBaseline(latest);
+    setConflict(null);
+    void form.handleSubmit((values) =>
+      saveAircraft(values, latest.updatedAt),
+    )();
   }
 
   return (
@@ -267,6 +316,16 @@ export function AircraftFormDialog({
             variant="default"
           />
 
+          {conflict && baseline && (
+            <AircraftConflictNotice
+              changedFields={getChangedAircraftFields(baseline, conflict)}
+              disabled={isExecuting}
+              onLoadLatest={handleLoadLatest}
+              onOverwrite={handleOverwrite}
+              registrationMark={conflict.registrationMark}
+            />
+          )}
+
           <DialogFooter className="-mx-6 -mb-6 mt-1 sm:justify-end">
             <Button
               disabled={isExecuting}
@@ -276,7 +335,11 @@ export function AircraftFormDialog({
             >
               Cancel
             </Button>
-            <Button disabled={isExecuting} type="submit">
+            <Button
+              className="disabled:cursor-default"
+              disabled={isExecuting || Boolean(conflict)}
+              type="submit"
+            >
               {isExecuting
                 ? isEditing
                   ? "Saving..."
@@ -289,6 +352,65 @@ export function AircraftFormDialog({
         </form>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function AircraftConflictNotice({
+  changedFields,
+  disabled,
+  onLoadLatest,
+  onOverwrite,
+  registrationMark,
+}: {
+  changedFields: string[];
+  disabled: boolean;
+  onLoadLatest: () => void;
+  onOverwrite: () => void;
+  registrationMark: string;
+}) {
+  return (
+    <div
+      className="grid gap-3 rounded-lg border border-amber-500/50 bg-amber-500/10 px-3 py-3"
+      role="alert"
+    >
+      <div className="flex items-start gap-2">
+        <TriangleAlertIcon className="mt-0.5 size-4 shrink-0 text-amber-600" />
+        <div className="grid gap-1 text-sm leading-relaxed text-amber-800">
+          <p className="font-semibold">Updated By Another User</p>
+          <p>
+            Someone else saved changes to {registrationMark} while you were
+            editing, so your changes were not saved.
+            {changedFields.length > 0 &&
+              ` They changed: ${changedFields.join(", ")}.`}
+          </p>
+          <p>
+            Load their latest details and edit again, or save your version and
+            replace theirs.
+          </p>
+        </div>
+      </div>
+      <div className="flex gap-2 *:flex-1 sm:justify-end sm:*:flex-initial">
+        <Button
+          className="disabled:cursor-default"
+          disabled={disabled}
+          onClick={onLoadLatest}
+          size="sm"
+          type="button"
+          variant="outline"
+        >
+          Load latest
+        </Button>
+        <Button
+          className="disabled:cursor-default"
+          disabled={disabled}
+          onClick={onOverwrite}
+          size="sm"
+          type="button"
+        >
+          Save mine anyway
+        </Button>
+      </div>
+    </div>
   );
 }
 

@@ -17,7 +17,7 @@ export function useDeleteAircraft({
     onSuccess: ({ data }) => {
       toastActionResult(data);
 
-      if (data?.ok) {
+      if (data?.ok || data?.reason) {
         queryClient.invalidateQueries({ queryKey: AIRCRAFTS_QUERY_KEYS.all });
         onDeleted?.();
       }

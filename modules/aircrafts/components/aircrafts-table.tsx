@@ -551,7 +551,10 @@ export function AircraftsTable({
 
       {editingAircraft && (
         <AircraftFormDialog
-          aircraft={editingAircraft}
+          aircraft={
+            aircrafts.find((a) => a.id === editingAircraft.id) ??
+            editingAircraft
+          }
           onOpenChange={(open) => {
             if (!open) {
               setEditingAircraft(null);

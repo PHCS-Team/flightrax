@@ -29,6 +29,20 @@ export type AircraftListRow = Pick<
   | "updated_at"
 >;
 
+export type AircraftVersionRow = Pick<
+  AircraftRow,
+  | "registration_number"
+  | "aircraft_type"
+  | "color_markings"
+  | "id"
+  | "registration_mark"
+  | "photo_path"
+  | "remarks"
+  | "serial_number"
+  | "status"
+  | "updated_at"
+>;
+
 export type AircraftTypeWbSpecs = {
   usableFuelArm: number | null;
   fiAndStudentArm: number | null;
@@ -62,3 +76,18 @@ export type DeleteAircraftInput = z.infer<typeof deleteAircraftSchema>;
 export type UpdateAircraftStatusInput = z.infer<
   typeof updateAircraftStatusSchema
 >;
+
+export type AircraftEditSnapshot = Omit<AircraftFormInput, "photo"> & {
+  photoPath: string | null;
+  updatedAt: string;
+};
+
+export type AircraftWriteResult =
+  | { ok: true; message: string; reason?: never }
+  | { ok: false; message: string; reason?: "deleted" | "in-use" }
+  | {
+      ok: false;
+      message: string;
+      reason: "changed";
+      latest: AircraftEditSnapshot;
+    };

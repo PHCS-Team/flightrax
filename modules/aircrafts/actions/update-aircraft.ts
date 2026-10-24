@@ -2,9 +2,14 @@
 
 import { updateAircraftSchema } from "@/modules/aircrafts/schemas/aircraft-schema";
 import type {
-  AircraftRow,
   AircraftUpdate,
+  AircraftWriteResult,
 } from "@/modules/aircrafts/types/aircraft";
+import {
+  AIRCRAFT_DELETED_WHILE_EDITING_MESSAGE,
+  AIRCRAFT_VERSION_SELECT,
+  toAircraftEditSnapshot,
+} from "@/modules/aircrafts/utils/aircraft-conflict";
 import { getAircraftPhotoPath } from "@/modules/aircrafts/utils/aircraft-photo";
 import { canManageAircrafts } from "@/modules/aircrafts/utils/aircraft-permissions";
 import { getAircraftWriteErrorMessage } from "@/modules/aircrafts/utils/aircraft-write-error";
@@ -16,7 +21,7 @@ import { describeActionError } from "@/shared/lib/action-error";
 
 export const updateAircraftAction = actionClient
   .inputSchema(updateAircraftSchema)
-  .action(async ({ parsedInput }) => {
+  .action(async ({ parsedInput }): Promise<AircraftWriteResult> => {
     const actor = await getCurrentAuthorizationProfile();
 
     if (!canManageAircrafts(actor)) {
@@ -27,10 +32,38 @@ export const updateAircraftAction = actionClient
     }
 
     const supabase = createAdminClient();
+
+    async function getConflictResult(): Promise<AircraftWriteResult> {
+      const { data: latest, error: latestError } = await supabase
+        .from("aircrafts")
+        .select(AIRCRAFT_VERSION_SELECT)
+        .eq("id", parsedInput.aircraftId)
+        .maybeSingle();
+
+      if (latestError) {
+        return { ok: false, message: describeActionError(latestError) };
+      }
+
+      if (!latest) {
+        return {
+          ok: false,
+          message: AIRCRAFT_DELETED_WHILE_EDITING_MESSAGE,
+          reason: "deleted",
+        };
+      }
+
+      return {
+        ok: false,
+        latest: toAircraftEditSnapshot(latest),
+        message: `Another user saved changes to ${latest.registration_mark} while you were editing. Your changes were not saved.`,
+        reason: "changed",
+      };
+    }
+
     const { data: currentAircraft, error: currentAircraftError } =
       await supabase
         .from("aircrafts")
-        .select("id, photo_path")
+        .select("id, photo_path, updated_at")
         .eq("id", parsedInput.aircraftId)
         .maybeSingle();
 
@@ -38,14 +71,13 @@ export const updateAircraftAction = actionClient
       return { ok: false, message: describeActionError(currentAircraftError) };
     }
 
-    if (!currentAircraft) {
-      return { ok: false, message: "Choose an existing aircraft." };
+    if (
+      !currentAircraft ||
+      currentAircraft.updated_at !== parsedInput.expectedUpdatedAt
+    ) {
+      return getConflictResult();
     }
 
-    const target = currentAircraft satisfies Pick<
-      AircraftRow,
-      "id" | "photo_path"
-    >;
     const newPhotoPath = parsedInput.photo
       ? getAircraftPhotoPath(parsedInput.aircraftId, parsedInput.photo.type)
       : null;
@@ -60,6 +92,14 @@ export const updateAircraftAction = actionClient
 
       if (uploadError) {
         return { ok: false, message: describeActionError(uploadError) };
+      }
+    }
+
+    async function removeUploadedPhoto() {
+      if (newPhotoPath) {
+        await supabase.storage
+          .from(AIRCRAFT_PHOTOS_BUCKET)
+          .remove([newPhotoPath]);
       }
     }
 
@@ -80,29 +120,36 @@ export const updateAircraftAction = actionClient
       updateValues.photo_uploaded_at = new Date().toISOString();
     }
 
-    const { error } = await supabase
+    // The updated_at filter makes the version check atomic: a save or delete
+    // that lands between the read above and this write matches zero rows.
+    const { data: updated, error } = await supabase
       .from("aircrafts")
       .update(updateValues)
-      .eq("id", parsedInput.aircraftId);
+      .eq("id", parsedInput.aircraftId)
+      .eq("updated_at", parsedInput.expectedUpdatedAt)
+      .select("id")
+      .maybeSingle();
 
     if (error) {
-      if (newPhotoPath) {
-        await supabase.storage
-          .from(AIRCRAFT_PHOTOS_BUCKET)
-          .remove([newPhotoPath]);
-      }
+      await removeUploadedPhoto();
 
       return { ok: false, message: getAircraftWriteErrorMessage(error) };
     }
 
+    if (!updated) {
+      await removeUploadedPhoto();
+
+      return getConflictResult();
+    }
+
     if (
       newPhotoPath &&
-      target.photo_path &&
-      target.photo_path !== newPhotoPath
+      currentAircraft.photo_path &&
+      currentAircraft.photo_path !== newPhotoPath
     ) {
       await supabase.storage
         .from(AIRCRAFT_PHOTOS_BUCKET)
-        .remove([target.photo_path]);
+        .remove([currentAircraft.photo_path]);
     }
 
     return { ok: true, message: "Aircraft saved." };

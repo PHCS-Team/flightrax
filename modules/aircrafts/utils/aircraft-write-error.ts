@@ -1,3 +1,5 @@
+import { describeActionError } from "@/shared/lib/action-error";
+
 // Postgres unique_violation. The constraint name rides in the message, so
 // the user hears which field collided instead of a raw database error.
 const UNIQUE_VIOLATION = "23505";
@@ -16,7 +18,7 @@ export function getAircraftWriteErrorMessage(error: {
   message: string;
 }): string {
   if (error.code !== UNIQUE_VIOLATION) {
-    return error.message;
+    return describeActionError(error);
   }
 
   const hit = Object.entries(DUPLICATE_MESSAGES).find(([constraint]) =>

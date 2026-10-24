@@ -1,6 +1,8 @@
 "use server";
 
 import { updateAircraftStatusSchema } from "@/modules/aircrafts/schemas/aircraft-schema";
+import type { AircraftWriteResult } from "@/modules/aircrafts/types/aircraft";
+import { AIRCRAFT_NO_LONGER_EXISTS_MESSAGE } from "@/modules/aircrafts/utils/aircraft-conflict";
 import { canManageAircrafts } from "@/modules/aircrafts/utils/aircraft-permissions";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { actionClient } from "@/shared/lib/safe-action";
@@ -9,7 +11,7 @@ import { describeActionError } from "@/shared/lib/action-error";
 
 export const updateAircraftStatusAction = actionClient
   .inputSchema(updateAircraftStatusSchema)
-  .action(async ({ parsedInput }) => {
+  .action(async ({ parsedInput }): Promise<AircraftWriteResult> => {
     const actor = await getCurrentAuthorizationProfile();
 
     if (!canManageAircrafts(actor)) {
@@ -32,7 +34,11 @@ export const updateAircraftStatusAction = actionClient
     }
 
     if (!data) {
-      return { ok: false, message: "Choose an existing aircraft." };
+      return {
+        ok: false,
+        message: AIRCRAFT_NO_LONGER_EXISTS_MESSAGE,
+        reason: "deleted",
+      };
     }
 
     return { ok: true, message: "Aircraft status updated." };

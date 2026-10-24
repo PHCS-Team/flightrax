@@ -59,6 +59,7 @@ export const createAircraftSchema = aircraftFormSchema;
 
 export const updateAircraftSchema = aircraftFormSchema.extend({
   aircraftId: z.string().uuid(),
+  expectedUpdatedAt: z.string().min(1),
 });
 
 export const updateAircraftStatusSchema = z.object({
@@ -68,4 +69,5 @@ export const updateAircraftStatusSchema = z.object({
 
 export const deleteAircraftSchema = z.object({
   aircraftId: z.string().uuid(),
+  expectedUpdatedAt: z.string().min(1),
 });

@@ -15,7 +15,7 @@ export function useUpdateAircraftStatus() {
     onSuccess: ({ data }) => {
       toastActionResult(data);
 
-      if (data?.ok) {
+      if (data?.ok || data?.reason === "deleted") {
         queryClient.invalidateQueries({ queryKey: AIRCRAFTS_QUERY_KEYS.all });
       }
     },

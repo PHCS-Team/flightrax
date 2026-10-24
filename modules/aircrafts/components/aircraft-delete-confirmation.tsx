@@ -25,14 +25,17 @@ export function AircraftDeleteConfirmation({
       confirmingLabel="Deleting..."
       description={
         aircraft
-          ? `${aircraft.registrationMark} will be removed from the fleet. Its image, weight and balance configurations, and any flight records will also be deleted.`
+          ? `${aircraft.registrationMark} will be removed from the fleet, along with its image, weight and balance configuration, and schedule entries. Aircraft with filed flight plans cannot be deleted; set them to Retired instead.`
           : "Remove this aircraft from the fleet."
       }
       icon={Trash2Icon}
       isConfirming={deleteAircraft.isExecuting}
       onConfirm={() => {
         if (aircraft) {
-          deleteAircraft.execute({ aircraftId: aircraft.id });
+          deleteAircraft.execute({
+            aircraftId: aircraft.id,
+            expectedUpdatedAt: aircraft.updatedAt,
+          });
         }
       }}
       onOpenChange={onOpenChange}

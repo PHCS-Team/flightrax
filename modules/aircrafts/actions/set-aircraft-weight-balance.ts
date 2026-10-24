@@ -1,15 +1,21 @@
 "use server";
 
 import { setAircraftWeightBalanceSchema } from "@/modules/aircrafts/schemas/aircraft-weight-balance-schema";
+import type { AircraftWriteResult } from "@/modules/aircrafts/types/aircraft";
+import { AIRCRAFT_DELETED_WHILE_EDITING_MESSAGE } from "@/modules/aircrafts/utils/aircraft-conflict";
 import { canManageAircrafts } from "@/modules/aircrafts/utils/aircraft-permissions";
 import { getCurrentAuthorizationProfile } from "@/shared/lib/rbac/authorization-profile";
 import { actionClient } from "@/shared/lib/safe-action";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
 import { describeActionError } from "@/shared/lib/action-error";
 
+// Postgres foreign_key_violation: the aircraft was deleted between the
+// existence check and the insert.
+const FOREIGN_KEY_VIOLATION = "23503";
+
 export const setAircraftWeightBalanceAction = actionClient
   .inputSchema(setAircraftWeightBalanceSchema)
-  .action(async ({ parsedInput }) => {
+  .action(async ({ parsedInput }): Promise<AircraftWriteResult> => {
     const actor = await getCurrentAuthorizationProfile();
 
     if (!canManageAircrafts(actor)) {
@@ -33,7 +39,11 @@ export const setAircraftWeightBalanceAction = actionClient
     }
 
     if (!aircraft) {
-      return { ok: false, message: "Choose an existing aircraft." };
+      return {
+        ok: false,
+        message: AIRCRAFT_DELETED_WHILE_EDITING_MESSAGE,
+        reason: "deleted",
+      };
     }
 
     const config = {
@@ -67,6 +77,14 @@ export const setAircraftWeightBalanceAction = actionClient
         .insert({ aircraft_id: parsedInput.aircraftId, ...config });
 
       error = insertError;
+    }
+
+    if (error?.code === FOREIGN_KEY_VIOLATION) {
+      return {
+        ok: false,
+        message: AIRCRAFT_DELETED_WHILE_EDITING_MESSAGE,
+        reason: "deleted",
+      };
     }
 
     if (error) {
